@@ -7,7 +7,7 @@
   }catch(e){}
   if(reduced) return;
 
-  // SPACE_RIBBONS_LAYERED_START v20.20.6: unified runtime scheduling; keep visual, avoid old-frame phase flash.
+  // SPACE_RIBBONS_LAYERED_START v20.20.6：统一运行时调度；保留视觉效果，避免旧帧相位闪现。
 
   var SVG_NS = 'http://www.w3.org/2000/svg';
   var isAdmin = document.documentElement.hasAttribute('data-admin-theme') || location.pathname.indexOf('/admin') === 0 || location.pathname.indexOf('/articles') === 0;

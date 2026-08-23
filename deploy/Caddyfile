@@ -1,9 +1,29 @@
-# 改成你的真实域名
-write.example.com {
-    reverse_proxy 127.0.0.1:8080
-}
+# 统一站点入口：公开博客在 /，投稿后台在 /write/。
+# 使用前设置 SITE_HOST（例如 blog.example.com）与 PUBLIC_DIR；默认值仅作示例。
+{$SITE_HOST:blog.example.com} {
+    encode zstd gzip
 
-blog.example.com {
-    root * /opt/gexian-blog-mvp-v2/published
-    file_server
+    redir /write /write/ permanent
+    handle_path /write/* {
+        reverse_proxy 127.0.0.1:8080
+    }
+
+    @adminAssets path /static/*
+    handle @adminAssets {
+        reverse_proxy 127.0.0.1:8080
+    }
+
+    @publicAPI path /api/*
+    handle @publicAPI {
+        reverse_proxy 127.0.0.1:8080
+    }
+
+    handle /healthz {
+        reverse_proxy 127.0.0.1:8080
+    }
+
+    handle {
+        root * {$PUBLIC_DIR:/opt/gexian-blog-mvp-v2/published}
+        file_server
+    }
 }

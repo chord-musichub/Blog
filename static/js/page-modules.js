@@ -128,7 +128,7 @@
     }
     if(loading[mod.key]) return;
 
-    // If the script tag already exists from server-side partial, mark loaded-ish and init soon.
+    // 若服务端局部模板已输出脚本标签，先标记为即将加载，再尽快初始化。
     var existing = document.querySelector('script[data-page-script="' + mod.key + '"], script[src*="' + mod.src.split('?')[0] + '"]');
     if(existing){
       loading[mod.key] = true;
@@ -137,7 +137,7 @@
         loading[mod.key] = false;
         mod.init(root || document);
       }, {once:true});
-      // It may already be loaded.
+      // 它可能已经加载完成。
       window.setTimeout(function(){
         if(loaded[mod.key]) return;
         loaded[mod.key] = true;

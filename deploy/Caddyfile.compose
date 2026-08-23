@@ -1,0 +1,30 @@
+:80 {
+    encode zstd gzip
+
+    # 后台在同一站点下使用 /write/，转发前移除路径前缀。
+    redir /write /write/ permanent
+    handle_path /write/* {
+        reverse_proxy blog-admin:8080
+    }
+
+    # 后台资源与公开工具接口仍由 Go 服务处理。
+    @adminAssets path /static/*
+    handle @adminAssets {
+        reverse_proxy blog-admin:8080
+    }
+
+    @publicAPI path /api/*
+    handle @publicAPI {
+        reverse_proxy blog-admin:8080
+    }
+
+    handle /healthz {
+        reverse_proxy blog-admin:8080
+    }
+
+    # 其余请求均为 Hugo 已生成的公开博客。
+    handle {
+        root * /srv
+        file_server
+    }
+}

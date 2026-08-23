@@ -636,6 +636,6 @@
 })();
 
 
-/* v20.18.5-cleanup note:
+/* v20.18.5-cleanup 说明：
    阅读器置顶/置底按钮现在只由 SonglineNormalizeFloatReadingButtons 的 body portal 逻辑接管。
 */

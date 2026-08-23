@@ -100,7 +100,7 @@ body.dark .area-more:hover,body.dark .area-more:focus-visible{background:#203753
 body.dark .social-row a{background:#1e2d42;color:#eaf6ff}
 .social-row img{width:24px;height:24px}
 .footer{max-width:var(--max);margin:34px auto 0;padding:26px 34px;text-align:center;color:var(--muted);border-top:1px solid rgba(203,213,225,.45)}
-/* Archive pages */
+/* 归档页面 */
 .page-hero{border:1px solid var(--border);border-radius:var(--radius);min-height:270px;padding:58px;background:var(--panel);background-size:cover;background-position:center;box-shadow:var(--shadow);position:relative;overflow:hidden;margin-bottom:34px}
 .page-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,253,250,.86),rgba(255,253,250,.38))}
 body.dark .page-hero:before{background:linear-gradient(90deg,rgba(15,23,42,.76),rgba(15,23,42,.32))}
@@ -133,7 +133,7 @@ body.dark .page-hero:before{background:linear-gradient(90deg,rgba(15,23,42,.76),
 .panel-two{display:grid;grid-template-columns:1fr 1fr;gap:24px}.panel-two .card{padding:24px}
 .activity-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}.activity-list li{display:flex;justify-content:space-between;gap:18px;color:#405871}
 .friend-hero{display:grid;grid-template-columns:160px minmax(0,1fr);gap:28px;align-items:center}.friend-hero .avatar{width:140px;height:140px;margin:0}.friend-hero h1{margin:0 0 10px;font-size:46px}
-/* Markdown single */
+/* Markdown 文章详情页 */
 .article-shell{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:28px;align-items:start}
 .article-reader{padding:28px 34px}
 .article-toc{padding:22px;position:sticky;top:110px;max-height:calc(100vh - 130px);overflow:auto}
@@ -3605,11 +3605,11 @@ body.dark a.notice-badge:hover{
   transform:none;
 }
 
-/* v11.9: rebuild.sh migrates legacy notice front matter to stable /tags/site-notice/. */
+/* 公告页使用稳定的 /tags/site-notice/ 路径。 */
 
-/* v12.0: repair notice front matter delimiter written by v11.9 rebuild script. */
+/* v12.0：修复 v11.9 重建脚本写入的公告 Front Matter 分隔符。 */
 
-/* v12.1: robustly repair malformed front matter delimiters before Hugo build. */
+/* v12.1：在 Hugo 构建前稳健地修复格式错误的 Front Matter 分隔符。 */
 
 
 /* v12.2：首页公告标签视觉降噪，公告 tag 作为保护标签 */
@@ -7156,7 +7156,7 @@ body.dark .posts-list .post-card .tag{
    post-card.html 保持单一结构，不维护第二套卡片 partial。
 */
 
-/* v18.0: /posts flatten is handled locally in layouts/posts/list.html plus a tiny JS fallback. */
+/* v18.0：/posts 的扁平化由 layouts/posts/list.html 局部处理，并保留轻量 JS 兜底。 */
 
 
 /* v18.0：文章卡片摘要裁剪 + hover 统一兜底 */
@@ -11515,7 +11515,7 @@ html body .page-hero > h1 + p{
     radial-gradient(circle at 42% 30%, rgba(255,255,255,.12), transparent 22%),
     linear-gradient(118deg, transparent 36%, rgba(14,30,74,.06) 56%, rgba(14,30,74,.20) 100%);
 }
-/* retired in v20.18.5 to avoid stray vertical lines */
+/* v20.18.5 起已停用，避免出现多余的竖线。 */
 .waapi-planet-field{display:none;
   position:absolute;
   left:50%;top:50%;
@@ -11726,7 +11726,7 @@ body.dark .waapi-planet-field::before{display:none;border-color:rgba(125,211,252
   .waapi-planet{width:184px;height:184px}
   .waapi-planet-ring{width:284px;height:98px}
   .waapi-planet-dust{width:316px;height:154px}
-  /* retired in v20.18.5 to avoid stray vertical lines */
+  /* v20.18.5 起已停用，避免出现多余的竖线。 */
 .waapi-planet-field{display:none;width:254px;height:254px}
   .waapi-satellite{min-width:100px;padding:9px 11px}
   .waapi-satellite-text small{display:none}
@@ -11781,7 +11781,7 @@ body.dark .waapi-planet-field::before{display:none;border-color:rgba(125,211,252
   .waapi-satellite,.waapi-gateway-more,.waapi-planet-aura,.waapi-planet-dust,.waapi-planet-nebula,.waapi-planet-ribbon,.waapi-planet-field,.waapi-planet-moon{transition:none!important;animation:none!important}
 }
 
-/* v20.18.5 hardening: remove large animated/blurred center boxes that can leak rectangular compositing edges. */
+/* v20.18.5 加固：移除大型动画/模糊中心块，避免矩形合成边缘泄漏。 */
 .waapi-planet-dust,
 .waapi-planet-nebula,
 .waapi-planet-ribbon,
@@ -17766,7 +17766,7 @@ body > .scroll-to-bottom-button[data-songline-float-portal="1"]:focus-visible{
   }
 }
 
-/* v20.18.5-cleanup final note:
+/* v20.18.5-cleanup 最终说明：
    当前稳定交互入口：
    - 星轨背景：.songline-starstream-layer / .starstream-*
    - 手机端目录：mobile-toc.js + .mobile-toc-drawer / .mobile-toc-fab
@@ -22024,7 +22024,7 @@ body:has(.audio-visualizer-page) .back-icon-link[data-back-icon]::after{
   text-shadow:0 0 18px rgba(125,211,252,.28)!important;
 }
 
-/* browser captured audio still should not show song card */
+/* 浏览器捕获的音频仍不应显示歌曲信息卡。 */
 .audio-visualizer-page.is-browser-audio-live .av-now,
 .audio-visualizer-page.is-visual-live.is-browser-audio-live .av-now,
 .audio-visualizer-page.is-visual-live.is-browser-audio-live.has-track .av-now{
@@ -23009,7 +23009,7 @@ body.dark .focus-finish-card{background:linear-gradient(145deg,rgba(15,23,42,.96
 }
 
 
-/* v20.21.19：星轨专注钟功能与白点循环修复 START */
+/* v20.21.19：星轨专注钟功能与白点循环修复开始 */
 .focus-timer-page .focus-main-card::before,
 .focus-timer-page .focus-orbit::before,
 .focus-timer-page .focus-orbit::after,
@@ -23056,10 +23056,10 @@ body.dark .focus-finish-card{background:linear-gradient(145deg,rgba(15,23,42,.96
   from{ transform: rotate(0deg) translateX(112px) rotate(0deg); }
   to{ transform: rotate(360deg) translateX(112px) rotate(-360deg); }
 }
-/* v20.21.19：星轨专注钟功能与白点循环修复 END */
+/* v20.21.19：星轨专注钟功能与白点循环修复结束 */
 
 
-/* v20.21.20：星轨专注钟点击保障 START */
+/* v20.21.20：星轨专注钟点击保障开始 */
 .focus-timer-page .focus-main-card::before,
 .focus-timer-page .focus-main-card::after,
 .focus-timer-page .focus-orbit::before,
@@ -23079,10 +23079,10 @@ body.dark .focus-finish-card{background:linear-gradient(145deg,rgba(15,23,42,.96
 .focus-timer-page input{
   pointer-events:auto!important;
 }
-/* v20.21.20：星轨专注钟点击保障 END */
+/* v20.21.20：星轨专注钟点击保障结束 */
 
 
-/* v20.21.21：星轨专注钟渐变边框修复 START */
+/* v20.21.21：星轨专注钟渐变边框修复开始 */
 .focus-timer-page .focus-panel,
 .focus-timer-page .focus-side-section,
 .focus-timer-page .focus-note{
@@ -23157,7 +23157,4 @@ body.dark .focus-finish-card{background:linear-gradient(145deg,rgba(15,23,42,.96
 .focus-timer-page .focus-panel::after{
   pointer-events: none !important;
 }
-/* v20.21.21：星轨专注钟渐变边框修复 END */
-
-
-
+/* v20.21.21：星轨专注钟渐变边框修复结束 */

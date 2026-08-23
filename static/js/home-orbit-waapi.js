@@ -1,7 +1,7 @@
-/* v20.18.5: Home WAAPI orbital gateway.
- * Adapted for this project from the MIT-licensed WAAPI solar-system structure by Juan David Nicholls Cardona:
+/* v20.18.5：首页 WAAPI 轨道入口。
+ * 本项目改编自 Juan David Nicholls Cardona 发布的 MIT 许可 WAAPI solar-system 结构：
  * https://github.com/jdnichollsc/solar-systems
- * The implementation below keeps the same Web Animations API idea, but uses the blog's own DOM, icons, links, and responsive layout.
+ * 下方实现保留 Web Animations API 的设计思路，但使用本博客自己的 DOM、图标、链接与响应式布局。
  */
 (function(){
   'use strict';

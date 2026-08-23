@@ -12,12 +12,29 @@ services:
       ADMIN_USER: "${ADMIN_USER:?Run deploy/init-local.ps1 to create .env first}"
       ADMIN_PASS: "${ADMIN_PASS:?Run deploy/init-local.ps1 to create .env first}"
       SESSION_SECRET: "${SESSION_SECRET:?Run deploy/init-local.ps1 to create .env first}"
-      ADMIN_BASE_PATH: "${ADMIN_BASE_PATH:-}"
+      ADMIN_BASE_PATH: "${ADMIN_BASE_PATH:-/write}"
       PUBLIC_BASE_URL: "${PUBLIC_BASE_URL:-/}"
+      PUBLIC_SITE_URL: "${PUBLIC_SITE_URL:-}"
+      PUBLIC_API_URL: "${PUBLIC_API_URL:-}"
+      PUBLIC_CORS_ORIGINS: "${PUBLIC_CORS_ORIGINS:-}"
+      HUGO_BUILD_TIMEOUT_SECONDS: "${HUGO_BUILD_TIMEOUT_SECONDS:-180}"
+      MAX_UPLOAD_BYTES: "${MAX_UPLOAD_BYTES:-104857600}"
     volumes:
       - ./data:/app/data
       - ./content:/app/content
       - ./static/uploads:/app/static/uploads
       - ./published:/app/published
+    expose:
+      - "8080"
+
+  blog-web:
+    image: caddy:2.8-alpine
+    container_name: blog-web
+    restart: unless-stopped
+    depends_on:
+      - blog-admin
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./published:/srv:ro
+      - ./deploy/Caddyfile.compose:/etc/caddy/Caddyfile:ro

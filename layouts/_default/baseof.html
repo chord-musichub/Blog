@@ -39,8 +39,8 @@
         if(!reduced && !played){
           document.documentElement.classList.add('is-boot-preparing');
           document.documentElement.style.backgroundColor = '#000';
-          // v20.20.6: refresh fail-safe. If deferred boot JS is cached, interrupted,
-          // or fails before creating the overlay, never leave the whole page hidden.
+          // v20.20.6：刷新兜底。若延迟启动脚本被缓存、中断，
+          // 或在创建遮罩前失败，不能让整个页面一直隐藏。
           window.__songlineBootPrepFallback = window.setTimeout(function(){
             try{
               var root = document.documentElement;

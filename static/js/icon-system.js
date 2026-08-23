@@ -1,5 +1,5 @@
-/* v20.3.5: unified public icon interface.
-   Change icon shapes here; every element with data-ui-icon will refresh from this registry. */
+/* v20.3.5：统一公开站图标接口。
+   在这里修改图标形状；所有带 data-ui-icon 的元素都会从该注册表刷新。 */
 (function(){
   var VERSION = 'v20.3.5';
   var base = 'class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"';

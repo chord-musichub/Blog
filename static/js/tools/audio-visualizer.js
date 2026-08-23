@@ -1359,7 +1359,7 @@
       ctx.restore();
     }
 
-  // REALTIME_AUDIO_SMOOTH_ORBIT_PLANETS v20.20.6
+  // REALTIME_AUDIO_SMOOTH_ORBIT_PLANETS v20.20.6：实时音频平滑驱动轨道星体。
     function drawBackground(e){
       var flow = updateBgFlow(e);
       paletteHue = (paletteHue + 0.08 + flow.bass * 0.22 + flow.mid * 0.08) % 360;

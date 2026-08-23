@@ -3379,7 +3379,7 @@ body.admin-dark .admin-site-bg-layer::after{
   animation-duration:calc(var(--group-drift-duration, 60000ms) * .78)!important;
 }
 
-/* v20.18.5-cleanup final note:
+/* v20.18.5-cleanup 最终说明：
    后台背景动画只保留 starstream 实现：
    - .songline-starstream-layer
    - .starstream-path / .starstream-flow

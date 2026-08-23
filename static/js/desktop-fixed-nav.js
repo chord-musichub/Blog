@@ -14,7 +14,7 @@
     var nodes = Array.prototype.slice.call(document.querySelectorAll(headerSelector));
     if(!nodes.length) return null;
 
-    // Prefer the visible top-level site header.
+    // 优先使用可见的顶层站点页眉。
     for(var i = 0; i < nodes.length; i++){
       var node = nodes[i];
       if(!node || node.closest('.mobile-toc-drawer, .modal, .drawer')) continue;

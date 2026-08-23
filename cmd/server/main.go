@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"net"
@@ -26,251 +25,6 @@ import (
 	"sync"
 	"time"
 )
-
-const (
-	roleAdmin  = "admin"
-	roleAuthor = "author"
-
-	accountSystem = "system"
-	accountOwner  = "owner"
-	accountFriend = "friend"
-
-	stDraft     = "draft"
-	stPending   = "pending"
-	stPublished = "published"
-	stRejected  = "rejected"
-	stDeleted   = "deleted"
-)
-
-type Config struct {
-	Addr              string
-	DataDir           string
-	HugoContentDir    string
-	PublicDir         string
-	HugoCommand       string
-	SessionSecret     string
-	AdminUser         string
-	AdminPass         string
-	AdminBasePath     string
-	PublicBaseURL     string
-	PublicSiteURL     string
-	PublicAPIURL      string
-	PublicCORSOrigins string
-}
-
-type App struct {
-	cfg       Config
-	store     *Store
-	tpl       *template.Template
-	limiter   *Limiter
-	startedAt time.Time
-}
-
-type User struct {
-	Username           string    `json:"username"`
-	DisplayName        string    `json:"display_name"`
-	Role               string    `json:"role"`
-	AccountType        string    `json:"account_type,omitempty"`
-	Bio                string    `json:"bio,omitempty"`
-	Homepage           string    `json:"homepage,omitempty"`
-	Avatar             string    `json:"avatar,omitempty"`
-	Cover              string    `json:"cover,omitempty"`
-	ShowInFriends      bool      `json:"show_in_friends,omitempty"`
-	PasswordHash       string    `json:"password_hash"`
-	CreatedAt          time.Time `json:"created_at"`
-	Disabled           bool      `json:"disabled,omitempty"`
-	PasswordMustChange bool      `json:"password_must_change,omitempty"`
-}
-
-type SnakeScoreRecord struct {
-	Score       int    `json:"score"`
-	CreatedAt   string `json:"created_at"`
-	PlayerID    string `json:"player_id,omitempty"`
-	Username    string `json:"username,omitempty"`
-	DisplayName string `json:"display_name,omitempty"`
-	Mode        string `json:"mode,omitempty"`
-	ArticleID   string `json:"article_id,omitempty"`
-}
-
-type snakeScoreRequest struct {
-	Score     int    `json:"score"`
-	PlayerID  string `json:"player_id,omitempty"`
-	Mode      string `json:"mode,omitempty"`
-	ArticleID string `json:"article_id,omitempty"`
-}
-
-type PublicFriend struct {
-	Username    string   `json:"username"`
-	DisplayName string   `json:"display_name"`
-	Slug        string   `json:"slug"`
-	URL         string   `json:"url"`
-	Bio         string   `json:"bio,omitempty"`
-	Homepage    string   `json:"homepage,omitempty"`
-	Avatar      string   `json:"avatar,omitempty"`
-	Cover       string   `json:"cover,omitempty"`
-	PostCount   int      `json:"post_count"`
-	PostTitles  []string `json:"post_titles,omitempty"`
-	UpdatedAt   string   `json:"updated_at,omitempty"`
-}
-
-type Article struct {
-	ID          string     `json:"id"`
-	Title       string     `json:"title"`
-	Slug        string     `json:"slug"`
-	Author      string     `json:"author"`
-	Tags        []string   `json:"tags"`
-	Summary     string     `json:"summary"`
-	Cover       string     `json:"cover,omitempty"`
-	CoverMode   string     `json:"cover_mode,omitempty"`
-	Body        string     `json:"body"`
-	SourceMD    string     `json:"source_md,omitempty"`
-	Status      string     `json:"status"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
-	PublishedAt *time.Time `json:"published_at,omitempty"`
-	RejectedAt  *time.Time `json:"rejected_at,omitempty"`
-	RejectNote  string     `json:"reject_note,omitempty"`
-}
-
-type PasswordResetRequest struct {
-	ID         string    `json:"id"`
-	Username   string    `json:"username"`
-	Note       string    `json:"note,omitempty"`
-	Status     string    `json:"status"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	ResolvedBy string    `json:"resolved_by,omitempty"`
-}
-
-type SiteSettings struct {
-	Site         SiteBasic          `json:"site"`
-	Home         HomeSettings       `json:"home"`
-	Pages        PageSettings       `json:"pages"`
-	Boot         BootSettings       `json:"boot"`
-	Orbit        OrbitSettings      `json:"orbit"`
-	Manuscript   ManuscriptSettings `json:"manuscript"`
-	Background   BackgroundSettings `json:"background"`
-	AboutCard    AboutCard          `json:"about_card"`
-	Social       SocialSettings     `json:"social"`
-	ContentAreas []ContentArea      `json:"content_areas"`
-}
-
-type SiteBasic struct {
-	Title            string `json:"title"`
-	DisplayName      string `json:"display_name"`
-	FooterText       string `json:"footer_text"`
-	ICP              string `json:"icp"`
-	Logo             string `json:"logo"`
-	LogoIcon         string `json:"logo_icon"`
-	Favicon          string `json:"favicon"`
-	EnableDarkToggle bool   `json:"enable_dark_toggle"`
-}
-type HomeSettings struct {
-	HeroTitle        string `json:"hero_title"`
-	HeroSubtitle     string `json:"hero_subtitle"`
-	HeroImage        string `json:"hero_image"`
-	IntroTitle       string `json:"intro_title"`
-	IntroBody        string `json:"intro_body"`
-	FoundedAt        string `json:"founded_at"`
-	RecommendedCount int    `json:"recommended_count"`
-}
-type PageSettings struct {
-	PostsHeroTitle      string `json:"posts_hero_title"`
-	PostsHeroSubtitle   string `json:"posts_hero_subtitle"`
-	PostsHeroImage      string `json:"posts_hero_image"`
-	TagsHeroTitle       string `json:"tags_hero_title"`
-	TagsHeroSubtitle    string `json:"tags_hero_subtitle"`
-	TagsHeroImage       string `json:"tags_hero_image"`
-	FriendsHeroTitle    string `json:"friends_hero_title"`
-	FriendsHeroSubtitle string `json:"friends_hero_subtitle"`
-	FriendsHeroImage    string `json:"friends_hero_image"`
-	ArticleDefaultCover string `json:"article_default_cover"`
-	TagDefaultCover     string `json:"tag_default_cover"`
-	FriendDefaultCover  string `json:"friend_default_cover"`
-	ToolsHeroTitle      string `json:"tools_hero_title"`
-	ToolsHeroSubtitle   string `json:"tools_hero_subtitle"`
-}
-
-type BootSettings struct {
-	WelcomeText string `json:"welcome_text"`
-}
-
-type OrbitEntry struct {
-	Label       string `json:"label"`
-	Kicker      string `json:"kicker"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Href        string `json:"href"`
-	LinkText    string `json:"link_text"`
-}
-
-type OrbitSettings struct {
-	Title   string     `json:"title"`
-	Posts   OrbitEntry `json:"posts"`
-	Tags    OrbitEntry `json:"tags"`
-	Friends OrbitEntry `json:"friends"`
-	Tools   OrbitEntry `json:"tools"`
-	Notice  OrbitEntry `json:"notice"`
-	About   OrbitEntry `json:"about"`
-}
-
-type ManuscriptSettings struct {
-	DefaultSummary string `json:"default_summary"`
-}
-
-type BackgroundSettings struct {
-	Image   string `json:"image"`
-	Height  string `json:"height"`
-	Blur    string `json:"blur"`
-	Opacity string `json:"opacity"`
-}
-type AboutCard struct {
-	Title       string `json:"title"`
-	AvatarText  string `json:"avatar_text"`
-	AvatarImage string `json:"avatar_image"`
-	Name        string `json:"name"`
-	Body        string `json:"body"`
-}
-type SocialSettings struct {
-	GitHub       string `json:"github"`
-	Email        string `json:"email"`
-	Bilibili     string `json:"bilibili"`
-	ShowGitHub   bool   `json:"show_github"`
-	ShowEmail    bool   `json:"show_email"`
-	ShowBilibili bool   `json:"show_bilibili"`
-	BilibiliIcon string `json:"bilibili_icon"`
-}
-type ContentArea struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Icon        string `json:"icon"`
-	Link        string `json:"link"`
-}
-
-type ThemeSettings struct {
-	Preset       string `json:"preset"`
-	Accent       string `json:"accent"`
-	Accent2      string `json:"accent_2"`
-	Background   string `json:"background"`
-	Panel        string `json:"panel"`
-	Text         string `json:"text"`
-	Muted        string `json:"muted"`
-	Radius       string `json:"radius"`
-	Shadow       string `json:"shadow"`
-	MaxWidth     string `json:"max_width"`
-	HeroHeight   string `json:"hero_height"`
-	ContentWidth string `json:"content_width"`
-	BodyFontSize string `json:"body_font_size"`
-	Watercolor   bool   `json:"watercolor"`
-}
-
-type Store struct {
-	mu       sync.Mutex
-	dataDir  string
-	users    map[string]User
-	articles map[string]Article
-	resets   map[string]PasswordResetRequest
-}
 
 func main() {
 	loadDotEnv(".env")
@@ -287,128 +41,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	funcs := template.FuncMap{
-		"dict": func(values ...any) (map[string]any, error) {
-			if len(values)%2 != 0 {
-				return nil, fmt.Errorf("dict expects even arg count")
-			}
-			m := make(map[string]any, len(values)/2)
-			for i := 0; i < len(values); i += 2 {
-				key, ok := values[i].(string)
-				if !ok {
-					return nil, fmt.Errorf("dict keys must be strings")
-				}
-				m[key] = values[i+1]
-			}
-			return m, nil
-		},
-		"default": func(fallback any, value any) any {
-			switch v := value.(type) {
-			case string:
-				if strings.TrimSpace(v) == "" {
-					return fallback
-				}
-				return v
-			case int:
-				if v == 0 {
-					return fallback
-				}
-				return v
-			case nil:
-				return fallback
-			default:
-				return value
-			}
-		},
-		"joinTags":    func(tags []string) string { return strings.Join(tags, ", ") },
-		"statusText":  statusText,
-		"statusClass": statusClass,
-		"fmtTime": func(t time.Time) string {
-			if t.IsZero() {
-				return ""
-			}
-			return t.Format("2006-01-02 15:04")
-		},
-		"canSubmit":        func(a Article) bool { return a.Status == stDraft || a.Status == stRejected },
-		"canPublish":       func(a Article) bool { return a.Status == stPending || a.Status == stDraft || a.Status == stRejected },
-		"isAdminUser":      func(u User) bool { return u.Role == roleAdmin },
-		"userArticleCount": func(username string) int { return store.ArticleCountByAuthor(username) },
-		"canDeleteUser":    func(u User) bool { return u.Role != roleAdmin && store.ArticleCountByAuthor(u.Username) == 0 },
-		"userDeleteReason": func(u User) string {
-			if u.Role == roleAdmin {
-				return "管理员账号不可删除"
-			}
-			n := store.ArticleCountByAuthor(u.Username)
-			if n > 0 {
-				return fmt.Sprintf("不可删除：该用户还有 %d 篇文章。可以先删除文章，或改用禁用。", n)
-			}
-			return ""
-		},
-		"resetStatusText": resetStatusText,
-		"accountTypeText": accountTypeText,
-		"isSystemAccount": func(t string) bool { return normalizeAccountType("", t) == accountSystem },
-		"isOwnerAccount":  func(t string) bool { return normalizeAccountType("", t) == accountOwner },
-		"isFriendAccount": func(t string) bool { return normalizeAccountType("", t) == accountFriend },
-		"adminURL":        func(p string) string { return adminURLPath(cfg.AdminBasePath, p) },
-		"publicURL":       func() string { return cfg.PublicBaseURL },
-	}
-	tpl := template.Must(template.New("").Funcs(funcs).ParseGlob("web/templates/*.html"))
-
-	app := &App{cfg: cfg, store: store, tpl: tpl, limiter: NewLimiter(), startedAt: time.Now()}
+	app := newApp(cfg, store)
 	if err := app.runHugo(context.Background()); err != nil {
 		log.Printf("initial site build error: %v", err)
 	}
-	mux := http.NewServeMux()
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
-	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("static/uploads"))))
-	mux.HandleFunc("/api/views", app.handleViewsAPI)
-	mux.HandleFunc("/api/tools/snake-scores", app.handleSnakeScoresAPI)
-	mux.HandleFunc("/write/api/tools/snake-scores", app.handleSnakeScoresAPI)
-	mux.HandleFunc("/static/api/snake-scores", app.handleSnakeScoresAPI)
-	mux.HandleFunc("/api/snake-scores", app.handleSnakeScoresAPI)
-	mux.HandleFunc("/api/tools/2048-scores", app.handleGame2048ScoresAPI)
-	mux.HandleFunc("/write/api/tools/2048-scores", app.handleGame2048ScoresAPI)
-	mux.HandleFunc("/static/api/2048-scores", app.handleGame2048ScoresAPI)
-	mux.HandleFunc("/api/2048-scores", app.handleGame2048ScoresAPI)
-	mux.HandleFunc("/api/tools/reaction-scores", app.handleReactionScoresAPI)
-	mux.HandleFunc("/write/api/tools/reaction-scores", app.handleReactionScoresAPI)
-	mux.HandleFunc("/static/api/reaction-scores", app.handleReactionScoresAPI)
-	mux.HandleFunc("/api/reaction-scores", app.handleReactionScoresAPI)
-	mux.HandleFunc("/api/tools/flappy-scores", app.handleFlappyScoresAPI)
-	mux.HandleFunc("/write/api/tools/flappy-scores", app.handleFlappyScoresAPI)
-	mux.HandleFunc("/static/api/flappy-scores", app.handleFlappyScoresAPI)
-	mux.HandleFunc("/api/flappy-scores", app.handleFlappyScoresAPI)
-	mux.HandleFunc("/api/tools/typing-scores", app.handleTypingScoresAPI)
-	mux.HandleFunc("/write/api/tools/typing-scores", app.handleTypingScoresAPI)
-	mux.HandleFunc("/static/api/typing-scores", app.handleTypingScoresAPI)
-	mux.HandleFunc("/api/typing-scores", app.handleTypingScoresAPI)
-	mux.HandleFunc("/", app.handleHome)
-	mux.HandleFunc("/healthz", app.handleHealth)
-	mux.HandleFunc("/login", app.withRate("login", 10, time.Minute, app.handleLogin))
-	mux.HandleFunc("/logout", app.handleLogout)
-	mux.HandleFunc("/account", app.requireLogin(app.handleAccount))
-	mux.HandleFunc("/password/request", app.withRate("password-request", 5, time.Hour, app.handlePasswordResetRequest))
-	mux.HandleFunc("/articles/new", app.requireLogin(app.handleNewArticle))
-	mux.HandleFunc("/articles/upload", app.requireLogin(app.handleUploadArticle))
-	mux.HandleFunc("/articles/", app.requireLogin(app.handleArticleRoutes))
-	mux.HandleFunc("/admin", app.requireAdmin(app.handleAdmin))
-	mux.HandleFunc("/admin/site", app.requireAdmin(app.handleSiteSettings))
-	mux.HandleFunc("/admin/manuscript", app.requireAdmin(app.handleManuscriptSettings))
-	mux.HandleFunc("/admin/theme", app.requireAdmin(app.handleThemeSettings))
-	mux.HandleFunc("/admin/media", app.requireLogin(app.handleMediaLibrary))
-	mux.HandleFunc("/admin/cleanup", app.requireAdmin(app.handleCleanup))
-	mux.HandleFunc("/admin/password-requests/", app.requireAdmin(app.handlePasswordRequestRoutes))
-	mux.HandleFunc("/users/new", app.requireAdmin(app.handleNewUser))
-	mux.HandleFunc("/users/", app.requireAdmin(app.handleUserRoutes))
-
-	srv := &http.Server{
-		Addr:              cfg.Addr,
-		Handler:           securityHeaders(cfg, mux),
-		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      30 * time.Second,
-		MaxHeaderBytes:    1 << 20,
-	}
+	srv := newHTTPServer(cfg, app)
 	log.Printf("blog admin v20.18.5 listening on %s base=%q", cfg.Addr, cfg.AdminBasePath)
 	log.Fatal(srv.ListenAndServe())
 }
@@ -519,7 +156,7 @@ func (app *App) handleSnakeScoresAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&req); err != nil {
+		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -640,11 +277,11 @@ func (app *App) handleGame2048ScoresAPI(w http.ResponseWriter, r *http.Request) 
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&req); err != nil {
+		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
-		if req.Score <= 0 || req.Score > 9999999 {
+		if req.Score <= 0 || req.Score > maxAcceptedGameScore {
 			http.Error(w, "invalid score", http.StatusBadRequest)
 			return
 		}
@@ -855,7 +492,7 @@ func (app *App) handleReactionScoresAPI(w http.ResponseWriter, r *http.Request) 
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&req); err != nil {
+		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -950,7 +587,7 @@ func (app *App) handleFlappyScoresAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&req); err != nil {
+		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -1091,7 +728,7 @@ func (app *App) handleTypingScoresAPI(w http.ResponseWriter, r *http.Request) {
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&req); err != nil {
+		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -1195,33 +832,6 @@ func isSystemAccount(t string) bool {
 	return normalizeAccountType("", t) == accountSystem
 }
 
-func cleanBasePath(p string) string {
-	p = strings.TrimSpace(p)
-	if p == "" || p == "/" {
-		return ""
-	}
-	if !strings.HasPrefix(p, "/") {
-		p = "/" + p
-	}
-	return strings.TrimRight(p, "/")
-}
-
-func adminURLPath(base, p string) string {
-	if p == "" {
-		p = "/"
-	}
-	if !strings.HasPrefix(p, "/") {
-		p = "/" + p
-	}
-	if base == "" {
-		return p
-	}
-	if p == "/" {
-		return base + "/"
-	}
-	return base + p
-}
-
 func (app *App) adminURL(p string) string {
 	return adminURLPath(app.cfg.AdminBasePath, p)
 }
@@ -1232,106 +842,6 @@ func (app *App) redirect(w http.ResponseWriter, r *http.Request, p string, code 
 		return
 	}
 	http.Redirect(w, r, app.adminURL(p), code)
-}
-
-func loadConfig() Config {
-	get := func(k, d string) string {
-		if v := os.Getenv(k); v != "" {
-			return v
-		}
-		return d
-	}
-	secret := strings.TrimSpace(get("SESSION_SECRET", ""))
-	if len(secret) < 32 {
-		log.Fatal("SESSION_SECRET must be set to a random value of at least 32 characters")
-	}
-	adminPass := get("ADMIN_PASS", "")
-	if strings.TrimSpace(adminPass) == "" {
-		log.Fatal("ADMIN_PASS must be set in local configuration before starting the server")
-	}
-	adminUser := strings.TrimSpace(get("ADMIN_USER", ""))
-	if adminUser == "" {
-		log.Fatal("ADMIN_USER must be set in local configuration before starting the server")
-	}
-	return Config{
-		Addr:              get("ADDR", ":8080"),
-		DataDir:           get("DATA_DIR", "./data"),
-		HugoContentDir:    get("HUGO_CONTENT_DIR", "./content/posts"),
-		PublicDir:         get("PUBLIC_DIR", "./published"),
-		HugoCommand:       get("HUGO_COMMAND", ""),
-		SessionSecret:     secret,
-		AdminUser:         adminUser,
-		AdminPass:         adminPass,
-		AdminBasePath:     cleanBasePath(get("ADMIN_BASE_PATH", "")),
-		PublicBaseURL:     get("PUBLIC_BASE_URL", "/"),
-		PublicSiteURL:     strings.TrimRight(strings.TrimSpace(get("PUBLIC_SITE_URL", "")), "/"),
-		PublicAPIURL:      strings.TrimRight(strings.TrimSpace(get("PUBLIC_API_URL", "")), "/"),
-		PublicCORSOrigins: get("PUBLIC_CORS_ORIGINS", ""),
-	}
-}
-
-// loadDotEnv lets local binary runs use the same private configuration file as
-// Docker Compose. Existing process environment variables always take priority.
-func loadDotEnv(path string) {
-	b, err := os.ReadFile(path)
-	if errors.Is(err, os.ErrNotExist) {
-		return
-	}
-	if err != nil {
-		log.Printf("warning: could not read %s: %v", path, err)
-		return
-	}
-	for _, raw := range strings.Split(string(b), "\n") {
-		line := strings.TrimSpace(strings.TrimPrefix(raw, "\ufeff"))
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		key, value, ok := strings.Cut(line, "=")
-		key = strings.TrimSpace(key)
-		if !ok || key == "" {
-			log.Printf("warning: ignored malformed line in %s", path)
-			continue
-		}
-		if _, exists := os.LookupEnv(key); exists {
-			continue
-		}
-		value = strings.TrimSpace(value)
-		if len(value) >= 2 && ((value[0] == '"' && value[len(value)-1] == '"') || (value[0] == '\'' && value[len(value)-1] == '\'')) {
-			value = value[1 : len(value)-1]
-		}
-		if err := os.Setenv(key, value); err != nil {
-			log.Printf("warning: could not set %s from %s: %v", key, path, err)
-		}
-	}
-}
-
-func normalizedOrigin(raw string) string {
-	u, err := url.Parse(strings.TrimSpace(raw))
-	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
-		return ""
-	}
-	return u.Scheme + "://" + u.Host
-}
-
-func (app *App) allowPublicCORS(w http.ResponseWriter, r *http.Request) bool {
-	origin := normalizedOrigin(r.Header.Get("Origin"))
-	if origin == "" {
-		return true
-	}
-	allowed := map[string]bool{}
-	for _, raw := range append([]string{app.cfg.PublicSiteURL, app.cfg.PublicAPIURL}, strings.Split(app.cfg.PublicCORSOrigins, ",")...) {
-		if candidate := normalizedOrigin(raw); candidate != "" {
-			allowed[candidate] = true
-		}
-	}
-	if !allowed[origin] {
-		return false
-	}
-	w.Header().Set("Access-Control-Allow-Origin", origin)
-	w.Header().Set("Vary", "Origin")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	return true
 }
 
 func mustMkdir(p string, mode os.FileMode) {
@@ -1393,9 +903,8 @@ func (s *Store) EnsureAdmin(username, password string) error {
 		if u.Role != roleAdmin {
 			return errors.New("ADMIN_USER already belongs to a non-admin account; choose a different username or resolve the account conflict")
 		}
-		// The local environment is authoritative for the bootstrap administrator.
-		// This keeps a password change in .env effective after every restart while
-		// leaving all other users managed by the application data store.
+		// 本地环境配置是初始管理员的唯一权威来源。
+		// 这样 .env 中的密码修改会在每次重启后生效，其他用户仍由应用数据存储管理。
 		if VerifyPassword(password, u.PasswordHash) {
 			return nil
 		}
@@ -2641,7 +2150,7 @@ func canAccessArticle(u User, a Article) bool { return u.Role == roleAdmin || a.
 
 func (app *App) hugoRootDir() string {
 	contentDir := filepath.Clean(app.cfg.HugoContentDir)
-	// Typical: /opt/gexian-blog-mvp/content/posts -> /opt/gexian-blog-mvp
+	// 示例：/opt/gexian-blog-mvp/content/posts -> /opt/gexian-blog-mvp
 	return filepath.Dir(filepath.Dir(contentDir))
 }
 
@@ -3177,6 +2686,9 @@ func (app *App) ensureBuiltinContentPages() error {
 }
 
 func (app *App) runHugo(ctx context.Context) error {
+	app.buildMu.Lock()
+	defer app.buildMu.Unlock()
+
 	if err := app.ensureSiteDefaults(); err != nil {
 		return err
 	}
@@ -3186,9 +2698,9 @@ func (app *App) runHugo(ctx context.Context) error {
 	if err := app.syncPublishedArticles(); err != nil {
 		return err
 	}
-	// v20.0.8: 朋友页改为以 data/friends.json 为唯一长期数据源。
-	// 这里不再由后台根据 users.json 自动重写 friends.json，避免发布文章/重建时把星图朋友数据缩成 1 人。
-	// 朋友公开页由 deploy/rebuild.sh 读取 friends.json 生成。
+	// 朋友页改为以 data/friends.json 为唯一长期数据源。
+	// 这里不再由后台根据 users.json 自动重写 friends.json，避免发布文章或重建时把星图朋友数据缩成 1 人。
+	// 公开朋友数据会在构建前同步到静态资源目录。
 	if err := app.ensureBuiltinContentPages(); err != nil {
 		return err
 	}
@@ -3198,7 +2710,7 @@ func (app *App) runHugo(ctx context.Context) error {
 	if strings.TrimSpace(app.cfg.HugoCommand) == "" {
 		return nil
 	}
-	cctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+	cctx, cancel := context.WithTimeout(ctx, app.cfg.HugoBuildTimeout)
 	defer cancel()
 	parts := strings.Fields(app.cfg.HugoCommand)
 	if app.cfg.PublicSiteURL != "" && strings.EqualFold(filepath.Base(parts[0]), "hugo") {
@@ -3749,8 +3261,8 @@ func (app *App) handleMediaLibrary(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		r.Body = http.MaxBytesReader(w, r.Body, 100*1024*1024)
-		if err := r.ParseMultipartForm(100 * 1024 * 1024); err != nil {
+		r.Body = http.MaxBytesReader(w, r.Body, app.cfg.MaxUploadBytes)
+		if err := r.ParseMultipartForm(app.cfg.MaxUploadBytes); err != nil {
 			renderMedia(map[string]any{"Error": "上传失败：文件过大或表单格式错误"})
 			return
 		}
@@ -4119,8 +3631,8 @@ func HashPassword(password string) (string, error) {
 	if _, err := rand.Read(salt); err != nil {
 		return "", err
 	}
-	dk := pbkdf2Key([]byte(password), salt, 120000, 32)
-	return fmt.Sprintf("pbkdf2$120000$%s$%s", base64.RawStdEncoding.EncodeToString(salt), base64.RawStdEncoding.EncodeToString(dk)), nil
+	dk := pbkdf2Key([]byte(password), salt, passwordPBKDF2Iterations, passwordHashBytes)
+	return fmt.Sprintf("pbkdf2$%d$%s$%s", passwordPBKDF2Iterations, base64.RawStdEncoding.EncodeToString(salt), base64.RawStdEncoding.EncodeToString(dk)), nil
 }
 func VerifyPassword(password, encoded string) bool {
 	parts := strings.Split(encoded, "$")
@@ -4132,7 +3644,7 @@ func VerifyPassword(password, encoded string) bool {
 	if err1 != nil || err2 != nil {
 		return false
 	}
-	dk := pbkdf2Key([]byte(password), salt, 120000, len(want))
+	dk := pbkdf2Key([]byte(password), salt, passwordPBKDF2Iterations, len(want))
 	return subtle.ConstantTimeCompare(dk, want) == 1
 }
 func pbkdf2Key(password, salt []byte, iter, keyLen int) []byte {

@@ -25,13 +25,6 @@
 deploy/*.local.sh
 deploy/*.local.ps1
 
-# Historical deployment checks may contain machine and domain details; keep
-# them locally, but do not include them in the source-only repository.
-/deploy/verify_v*.sh
-/deploy/deploy_v*_safe.sh
-/deploy/install_*_v*.sh
-/deploy/nginx-*-v*.conf
-
 # 系统、编辑器和私钥文件
 .DS_Store
 Thumbs.db

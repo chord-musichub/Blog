@@ -35,11 +35,13 @@ ADDR=:8080
 ADMIN_USER=$AdminUser
 ADMIN_PASS=$AdminPassword
 SESSION_SECRET=$sessionSecret
-ADMIN_BASE_PATH=
+ADMIN_BASE_PATH=/write
 PUBLIC_BASE_URL=/
 PUBLIC_SITE_URL=$PublicSiteURL
 PUBLIC_API_URL=$PublicAPIURL
 PUBLIC_CORS_ORIGINS=$PublicSiteURL
+HUGO_BUILD_TIMEOUT_SECONDS=180
+MAX_UPLOAD_BYTES=104857600
 "@
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($envPath, $envContent, $utf8NoBom)

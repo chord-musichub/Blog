@@ -17,8 +17,8 @@
     try{ window.dispatchEvent(new Event('resize')); }catch(e){}
   }
 
-  // v20.20.6: browser refresh can leave the inline boot-preparing cloak visible
-  // if cached/deferred scripts race. Remove the cloak before the user sees a blank page.
+  // v20.20.6：浏览器刷新时，缓存或延迟脚本竞争可能让内联启动遮罩一直可见。
+  // 在用户看到空白页面前移除该遮罩。
   window.setTimeout(function(){
     if(root.classList.contains('is-boot-preparing') && !document.querySelector('.site-boot-overlay')){
       forceBootReveal('early-no-overlay');
@@ -281,8 +281,8 @@
           window.requestAnimationFrame(function(){
             overlay.classList.add('is-opening');
             root.classList.add('boot-opening', 'is-boot-interactive');
-            // v20.19.3: the curtain is already pointer-events:none here, so release
-            // scroll/click immediately instead of waiting for the cleanup timeout.
+            // v20.19.3：此时幕布已设为 pointer-events:none，立即恢复滚动和点击，
+            // 无需等待清理超时。
             root.classList.remove('is-booting', 'is-boot-preparing', 'boot-frame-settling');
           });
         });
@@ -334,7 +334,7 @@
     const nav = document.querySelector('.modern-nav-links');
     if(!nav) return null;
 
-    // Remove the old indicator if previous versions left it in the DOM.
+    // 若旧版本遗留了指示器，先从 DOM 中移除。
     nav.querySelectorAll('.nav-active-indicator').forEach(function(oldIndicator){
       oldIndicator.remove();
     });

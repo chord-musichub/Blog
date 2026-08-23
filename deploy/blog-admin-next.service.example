@@ -1,0 +1,25 @@
+[Unit]
+Description=Songline Blog Admin (candidate release)
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/opt/songline-blog/next/blog-admin
+
+[Service]
+Type=simple
+User=blog
+Group=blog
+WorkingDirectory=/opt/songline-blog/next
+EnvironmentFile=/opt/songline-blog/shared/blog-admin.env
+# 预发布实例只监听本机 8081，不会接收公开流量。
+ExecStart=/usr/bin/env ADDR=127.0.0.1:8081 /opt/songline-blog/next/blog-admin
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=20
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=full
+ReadWritePaths=/opt/songline-blog
+
+[Install]
+WantedBy=multi-user.target
