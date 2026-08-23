@@ -3,7 +3,7 @@
 {{ $posts := where .Site.RegularPages "Section" "posts" }}
 <div class="page-grid">
   <div>
-    {{ $homeHeroImage := default "/img/hero-home.svg" $cfg.home.hero_image }}
+    {{ $homeHeroImage := default "/uploads/admin/show.png" $cfg.home.hero_image }}
     <section class="hero-banner hero-banner-image-only hero-banner-actual-image" style="background-image:url('{{ $homeHeroImage }}')" aria-label="首页视觉封面">
       <img class="hero-banner-img" src="{{ $homeHeroImage }}" alt="" loading="eager" decoding="async" fetchpriority="high">
     </section>
@@ -28,7 +28,7 @@
       </div>
       <div class="notice-list">
         {{ range first 3 $notices }}
-        {{ $noticeCover := .Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}
+        {{ $noticeCover := .Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}
         {{ $noticeCoverMode := .Params.cover_mode | default "cover" }}
         <a class="card notice-item notice-item-with-cover" href="{{ .RelPermalink }}">
           <div class="notice-item-content">
@@ -64,7 +64,7 @@
       <div class="recommended-grid" data-recommended-posts>
         {{ $recommendCount := default 6 $cfg.home.recommended_count }}
         {{ range first $recommendCount (where $posts ".Params.is_notice" "ne" true) }}
-          {{ $cover := .Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}
+          {{ $cover := .Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}
           {{ $coverMode := .Params.cover_mode | default "cover" }}
           <article class="card recommended-card" data-card-link="{{ .RelPermalink }}" data-recommend-path="{{ .RelPermalink }}" role="link" tabindex="0" aria-label="阅读推荐文章：{{ .Title }}">
             <div class="recommended-cover lazy-bg cover-mode-{{ $coverMode }}" data-bg="{{ $cover }}"></div>
@@ -99,12 +99,12 @@
         <div class="friend-grid home-friend-track" data-home-friend-track>
           {{ range $publicFriends }}
             <a class="card friend-card home-friend-slide" href="{{ .url }}">
-              <img class="avatar" src="{{ default "/img/avatar-default.svg" .avatar }}" alt="{{ .display_name }}">
+              <img class="avatar" src="{{ default "/uploads/admin/main_logo.png" .avatar }}" alt="{{ .display_name }}">
               <h3>{{ .display_name }}</h3>
               <p>{{ default "记录想法，分享文字。" .bio | plainify | truncate 36 }}</p>
             </a>
           {{ else }}
-            <a class="card friend-card home-friend-slide" href="/friends/"><img class="avatar" src="/img/avatar-default.svg" alt=""><h3>朋友们</h3><p>这里会展示一起写作的朋友。</p></a>
+            <a class="card friend-card home-friend-slide" href="/friends/"><img class="avatar" src="/uploads/admin/main_logo.png" alt=""><h3>朋友们</h3><p>这里会展示一起写作的朋友。</p></a>
           {{ end }}
         </div>
       </div>
@@ -154,7 +154,7 @@
           {{ $emailText := replace $emailHref "mailto:" "" }}
           <a class="email-contact" href="{{ $emailHref | safeURL }}" data-email="{{ $emailText }}" aria-label="Email" title="点击打开邮件；若没有邮件客户端，会复制邮箱">{{ partial "ui-icon.html" "mail" }}<span class="contact-tip">已复制邮箱</span></a>
         {{ end }}
-        {{ if $cfg.social.show_bilibili }}<a href="{{ $cfg.social.bilibili }}" target="_blank" rel="noopener" aria-label="Bilibili"><img src="{{ default "/img/bilibili.svg" $cfg.social.bilibili_icon }}" alt="B站"></a>{{ end }}
+        {{ if $cfg.social.show_bilibili }}<a href="{{ $cfg.social.bilibili }}" target="_blank" rel="noopener" aria-label="Bilibili"><img src="{{ default "/uploads/admin/bilibili.png" $cfg.social.bilibili_icon }}" alt="B站"></a>{{ end }}
       </div>
     </section>
   </aside>

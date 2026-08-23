@@ -52,6 +52,17 @@ sudo chown -R blog:blog /opt/songline-blog/shared/data /opt/songline-blog/shared
 
 若其中某个旧目录不存在，先跳过对应的一行即可。
 
+### 整理早期站点图标
+
+若旧版本把站点图标直接放在 `static/uploads/` 根目录，可在完成代码发布后执行一次：
+
+```bash
+sudo bash /opt/songline-blog/current/deploy/migrate-admin-assets.sh
+sudo systemctl restart blog-admin.service
+```
+
+脚本会将已知的站点图片移动到 `static/uploads/admin/`，并同步更新站点设置与默认朋友头像；不会删除上传资源。
+
 从仓库复制环境示例，填写真实管理员账号、密码与会话密钥。不要把真实文件贴到聊天或提交到 Git：
 
 ```bash

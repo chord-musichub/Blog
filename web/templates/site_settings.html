@@ -134,7 +134,7 @@ html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
         <label>站点标题<input name="site_title" value="{{.Settings.Site.Title}}"></label>
         <label>公开显示名<input name="display_name" value="{{.Settings.Site.DisplayName}}"></label>
         <label>左上角 Logo 文本<input name="logo" value="{{.Settings.Site.Logo}}"></label>
-        <label>左上角自定义图标<input name="logo_icon" value="{{.Settings.Site.LogoIcon}}" placeholder="/uploads/logo.png 或 /img/avatar-default.svg"></label>
+        <label>左上角自定义图标<input name="logo_icon" value="{{.Settings.Site.LogoIcon}}" placeholder="/uploads/admin/main_logo.png"></label>
         <label>浏览器标签页图标<input name="favicon" value="{{.Settings.Site.Favicon}}" placeholder="/uploads/favicon.png 或 /uploads/favicon.ico"></label>
         <label>ICP备案号<input name="icp" value="{{.Settings.Site.ICP}}"></label>
       </div>
@@ -144,7 +144,7 @@ html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
     <section class="card admin-settings-card">
       <h2>首页当前展示</h2>
       <p class="meta">首页欢迎区现在只展示封面图；旧的 Hero 标题/副标题已从后台移除。</p>
-      <label>首页封面图路径<input name="hero_image" value="{{.Settings.Home.HeroImage}}" placeholder="/uploads/xxx.webp 或 /img/hero-home.svg"></label>
+      <label>首页封面图路径<input name="hero_image" value="{{.Settings.Home.HeroImage}}" placeholder="/uploads/admin/show.png"></label>
       <div class="grid2">
         <label>创站时间<input name="founded_at" value="{{.Settings.Home.FoundedAt}}" placeholder="2026/5/8"></label>
         <label>首页推荐文章数量<input name="recommended_count" value="{{.Settings.Home.RecommendedCount}}" placeholder="6"></label>

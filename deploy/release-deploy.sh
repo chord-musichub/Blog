@@ -80,7 +80,8 @@ link_shared_path static/uploads
 link_shared_path static/md-source
 
 echo "构建候选版本 ${REVISION}…"
-(cd "$RELEASE_DIR" && go build -trimpath -ldflags='-s -w' -o blog-admin ./cmd/server)
+# 发布目录会切换为 blog 用户所有；禁用 Go 的 VCS 信息写入，避免构建时触发 Git 的属主安全检查。
+(cd "$RELEASE_DIR" && go build -buildvcs=false -trimpath -ldflags='-s -w' -o blog-admin ./cmd/server)
 install -d -o blog -g blog -m 0755 "$RELEASE_DIR/published"
 chown -R blog:blog "$RELEASE_DIR"
 

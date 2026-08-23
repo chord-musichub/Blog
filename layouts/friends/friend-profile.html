@@ -3,8 +3,8 @@
 {{ $cfg := .Site.Data.site }}
 {{ $username := .Params.friend_username }}
 {{ $display := .Params.friend_display_name | default .Title }}
-{{ $avatar := .Params.friend_avatar | default "/img/avatar-default.svg" }}
-{{ $cover := .Params.friend_cover | default (default (default "/img/hero-friends.svg" $cfg.pages.friends_hero_image) $cfg.pages.friend_default_cover) }}
+{{ $avatar := .Params.friend_avatar | default "/uploads/admin/main_logo.png" }}
+{{ $cover := .Params.friend_cover | default (default (default "/uploads/admin/friends.png" $cfg.pages.friends_hero_image) $cfg.pages.friend_default_cover) }}
 {{ $bio := .Params.friend_bio | default "记录想法，分享文字。" }}
 {{ $homepage := .Params.friend_homepage }}
 {{ $posts := where (where .Site.RegularPages "Section" "posts") ".Params.author_username" $username }}

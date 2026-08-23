@@ -115,9 +115,9 @@
   function safeImg(img, src){
     if(!img) return;
     img.onerror = function(){
-      if(img.getAttribute('src') !== '/img/avatar-default.svg') img.src = '/img/avatar-default.svg';
+      if(img.getAttribute('src') !== '/uploads/admin/main_logo.png') img.src = '/uploads/admin/main_logo.png';
     };
-    img.src = src || '/img/avatar-default.svg';
+    img.src = src || '/uploads/admin/main_logo.png';
   }
 
   function escapeHtml(s){
@@ -206,7 +206,7 @@
         username: username,
         name: name,
         bio: text(f.bio || f.Bio, '这个朋友还没有写简介。'),
-        avatar: toUrl(f.avatar || f.Avatar, '/img/avatar-default.svg'),
+        avatar: toUrl(f.avatar || f.Avatar, '/uploads/admin/main_logo.png'),
         href: toUrl(f.url || f.URL || f.href || f.Href, '/friends/' + slugify(slug) + '/'),
         count: Number(f.post_count || f.postCount || f.PostCount || 0),
         updated: text(f.updated_at || f.updatedAt || f.UpdatedAt),

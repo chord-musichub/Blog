@@ -6,14 +6,14 @@
 {{ if gt (len $friends) 0 }}{{ $first = index $friends 0 }}{{ end }}
 {{ $firstName := "朋友星图" }}
 {{ $firstBio := "搜索或点击头像，切换中心朋友。" }}
-{{ $firstAvatar := "/img/avatar-default.svg" }}
+{{ $firstAvatar := "/uploads/admin/main_logo.png" }}
 {{ $firstURL := "/friends/" }}
 {{ $firstCount := 0 }}
 {{ $firstUpdated := "最近更新 —" }}
 {{ with $first }}
   {{ $firstName = default (default .username .name) (default .display_name .name) }}
   {{ $firstBio = default "这个朋友还没有写简介。" .bio }}
-  {{ $firstAvatar = default "/img/avatar-default.svg" .avatar }}
+  {{ $firstAvatar = default "/uploads/admin/main_logo.png" .avatar }}
   {{ $firstURL = default "/friends/" .url }}
   {{ $firstCount = default 0 .post_count }}
   {{ if .updated_at }}{{ $firstUpdated = printf "最近更新 %s" (substr .updated_at 0 10) }}{{ end }}
@@ -69,7 +69,7 @@
         "display_name": {{ $name | jsonify }},
         "bio": {{ default "这个朋友还没有写简介。" $f.bio | jsonify }},
         "url": {{ default (printf "/friends/%s/" $slug) $f.url | jsonify }},
-        "avatar": {{ default "/img/avatar-default.svg" $f.avatar | jsonify }},
+        "avatar": {{ default "/uploads/admin/main_logo.png" $f.avatar | jsonify }},
         "cover": {{ $f.cover | jsonify }},
         "post_count": {{ default 0 $f.post_count | jsonify }},
         "post_titles": {{ default slice $f.post_titles | jsonify }},

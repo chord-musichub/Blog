@@ -1,8 +1,8 @@
 {{ define "main" }}
 {{ $cfg := .Site.Data.site }}
 {{ $first := index .Pages 0 }}
-{{ $avatar := "/img/avatar-default.svg" }}
-{{ $cover := default "/img/hero-friends.svg" $cfg.pages.friends_hero_image }}
+{{ $avatar := "/uploads/admin/main_logo.png" }}
+{{ $cover := default "/uploads/admin/friends.png" $cfg.pages.friends_hero_image }}
 {{ $bio := "记录想法，分享文字。" }}
 {{ $homepage := "" }}
 {{ with $first }}

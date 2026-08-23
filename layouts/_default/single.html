@@ -1,7 +1,7 @@
 {{ define "main" }}
 {{ partial "back-icon.html" (dict "fallback" "/posts/") }}
 {{ $cfg := .Site.Data.site }}
-{{ $cover := .Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}
+{{ $cover := .Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}
 {{ $coverMode := .Params.cover_mode | default "cover" }}
 <section class="page-hero article-cover-hero article-cover-actual-image cover-mode-{{ $coverMode }}" style="background-image:url('{{ $cover }}')" aria-label="文章封面">
   <img class="article-cover-img" src="{{ $cover }}" alt="" loading="eager" decoding="async" fetchpriority="high">
@@ -380,7 +380,7 @@
   <div class="related-grid">
     {{ range first 3 (where $pages "Permalink" "ne" .Permalink) }}
     <article class="card related-card" data-card-link="{{ .RelPermalink }}" role="link" tabindex="0" aria-label="阅读相关文章：{{ .Title }}">
-      <a class="post-thumb lazy-bg cover-mode-{{ .Params.cover_mode | default "cover" }}" href="{{ .RelPermalink }}" data-bg="{{ .Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}"></a>
+      <a class="post-thumb lazy-bg cover-mode-{{ .Params.cover_mode | default "cover" }}" href="{{ .RelPermalink }}" data-bg="{{ .Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}"></a>
       <div class="post-info"><h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3><div class="meta-row"><span>{{ .Date.Format "2006-01-02" }}</span><span class="views real-views meta-icon-item" data-view-mode="get" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span></div></div>
     </article>
     {{ end }}

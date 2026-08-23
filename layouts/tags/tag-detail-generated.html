@@ -21,6 +21,6 @@
 </section>
 <section class="section">
   <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "fire" }}</span><h2>热门文章</h2></div>
-  <div class="related-grid">{{ range first 3 $posts }}<a class="card related-card related-card-link" href="{{ .RelPermalink }}" aria-label="阅读热门文章：{{ .Title }}"><span class="post-thumb lazy-bg cover-mode-{{ .Params.cover_mode | default "cover" }}" data-bg="{{ .Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}"></span><div class="post-info"><h3>{{ .Title }}</h3><div class="meta-row"><span>{{ .Date.Format "2006-01-02" }}</span><span class="views real-views meta-icon-item" data-view-mode="get" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span></div></div></a>{{ end }}</div>
+  <div class="related-grid">{{ range first 3 $posts }}<a class="card related-card related-card-link" href="{{ .RelPermalink }}" aria-label="阅读热门文章：{{ .Title }}"><span class="post-thumb lazy-bg cover-mode-{{ .Params.cover_mode | default "cover" }}" data-bg="{{ .Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}"></span><div class="post-info"><h3>{{ .Title }}</h3><div class="meta-row"><span>{{ .Date.Format "2006-01-02" }}</span><span class="views real-views meta-icon-item" data-view-mode="get" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span></div></div></a>{{ end }}</div>
 </section>
 {{ end }}

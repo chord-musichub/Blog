@@ -1,7 +1,7 @@
 {{ define "main" }}
 {{ partial "back-icon.html" (dict "fallback" "/tags/") }}
 {{ $cfg := .Site.Data.site }}
-{{ $tagCover := default "/img/hero-article.svg" $cfg.pages.article_default_cover }}
+{{ $tagCover := default "/uploads/admin/article_default.png" $cfg.pages.article_default_cover }}
 <section class="page-hero tag-detail-hero cover-mode-cover" style="background-image:url('{{ $tagCover }}')">
 <h1># 站点公告</h1>
 </section>

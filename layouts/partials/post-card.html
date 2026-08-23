@@ -6,7 +6,7 @@
 {{ end }}
 {{ $cfg := site.Data.site }}
 {{ $tagURLs := site.Data.tag_urls | default dict }}
-{{ $cover := $p.Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}
+{{ $cover := $p.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}
 {{ $coverMode := $p.Params.cover_mode | default "cover" }}
 <article class="card post-card {{ if and $p.Params.is_notice (not $flat) }}notice-card{{ end }}" data-card-link="{{ $p.RelPermalink }}" role="link" tabindex="0" aria-label="阅读文章：{{ $p.Title }}">
   <a class="post-thumb lazy-bg cover-mode-{{ $coverMode }}" href="{{ $p.RelPermalink }}" data-bg="{{ $cover }}"></a>
