@@ -46,6 +46,13 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # 上传文件属于运行时数据，不在 Hugo 的 published 目录中；交由后台服务提供。
+    location ^~ /uploads/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     location ^~ /api/ {
         proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;
