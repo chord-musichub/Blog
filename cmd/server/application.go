@@ -75,5 +75,12 @@ func newApp(cfg Config, store *Store) *App {
 	}
 
 	tpl := template.Must(template.New("").Funcs(funcs).ParseGlob("web/templates/*.html"))
-	return &App{cfg: cfg, store: store, tpl: tpl, limiter: NewLimiter(), startedAt: time.Now()}
+	return &App{
+		cfg:        cfg,
+		store:      store,
+		tpl:        tpl,
+		limiter:    NewLimiter(),
+		startedAt:  time.Now(),
+		scoreCache: make(map[string][]SnakeScoreRecord),
+	}
 }

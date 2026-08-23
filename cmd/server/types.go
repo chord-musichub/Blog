@@ -51,6 +51,10 @@ type App struct {
 	limiter   *Limiter
 	startedAt time.Time
 	buildMu   sync.Mutex
+	// 运行时统计文件不再占用用户/文章仓储锁，避免小游戏请求阻塞后台操作。
+	viewsMu    sync.Mutex
+	scoresMu   sync.Mutex
+	scoreCache map[string][]SnakeScoreRecord
 }
 
 type User struct {

@@ -83,57 +83,27 @@ func cleanViewPath(raw string) string {
 
 func (app *App) loadViews() map[string]int {
 	out := map[string]int{}
-	b, err := os.ReadFile(app.viewsPath())
-	if err != nil || len(strings.TrimSpace(string(b))) == 0 {
+	if err := readJSONFile(app.viewsPath(), &out); err != nil {
+		log.Printf("load views error: %v", err)
 		return out
 	}
-	_ = json.Unmarshal(b, &out)
 	return out
 }
 
 func (app *App) saveViews(v map[string]int) error {
-	if err := os.MkdirAll(app.cfg.DataDir, 0700); err != nil {
-		return err
-	}
-	b, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		return err
-	}
-	tmp := app.viewsPath() + ".tmp"
-	if err := os.WriteFile(tmp, b, 0600); err != nil {
-		return err
-	}
-	return os.Rename(tmp, app.viewsPath())
+	return writeJSONFile(app.viewsPath(), v, 0600)
 }
 
 func (app *App) snakeScoresPath() string {
-	return filepath.Join(app.cfg.DataDir, "snake_scores.json")
+	return app.scoreDataPath("snake_scores.json")
 }
 
 func (app *App) loadSnakeScores() []SnakeScoreRecord {
-	path := app.snakeScoresPath()
-	data, err := os.ReadFile(path)
-	if err != nil || len(data) == 0 {
-		return []SnakeScoreRecord{}
-	}
-	var scores []SnakeScoreRecord
-	if err := json.Unmarshal(data, &scores); err != nil {
-		log.Printf("load snake scores error: %v", err)
-		return []SnakeScoreRecord{}
-	}
-	return normalizeHighScoreRecords(scores)
+	return app.loadScoreRecords(app.snakeScoresPath(), "snake", normalizeHighScoreRecords)
 }
 
 func (app *App) saveSnakeScores(scores []SnakeScoreRecord) error {
-	cleaned := normalizeHighScoreRecords(scores)
-	if err := os.MkdirAll(filepath.Dir(app.snakeScoresPath()), 0755); err != nil {
-		return err
-	}
-	b, err := json.MarshalIndent(cleaned, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(app.snakeScoresPath(), b, 0644)
+	return app.saveScoreRecords(app.snakeScoresPath(), scores, normalizeHighScoreRecords)
 }
 
 func (app *App) handleSnakeScoresAPI(w http.ResponseWriter, r *http.Request) {
@@ -149,14 +119,14 @@ func (app *App) handleSnakeScoresAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodGet:
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		scores := app.loadSnakeScores()
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
+		if err := decodeJSONBody(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes), scoreRequestMaxBytes, &req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -164,7 +134,7 @@ func (app *App) handleSnakeScoresAPI(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "invalid score", http.StatusBadRequest)
 			return
 		}
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		record := SnakeScoreRecord{
 			Score:     req.Score,
 			CreatedAt: time.Now().UTC().Format(time.RFC3339),
@@ -173,13 +143,13 @@ func (app *App) handleSnakeScoresAPI(w http.ResponseWriter, r *http.Request) {
 		scores := app.loadSnakeScores()
 		scores = append(scores, record)
 		if err := app.saveSnakeScores(scores); err != nil {
-			app.store.mu.Unlock()
+			app.scoresMu.Unlock()
 			log.Printf("save snake scores error: %v", err)
 			http.Error(w, "save failed", http.StatusInternalServerError)
 			return
 		}
 		scores = app.loadSnakeScores()
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
 		return
 	default:
@@ -228,33 +198,15 @@ func normalizeGame2048ScoreRecords(scores []SnakeScoreRecord) []SnakeScoreRecord
 }
 
 func (app *App) game2048ScoresPath() string {
-	return filepath.Join(app.cfg.DataDir, "2048_scores.json")
+	return app.scoreDataPath("2048_scores.json")
 }
 
 func (app *App) loadGame2048Scores() []SnakeScoreRecord {
-	path := app.game2048ScoresPath()
-	data, err := os.ReadFile(path)
-	if err != nil || len(data) == 0 {
-		return []SnakeScoreRecord{}
-	}
-	var scores []SnakeScoreRecord
-	if err := json.Unmarshal(data, &scores); err != nil {
-		log.Printf("load 2048 scores error: %v", err)
-		return []SnakeScoreRecord{}
-	}
-	return normalizeGame2048ScoreRecords(scores)
+	return app.loadScoreRecords(app.game2048ScoresPath(), "2048", normalizeGame2048ScoreRecords)
 }
 
 func (app *App) saveGame2048Scores(scores []SnakeScoreRecord) error {
-	cleaned := normalizeGame2048ScoreRecords(scores)
-	if err := os.MkdirAll(filepath.Dir(app.game2048ScoresPath()), 0755); err != nil {
-		return err
-	}
-	b, err := json.MarshalIndent(cleaned, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(app.game2048ScoresPath(), b, 0644)
+	return app.saveScoreRecords(app.game2048ScoresPath(), scores, normalizeGame2048ScoreRecords)
 }
 
 func (app *App) handleGame2048ScoresAPI(w http.ResponseWriter, r *http.Request) {
@@ -270,14 +222,14 @@ func (app *App) handleGame2048ScoresAPI(w http.ResponseWriter, r *http.Request) 
 	}
 	switch r.Method {
 	case http.MethodGet:
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		scores := app.loadGame2048Scores()
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
+		if err := decodeJSONBody(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes), scoreRequestMaxBytes, &req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -299,17 +251,17 @@ func (app *App) handleGame2048ScoresAPI(w http.ResponseWriter, r *http.Request) 
 			}
 			record.PlayerID = ""
 		}
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		scores := app.loadGame2048Scores()
 		scores = append(scores, record)
 		if err := app.saveGame2048Scores(scores); err != nil {
-			app.store.mu.Unlock()
+			app.scoresMu.Unlock()
 			log.Printf("save 2048 scores error: %v", err)
 			http.Error(w, "save failed", http.StatusInternalServerError)
 			return
 		}
 		scores = app.loadGame2048Scores()
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
 		return
 	default:
@@ -443,33 +395,15 @@ func normalizeReactionScoreRecords(scores []SnakeScoreRecord) []SnakeScoreRecord
 }
 
 func (app *App) reactionScoresPath() string {
-	return filepath.Join(app.cfg.DataDir, "reaction_scores.json")
+	return app.scoreDataPath("reaction_scores.json")
 }
 
 func (app *App) loadReactionScores() []SnakeScoreRecord {
-	path := app.reactionScoresPath()
-	data, err := os.ReadFile(path)
-	if err != nil || len(data) == 0 {
-		return []SnakeScoreRecord{}
-	}
-	var scores []SnakeScoreRecord
-	if err := json.Unmarshal(data, &scores); err != nil {
-		log.Printf("load reaction scores error: %v", err)
-		return []SnakeScoreRecord{}
-	}
-	return normalizeReactionScoreRecords(scores)
+	return app.loadScoreRecords(app.reactionScoresPath(), "reaction", normalizeReactionScoreRecords)
 }
 
 func (app *App) saveReactionScores(scores []SnakeScoreRecord) error {
-	cleaned := normalizeReactionScoreRecords(scores)
-	if err := os.MkdirAll(filepath.Dir(app.reactionScoresPath()), 0755); err != nil {
-		return err
-	}
-	b, err := json.MarshalIndent(cleaned, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(app.reactionScoresPath(), b, 0644)
+	return app.saveScoreRecords(app.reactionScoresPath(), scores, normalizeReactionScoreRecords)
 }
 
 func (app *App) handleReactionScoresAPI(w http.ResponseWriter, r *http.Request) {
@@ -485,14 +419,14 @@ func (app *App) handleReactionScoresAPI(w http.ResponseWriter, r *http.Request) 
 	}
 	switch r.Method {
 	case http.MethodGet:
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		scores := app.loadReactionScores()
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
+		if err := decodeJSONBody(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes), scoreRequestMaxBytes, &req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -517,17 +451,17 @@ func (app *App) handleReactionScoresAPI(w http.ResponseWriter, r *http.Request) 
 		} else {
 			record.DisplayName = reactionScoreDisplay(record)
 		}
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		scores := app.loadReactionScores()
 		scores = append(scores, record)
 		if err := app.saveReactionScores(scores); err != nil {
-			app.store.mu.Unlock()
+			app.scoresMu.Unlock()
 			log.Printf("save reaction scores error: %v", err)
 			http.Error(w, "save failed", http.StatusInternalServerError)
 			return
 		}
 		scores = app.loadReactionScores()
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
 		return
 	default:
@@ -538,33 +472,15 @@ func (app *App) handleReactionScoresAPI(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *App) flappyScoresPath() string {
-	return filepath.Join(app.cfg.DataDir, "flappy_scores.json")
+	return app.scoreDataPath("flappy_scores.json")
 }
 
 func (app *App) loadFlappyScores() []SnakeScoreRecord {
-	path := app.flappyScoresPath()
-	data, err := os.ReadFile(path)
-	if err != nil || len(data) == 0 {
-		return []SnakeScoreRecord{}
-	}
-	var scores []SnakeScoreRecord
-	if err := json.Unmarshal(data, &scores); err != nil {
-		log.Printf("load flappy scores error: %v", err)
-		return []SnakeScoreRecord{}
-	}
-	return normalizeHighScoreRecords(scores)
+	return app.loadScoreRecords(app.flappyScoresPath(), "flappy", normalizeHighScoreRecords)
 }
 
 func (app *App) saveFlappyScores(scores []SnakeScoreRecord) error {
-	cleaned := normalizeHighScoreRecords(scores)
-	if err := os.MkdirAll(filepath.Dir(app.flappyScoresPath()), 0755); err != nil {
-		return err
-	}
-	b, err := json.MarshalIndent(cleaned, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(app.flappyScoresPath(), b, 0644)
+	return app.saveScoreRecords(app.flappyScoresPath(), scores, normalizeHighScoreRecords)
 }
 
 func (app *App) handleFlappyScoresAPI(w http.ResponseWriter, r *http.Request) {
@@ -580,14 +496,14 @@ func (app *App) handleFlappyScoresAPI(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodGet:
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		scores := app.loadFlappyScores()
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
+		if err := decodeJSONBody(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes), scoreRequestMaxBytes, &req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -595,7 +511,7 @@ func (app *App) handleFlappyScoresAPI(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "invalid score", http.StatusBadRequest)
 			return
 		}
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		record := SnakeScoreRecord{
 			Score:     req.Score,
 			CreatedAt: time.Now().UTC().Format(time.RFC3339),
@@ -604,13 +520,13 @@ func (app *App) handleFlappyScoresAPI(w http.ResponseWriter, r *http.Request) {
 		scores := app.loadFlappyScores()
 		scores = append(scores, record)
 		if err := app.saveFlappyScores(scores); err != nil {
-			app.store.mu.Unlock()
+			app.scoresMu.Unlock()
 			log.Printf("save flappy scores error: %v", err)
 			http.Error(w, "save failed", http.StatusInternalServerError)
 			return
 		}
 		scores = app.loadFlappyScores()
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
 		return
 	default:
@@ -631,7 +547,7 @@ func typingScoreMode(raw string) string {
 }
 
 func (app *App) typingScoresPath() string {
-	return filepath.Join(app.cfg.DataDir, "typing_scores.json")
+	return app.scoreDataPath("typing_scores.json")
 }
 
 func typingScoreIdentity(item SnakeScoreRecord) string {
@@ -682,29 +598,12 @@ func normalizeAllTypingScoreRecords(scores []SnakeScoreRecord) []SnakeScoreRecor
 }
 
 func (app *App) loadTypingScores(mode string) []SnakeScoreRecord {
-	path := app.typingScoresPath()
-	data, err := os.ReadFile(path)
-	if err != nil || len(data) == 0 {
-		return []SnakeScoreRecord{}
-	}
-	var scores []SnakeScoreRecord
-	if err := json.Unmarshal(data, &scores); err != nil {
-		log.Printf("load typing scores error: %v", err)
-		return []SnakeScoreRecord{}
-	}
-	return normalizeTypingScoreRecords(scores, mode)
+	all := app.loadScoreRecords(app.typingScoresPath(), "typing", normalizeAllTypingScoreRecords)
+	return normalizeTypingScoreRecords(all, mode)
 }
 
 func (app *App) saveTypingScores(scores []SnakeScoreRecord) error {
-	cleaned := normalizeAllTypingScoreRecords(scores)
-	if err := os.MkdirAll(filepath.Dir(app.typingScoresPath()), 0755); err != nil {
-		return err
-	}
-	b, err := json.MarshalIndent(cleaned, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(app.typingScoresPath(), b, 0644)
+	return app.saveScoreRecords(app.typingScoresPath(), scores, normalizeAllTypingScoreRecords)
 }
 
 func (app *App) handleTypingScoresAPI(w http.ResponseWriter, r *http.Request) {
@@ -721,14 +620,14 @@ func (app *App) handleTypingScoresAPI(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		mode := typingScoreMode(r.URL.Query().Get("mode"))
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		scores := app.loadTypingScores(mode)
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"mode": mode, "scores": scores})
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes)).Decode(&req); err != nil {
+		if err := decodeJSONBody(http.MaxBytesReader(w, r.Body, scoreRequestMaxBytes), scoreRequestMaxBytes, &req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
@@ -755,17 +654,17 @@ func (app *App) handleTypingScoresAPI(w http.ResponseWriter, r *http.Request) {
 			}
 			record.PlayerID = ""
 		}
-		app.store.mu.Lock()
+		app.scoresMu.Lock()
 		all := normalizeAllTypingScoreRecords(append(app.loadTypingScores("english"), app.loadTypingScores("mixed")...))
 		all = append(all, record)
 		if err := app.saveTypingScores(all); err != nil {
-			app.store.mu.Unlock()
+			app.scoresMu.Unlock()
 			log.Printf("save typing scores error: %v", err)
 			http.Error(w, "save failed", http.StatusInternalServerError)
 			return
 		}
 		scores := app.loadTypingScores(mode)
-		app.store.mu.Unlock()
+		app.scoresMu.Unlock()
 		_ = json.NewEncoder(w).Encode(map[string]any{"mode": mode, "scores": scores})
 		return
 	default:
@@ -782,8 +681,8 @@ func (app *App) handleViewsAPI(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"bad path"}`, http.StatusBadRequest)
 		return
 	}
-	app.store.mu.Lock()
-	defer app.store.mu.Unlock()
+	app.viewsMu.Lock()
+	defer app.viewsMu.Unlock()
 
 	views := app.loadViews()
 	switch r.Method {
@@ -865,30 +764,11 @@ func NewStore(dataDir string) (*Store, error) {
 }
 
 func (s *Store) load(name string, v any) error {
-	b, err := os.ReadFile(filepath.Join(s.dataDir, name))
-	if errors.Is(err, os.ErrNotExist) {
-		return nil
-	}
-	if err != nil {
-		return err
-	}
-	if len(strings.TrimSpace(string(b))) == 0 {
-		return nil
-	}
-	return json.Unmarshal(b, v)
+	return readJSONFile(filepath.Join(s.dataDir, name), v)
 }
 
 func (s *Store) saveLocked(name string, v any) error {
-	b, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		return err
-	}
-	tmp := filepath.Join(s.dataDir, name+".tmp")
-	dst := filepath.Join(s.dataDir, name)
-	if err := os.WriteFile(tmp, b, 0600); err != nil {
-		return err
-	}
-	return os.Rename(tmp, dst)
+	return writeJSONFile(filepath.Join(s.dataDir, name), v, 0600)
 }
 
 func (s *Store) EnsureAdmin(username, password string) error {
