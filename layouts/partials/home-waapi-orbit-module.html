@@ -1,0 +1,68 @@
+<section class="section waapi-orbital-section" id="site-gateway" aria-labelledby="waapi-gateway-title" data-waapi-orbit>
+  {{ $cfg := .Site.Data.site }}
+  {{ $orbit := $cfg.orbit }}
+  <div class="section-head waapi-orbital-title">
+    <span class="section-icon"></span>
+    <h2 id="waapi-gateway-title">{{ default "星际入口" $orbit.title }}</h2>
+  </div>
+
+  <div class="card waapi-orbital-gateway">
+    <nav class="waapi-orbit-stage" aria-label="主页星际入口导航">
+    <span class="waapi-stage-bg bg-a" aria-hidden="true"></span>
+    <span class="waapi-stage-bg bg-b" aria-hidden="true"></span>
+    <span class="waapi-orbit-guide guide-posts" aria-hidden="true"></span>
+    <span class="waapi-orbit-guide guide-tags" aria-hidden="true"></span>
+    <span class="waapi-orbit-guide guide-friends" aria-hidden="true"></span>
+    <span class="waapi-orbit-guide guide-tools" aria-hidden="true"></span>
+    <span class="waapi-orbit-guide guide-notice" aria-hidden="true"></span>
+    <span class="waapi-orbit-guide guide-about" aria-hidden="true"></span>
+    <span class="waapi-depth-shadow" aria-hidden="true"></span>
+
+    <div class="waapi-planet" aria-hidden="true" data-waapi-planet>
+      <span class="waapi-planet-halo"></span>
+      <span class="waapi-planet-aura"></span>
+      <span class="waapi-planet-sphere">
+        <span class="waapi-planet-texture" data-waapi-planet-texture></span>
+        <span class="waapi-planet-meridian"></span>
+        <span class="waapi-planet-shine"></span>
+      </span>
+      <span class="waapi-planet-moon moon-a"></span>
+      <span class="waapi-planet-moon moon-b"></span>
+    </div>
+
+    <button class="waapi-satellite satellite-posts is-active" type="button" data-orbit-satellite data-orbit-key="posts" data-orbit-kicker="{{ default "Archive" $orbit.posts.kicker }}" data-orbit-title="{{ default "文章" $orbit.posts.title }}" data-orbit-desc="{{ default "浏览所有文章，按时间回看学习、项目和创作记录。" $orbit.posts.description }}" data-orbit-href="{{ default "/posts/" $orbit.posts.href }}" data-orbit-link="{{ default "进入文章" $orbit.posts.link_text }}" data-orbit-lane="0.44" data-orbit-flat="0.40" data-orbit-start="322" data-orbit-duration="39000" data-orbit-offset-x="10" data-orbit-offset-y="-14" data-orbit-rotate="-8" aria-pressed="true">
+      <span class="waapi-satellite-orb"></span>
+      <span class="waapi-satellite-label">{{ default "文章" $orbit.posts.label }}</span>
+    </button>
+    <button class="waapi-satellite satellite-tags" type="button" data-orbit-satellite data-orbit-key="tags" data-orbit-kicker="{{ default "Tags" $orbit.tags.kicker }}" data-orbit-title="{{ default "标签" $orbit.tags.title }}" data-orbit-desc="{{ default "按标签寻找主题，把零散内容重新归档成线索。" $orbit.tags.description }}" data-orbit-href="{{ default "/tags/" $orbit.tags.href }}" data-orbit-link="{{ default "查看标签" $orbit.tags.link_text }}" data-orbit-lane="0.33" data-orbit-flat="0.56" data-orbit-start="236" data-orbit-duration="32000" data-orbit-offset-x="-22" data-orbit-offset-y="-12" data-orbit-rotate="16" aria-pressed="false">
+      <span class="waapi-satellite-orb"></span>
+      <span class="waapi-satellite-label">{{ default "标签" $orbit.tags.label }}</span>
+    </button>
+    <button class="waapi-satellite satellite-friends" type="button" data-orbit-satellite data-orbit-key="friends" data-orbit-kicker="{{ default "Friends" $orbit.friends.kicker }}" data-orbit-title="{{ default "朋友" $orbit.friends.title }}" data-orbit-desc="{{ default "查看朋友们的主页与文字，进入这个小小的创作星图。" $orbit.friends.description }}" data-orbit-href="{{ default "/friends/" $orbit.friends.href }}" data-orbit-link="{{ default "查看朋友" $orbit.friends.link_text }}" data-orbit-lane="0.49" data-orbit-flat="0.46" data-orbit-start="334" data-orbit-duration="43000" data-orbit-offset-x="20" data-orbit-offset-y="-4" data-orbit-rotate="10" aria-pressed="false">
+      <span class="waapi-satellite-orb"></span>
+      <span class="waapi-satellite-label">{{ default "朋友" $orbit.friends.label }}</span>
+    </button>
+    <button class="waapi-satellite satellite-tools" type="button" data-orbit-satellite data-orbit-key="tools" data-orbit-kicker="{{ default "Tools" $orbit.tools.kicker }}" data-orbit-title="{{ default "工具" $orbit.tools.title }}" data-orbit-desc="{{ default "打开站内小工具和实验页面，放一些顺手好用的东西。" $orbit.tools.description }}" data-orbit-href="{{ default "/tools/" $orbit.tools.href }}" data-orbit-link="{{ default "进入工具" $orbit.tools.link_text }}" data-orbit-lane="0.39" data-orbit-flat="0.44" data-orbit-start="56" data-orbit-duration="35000" data-orbit-offset-x="24" data-orbit-offset-y="20" data-orbit-rotate="-18" aria-pressed="false">
+      <span class="waapi-satellite-orb"></span>
+      <span class="waapi-satellite-label">{{ default "工具" $orbit.tools.label }}</span>
+    </button>
+    <button class="waapi-satellite satellite-notice" type="button" data-orbit-satellite data-orbit-key="notice" data-orbit-kicker="{{ default "Notice" $orbit.notice.kicker }}" data-orbit-title="{{ default "公告" $orbit.notice.title }}" data-orbit-desc="{{ default "查看站点更新、投稿说明和一些需要被看见的小通知。" $orbit.notice.description }}" data-orbit-href="{{ default "#site-notice" $orbit.notice.href }}" data-orbit-link="{{ default "查看公告" $orbit.notice.link_text }}" data-orbit-lane="0.35" data-orbit-flat="0.62" data-orbit-start="146" data-orbit-duration="30000" data-orbit-offset-x="-24" data-orbit-offset-y="26" data-orbit-rotate="-22" aria-pressed="false">
+      <span class="waapi-satellite-orb"></span>
+      <span class="waapi-satellite-label">{{ default "公告" $orbit.notice.label }}</span>
+    </button>
+    <button class="waapi-satellite satellite-about" type="button" data-orbit-satellite data-orbit-key="about" data-orbit-kicker="{{ default "About" $orbit.about.kicker }}" data-orbit-title="{{ default "关于本站" $orbit.about.title }}" data-orbit-desc="{{ default "查看站点说明，了解这个小空间被放在这里的原因。" $orbit.about.description }}" data-orbit-href="{{ default "#site-intro" $orbit.about.href }}" data-orbit-link="{{ default "查看关于" $orbit.about.link_text }}" data-orbit-lane="0.37" data-orbit-flat="0.58" data-orbit-start="204" data-orbit-duration="33500" data-orbit-offset-x="-34" data-orbit-offset-y="18" data-orbit-rotate="-16" aria-pressed="false">
+      <span class="waapi-satellite-orb"></span>
+      <span class="waapi-satellite-label">{{ default "关于本站" $orbit.about.label }}</span>
+    </button>
+
+    <aside class="waapi-orbit-detail" data-orbit-detail aria-live="polite">
+      <span class="waapi-detail-kicker" data-orbit-detail-kicker>{{ default "Archive" $orbit.posts.kicker }}</span>
+      <h3 data-orbit-detail-title>{{ default "文章" $orbit.posts.title }}</h3>
+      <p data-orbit-detail-desc>{{ default "浏览所有文章，按时间回看学习、项目和创作记录。" $orbit.posts.description }}</p>
+      <a class="waapi-detail-link" href="{{ default "/posts/" $orbit.posts.href }}" data-orbit-detail-link>{{ default "进入文章" $orbit.posts.link_text }} {{ partial "ui-icon.html" "arrow-right" }}</a>
+    </aside>
+    </nav>
+
+    <p class="waapi-gateway-credit" aria-hidden="true">Orbit module adapted from a MIT WAAPI solar-system structure.</p>
+  </div>
+</section>

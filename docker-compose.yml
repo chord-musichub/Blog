@@ -1,0 +1,23 @@
+services:
+  blog-admin:
+    build: .
+    container_name: blog-admin
+    restart: unless-stopped
+    environment:
+      ADDR: "${ADDR:-:8080}"
+      DATA_DIR: "/app/data"
+      HUGO_CONTENT_DIR: "/app/content/posts"
+      PUBLIC_DIR: "/app/published"
+      HUGO_COMMAND: "hugo --minify --source . --destination /app/published"
+      ADMIN_USER: "${ADMIN_USER:?Run deploy/init-local.ps1 to create .env first}"
+      ADMIN_PASS: "${ADMIN_PASS:?Run deploy/init-local.ps1 to create .env first}"
+      SESSION_SECRET: "${SESSION_SECRET:?Run deploy/init-local.ps1 to create .env first}"
+      ADMIN_BASE_PATH: "${ADMIN_BASE_PATH:-}"
+      PUBLIC_BASE_URL: "${PUBLIC_BASE_URL:-/}"
+    volumes:
+      - ./data:/app/data
+      - ./content:/app/content
+      - ./static/uploads:/app/static/uploads
+      - ./published:/app/published
+    ports:
+      - "127.0.0.1:8080:8080"

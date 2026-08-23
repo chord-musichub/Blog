@@ -1,0 +1,37 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/") }}
+{{ $cfg := .Site.Data.site }}
+<section class="page-hero minimal-page-hero">
+<h1>文章</h1>
+</section>
+<section class="card toolbar-panel">
+  <input id="postSearch" class="searchbox" type="search" autocomplete="off" placeholder="搜索文章标题或作者...">
+  <button class="pill search-submit" id="postSearchSubmit" type="button" data-search-submit="post" data-no-page-loading>搜索</button>
+  <span class="pill search-count" id="postSearchCount">正在统计文章</span>
+  <div class="pills" id="postFilters">
+    <button class="pill active" type="button" data-filter="all">全部</button>
+    <button class="pill" type="button" data-filter="技术">技术</button>
+    <button class="pill" type="button" data-filter="生活">生活</button>
+    <button class="pill" type="button" data-filter="思考">思考</button>
+    <button class="pill" type="button" data-filter="随笔">随笔</button>
+  </div>
+  <span class="pill">最新发布⌄</span>
+</section>
+<section class="article-list" id="postList">
+  {{ range .Paginator.Pages }}
+    <div class="post-search-item" data-title="{{ .Title | plainify }}" data-author="{{ .Params.author_display | default .Params.author | plainify }} {{ .Params.author_username | default .Params.author | plainify }}" data-summary="{{ with .Params.summary }}{{ . | plainify }}{{ else }}{{ .Summary | plainify }}{{ end }}" data-tags="{{ with .Params.tags }}{{ delimit . "," }}{{ end }}" data-search-text="{{ .Plain | plainify }}">
+      {{ partial "post-card.html" . }}
+    </div>
+  {{ else }}
+    <div class="card" style="padding:28px">还没有文章。</div>
+  {{ end }}
+</section>
+<div id="postEmpty" class="card" style="display:none;padding:28px;margin-top:18px">没有找到匹配的文章。</div>
+{{ if gt .Paginator.TotalPages 1 }}
+<nav class="pagination">
+  {{ if .Paginator.HasPrev }}<a href="{{ .Paginator.Prev.URL }}">‹</a>{{ end }}
+  {{ range .Paginator.Pagers }}<a class="{{ if eq . $.Paginator }}active{{ end }}" href="{{ .URL }}">{{ .PageNumber }}</a>{{ end }}
+  {{ if .Paginator.HasNext }}<a href="{{ .Paginator.Next.URL }}">›</a>{{ end }}
+</nav>
+{{ end }}
+{{ end }}

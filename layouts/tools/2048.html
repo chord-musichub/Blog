@@ -1,0 +1,66 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+
+<main class="tool-page tool-2048-page">
+  <section class="tool-2048-shell" data-game-2048>
+    <div class="tool-2048-hero">
+      <div>
+        <p class="eyebrow">Songline Mini Game</p>
+        <h1>2048</h1>
+        <p>合并相同数字，冲到 2048。2048 封顶不再合成 4096，可以继续刷分。</p>
+      </div>
+    </div>
+
+    <div class="game-2048-panel">
+      <div class="game-2048-topbar">
+        <div class="game-2048-score-card">
+          <span>分数</span>
+          <strong data-2048-score>0</strong>
+        </div>
+        <div class="game-2048-score-card">
+          <span>最高</span>
+          <strong data-2048-best>0</strong>
+        </div>
+        <button class="game-2048-sound-toggle" type="button" data-2048-sound-toggle aria-pressed="true">
+          <span data-2048-sound-label>音效开</span>
+        </button>
+        <button class="game-2048-sync" type="button" data-2048-sync-best>同步本地最佳</button>
+        <button class="game-2048-new" type="button" data-2048-new>重新开始</button>
+      </div>
+
+      <div class="game-2048-board-wrap">
+        <div class="game-2048-board" data-2048-board aria-label="2048 游戏棋盘"></div>
+        <div class="game-2048-overlay" data-2048-overlay hidden>
+          <strong data-2048-overlay-title>2048</strong>
+          <span data-2048-overlay-text>合并数字，冲到 2048。</span>
+          <button type="button" data-2048-overlay-new>再来一局</button>
+        </div>
+      </div>
+
+      <div class="game-2048-controls" aria-label="移动控制">
+        <button type="button" data-2048-move="up" aria-label="向上">↑</button>
+        <div class="game-2048-control-row">
+          <button type="button" data-2048-move="left" aria-label="向左">←</button>
+          <button type="button" data-2048-move="down" aria-label="向下">↓</button>
+          <button type="button" data-2048-move="right" aria-label="向右">→</button>
+        </div>
+      </div>
+
+
+      <details class="snake-leaderboard game-2048-leaderboard" data-2048-leaderboard aria-label="2048 前三名成绩" open>
+        <summary>
+          <span>前三名成绩</span>
+          <small>服务器记录</small>
+        </summary>
+        <ol data-2048-top-scores>
+          <li>暂无记录</li>
+        </ol>
+      </details>
+
+      <p class="game-2048-tip">
+        小提示：2048 是封顶块，不会继续合成 4096；本地最高分会自动尝试同步到服务器排行榜。
+      </p>
+    </div>
+  </section>
+</main>
+{{ end }}

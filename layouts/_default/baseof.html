@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  {{ $cfg := .Site.Data.site }}
+  {{ $siteTitle := default .Site.Title $cfg.site.title }}
+  {{ $favicon := default $cfg.site.logo_icon $cfg.site.favicon }}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{ if .IsHome }}{{ $siteTitle }}{{ else }}{{ .Title }} - {{ $siteTitle }}{{ end }}</title>
+  <meta name="description" content="{{ with .Params.summary }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+  <script>
+    (function(){
+      try{
+        var theme = localStorage.getItem('songline-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#fbfaf7';
+      }catch(e){
+        document.documentElement.setAttribute('data-theme', 'dark');
+        document.documentElement.style.backgroundColor = '#0d1728';
+      }
+    })();
+  </script>
+  {{ if .IsHome }}
+  <style>
+    html.is-boot-preparing,
+    html.is-boot-preparing body{
+      background:#000!important;
+    }
+    html.is-boot-preparing body > :not(.site-boot-overlay){
+      opacity:0!important;
+      visibility:hidden!important;
+    }
+  </style>
+  <script>
+    (function(){
+      try{
+        var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var played = sessionStorage.getItem('songline-home-boot-v20.20.6') === '1';
+        if(!reduced && !played){
+          document.documentElement.classList.add('is-boot-preparing');
+          document.documentElement.style.backgroundColor = '#000';
+          // v20.20.6: refresh fail-safe. If deferred boot JS is cached, interrupted,
+          // or fails before creating the overlay, never leave the whole page hidden.
+          window.__songlineBootPrepFallback = window.setTimeout(function(){
+            try{
+              var root = document.documentElement;
+              var overlay = document.querySelector('.site-boot-overlay');
+              root.classList.remove('is-boot-preparing','is-booting','boot-frame-settling');
+              if(overlay && !overlay.classList.contains('is-opening')) overlay.classList.add('is-opening');
+            }catch(err){}
+          }, 4200);
+        }
+      }catch(e){}
+    })();
+  </script>
+  {{ end }}
+  {{ with $favicon }}<link rel="icon" href="{{ . }}">{{ end }}
+  {{ with $favicon }}<link rel="apple-touch-icon" href="{{ . }}">{{ end }}
+{{ partial "resource-hints.html" . }}
+  <link rel="stylesheet" href="/css/site.css?v=20.20.6">
+  <link rel="stylesheet" href="/css/theme-vars.css?v=20.20.6">
+  <script defer src="/js/performance-guard.js?v=20.20.6"></script>
+  <script defer src="/js/page-transition.js?v=20.20.6"></script>
+  <script defer src="/js/mobile-adapt.js?v=20.20.6"></script>
+  <script defer src="/js/mobile-fixed-nav.js?v=20.20.6"></script>
+<script defer src="/js/space-ribbons.js?v=20.20.6"></script>
+</head>
+<body data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-boot-welcome="{{ default "欢迎回来" $cfg.boot.welcome_text }}"{{ with $cfg.background.image }} class="has-site-bg"{{ end }}>
+  <script>
+    (function(){
+      try{
+        if((localStorage.getItem('songline-theme') || 'dark') === 'dark') document.body.classList.add('dark');
+      }catch(e){
+        document.body.classList.add('dark');
+      }
+    })();
+  </script>
+  {{ with $cfg.background.image }}
+  <div class="site-bg-layer" style="--site-bg-image:url('{{ . }}');--site-bg-height:{{ default "420px" $cfg.background.height }};--site-bg-blur:{{ default "18px" $cfg.background.blur }};--site-bg-opacity:{{ default "0.38" $cfg.background.opacity }};" aria-hidden="true"></div>
+  {{ end }}
+  {{ partial "header.html" . }}
+  <main class="container">{{ block "main" . }}{{ end }}</main>
+  {{ partial "footer.html" . }}
+<script defer src="/js/page-modules.js?v=20.20.6"></script>
+<script defer src="/runtime-config.js"></script>
+{{ partial "page-specific-scripts.html" . }}
+</body>
+</html>

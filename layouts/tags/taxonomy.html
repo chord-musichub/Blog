@@ -1,0 +1,34 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tags/") }}
+{{ $cfg := .Site.Data.site }}
+{{ $tagTitle := .Title }}
+{{ if eq .Title "site-notice" }}{{ $tagTitle = "站点公告" }}{{ end }}
+{{ $tagCover := default "/img/hero-article.svg" $cfg.pages.article_default_cover }}
+{{ $tagCoverMode := "cover" }}
+{{ range .Pages }}
+  {{ if and (eq $tagCover (default "/img/hero-article.svg" $cfg.pages.article_default_cover)) .Params.cover }}
+    {{ $tagCover = .Params.cover }}
+    {{ $tagCoverMode = .Params.cover_mode | default "cover" }}
+  {{ end }}
+{{ end }}
+<section class="page-hero minimal-page-hero tag-detail-hero">
+<h1># {{ $tagTitle }}</h1>
+</section>
+<section class="card toolbar-panel">
+  <span class="pill active">{{ len .Pages }} 篇文章</span>
+  <span class="pill">最近更新 {{ with index .Pages 0 }}{{ .Date.Format "2006-01-02" }}{{ end }}</span>
+  <div class="pills">{{ range first 6 .Site.Taxonomies.tags.ByCount }}{{ $name := .Page.Title }}{{ if eq $name "site-notice" }}{{ $name = "站点公告" }}{{ end }}{{ $url := .Page.RelPermalink }}{{ with index $.Site.Data.tag_urls .Page.Title }}{{ $url = .url }}{{ end }}<a class="pill" href="{{ $url }}">{{ $name }}</a>{{ end }}</div>
+</section>
+<section class="section">
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "article" }}</span><h2>该标签下的文章</h2></div>
+  <div class="article-list">{{ range .Pages }}{{ partial "post-card.html" . }}{{ else }}<div class="card" style="padding:28px">还没有文章。</div>{{ end }}</div>
+</section>
+<section class="section">
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "tag" }}</span><h2>相关标签</h2></div>
+  <div class="pills">{{ range first 8 .Site.Taxonomies.tags.ByCount }}{{ $name := .Page.Title }}{{ if eq $name "site-notice" }}{{ $name = "站点公告" }}{{ end }}{{ $url := .Page.RelPermalink }}{{ with index $.Site.Data.tag_urls .Page.Title }}{{ $url = .url }}{{ end }}<a class="pill" href="{{ $url }}">{{ $name }} {{ .Count }}</a>{{ end }}</div>
+</section>
+<section class="section">
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "fire" }}</span><h2>热门文章</h2></div>
+  <div class="related-grid">{{ range first 3 .Pages }}<a class="card related-card related-card-link" href="{{ .RelPermalink }}" aria-label="阅读热门文章：{{ .Title }}"><span class="post-thumb lazy-bg cover-mode-{{ .Params.cover_mode | default "cover" }}" data-bg="{{ .Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}"></span><div class="post-info"><h3>{{ .Title }}</h3><div class="meta-row"><span>{{ .Date.Format "2006-01-02" }}</span><span class="views real-views meta-icon-item" data-view-mode="get" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span></div></div></a>{{ end }}</div>
+</section>
+{{ end }}

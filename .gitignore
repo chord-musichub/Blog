@@ -1,0 +1,41 @@
+# 私有运行数据：文章、用户、站点设置、成绩等
+/data/*
+
+# 本地文章和自动生成的内容页面
+/content/posts/
+/content/friends/
+/content/tags/
+
+# 文章图片、后台上传的媒体
+/static/uploads/
+/static/md-source/
+/static/runtime-config.js
+/static/friends-data.json
+
+# Hugo 构建产物与本地二进制
+/published/
+/resources/
+.hugo_build.lock
+/blog-admin
+
+# 本地部署配置与密钥
+.env
+.env.*
+!.env.example
+deploy/*.local.sh
+deploy/*.local.ps1
+
+# Historical deployment checks may contain machine and domain details; keep
+# them locally, but do not include them in the source-only repository.
+/deploy/verify_v*.sh
+/deploy/deploy_v*_safe.sh
+/deploy/install_*_v*.sh
+/deploy/nginx-*-v*.conf
+
+# 系统、编辑器和私钥文件
+.DS_Store
+Thumbs.db
+*.pem
+*.key
+id_rsa
+id_rsa.pub

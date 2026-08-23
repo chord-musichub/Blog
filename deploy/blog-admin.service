@@ -1,0 +1,18 @@
+[Unit]
+Description=Gexian Markdown Blog Admin
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/gexian-blog-mvp
+ExecStart=/opt/gexian-blog-mvp/blog-admin
+Restart=always
+RestartSec=3
+Environment=ADDR=127.0.0.1:8080
+Environment=DATA_DIR=/opt/gexian-blog-mvp/data
+Environment=HUGO_CONTENT_DIR=/opt/gexian-blog-mvp/content/posts
+Environment=PUBLIC_DIR=/opt/gexian-blog-mvp/published
+Environment=HUGO_COMMAND=/opt/gexian-blog-mvp/deploy/rebuild.sh
+EnvironmentFile=/etc/gexian-blog-admin.env
+
+[Install]
+WantedBy=multi-user.target

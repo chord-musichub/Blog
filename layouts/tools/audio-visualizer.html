@@ -1,0 +1,94 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+
+<main class="tool-page audio-visualizer-page" data-audio-visualizer>
+  <section class="av-stage" data-av-stage>
+    <canvas class="av-canvas" data-av-canvas width="1440" height="900" aria-label="音频可视化画布"></canvas>
+    <div class="av-noise" aria-hidden="true"></div>
+    <div class="av-vignette" aria-hidden="true"></div>
+    <div class="av-drop-overlay" data-av-drop-overlay aria-hidden="true">
+      <div class="av-drop-card">
+        <span>Drop Audio</span>
+        <strong>松开添加到播放列表</strong>
+        <p>支持 MP3 / FLAC / WAV / M4A / AAC / OGG，可一次拖入多首。</p>
+      </div>
+    </div>
+
+    <header class="av-topbar">
+      <div>
+        <p class="eyebrow">Songline Visual Lab</p>
+        <h1>音频可视化</h1>
+        <p class="av-subtitle">网页端音频可视化：可以临时捕获系统/标签页声音，也可以加入本地音乐列表播放，并显示封面、进度和音量。</p>
+      </div>
+      <div class="av-status-stack">
+        <div class="av-status-pill is-soft" data-av-audio-state>等待音频来源</div>
+      </div>
+    </header>
+
+    <section class="av-now" data-av-now aria-live="polite">
+      <div class="av-cover" data-av-cover>
+        <img data-av-cover-img alt="当前歌曲封面" hidden>
+        <span data-av-cover-fallback>♫</span>
+      </div>
+      <div class="av-track">
+        <p data-av-source>Local Audio</p>
+        <h2 data-av-title>Audio Visualizer</h2>
+        <p data-av-artist></p>
+        <div class="av-progress" data-av-progressbar role="slider" tabindex="0" aria-label="播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span data-av-progress></span>
+        </div>
+        <small data-av-time>--:-- / --:--</small>
+      </div>
+    </section>
+
+    <section class="av-source-panel" data-av-source-panel aria-label="音频来源选择">
+      <article class="av-source-card is-primary">
+        <span>Source 01</span>
+        <strong>网页授权 · 系统声音</strong>
+        <p>临时捕获系统/标签页音频并生成频谱。浏览器通常会弹出系统授权窗口；这个模式只负责频谱，不读取歌曲名和封面。</p>
+        <button class="av-button" type="button" data-av-browser-audio>授权系统声音</button>
+      </article>
+
+      <article class="av-source-card">
+        <span>Source 02</span>
+        <strong>本地音频</strong>
+        <p>一次可以选择或拖拽多个音频文件加入本地播放列表，支持点击列表切歌、自动顺播、继续追加音乐。</p>
+        <button class="av-button" type="button" data-av-upload>添加音乐</button>
+      </article>
+    </section>
+
+    <section class="av-playlist-panel" data-av-playlist hidden aria-label="本地播放列表">
+      <div class="av-playlist-head">
+        <div>
+          <span>Local Queue</span>
+          <strong>本地音乐列表</strong>
+        </div>
+        <div class="av-playlist-actions">
+          <button class="av-mini-button" type="button" data-av-playlist-toggle aria-expanded="true">收起</button>
+          <button class="av-mini-button" type="button" data-av-play-mode aria-label="播放模式">列表循环</button>
+          <button class="av-mini-button" type="button" data-av-prev>上一首</button>
+          <button class="av-mini-button" type="button" data-av-next>下一首</button>
+        </div>
+      </div>
+      <div class="av-playlist-list" data-av-playlist-list></div>
+    </section>
+
+    <section class="av-controls">
+      <button class="av-button" type="button" data-av-open-file>添加音乐</button>
+      <button class="av-button" type="button" data-av-display-mode aria-pressed="false">全隐藏</button>
+      <button class="av-button" type="button" data-av-fullscreen>全屏显示</button>
+      <label class="av-volume-control" data-av-volume-wrap>
+        <span>音量</span>
+        <input type="range" min="0" max="100" step="1" value="80" data-av-volume aria-label="本地音频音量">
+        <small data-av-volume-value>80%</small>
+      </label>
+      <input type="file" accept="audio/*,.mp3,.flac,.wav,.m4a,.aac,.ogg" data-av-file multiple hidden>
+      <audio data-av-audio preload="metadata" hidden></audio>
+    </section>
+
+    <p class="av-hint" data-av-hint>
+      选择一个音频来源开始。网页系统声音适合临时频谱；本地音频支持多文件列表、顺播、切歌和音量控制。
+    </p>
+  </section>
+</main>
+{{ end }}

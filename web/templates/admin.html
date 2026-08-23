@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>审核后台</title><script>
+(function(){
+  try{
+    var theme = localStorage.getItem('gexian-admin-theme') || 'dark';
+    document.documentElement.setAttribute('data-admin-theme', theme);
+    document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#fbfaf7';
+  }catch(e){
+    document.documentElement.setAttribute('data-admin-theme', 'dark');
+    document.documentElement.style.backgroundColor = '#0d1728';
+  }
+})();
+</script><link rel="stylesheet" href="/static/style.css?v=20.18.5"><script defer src="/static/admin-theme.js"></script><script defer src="/static/admin-nav.js?v=20.18.5"></script><script defer src="/static/admin-mobile.js?v=20.18.5"></script><script defer src="/static/page-transition.js?v=20.18.5"></script>
+<style>
+:root{
+  --admin-bg:{{default "#fbfaf7" .Theme.Background}};
+  --admin-panel:color-mix(in srgb, {{default "#fffdfa" .Theme.Panel}} 86%, transparent);
+  --admin-panel-strong:{{default "#fffdfa" .Theme.Panel}};
+  --admin-text:{{default "#15345b" .Theme.Text}};
+  --admin-muted:{{default "#64748b" .Theme.Muted}};
+  --admin-accent:{{default "#0ea5e9" .Theme.Accent}};
+  --admin-accent-2:{{default "#2563eb" .Theme.Accent2}};
+  --admin-soft:color-mix(in srgb, {{default "#0ea5e9" .Theme.Accent}} 11%, {{default "#fbfaf7" .Theme.Background}});
+  --admin-warm:color-mix(in srgb, #ffe7bd 36%, {{default "#fbfaf7" .Theme.Background}});
+}
+</style>
+<style id="admin-dark-top-hardfix">
+html[data-admin-theme="dark"],
+html[data-admin-theme="dark"] body,
+html[data-admin-theme="dark"] body::before,
+html[data-admin-theme="dark"] body::after{
+  background:#0d1728!important;
+  background-image:none!important;
+}
+html[data-admin-theme="dark"] body{
+  margin-top:0!important;
+  border-top:0!important;
+  box-shadow:none!important;
+}
+html[data-admin-theme="dark"] .admin-site-bg-layer{
+  display:block!important;
+  visibility:visible!important;
+  opacity:var(--admin-site-bg-opacity, .38)!important;
+  background-image:var(--admin-site-bg-image)!important;
+  background-size:cover!important;
+  background-position:center top!important;
+}
+html[data-admin-theme="dark"] .admin-client-nav{
+  background:#101c30!important;
+  background-image:none!important;
+  border-color:rgba(125,211,252,.18)!important;
+}
+html[data-admin-theme="dark"] .admin-main-nav,
+html[data-admin-theme="dark"] .admin-glass-nav,
+html[data-admin-theme="dark"] main.wrap > nav.nav:first-child,
+html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
+  display:none!important;
+  height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+</style>
+<script defer src="/static/space-ribbons.js?v=20.18.5"></script>
+</head>
+<body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
+{{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
+
+<nav class="admin-client-nav" data-admin-client-nav>
+  <a class="admin-client-brand admin-client-brand-simple" href="{{adminURL "/"}}">后台</a>
+  <div class="admin-client-links">
+    <a href="{{adminURL "/"}}" data-admin-route="dashboard">工作台</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin"}}" data-admin-route="review">审核</a>{{end}}
+    <a href="{{adminURL "/articles/new"}}" data-admin-route="new">新建</a>
+    <a href="{{adminURL "/articles/upload"}}" data-admin-route="upload">上传</a>
+    <a href="{{adminURL "/admin/media"}}" data-admin-route="media">媒体库</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin/site"}}" data-admin-route="site">站点</a>{{end}}
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/users/new"}}" data-admin-route="users">作者</a>{{end}}
+    <a href="{{adminURL "/account"}}" data-admin-route="account">账号</a>
+  </div>
+  <div class="admin-client-actions">
+    <a class="admin-client-home" href="{{publicURL}}" target="_blank" rel="noopener">回主页 ↗</a>
+    <button class="admin-theme-icon-button admin-client-theme" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <a class="admin-client-logout" href="{{adminURL "/logout"}}">退出</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <nav class="nav admin-main-nav admin-glass-nav">
+    <strong class="admin-brand"><span class="admin-brand-mark">S</span><span>审核与站点管理</span></strong>
+    <a class="btn small ghost admin-back-icon" href="{{adminURL "/"}}" data-admin-back aria-label="返回" title="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
+    <a class="btn small" href="{{adminURL "/articles/upload"}}">上传 .md</a>
+    <a class="btn small secondary" href="{{adminURL "/articles/new"}}">新建文章</a>
+    <a class="btn small" href="{{adminURL "/users/new"}}">添加作者</a>
+    <a class="btn small secondary" href="{{adminURL "/admin/site"}}">站点设置</a>
+    <a class="btn small secondary" href="{{adminURL "/admin/manuscript"}}">稿件设置</a>
+    <a class="btn small secondary" href="{{adminURL "/admin/media"}}">媒体库</a>
+    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></button>
+  </nav>
+  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  <section class="hero compact admin-hero">
+    <div>
+<h1>审核后台</h1>
+      <p>这里优先处理「待审核稿件」。审核通过才会发布并重建公开站；草稿不会自动出现在首页。</p>
+    </div>
+    <div class="admin-hero-actions">
+      <a class="btn" href="{{adminURL "/articles/upload"}}">上传 .md</a>
+      <a class="btn secondary" href="{{adminURL "/articles/new"}}">新建文章</a>
+      <a class="btn secondary" href="{{adminURL "/admin/site"}}">站点设置</a>
+      <a class="btn ghost" href="{{publicURL}}" target="_blank">公开站 ↗</a>
+    </div>
+  </section>
+
+  <section class="card danger-zone">
+    <h2>清理工具</h2>
+    <p class="meta">测试期用。清理后会自动重建公开博客。</p>
+    <div class="actions">
+      <form method="post" action="{{adminURL "/admin/cleanup"}}" onsubmit="return confirm('确定清理所有草稿和退回文章吗？')"><input type="hidden" name="mode" value="drafts"><button class="small danger"><span class="btn-ico" aria-hidden="true">🧹</span><span class="btn-text optional">清理草稿/退回</span></button></form>
+      <form method="post" action="{{adminURL "/admin/cleanup"}}" onsubmit="return confirm('危险操作：确定清空所有文章吗？公开博客也会被清空。')"><input type="hidden" name="mode" value="all"><button class="small danger"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text optional">清空所有文章</span></button></form>
+    </div>
+  </section>
+
+  <div class="toolbar section-toolbar"><h2>待审核稿件 <span class="soft-count">{{len .PendingArticles}}</span></h2><span class="meta">只有这里的文章才算“进入审核”。</span></div>
+  {{range .PendingArticles}}
+  <article class="card article-row review-row pending-review-row">
+    <div>
+      <h3><a href="{{adminURL (printf "/articles/%s/edit" .ID)}}">{{.Title}}</a></h3>
+      <p class="meta">作者：{{.Author}} · <span class="badge {{statusClass .Status}}">{{statusText .Status}}</span> · Slug: <code>{{.Slug}}</code> · 更新：{{fmtTime .UpdatedAt}}</p>
+      {{if .Summary}}<p>{{.Summary}}</p>{{end}}
+    </div>
+    <div class="actions vertical">
+      <form method="post" action="{{adminURL (printf "/articles/%s/publish" .ID)}}"><button class="small"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text optional">审核通过并发布</span></button></form>
+      <details class="reject-box"><summary><span class="btn-ico" aria-hidden="true">↩</span>退回修改</summary><form method="post" action="{{adminURL (printf "/articles/%s/reject" .ID)}}"><input name="note" placeholder="退回原因，可选"><button class="small danger"><span class="btn-ico" aria-hidden="true">!</span><span class="btn-text optional">确认退回</span></button></form></details>
+      <a class="btn small secondary" href="{{adminURL (printf "/articles/%s/edit" .ID)}}">查看/编辑</a>
+    </div>
+  </article>
+  {{else}}<div class="empty card">暂无待审核稿件。作者点「提交审核」后，会出现在这里。</div>{{end}}
+
+  <details class="card admin-article-archive" open>
+    <summary><b>全部文章管理</b> <span class="soft-count">{{len .Articles}}</span> <span class="meta">草稿、已发布、退回都在这里</span></summary>
+    {{range .OtherArticles}}
+    <article class="card article-row compact-article-row">
+      <div>
+        <h3><a href="{{adminURL (printf "/articles/%s/edit" .ID)}}">{{.Title}}</a></h3>
+        <p class="meta">作者：{{.Author}} · <span class="badge {{statusClass .Status}}">{{statusText .Status}}</span> · Slug: <code>{{.Slug}}</code> · 更新：{{fmtTime .UpdatedAt}}</p>
+        {{if .Summary}}<p>{{.Summary}}</p>{{end}}
+        {{if .RejectNote}}<p class="warn">退回原因：{{.RejectNote}}</p>{{end}}
+      </div>
+      <div class="actions vertical">
+        <a class="btn small secondary" href="{{adminURL (printf "/articles/%s/edit" .ID)}}">查看/编辑</a>
+        {{if canPublish .}}<form method="post" action="{{adminURL (printf "/articles/%s/publish" .ID)}}"><button class="small"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text optional">{{if eq .Status "published"}}更新公开站{{else}}直接发布{{end}}</span></button></form>{{end}}
+        <form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" onsubmit="return confirm('确定删除这篇文章吗？已发布文章会同步从公开博客移除。')"><button class="small danger"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text optional">删除文章</span></button></form>
+      </div>
+    </article>
+    {{else}}<div class="empty card">暂无其他文章。</div>{{end}}
+  </details>
+
+  <h2>密码修改申请</h2>
+  <div class="card table-wrap"><table><thead><tr><th>用户</th><th>状态</th><th>说明</th><th>提交时间</th><th>处理人</th><th>操作</th></tr></thead><tbody>{{range .PasswordResets}}<tr><td>{{.Username}}</td><td><span class="badge {{.Status}}">{{resetStatusText .Status}}</span></td><td>{{.Note}}</td><td>{{fmtTime .CreatedAt}}</td><td>{{.ResolvedBy}}</td><td>{{if eq .Status "pending"}}<div class="actions"><details><summary>批准并设临时密码</summary><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/approve" .ID)}}" class="mini-form"><span class="password-field mini-password-field"><input id="reset-request-{{.ID}}" name="password" type="password" minlength="8" placeholder="临时密码，至少 8 位"><button class="password-toggle" type="button" data-password-toggle="#reset-request-{{.ID}}" aria-label="显示密码"></button></span><button class="small"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text optional">批准</span></button></form></details><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/reject" .ID)}}"><button class="small danger"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text optional">拒绝</span></button></form></div>{{else}}<span class="meta">已处理</span>{{end}}</td></tr>{{else}}<tr><td colspan="6" class="meta">暂无密码修改申请。</td></tr>{{end}}</tbody></table></div>
+  <form method="post" action="{{adminURL "/admin/password-requests/clear/clear"}}" onsubmit="return confirm('清理所有已处理的密码申请吗？')"><button class="small secondary"><span class="btn-ico" aria-hidden="true">🧹</span><span class="btn-text optional">清理已处理申请</span></button></form>
+
+  <h2>用户</h2>
+  <div class="card table-wrap">
+    <table>
+      <thead><tr><th>用户名</th><th>显示名</th><th>角色</th><th>账号类型</th><th>文章数</th><th>状态</th><th>密码</th><th>创建时间</th><th>操作</th></tr></thead>
+      <tbody>
+        {{range .Users}}
+        <tr>
+          <td>{{.Username}}</td>
+          <td>{{.DisplayName}}</td>
+          <td>{{.Role}}</td>
+          <td><span class="badge account-type {{.AccountType}}">{{accountTypeText .AccountType}}</span></td>
+          <td>{{userArticleCount .Username}}</td>
+          <td>{{if .Disabled}}<span class="badge rejected">已禁用</span>{{else}}<span class="badge published">正常</span>{{end}}</td>
+          <td>{{if .PasswordMustChange}}<span class="badge pending">需修改</span>{{else}}<span class="meta">正常</span>{{end}}</td>
+          <td>{{fmtTime .CreatedAt}}</td>
+          <td>
+            {{if ne .Role "admin"}}
+            <div class="actions">
+              <form method="post" action="{{adminURL (printf "/users/%s/toggle" .Username)}}"><button class="small secondary">{{if .Disabled}}启用{{else}}禁用{{end}}</button></form>
+              <details><summary><span class="btn-ico" aria-hidden="true">🔑</span>重置密码</summary><form method="post" action="{{adminURL (printf "/users/%s/reset" .Username)}}" class="mini-form"><span class="password-field mini-password-field"><input id="reset-user-{{.Username}}" name="password" type="password" placeholder="新密码，至少 6 位"><button class="password-toggle" type="button" data-password-toggle="#reset-user-{{.Username}}" aria-label="显示密码"></button></span><button class="small"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text optional">确认</span></button></form></details>
+              {{if canDeleteUser .}}
+              <form method="post" action="{{adminURL (printf "/users/%s/delete" .Username)}}" onsubmit="return confirm('确定删除该用户吗？此操作不可恢复。')"><button class="small danger"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text optional">删除</span></button></form>
+              {{else}}
+              <span class="meta">{{userDeleteReason .}}</span>
+              {{end}}
+            </div>
+            {{else}}<span class="meta">管理员不可删</span>{{end}}
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>

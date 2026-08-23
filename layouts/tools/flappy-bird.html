@@ -1,0 +1,54 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+
+<main class="tool-page flappy-page">
+  <section class="flappy-shell" data-flappy-game>
+    <div class="flappy-hero">
+      <div>
+        <p class="eyebrow">Songline Mini Game</p>
+        <h1>管道鸟</h1>
+        <p>点击屏幕或按空格让小鸟上飞，穿过管道得分。别撞管道，也别落地。</p>
+      </div>
+    </div>
+
+    <section class="flappy-panel">
+      <div class="flappy-topbar">
+        <div class="flappy-score-card">
+          <span>分数</span>
+          <strong data-flappy-score>0</strong>
+        </div>
+        <div class="flappy-score-card">
+          <span>本地最佳</span>
+          <strong data-flappy-best>0</strong>
+        </div>
+        <button class="flappy-sound-toggle" type="button" data-flappy-sound-toggle aria-pressed="true">
+          <span data-flappy-sound-label>音效开</span>
+        </button>
+        <button class="flappy-button leaderboard-sync-btn" type="button" data-flappy-sync-best>同步本地最佳</button>
+        <button class="flappy-button" type="button" data-flappy-start>开始 / 重来</button>
+      </div>
+
+      <div class="flappy-board-wrap">
+        <canvas class="flappy-canvas" data-flappy-canvas width="900" height="520" aria-label="管道鸟游戏画布"></canvas>
+        <button class="flappy-overlay" type="button" data-flappy-overlay>
+          <span data-flappy-state>准备起飞</span>
+          <strong data-flappy-title>点击开始</strong>
+          <em data-flappy-text>点击屏幕 / 按空格：向上飞一下。</em>
+        </button>
+      </div>
+
+      <details class="snake-leaderboard flappy-leaderboard" data-flappy-leaderboard aria-label="管道鸟前三名成绩" open>
+        <summary>
+          <span>前三名成绩</span>
+          <small>服务器记录</small>
+        </summary>
+        <ol data-flappy-top-scores>
+          <li>暂无记录</li>
+        </ol>
+      </details>
+
+      <p class="flappy-tip">小提示：不要狂点，节奏稍微稳一点，小鸟会更容易钻过管道。</p>
+    </section>
+  </section>
+</main>
+{{ end }}

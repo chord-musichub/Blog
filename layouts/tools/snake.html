@@ -1,0 +1,72 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+<section class="page-hero tools-hero snake-hero">
+<h1>贪吃蛇</h1>
+</section>
+
+<section class="card snake-tool-panel" data-snake-game>
+  <div class="snake-head">
+    <div>
+      <h2>星际贪吃蛇</h2>
+      <p>玩法：18格棋盘更清楚；粉豆限时连锁更难；棕豆造墙，黑豆清墙；金盾抵伤。</p>
+    </div>
+    <div class="snake-stats" aria-live="polite">
+      <span>分数 <b data-snake-score>0</b></span>
+      <span>最高 <b data-snake-best>0</b></span>
+      <span>等级 <b data-snake-level>1</b></span>
+      <span data-snake-state>准备开始</span>
+    </div>
+  </div>
+
+  <div class="snake-arcade-strip" aria-live="polite">
+    <span class="snake-chip snake-combo" data-snake-combo>连击 x1</span>
+    <span class="snake-chip snake-shield" data-snake-shield>护盾 0</span>
+    <span class="snake-chip snake-slow" data-snake-slow>缓速 0s</span>
+    <span class="snake-chip snake-rush" data-snake-rush>临时豆 待机</span>
+    <span class="snake-chip snake-tip" data-snake-tip>18格棋盘 · 粉豆限时连锁 · 棕豆造墙 · 黑豆清墙</span>
+  </div>
+
+  <div class="snake-stage-wrap">
+    <canvas class="snake-canvas" width="480" height="480" data-snake-canvas aria-label="贪吃蛇游戏区域"></canvas>
+    <div class="snake-overlay" data-snake-overlay>
+      <strong data-snake-overlay-title>玩法介绍</strong>
+      <span data-snake-overlay-text>18格棋盘更清楚；蓝豆得分；粉豆限时连锁，越后越紧；棕豆造墙；黑豆清墙；金盾抵伤。点击开始。</span>
+    </div>
+  </div>
+
+  <details class="snake-leaderboard" data-snake-leaderboard aria-label="贪吃蛇前三名成绩" open>
+    <summary>
+      <span>前三名成绩</span>
+      <small>服务器记录</small>
+    </summary>
+    <ol data-snake-top-scores>
+      <li>暂无记录</li>
+    </ol>
+  </details>
+
+  <div class="snake-controls">
+    <button class="btn" type="button" data-snake-start>开始 / 重新开始</button>
+    <button class="btn secondary" type="button" data-snake-pause>暂停</button>
+    <button class="btn secondary leaderboard-sync-btn" type="button" data-snake-sync-best>同步本地最佳</button>
+    <label class="snake-sound-toggle"><input type="checkbox" data-snake-sound checked> 音效</label>
+  </div>
+
+  <div class="snake-mobile-panel" data-snake-mobile-pad aria-label="移动端操作区">
+<div class="snake-mobile-pad" aria-label="移动端方向控制">
+      <button type="button" data-snake-dir="up">{{ partial "ui-icon.html" "arrow-up" }}</button>
+      <button type="button" data-snake-dir="left">{{ partial "ui-icon.html" "arrow-left" }}</button>
+      <button type="button" data-snake-dir="down">{{ partial "ui-icon.html" "arrow-down" }}</button>
+      <button type="button" data-snake-dir="right">{{ partial "ui-icon.html" "arrow-right" }}</button>
+    </div>
+  </div>
+
+  <div class="snake-help">
+    <span><kbd>↑↓←→</kbd> / <kbd>WASD</kbd> 移动</span>
+    <span><kbd>Space</kbd> 暂停 / 继续</span>
+    <span><kbd>Shift</kbd> 按住加速</span>
+    <span>18格棋盘 · 粉豆限时连锁 · 棕豆造墙 · 黑豆清墙 · 金盾抵伤</span>
+    <span>首次点击游戏区域会激活音效</span>
+  </div>
+</section>
+
+{{ end }}

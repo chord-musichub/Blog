@@ -1,0 +1,56 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+
+<main class="tool-page typing-page">
+  <section class="typing-shell" data-typing-practice>
+    <div class="typing-hero">
+      <div>
+        <p class="eyebrow">Songline Mini Tool</p>
+        <h1>打字练习</h1>
+        <p>随机抽取短文练习。英文模式和中英混打模式分开统计，排行榜按完成整篇文章的时间排序。</p>
+      </div>
+    </div>
+
+    <section class="typing-panel">
+      <div class="typing-topbar">
+        <div class="typing-mode-group" role="group" aria-label="打字模式">
+          <button class="typing-mode is-active" type="button" data-typing-mode="english">英文</button>
+          <button class="typing-mode" type="button" data-typing-mode="mixed">中文/中英混打</button>
+        </div>
+        <button class="typing-sound-toggle" type="button" data-typing-sound-toggle aria-pressed="true"><span data-typing-sound-label>音效开</span></button>
+        <button class="typing-button leaderboard-sync-btn" type="button" data-typing-sync-best>同步本地最佳</button>
+        <button class="typing-button" type="button" data-typing-random>随机换文</button>
+      </div>
+
+      <div class="typing-stats">
+        <div class="typing-stat-card"><span>时间</span><strong data-typing-time>0.00s</strong></div>
+        <div class="typing-stat-card"><span>进度</span><strong data-typing-progress>0%</strong></div>
+        <div class="typing-stat-card"><span>错误</span><strong data-typing-errors>0</strong></div>
+        <div class="typing-stat-card"><span>本地最佳</span><strong data-typing-best>--</strong></div>
+      </div>
+
+      <article class="typing-card">
+        <div class="typing-meta"><span data-typing-article-title>Loading</span><small data-typing-mode-label>英文</small></div>
+        <div class="typing-text" data-typing-text aria-label="练习文本"></div>
+        <textarea class="typing-input" data-typing-input autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="点这里开始输入。完成整篇文章后会记录时间。" autocorrect="off" inputmode="text"></textarea>
+        <div class="typing-actions">
+          <button class="typing-button" type="button" data-typing-restart>重新开始</button>
+          <button class="typing-button" type="button" data-typing-focus>开始输入</button>
+        </div>
+      </article>
+
+      <details class="snake-leaderboard typing-leaderboard" data-typing-leaderboard aria-label="打字练习前三名成绩" open>
+        <summary>
+          <span data-typing-rank-title>英文前三名</span>
+          <small>越快越好</small>
+        </summary>
+        <ol data-typing-top-scores>
+          <li>暂无记录</li>
+        </ol>
+      </details>
+
+      <p class="typing-tip">小提示：为了排行榜更接近真实手速，粘贴会被拦截。文章池目前是内置随机，后面可以再做后台文本库。</p>
+    </section>
+  </section>
+</main>
+{{ end }}

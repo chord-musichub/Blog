@@ -1,0 +1,225 @@
+(function(){
+  'use strict';
+
+  var VERSION = '20.20.6';
+  var loaded = Object.create(null);
+  var loading = Object.create(null);
+
+  var modules = [
+    {
+      key:'home-orbit',
+      src:'/js/home-orbit-waapi.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-waapi-orbit], .waapi-orbit-stage, .home-orbit-stage, .home-waapi-orbit');
+      },
+      init:function(root){
+        if(window.SonglineInitHomeOrbit) window.SonglineInitHomeOrbit(root || document);
+      }
+    },
+    {
+      key:'friend-galaxy',
+      src:'/js/friend-galaxy.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-friend-galaxy], .friend-galaxy, .friend-galaxy-stage, .friends-galaxy, .galaxy-map');
+      },
+      init:function(root){
+        if(window.SonglineInitFriendGalaxy) window.SonglineInitFriendGalaxy(root || document);
+      }
+    },
+    {
+      key:'tag-flow',
+      src:'/js/tag-flow.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-tag-flow], .tag-flow, .tag-river, .tag-river-stage, .tag-river-canvas, .tag-river-search');
+      },
+      init:function(root){
+        if(window.SonglineInitTagFlow) window.SonglineInitTagFlow(root || document);
+      }
+    },
+    {
+      key:'snake',
+      src:'/js/tools/snake.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-snake-game], .snake-game, .snake-tool-panel, #snake-canvas');
+      },
+      init:function(root){
+        if(window.SonglineInitSnake) window.SonglineInitSnake(root || document);
+      }
+    },
+    {
+      key:'2048',
+      src:'/js/tools/game-2048.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-game-2048], .tool-2048-page, .game-2048-board');
+      },
+      init:function(root){
+        if(window.SonglineInit2048) window.SonglineInit2048(root || document);
+      }
+    },
+    {
+      key:'typing-practice',
+      src:'/js/tools/typing-practice.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-typing-practice], .typing-page, .typing-input');
+      },
+      init:function(root){
+        if(window.SonglineInitTypingPractice) window.SonglineInitTypingPractice(root || document);
+      }
+    },
+    {
+      key:'flappy-bird',
+      src:'/js/tools/flappy-bird.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-flappy-game], .flappy-page, .flappy-canvas');
+      },
+      init:function(root){
+        if(window.SonglineInitFlappyBird) window.SonglineInitFlappyBird(root || document);
+      }
+    },
+    {
+      key:'reaction-test',
+      src:'/js/tools/reaction-test.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-reaction-test], .reaction-test-page, .reaction-stage');
+      },
+      init:function(root){
+        if(window.SonglineInitReactionTest) window.SonglineInitReactionTest(root || document);
+      }
+    },
+    {
+      key:'audio-visualizer',
+      src:'/js/tools/audio-visualizer.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-audio-visualizer], .audio-visualizer-page, .av-canvas');
+      },
+      init:function(root){
+        if(window.SonglineInitAudioVisualizer) window.SonglineInitAudioVisualizer(root || document);
+      }
+    },
+    {
+      key:'mobile-toc',
+      src:'/js/mobile-toc.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '.article-shell, .article-layout, .post-single, .post-layout, nav#TableOfContents, #TableOfContents');
+      },
+      init:function(root){
+        if(window.SonglineInitMobileToc) window.SonglineInitMobileToc(root || document);
+      }
+    }
+  ];
+
+  function query(root, selector){
+    root = root || document;
+    try{
+      if(root.querySelector && root.querySelector(selector)) return true;
+    }catch(e){}
+    if(root !== document && document.querySelector){
+      try{
+        return !!document.querySelector(selector);
+      }catch(e){}
+    }
+    return false;
+  }
+
+  function loadScript(mod, root){
+    if(loaded[mod.key]){
+      mod.init(root || document);
+      return;
+    }
+    if(loading[mod.key]) return;
+
+    // If the script tag already exists from server-side partial, mark loaded-ish and init soon.
+    var existing = document.querySelector('script[data-page-script="' + mod.key + '"], script[src*="' + mod.src.split('?')[0] + '"]');
+    if(existing){
+      loading[mod.key] = true;
+      existing.addEventListener('load', function(){
+        loaded[mod.key] = true;
+        loading[mod.key] = false;
+        mod.init(root || document);
+      }, {once:true});
+      // It may already be loaded.
+      window.setTimeout(function(){
+        if(loaded[mod.key]) return;
+        loaded[mod.key] = true;
+        loading[mod.key] = false;
+        mod.init(root || document);
+      }, existing.dataset.pageScript === mod.key ? 140 : 80);
+      return;
+    }
+
+    loading[mod.key] = true;
+    var script = document.createElement('script');
+    script.defer = true;
+    script.src = mod.src;
+    script.dataset.pageScript = mod.key;
+    script.dataset.loadedBy = 'page-modules';
+    script.onload = function(){
+      loaded[mod.key] = true;
+      loading[mod.key] = false;
+      mod.init(root || document);
+    };
+    script.onerror = function(){
+      loading[mod.key] = false;
+      console.warn('[page-modules] failed to load', mod.key, mod.src);
+    };
+    document.head.appendChild(script);
+  }
+
+  var scanTimer = 0;
+  var pendingRoot = null;
+  var lastScanAt = 0;
+
+  function mergeRoot(root){
+    if(!pendingRoot || root === document) pendingRoot = root || document;
+  }
+
+  function scanNow(root){
+    root = root || pendingRoot || document;
+    pendingRoot = null;
+    var now = Date.now();
+    if(now - lastScanAt < 90 && root === document) return;
+    lastScanAt = now;
+    if(window.SonglinePageModules) window.SonglinePageModules.lastScanAt = now;
+    modules.forEach(function(mod){
+      if(mod.test(root)){
+        loadScript(mod, root);
+      }
+    });
+  }
+
+  function scan(root){
+    mergeRoot(root || document);
+    window.clearTimeout(scanTimer);
+    var run = function(){ scanNow(pendingRoot || document); };
+    if(window.SonglineRuntime && typeof window.SonglineRuntime.idle === 'function'){
+      window.SonglineRuntime.idle('page-modules-scan', run, 260);
+      return;
+    }
+    if(window.requestIdleCallback){
+      scanTimer = window.setTimeout(function(){ window.requestIdleCallback(run, {timeout: 260}); }, 0);
+    }else if(window.requestAnimationFrame){
+      scanTimer = window.requestAnimationFrame(run);
+    }else{
+      scanTimer = window.setTimeout(run, 0);
+    }
+  }
+
+  window.SonglinePageModules = {
+    scan: scan,
+    loaded: loaded,
+    lastScanAt: 0
+  };
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ scan(document); });
+  }else{
+    scan(document);
+  }
+
+  window.addEventListener('pageshow', function(){ scan(document); });
+  window.addEventListener('songline:page-swap', function(event){
+    var root = event.detail && event.detail.root ? event.detail.root : document;
+    window.setTimeout(function(){ scan(root); }, 0);
+    window.setTimeout(function(){ scan(document); }, 120);
+  });
+})();

@@ -1,0 +1,52 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+<section class="page-hero minimal-page-hero tools-hero">
+<h1>Markdown 预览器</h1>
+</section>
+
+<section class="article-shell md-tool-layout" data-md-tool>
+  <div class="card md-tool-panel md-tool-panel-single">
+    <div class="md-tool-head">
+      <div>
+        <h2>选择文件</h2>
+      </div>
+      <label class="btn md-file-button">
+        选择 .md 文件
+        <input type="file" accept=".md,.markdown,text/markdown,text/plain" data-md-file hidden>
+      </label>
+    </div>
+
+    <div class="md-drop-zone" data-md-drop>
+      <strong>拖放 Markdown 文件到这里</strong>
+      <span>仅本地临时读取。</span>
+    </div>
+
+    <div class="md-tool-meta">
+      <span data-md-name>尚未选择文件</span>
+      <span data-md-size></span>
+    </div>
+
+    <article class="markdown-body md-live-preview md-render-only" data-md-preview>
+      <div class="md-empty-state">
+        <h2>等待选择文件</h2>
+        <p>选择后会显示预览。</p>
+      </div>
+    </article>
+  </div>
+
+  <aside class="card article-toc md-tool-toc" data-md-toc-toggle-card data-md-toc>
+    <div class="toc-head">
+      <h3>{{ partial "ui-icon.html" "menu" }} 目录</h3>
+    </div>
+    <div class="toc-body">
+      <nav><ul><li><span class="meta">选择文件后生成目录</span></li></ul></nav>
+    </div>
+  </aside>
+</section>
+
+<button class="back-to-top-button tool-page-top-button" type="button" aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "arrow-up" }}</button>
+<button class="scroll-to-bottom-button tool-page-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "arrow-down" }}</button>
+
+<script src="/js/markdown-renderer.js?v=20.20.6"></script>
+<script defer src="/js/tools/markdown-previewer.js?v=20.20.6"></script>
+{{ end }}

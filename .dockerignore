@@ -1,0 +1,26 @@
+# Keep private runtime content out of Docker build contexts and images.
+.git
+.env
+.env.*
+data/
+content/posts/
+content/friends/
+content/tags/
+static/uploads/
+static/md-source/
+static/runtime-config.js
+static/friends-data.json
+published/
+resources/
+deploy/verify_v*.sh
+deploy/deploy_v*_safe.sh
+deploy/install_*_v*.sh
+deploy/nginx-*-v*.conf
+
+# Local/editor files.
+.DS_Store
+Thumbs.db
+*.pem
+*.key
+id_rsa
+id_rsa.pub

@@ -1,0 +1,53 @@
+{{- /*
+v20.20.6：页面级 JS 按需加载。
+只在需要的页面加载对应脚本，减少普通页面无意义执行。
+*/ -}}
+
+{{- $v := "20.20.6" -}}
+{{- $section := .Section -}}
+{{- $rel := .RelPermalink -}}
+
+{{- if .IsHome }}
+<script defer data-page-script="home-orbit" src="/js/home-orbit-waapi.js?v={{ $v }}"></script>
+{{- end }}
+
+{{- if or (eq $section "friends") (hasPrefix $rel "/friends/") }}
+<script defer data-page-script="friend-galaxy" src="/js/friend-galaxy.js?v={{ $v }}"></script>
+{{- end }}
+
+{{- if or (eq $section "tags") (hasPrefix $rel "/tags/") (eq .Kind "taxonomy") (eq .Kind "term") }}
+<script defer data-page-script="tag-flow" src="/js/tag-flow.js?v={{ $v }}"></script>
+{{- end }}
+
+{{- if and (hasPrefix $rel "/tools/snake/") }}
+<script defer data-page-script="snake" src="/js/tools/snake.js?v={{ $v }}"></script>
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/2048/" }}
+<script defer data-page-script="2048" src="/js/tools/game-2048.js?v={{ $v }}"></script>
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/reaction-test/" }}
+<script defer data-page-script="reaction-test" src="/js/tools/reaction-test.js?v={{ $v }}"></script>
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/flappy-bird/" }}
+<script defer data-page-script="flappy-bird" src="/js/tools/flappy-bird.js?v={{ $v }}"></script>
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/typing-practice/" }}
+<script defer data-page-script="typing-practice" src="/js/tools/typing-practice.js?v={{ $v }}"></script>
+{{- end }}
+
+
+{{- if and .IsPage (eq $section "posts") }}
+<script defer data-page-script="mobile-toc" src="/js/mobile-toc.js?v={{ $v }}"></script>
+{{- end }}
+
+
+{{- if hasPrefix $rel "/tools/audio-visualizer/" }}
+<script defer data-page-script="audio-visualizer" src="/js/tools/audio-visualizer.js?v={{ $v }}"></script>
+{{- end }}
+{{- if hasPrefix $rel "/tools/focus-timer/" }}
+<script defer data-page-script="focus-timer" src="/js/tools/focus-timer.js?v={{ $v }}"></script>
+{{- end }}

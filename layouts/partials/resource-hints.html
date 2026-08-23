@@ -1,0 +1,56 @@
+{{- /*
+v20.20.6：首屏资源提示。
+只做 preload/modulepreload 提示，不改变脚本执行逻辑。
+*/ -}}
+
+{{- $v := "20.20.6" -}}
+{{- $section := .Section -}}
+{{- $rel := .RelPermalink -}}
+
+<link rel="preload" href="/css/site.css?v={{ $v }}" as="style">
+
+{{- if .IsHome }}
+<link rel="preload" href="/js/home-orbit-waapi.js?v={{ $v }}" as="script">
+{{- end }}
+
+{{- if or (eq $section "friends") (hasPrefix $rel "/friends/") }}
+<link rel="preload" href="/js/friend-galaxy.js?v={{ $v }}" as="script">
+{{- end }}
+
+{{- if or (eq $section "tags") (hasPrefix $rel "/tags/") (eq .Kind "taxonomy") (eq .Kind "term") }}
+<link rel="preload" href="/js/tag-flow.js?v={{ $v }}" as="script">
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/snake/" }}
+<link rel="preload" href="/js/tools/snake.js?v={{ $v }}" as="script">
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/2048/" }}
+<link rel="preload" href="/js/tools/game-2048.js?v={{ $v }}" as="script">
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/reaction-test/" }}
+<link rel="preload" href="/js/tools/reaction-test.js?v={{ $v }}" as="script">
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/flappy-bird/" }}
+<link rel="preload" href="/js/tools/flappy-bird.js?v={{ $v }}" as="script">
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/typing-practice/" }}
+<link rel="preload" href="/js/tools/typing-practice.js?v={{ $v }}" as="script">
+{{- end }}
+
+
+{{- if and .IsPage (eq $section "posts") }}
+<link rel="preload" href="/js/mobile-toc.js?v={{ $v }}" as="script">
+{{- end }}
+
+
+{{- if hasPrefix $rel "/tools/audio-visualizer/" }}
+<link rel="preload" href="/js/tools/audio-visualizer.js?v={{ $v }}" as="script">
+{{- end }}
+
+{{- if hasPrefix $rel "/tools/focus-timer/" }}
+<link rel="preload" href="/js/tools/focus-timer.js?v={{ $v }}" as="script">
+{{- end }}

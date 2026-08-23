@@ -1,0 +1,38 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tags/") }}
+{{ $cfg := .Site.Data.site }}
+{{ $tagCover := default "/img/hero-article.svg" $cfg.pages.article_default_cover }}
+<section class="page-hero tag-detail-hero cover-mode-cover" style="background-image:url('{{ $tagCover }}')">
+<h1># 站点公告</h1>
+</section>
+
+{{ $notices := where .Site.RegularPages ".Params.is_notice" true }}
+<section class="card toolbar-panel">
+  <span class="pill active">{{ len $notices }} 篇公告</span>
+  {{ if gt (len $notices) 0 }}
+    <span class="pill">最近更新 {{ with index $notices 0 }}{{ .Date.Format "2006-01-02" }}{{ end }}</span>
+  {{ else }}
+    <span class="pill">暂无公告</span>
+  {{ end }}
+  <div class="pills">
+    <a class="pill" href="/tags/">全部标签</a>
+    <a class="pill" href="/posts/">全部文章</a>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "logo" }}</span><h2>公告记录</h2></div>
+  <div class="article-list">
+    {{ range $notices }}
+      {{ partial "post-card.html" . }}
+    {{ else }}
+      <div class="card notice-empty-card">
+        <span class="notice-badge large">站点公告</span>
+        <h2>暂时还没有公告</h2>
+        <p>这里之后会显示博客更新、站点通知和朋友投稿说明。现在先空着，也挺清爽。</p>
+        <a class="btn ghost" href="/">返回首页</a>
+      </div>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

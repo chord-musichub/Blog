@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>外观设置</title><script>
+(function(){
+  try{
+    var theme = localStorage.getItem('gexian-admin-theme') || 'dark';
+    document.documentElement.setAttribute('data-admin-theme', theme);
+    document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#fbfaf7';
+  }catch(e){
+    document.documentElement.setAttribute('data-admin-theme', 'dark');
+    document.documentElement.style.backgroundColor = '#0d1728';
+  }
+})();
+</script><link rel="stylesheet" href="/static/style.css?v=20.18.5"><script defer src="/static/admin-theme.js"></script><script defer src="/static/admin-nav.js?v=20.18.5"></script><script defer src="/static/admin-mobile.js?v=20.18.5"></script><script defer src="/static/page-transition.js?v=20.18.5"></script>
+<style>
+:root{
+  --admin-bg:{{default "#fbfaf7" .Theme.Background}};
+  --admin-panel:color-mix(in srgb, {{default "#fffdfa" .Theme.Panel}} 86%, transparent);
+  --admin-panel-strong:{{default "#fffdfa" .Theme.Panel}};
+  --admin-text:{{default "#15345b" .Theme.Text}};
+  --admin-muted:{{default "#64748b" .Theme.Muted}};
+  --admin-accent:{{default "#0ea5e9" .Theme.Accent}};
+  --admin-accent-2:{{default "#2563eb" .Theme.Accent2}};
+  --admin-soft:color-mix(in srgb, {{default "#0ea5e9" .Theme.Accent}} 11%, {{default "#fbfaf7" .Theme.Background}});
+  --admin-warm:color-mix(in srgb, #ffe7bd 36%, {{default "#fbfaf7" .Theme.Background}});
+}
+</style>
+<style id="admin-dark-top-hardfix">
+html[data-admin-theme="dark"],
+html[data-admin-theme="dark"] body,
+html[data-admin-theme="dark"] body::before,
+html[data-admin-theme="dark"] body::after{
+  background:#0d1728!important;
+  background-image:none!important;
+}
+html[data-admin-theme="dark"] body{
+  margin-top:0!important;
+  border-top:0!important;
+  box-shadow:none!important;
+}
+html[data-admin-theme="dark"] .admin-site-bg-layer{
+  display:block!important;
+  visibility:visible!important;
+  opacity:var(--admin-site-bg-opacity, .38)!important;
+  background-image:var(--admin-site-bg-image)!important;
+  background-size:cover!important;
+  background-position:center top!important;
+}
+html[data-admin-theme="dark"] .admin-client-nav{
+  background:#101c30!important;
+  background-image:none!important;
+  border-color:rgba(125,211,252,.18)!important;
+}
+html[data-admin-theme="dark"] .admin-main-nav,
+html[data-admin-theme="dark"] .admin-glass-nav,
+html[data-admin-theme="dark"] main.wrap > nav.nav:first-child,
+html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
+  display:none!important;
+  height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+</style>
+<script defer src="/static/space-ribbons.js?v=20.18.5"></script>
+</head>
+<body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
+{{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
+
+<nav class="admin-client-nav" data-admin-client-nav>
+  <a class="admin-client-brand admin-client-brand-simple" href="{{adminURL "/"}}">后台</a>
+  <div class="admin-client-links">
+    <a href="{{adminURL "/"}}" data-admin-route="dashboard">工作台</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin"}}" data-admin-route="review">审核</a>{{end}}
+    <a href="{{adminURL "/articles/new"}}" data-admin-route="new">新建</a>
+    <a href="{{adminURL "/articles/upload"}}" data-admin-route="upload">上传</a>
+    <a href="{{adminURL "/admin/media"}}" data-admin-route="media">媒体库</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin/site"}}" data-admin-route="site">站点</a>{{end}}
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/users/new"}}" data-admin-route="users">作者</a>{{end}}
+    <a href="{{adminURL "/account"}}" data-admin-route="account">账号</a>
+  </div>
+  <div class="admin-client-actions">
+    <a class="admin-client-home" href="{{publicURL}}" target="_blank" rel="noopener">回主页 ↗</a>
+    <button class="admin-theme-icon-button admin-client-theme" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <a class="admin-client-logout" href="{{adminURL "/logout"}}">退出</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <nav class="nav compact-nav">
+    <a class="btn small ghost admin-back-icon" href="{{adminURL "/admin"}}" data-admin-back aria-label="返回" title="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
+    <a class="btn small ghost" href="{{adminURL "/admin/site"}}">站点设置</a>
+    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></button>
+  </nav>
+  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  <section class="hero compact"><h1>外观设置</h1><p>不用碰代码也能调公开站样式。可以先选预设，也可以勾选自定义后微调颜色、圆角、宽度和 Hero 高度。</p></section>
+
+  <form method="post" action="{{adminURL "/admin/theme"}}">
+    <section class="card">
+      <h2>主题预设</h2>
+      <div class="theme-presets">
+        <label class="preset-card"><input type="radio" name="preset" value="soft-blue" {{if eq .Theme.Preset "soft-blue"}}checked{{end}}><span class="swatch blue"></span><b>柔和蓝白</b><small>当前默认，清爽水彩</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="warm-notebook" {{if eq .Theme.Preset "warm-notebook"}}checked{{end}}><span class="swatch warm"></span><b>暖白手账</b><small>更温暖，像笔记本</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="cool-gray" {{if eq .Theme.Preset "cool-gray"}}checked{{end}}><span class="swatch gray"></span><b>极简冷灰</b><small>更克制，少装饰</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="winter" {{if eq .Theme.Preset "winter"}}checked{{end}}><span class="swatch winter"></span><b>冬日水彩</b><small>更轻、更蓝、更柔</small></label>
+      </div>
+      <p class="meta">不勾选「启用自定义参数」时，保存会直接套用预设。</p>
+      <label class="check"><input type="checkbox" name="use_custom"> 启用自定义参数</label>
+    </section>
+
+    <section class="card">
+      <h2>自定义样式参数</h2>
+      <div class="grid2">
+        <label>主色 accent<input name="accent" value="{{.Theme.Accent}}" placeholder="#0ea5e9"></label>
+        <label>强调色 accent-2<input name="accent_2" value="{{.Theme.Accent2}}" placeholder="#2563eb"></label>
+        <label>背景色<input name="background" value="{{.Theme.Background}}" placeholder="#fbfaf7"></label>
+        <label>卡片色<input name="panel" value="{{.Theme.Panel}}" placeholder="#fffdfa"></label>
+        <label>文字色<input name="text" value="{{.Theme.Text}}" placeholder="#15345b"></label>
+        <label>辅助文字色<input name="muted" value="{{.Theme.Muted}}" placeholder="#64748b"></label>
+        <label>圆角大小<input name="radius" value="{{.Theme.Radius}}" placeholder="18px"></label>
+        <label>阴影强度<select name="shadow"><option value="soft" {{if eq .Theme.Shadow "soft"}}selected{{end}}>soft</option><option value="none" {{if eq .Theme.Shadow "none"}}selected{{end}}>none</option><option value="strong" {{if eq .Theme.Shadow "strong"}}selected{{end}}>strong</option></select></label>
+        <label>页面最大宽度<input name="max_width" value="{{.Theme.MaxWidth}}" placeholder="1280px"></label>
+        <label>Hero 高度<input name="hero_height" value="{{.Theme.HeroHeight}}" placeholder="300px"></label>
+        <label>文章正文宽度<input name="content_width" value="{{.Theme.ContentWidth}}" placeholder="860px"></label>
+        <label>正文字号<input name="body_font_size" value="{{.Theme.BodyFontSize}}" placeholder="17px"></label>
+      </div>
+      <label class="check"><input type="checkbox" name="watercolor" {{if .Theme.Watercolor}}checked{{end}}> 显示水彩背景图</label>
+    </section>
+
+    <div class="actions"><button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">保存外观并重建公开站</span></button><a class="btn secondary" href="{{adminURL "/admin"}}"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text">取消</span></a></div>
+  </form>
+</main>
+</body>
+</html>

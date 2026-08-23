@@ -1,0 +1,36 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/friends/") }}
+{{ $cfg := .Site.Data.site }}
+{{ $username := .Params.friend_username }}
+{{ $display := .Params.friend_display_name | default .Title }}
+{{ $avatar := .Params.friend_avatar | default "/img/avatar-default.svg" }}
+{{ $cover := .Params.friend_cover | default (default (default "/img/hero-friends.svg" $cfg.pages.friends_hero_image) $cfg.pages.friend_default_cover) }}
+{{ $bio := .Params.friend_bio | default "记录想法，分享文字。" }}
+{{ $homepage := .Params.friend_homepage }}
+{{ $posts := where (where .Site.RegularPages "Section" "posts") ".Params.author_username" $username }}
+
+<section class="friend-detail-hero card">
+  <div class="friend-cover friend-cover-blurfill" style="--friend-cover-image:url('{{ $cover }}')">
+    <span class="friend-cover-bg" aria-hidden="true"></span>
+    <span class="friend-cover-main" aria-hidden="true"></span>
+  </div>
+  <div class="friend-profile-row">
+    <img class="avatar friend-detail-avatar" src="{{ $avatar }}" alt="{{ $display }}">
+    <div>
+      <h1>{{ $display }}</h1>
+      <p>{{ $bio | markdownify }}</p>
+      <div class="meta-row">
+        <span class="meta-icon-item">{{ partial "ui-icon.html" "article" }} 文章 {{ len $posts }} 篇</span>
+        {{ with $homepage }}<a class="tag" href="{{ . }}" target="_blank" rel="noopener">个人主页 ↗</a>{{ end }}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "article" }}</span><h2>{{ $display }} 的文章</h2></div>
+  <div class="article-list">
+    {{ range $posts }}{{ partial "post-card.html" . }}{{ else }}<div class="card" style="padding:28px">这个朋友还没有发布文章。</div>{{ end }}
+  </div>
+</section>
+{{ end }}

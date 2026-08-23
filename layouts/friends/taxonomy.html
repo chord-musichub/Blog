@@ -1,0 +1,39 @@
+{{ define "main" }}
+{{ $cfg := .Site.Data.site }}
+{{ $first := index .Pages 0 }}
+{{ $avatar := "/img/avatar-default.svg" }}
+{{ $cover := default "/img/hero-friends.svg" $cfg.pages.friends_hero_image }}
+{{ $bio := "记录想法，分享文字。" }}
+{{ $homepage := "" }}
+{{ with $first }}
+  {{ with .Params.author_avatar }}{{ $avatar = . }}{{ end }}
+  {{ with .Params.author_cover }}{{ $cover = . }}{{ end }}
+  {{ with .Params.author_bio }}{{ $bio = . }}{{ end }}
+  {{ with .Params.author_homepage }}{{ $homepage = . }}{{ end }}
+{{ end }}
+
+<section class="friend-detail-hero card">
+  <div class="friend-cover friend-cover-blurfill" style="--friend-cover-image:url('{{ $cover }}')">
+    <span class="friend-cover-bg" aria-hidden="true"></span>
+    <span class="friend-cover-main" aria-hidden="true"></span>
+  </div>
+  <div class="friend-profile-row">
+    <img class="avatar friend-detail-avatar" src="{{ $avatar }}" alt="{{ .Title }}">
+    <div>
+      <h1>{{ .Title }}</h1>
+      <p>{{ $bio | markdownify }}</p>
+      <div class="meta-row">
+        <span class="meta-icon-item">{{ partial "ui-icon.html" "article" }} 文章 {{ len .Pages }} 篇</span>
+        {{ with $homepage }}<a class="tag" href="{{ . }}" target="_blank" rel="noopener">个人主页 ↗</a>{{ end }}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "article" }}</span><h2>{{ .Title }} 的文章</h2></div>
+  <div class="article-list">
+    {{ range .Pages }}{{ partial "post-card.html" . }}{{ else }}<div class="card" style="padding:28px">还没有文章。</div>{{ end }}
+  </div>
+</section>
+{{ end }}

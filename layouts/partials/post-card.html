@@ -1,0 +1,36 @@
+{{ $p := . }}
+{{ $flat := false }}
+{{ if reflect.IsMap . }}
+  {{ $p = .Page }}
+  {{ $flat = .Flat | default false }}
+{{ end }}
+{{ $cfg := site.Data.site }}
+{{ $tagURLs := site.Data.tag_urls | default dict }}
+{{ $cover := $p.Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}
+{{ $coverMode := $p.Params.cover_mode | default "cover" }}
+<article class="card post-card {{ if and $p.Params.is_notice (not $flat) }}notice-card{{ end }}" data-card-link="{{ $p.RelPermalink }}" role="link" tabindex="0" aria-label="阅读文章：{{ $p.Title }}">
+  <a class="post-thumb lazy-bg cover-mode-{{ $coverMode }}" href="{{ $p.RelPermalink }}" data-bg="{{ $cover }}"></a>
+  <div class="post-info">
+    <div class="post-card-head">
+      {{ if and $p.Params.is_notice (not $flat) }}<a class="notice-badge" href="/tags/site-notice/">站点公告</a>{{ end }}
+      <h2><a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a></h2>
+    </div>
+    <p>{{ with $p.Params.summary }}{{ . }}{{ else }}{{ $p.Summary }}{{ end }}</p>
+    <div class="meta-row">
+      <span class="meta-icon-item">{{ partial "ui-icon.html" "calendar" }} {{ $p.Date.Format "2006-01-02" }}</span>
+      {{ $authorName := $p.Params.author_display | default $p.Params.author }}
+      {{ $authorHref := "" }}
+      {{ $authorUsername := $p.Params.author_username | default $p.Params.author }}
+      {{ range site.Data.friends }}{{ if eq .username $authorUsername }}{{ $authorHref = .url }}{{ end }}{{ end }}
+      {{ if $authorHref }}<a class="author-link meta-icon-item" href="{{ $authorHref }}">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</a>{{ else }}<span class="meta-icon-item">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</span>{{ end }}
+      {{ with $p.Params.tags }}{{ range . }}
+        {{ if or (ne . "site-notice") (not $flat) }}
+          {{ $tagLabel := . }}{{ if eq . "site-notice" }}{{ $tagLabel = "站点公告" }}{{ end }}
+          {{ $tagHref := printf "/tags/%s/" (. | urlize) }}{{ if eq . "site-notice" }}{{ $tagHref = "/tags/site-notice/" }}{{ end }}
+          <a class="tag" href="{{ $tagHref }}">{{ $tagLabel }}</a>
+        {{ end }}
+      {{ end }}{{ end }}
+      <span class="views real-views meta-icon-item" data-view-mode="get" data-view-path="{{ $p.RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>站点设置</title><script>
+(function(){
+  try{
+    var theme = localStorage.getItem('gexian-admin-theme') || 'dark';
+    document.documentElement.setAttribute('data-admin-theme', theme);
+    document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#fbfaf7';
+  }catch(e){
+    document.documentElement.setAttribute('data-admin-theme', 'dark');
+    document.documentElement.style.backgroundColor = '#0d1728';
+  }
+})();
+</script><link rel="stylesheet" href="/static/style.css?v=20.18.5"><script defer src="/static/admin-theme.js"></script><script defer src="/static/admin-nav.js?v=20.18.5"></script><script defer src="/static/admin-mobile.js?v=20.18.5"></script><script defer src="/static/page-transition.js?v=20.18.5"></script>
+<style>
+:root{
+  --admin-bg:{{default "#fbfaf7" .Theme.Background}};
+  --admin-panel:color-mix(in srgb, {{default "#fffdfa" .Theme.Panel}} 86%, transparent);
+  --admin-panel-strong:{{default "#fffdfa" .Theme.Panel}};
+  --admin-text:{{default "#15345b" .Theme.Text}};
+  --admin-muted:{{default "#64748b" .Theme.Muted}};
+  --admin-accent:{{default "#0ea5e9" .Theme.Accent}};
+  --admin-accent-2:{{default "#2563eb" .Theme.Accent2}};
+  --admin-soft:color-mix(in srgb, {{default "#0ea5e9" .Theme.Accent}} 11%, {{default "#fbfaf7" .Theme.Background}});
+  --admin-warm:color-mix(in srgb, #ffe7bd 36%, {{default "#fbfaf7" .Theme.Background}});
+}
+</style>
+<style id="admin-dark-top-hardfix">
+html[data-admin-theme="dark"],
+html[data-admin-theme="dark"] body,
+html[data-admin-theme="dark"] body::before,
+html[data-admin-theme="dark"] body::after{
+  background:#0d1728!important;
+  background-image:none!important;
+}
+html[data-admin-theme="dark"] body{
+  margin-top:0!important;
+  border-top:0!important;
+  box-shadow:none!important;
+}
+html[data-admin-theme="dark"] .admin-site-bg-layer{
+  display:block!important;
+  visibility:visible!important;
+  opacity:var(--admin-site-bg-opacity, .38)!important;
+  background-image:var(--admin-site-bg-image)!important;
+  background-size:cover!important;
+  background-position:center top!important;
+}
+html[data-admin-theme="dark"] .admin-client-nav{
+  background:#101c30!important;
+  background-image:none!important;
+  border-color:rgba(125,211,252,.18)!important;
+}
+html[data-admin-theme="dark"] .admin-main-nav,
+html[data-admin-theme="dark"] .admin-glass-nav,
+html[data-admin-theme="dark"] main.wrap > nav.nav:first-child,
+html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
+  display:none!important;
+  height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+</style>
+<script defer src="/static/space-ribbons.js?v=20.18.5"></script>
+</head>
+<body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
+{{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
+
+<nav class="admin-client-nav" data-admin-client-nav>
+  <a class="admin-client-brand admin-client-brand-simple" href="{{adminURL "/"}}">后台</a>
+  <div class="admin-client-links">
+    <a href="{{adminURL "/"}}" data-admin-route="dashboard">工作台</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin"}}" data-admin-route="review">审核</a>{{end}}
+    <a href="{{adminURL "/articles/new"}}" data-admin-route="new">新建</a>
+    <a href="{{adminURL "/articles/upload"}}" data-admin-route="upload">上传</a>
+    <a href="{{adminURL "/admin/media"}}" data-admin-route="media">媒体库</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin/site"}}" data-admin-route="site">站点</a>{{end}}
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/users/new"}}" data-admin-route="users">作者</a>{{end}}
+    <a href="{{adminURL "/account"}}" data-admin-route="account">账号</a>
+  </div>
+  <div class="admin-client-actions">
+    <a class="admin-client-home" href="{{publicURL}}" target="_blank" rel="noopener">回主页 ↗</a>
+    <button class="admin-theme-icon-button admin-client-theme" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <a class="admin-client-logout" href="{{adminURL "/logout"}}">退出</a>
+  </div>
+</nav>
+
+<main class="wrap wide">
+  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Error}}<div class="flash error">{{.Error}}</div>{{end}}
+  <section class="hero compact admin-hero admin-settings-hero"><div><h1>站点设置</h1><p>这一版按当前客户端整理：删掉已经不展示的标题/副标题配置，补上开机动画和星际入口自定义。</p></div><a class="btn ghost" href="{{publicURL}}" target="_blank">回公开主页 ↗</a></section>
+
+  <form method="post" action="{{adminURL "/admin/theme"}}" class="site-theme-form">
+    <section class="card admin-settings-card">
+      <h2>外观设置</h2>
+      <p class="meta">保留当前客户端仍然使用的主题参数。保存后会自动重建公开站。</p>
+      <div class="theme-presets">
+        <label class="preset-card"><input type="radio" name="preset" value="soft-blue" {{if eq .Theme.Preset "soft-blue"}}checked{{end}}><span class="swatch blue"></span><b>柔和蓝白</b><small>当前默认，清爽水彩</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="warm-notebook" {{if eq .Theme.Preset "warm-notebook"}}checked{{end}}><span class="swatch warm"></span><b>暖白手账</b><small>更温暖，像笔记本</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="cool-gray" {{if eq .Theme.Preset "cool-gray"}}checked{{end}}><span class="swatch gray"></span><b>极简冷灰</b><small>更克制，少装饰</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="winter" {{if eq .Theme.Preset "winter"}}checked{{end}}><span class="swatch winter"></span><b>冬日水彩</b><small>更轻、更蓝、更柔</small></label>
+      </div>
+      <label class="check"><input type="checkbox" name="use_custom"> 启用自定义参数</label>
+      <details class="appearance-advanced"><summary>展开自定义样式参数</summary>
+        <div class="grid2">
+          <label>主色 accent<input name="accent" value="{{.Theme.Accent}}" placeholder="#0ea5e9"></label>
+          <label>强调色 accent-2<input name="accent_2" value="{{.Theme.Accent2}}" placeholder="#2563eb"></label>
+          <label>背景色<input name="background" value="{{.Theme.Background}}" placeholder="#fbfaf7"></label>
+          <label>卡片色<input name="panel" value="{{.Theme.Panel}}" placeholder="#fffdfa"></label>
+          <label>文字色<input name="text" value="{{.Theme.Text}}" placeholder="#15345b"></label>
+          <label>辅助文字色<input name="muted" value="{{.Theme.Muted}}" placeholder="#64748b"></label>
+          <label>圆角大小<input name="radius" value="{{.Theme.Radius}}" placeholder="18px"></label>
+          <label>阴影强度<select name="shadow"><option value="soft" {{if eq .Theme.Shadow "soft"}}selected{{end}}>soft</option><option value="none" {{if eq .Theme.Shadow "none"}}selected{{end}}>none</option><option value="strong" {{if eq .Theme.Shadow "strong"}}selected{{end}}>strong</option></select></label>
+          <label>页面最大宽度<input name="max_width" value="{{.Theme.MaxWidth}}" placeholder="1280px"></label>
+          <label>封面/横幅高度<input name="hero_height" value="{{.Theme.HeroHeight}}" placeholder="300px"></label>
+          <label>文章正文宽度<input name="content_width" value="{{.Theme.ContentWidth}}" placeholder="860px"></label>
+          <label>正文字号<input name="body_font_size" value="{{.Theme.BodyFontSize}}" placeholder="17px"></label>
+        </div>
+        <label class="check"><input type="checkbox" name="watercolor" {{if .Theme.Watercolor}}checked{{end}}> 显示水彩背景图</label>
+      </details>
+      <div class="actions"><button><span class="btn-text">保存外观并重建公开站</span></button></div>
+    </section>
+  </form>
+
+  <form method="post" action="{{adminURL "/admin/site"}}">
+    <section class="card admin-settings-card">
+      <h2>基础信息</h2>
+      <div class="grid2">
+        <label>站点标题<input name="site_title" value="{{.Settings.Site.Title}}"></label>
+        <label>公开显示名<input name="display_name" value="{{.Settings.Site.DisplayName}}"></label>
+        <label>左上角 Logo 文本<input name="logo" value="{{.Settings.Site.Logo}}"></label>
+        <label>左上角自定义图标<input name="logo_icon" value="{{.Settings.Site.LogoIcon}}" placeholder="/uploads/logo.png 或 /img/avatar-default.svg"></label>
+        <label>浏览器标签页图标<input name="favicon" value="{{.Settings.Site.Favicon}}" placeholder="/uploads/favicon.png 或 /uploads/favicon.ico"></label>
+        <label>ICP备案号<input name="icp" value="{{.Settings.Site.ICP}}"></label>
+      </div>
+      <label>页脚文案<input name="footer_text" value="{{.Settings.Site.FooterText}}"></label>
+    </section>
+
+    <section class="card admin-settings-card">
+      <h2>首页当前展示</h2>
+      <p class="meta">首页欢迎区现在只展示封面图；旧的 Hero 标题/副标题已从后台移除。</p>
+      <label>首页封面图路径<input name="hero_image" value="{{.Settings.Home.HeroImage}}" placeholder="/uploads/xxx.webp 或 /img/hero-home.svg"></label>
+      <div class="grid2">
+        <label>创站时间<input name="founded_at" value="{{.Settings.Home.FoundedAt}}" placeholder="2026/5/8"></label>
+        <label>首页推荐文章数量<input name="recommended_count" value="{{.Settings.Home.RecommendedCount}}" placeholder="6"></label>
+      </div>
+      <label>欢迎图下方说明标题<input name="intro_title" value="{{.Settings.Home.IntroTitle}}"></label>
+      <label>欢迎图下方说明正文<textarea name="intro_body" rows="5">{{.Settings.Home.IntroBody}}</textarea></label>
+    </section>
+
+    <section class="card admin-settings-card">
+      <h2>开机动画</h2>
+      <label>100% 后显示的欢迎文字<input name="boot_welcome_text" value="{{.Settings.Boot.WelcomeText}}" placeholder="欢迎回来"></label>
+    </section>
+
+    <section class="card admin-settings-card">
+      <h2>星际入口</h2>
+      <p class="meta">这里对应首页的动态星球入口，支持修改入口标题、各小球文字和详情卡片文案。</p>
+      <label>模块标题<input name="orbit_title" value="{{.Settings.Orbit.Title}}" placeholder="星际入口"></label>
+      <div class="orbit-admin-grid">
+        {{template "orbitEntry" dict "Prefix" "orbit_posts" "Name" "文章入口" "Item" .Settings.Orbit.Posts}}
+        {{template "orbitEntry" dict "Prefix" "orbit_tags" "Name" "标签入口" "Item" .Settings.Orbit.Tags}}
+        {{template "orbitEntry" dict "Prefix" "orbit_friends" "Name" "朋友入口" "Item" .Settings.Orbit.Friends}}
+        {{template "orbitEntry" dict "Prefix" "orbit_tools" "Name" "工具入口" "Item" .Settings.Orbit.Tools}}
+        {{template "orbitEntry" dict "Prefix" "orbit_notice" "Name" "公告入口" "Item" .Settings.Orbit.Notice}}
+        {{template "orbitEntry" dict "Prefix" "orbit_about" "Name" "关于入口" "Item" .Settings.Orbit.About}}
+      </div>
+    </section>
+
+    <section class="card admin-settings-card">
+      <h2>子页面当前展示</h2>
+      <p class="meta">子页面现在主要使用标题、封面/默认插图；旧副标题配置已从后台移除。</p>
+      <div class="grid2">
+        <label>文章页标题<input name="posts_hero_title" value="{{.Settings.Pages.PostsHeroTitle}}"></label>
+        <label>文章页 Hero 图<input name="posts_hero_image" value="{{.Settings.Pages.PostsHeroImage}}"></label>
+        <label>标签页标题<input name="tags_hero_title" value="{{.Settings.Pages.TagsHeroTitle}}"></label>
+        <label>标签页 Hero 图<input name="tags_hero_image" value="{{.Settings.Pages.TagsHeroImage}}"></label>
+        <label>朋友页标题<input name="friends_hero_title" value="{{.Settings.Pages.FriendsHeroTitle}}"></label>
+        <label>朋友页 Hero 图<input name="friends_hero_image" value="{{.Settings.Pages.FriendsHeroImage}}"></label>
+        <label>工具页标题<input name="tools_hero_title" value="{{.Settings.Pages.ToolsHeroTitle}}"></label>
+        <label>文章默认封面<input name="article_default_cover" value="{{.Settings.Pages.ArticleDefaultCover}}"></label>
+        <label>标签详情默认图<input name="tag_default_cover" value="{{.Settings.Pages.TagDefaultCover}}"></label>
+        <label>朋友详情默认图<input name="friend_default_cover" value="{{.Settings.Pages.FriendDefaultCover}}"></label>
+      </div>
+    </section>
+
+    <section class="card admin-settings-card">
+      <h2>全站背景图片</h2>
+      <div class="grid2">
+        <label>背景图片路径<input name="background_image" value="{{.Settings.Background.Image}}" placeholder="/uploads/site-bg.png"></label>
+        <label>背景高度<input name="background_height" value="{{.Settings.Background.Height}}" placeholder="420px"></label>
+        <label>模糊程度<input name="background_blur" value="{{.Settings.Background.Blur}}" placeholder="18px"></label>
+        <label>透明度 0-1<input name="background_opacity" value="{{.Settings.Background.Opacity}}" placeholder="0.38"></label>
+      </div>
+    </section>
+
+    <section class="card admin-settings-card">
+      <h2>首页右侧「关于本站」</h2>
+      <div class="grid2">
+        <label>卡片标题<input name="about_title" value="{{.Settings.AboutCard.Title}}"></label>
+        <label>圆形字母<input name="about_avatar_text" value="{{.Settings.AboutCard.AvatarText}}"></label>
+        <label>圆形头像图片<input name="about_avatar_image" value="{{.Settings.AboutCard.AvatarImage}}" placeholder="/uploads/avatar.png"></label>
+        <label>显示名称<input name="about_name" value="{{.Settings.AboutCard.Name}}"></label>
+      </div>
+      <label>简介<textarea name="about_body" rows="4">{{.Settings.AboutCard.Body}}</textarea></label>
+    </section>
+
+    <section class="card admin-settings-card">
+      <h2>联系我</h2>
+      <div class="grid2">
+        <label>GitHub 链接<input name="github" value="{{.Settings.Social.GitHub}}"></label>
+        <label>邮箱地址<input name="email" value="{{.Settings.Social.Email}}" placeholder="xxx@example.com 或 mailto:xxx@example.com"></label>
+        <label>B站频道链接<input name="bilibili" value="{{.Settings.Social.Bilibili}}"></label>
+        <label>B站图标路径<input name="bilibili_icon" value="{{.Settings.Social.BilibiliIcon}}"></label>
+      </div>
+      <label class="check"><input type="checkbox" name="show_github" {{if .Settings.Social.ShowGitHub}}checked{{end}}> 显示 GitHub</label>
+      <label class="check"><input type="checkbox" name="show_email" {{if .Settings.Social.ShowEmail}}checked{{end}}> 显示邮箱</label>
+      <label class="check"><input type="checkbox" name="show_bilibili" {{if .Settings.Social.ShowBilibili}}checked{{end}}> 显示 B站</label>
+    </section>
+
+    <div class="actions sticky-admin-actions"><button><span class="btn-text">保存设置并重建公开站</span></button><a class="btn secondary" href="{{adminURL "/admin"}}">取消</a><a class="btn ghost" href="{{publicURL}}" target="_blank">回公开主页 ↗</a></div>
+  </form>
+</main>
+</body>
+</html>
+
+{{define "orbitEntry"}}
+<section class="orbit-admin-item">
+  <h3>{{.Name}}</h3>
+  <label>小球文字<input name="{{.Prefix}}_label" value="{{.Item.Label}}"></label>
+  <div class="grid2 compact-fields">
+    <label>详情小标题<input name="{{.Prefix}}_kicker" value="{{.Item.Kicker}}"></label>
+    <label>详情标题<input name="{{.Prefix}}_title" value="{{.Item.Title}}"></label>
+  </div>
+  <label>详情描述<textarea name="{{.Prefix}}_desc" rows="3">{{.Item.Description}}</textarea></label>
+  <div class="grid2 compact-fields">
+    <label>跳转地址<input name="{{.Prefix}}_href" value="{{.Item.Href}}" placeholder="/posts/ 或 #site-intro"></label>
+    <label>按钮文字<input name="{{.Prefix}}_link" value="{{.Item.LinkText}}"></label>
+  </div>
+</section>
+{{end}}

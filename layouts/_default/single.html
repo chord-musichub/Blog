@@ -1,0 +1,389 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/posts/") }}
+{{ $cfg := .Site.Data.site }}
+{{ $cover := .Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}
+{{ $coverMode := .Params.cover_mode | default "cover" }}
+<section class="page-hero article-cover-hero article-cover-actual-image cover-mode-{{ $coverMode }}" style="background-image:url('{{ $cover }}')" aria-label="文章封面">
+  <img class="article-cover-img" src="{{ $cover }}" alt="" loading="eager" decoding="async" fetchpriority="high">
+</section>
+<section class="card" style="padding:30px 34px;margin-top:-34px;position:relative;z-index:2">
+  {{ if .Params.is_notice }}<div class="notice-badge large">站点公告</div>{{ end }}
+<h1 style="font-size:42px;line-height:1.15;margin:0 0 12px">{{ .Title }}</h1>
+  <p style="color:var(--muted);margin:0 0 20px">{{ with .Params.summary }}{{ . }}{{ else }}{{ .Summary }}{{ end }}</p>
+  <div class="meta-row">
+    <span class="meta-icon-item">{{ partial "ui-icon.html" "calendar" }} {{ .Date.Format "2006-01-02" }}</span>
+    {{ $authorName := .Params.author_display | default .Params.author }}
+    {{ $authorHref := "" }}
+      {{ $authorUsername := .Params.author_username | default .Params.author }}
+      {{ range site.Data.friends }}{{ if eq .username $authorUsername }}{{ $authorHref = .url }}{{ end }}{{ end }}
+    {{ if $authorHref }}<a class="author-link meta-icon-item" href="{{ $authorHref }}">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</a>{{ else }}<span class="meta-icon-item">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</span>{{ end }}
+    <span>◷ 阅读约 {{ .ReadingTime }} 分钟</span>
+    {{ with .Params.tags }}{{ range . }}
+      {{ $tagRaw := . }}{{ $tagHref := printf "/tags/%s/" ($tagRaw | urlize) }}
+      <a class="tag" href="{{ $tagHref }}">{{ . }}</a>
+    {{ end }}{{ end }}
+    <span class="views real-views article-view-counter meta-icon-item" data-view-mode="post" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span>
+  </div>
+</section>
+
+<div class="article-shell section" data-toc-state="collapsed">
+  <article class="card article-reader markdown-body" data-article-renderer="songline-markdown">
+    {{ .Content }}
+  </article>
+  <aside class="card article-toc" data-toc-toggle-card role="button" tabindex="0" aria-label="展开或收起目录" title="点击展开 / 收起目录">
+    <div class="toc-head">
+      <h3>{{ partial "ui-icon.html" "menu" }} 目录</h3>
+    </div>
+    <div class="toc-body">
+      {{ .TableOfContents }}
+    </div>
+  </aside>
+</div>
+
+<script>
+(function(){
+  const reader = document.querySelector('.article-reader');
+  if(!reader) return;
+
+  // v17.5：正式文章阅读页兜底处理 <br> 换行。
+  // 情况 A：Hugo 已经输出了真正的 <br>，这里给它补一个可见块级换行。
+  // 情况 B：正文中出现被转义的 &lt;br&gt; / &lt;br/&gt; 文本，替换成真正换行。
+  reader.querySelectorAll('br').forEach(function(br){
+    br.classList.add('md-hard-break');
+  });
+
+  const walker = document.createTreeWalker(reader, NodeFilter.SHOW_TEXT);
+  const targets = [];
+  while(walker.nextNode()){
+    const node = walker.currentNode;
+    if(/<br\s*\/?>|&lt;br\s*\/?&gt;/i.test(node.nodeValue || '')){
+      targets.push(node);
+    }
+  }
+
+  targets.forEach(function(node){
+    const text = node.nodeValue || '';
+    const parts = text.split(/(?:<br\s*\/?>|&lt;br\s*\/?&gt;)/i);
+    const frag = document.createDocumentFragment();
+    parts.forEach(function(part, index){
+      if(index > 0){
+        const br = document.createElement('br');
+        br.className = 'md-hard-break';
+        frag.appendChild(br);
+      }
+      if(part) frag.appendChild(document.createTextNode(part));
+    });
+    node.parentNode.replaceChild(frag, node);
+  });
+})();
+</script>
+
+<section class="article-bottom-actions card">
+  <div>
+    <h3>Markdown 源文件</h3>
+    <p>喜欢离线保存的话，可以把这篇文章下载为 Markdown 文件。</p>
+  </div>
+  <button class="btn md-download-button" type="button" data-md-download>下载 .md</button>
+</section>
+
+<button class="back-to-top-button" type="button" aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "arrow-up" }}</button>
+<button class="scroll-to-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "arrow-down" }}</button>
+<script src="/js/markdown-renderer.js?v=20.20.6"></script>
+<script id="article-md-source" type="application/json" data-source-format="{{ if .Params.source_md_b64 }}base64{{ else }}text{{ end }}" data-source-url="{{ with .Params.source_md_url }}{{ . }}{{ end }}">{{ with .Params.source_md_b64 }}{{ . | jsonify }}{{ else }}{{ with .RawContent }}{{ . | jsonify }}{{ else }}{{ .Plain | jsonify }}{{ end }}{{ end }}</script>
+
+<script id="article-render-sync">
+(function(){
+  const reader = document.querySelector('[data-article-renderer="songline-markdown"]');
+  const sourceEl = document.getElementById('article-md-source');
+  if(!reader || !sourceEl || !window.SonglineMarkdown) return;
+
+  function decodeBase64Utf8(value){
+    const clean = String(value || '').replace(/\s+/g, '');
+    const binary = atob(clean);
+    const bytes = new Uint8Array(binary.length);
+    for(let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    if(window.TextDecoder){
+      return new TextDecoder('utf-8', {fatal:false}).decode(bytes);
+    }
+    let encoded = '';
+    bytes.forEach(function(b){ encoded += '%' + b.toString(16).padStart(2, '0'); });
+    return decodeURIComponent(encoded);
+  }
+
+  function readInlineMarkdown(){
+    try{
+      let md = JSON.parse(sourceEl.textContent || '""');
+      if(sourceEl.dataset.sourceFormat === 'base64'){
+        md = decodeBase64Utf8(md);
+      }
+      return String(md || '');
+    }catch(e){
+      return '';
+    }
+  }
+
+  function slugify(text, used){
+    let base = String(text || '')
+      .replace(/<[^>]*>/g, '')
+      .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .toLowerCase();
+    if(!base) base = 'heading';
+    let slug = base;
+    let i = 2;
+    while(used[slug]){
+      slug = base + '-' + i++;
+    }
+    used[slug] = true;
+    return slug;
+  }
+
+  function rebuildToc(){
+    const tocBody = document.querySelector('.article-toc .toc-body');
+    if(!tocBody) return;
+    const headings = Array.from(reader.querySelectorAll('h1,h2,h3,h4'));
+    if(!headings.length){
+      tocBody.innerHTML = '<nav><ul><li><span class="meta">暂无目录</span></li></ul></nav>';
+      return;
+    }
+    const used = {};
+    const levels = headings.map(function(h){ return Number(h.tagName.slice(1)); }).filter(Boolean);
+    const baseLevel = levels.length ? Math.min.apply(null, levels) : 1;
+    const items = headings.map(function(h){
+      if(!h.id) h.id = slugify(h.textContent, used);
+      const rawLevel = Number(h.tagName.slice(1)) || baseLevel;
+      const relativeLevel = Math.min(6, Math.max(1, rawLevel - baseLevel + 1));
+      return '<li class="toc-level-' + rawLevel + ' toc-depth-' + relativeLevel + '" data-toc-level="' + rawLevel + '" data-toc-depth="' + relativeLevel + '"><a href="#' + h.id + '">' + h.textContent + '</a></li>';
+    }).join('');
+    tocBody.innerHTML = '<nav><ul>' + items + '</ul></nav>';
+  }
+
+  async function getMarkdown(){
+    const src = sourceEl.dataset.sourceUrl || '';
+    if(src){
+      try{
+        const res = await fetch(src, {credentials:'same-origin', cache:'no-store'});
+        if(res.ok){
+          const text = await res.text();
+          if(text) return text;
+        }
+      }catch(e){}
+    }
+    return readInlineMarkdown();
+  }
+
+  function decodeHashId(raw){
+    let value = String(raw || '').replace(/^#/, '');
+    try{ value = decodeURIComponent(value); }catch(e){}
+    return value;
+  }
+
+  function articleHeaderOffset(){
+    const header = document.querySelector('.site-header, .modern-site-header');
+    const headerHeight = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+    return Math.max(72, headerHeight + 22);
+  }
+
+  function scrollToArticleHeading(raw, instant){
+    const id = decodeHashId(raw);
+    if(!id) return false;
+    const target = document.getElementById(id);
+    if(!target) return false;
+    const top = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - articleHeaderOffset());
+    window.scrollTo({ top: top, behavior: instant ? 'auto' : 'smooth' });
+    target.classList.remove('toc-target-flash');
+    window.requestAnimationFrame(function(){
+      target.classList.add('toc-target-flash');
+      window.setTimeout(function(){ target.classList.remove('toc-target-flash'); }, 1100);
+    });
+    return true;
+  }
+
+  window.SonglineScrollToArticleHeading = scrollToArticleHeading;
+
+  document.addEventListener('click', function(event){
+    const link = event.target && event.target.closest ? event.target.closest('.article-toc .toc-body a[href^="#"]') : null;
+    if(!link) return;
+    const hash = link.getAttribute('href') || '';
+    if(hash.length <= 1) return;
+    if(scrollToArticleHeading(hash, false)){
+      event.preventDefault();
+      event.stopPropagation();
+      try{ history.pushState(null, '', window.location.pathname + window.location.search + hash); }catch(e){}
+    }
+  }, true);
+
+  getMarkdown().then(function(markdown){
+    if(!markdown) return;
+    reader.innerHTML = window.SonglineMarkdown.render(markdown);
+    if(window.SonglineEnhanceMarkdown) window.SonglineEnhanceMarkdown(reader);
+    rebuildToc();
+    if(window.updateArticleScrollButtons) window.updateArticleScrollButtons();
+    if(window.location.hash){
+      window.setTimeout(function(){ scrollToArticleHeading(window.location.hash, true); }, 90);
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  const shell = document.querySelector('.article-shell');
+  const toc = document.querySelector('.article-toc');
+  if(!shell || !toc) return;
+  const key = 'songline-toc-state';
+  const saved = localStorage.getItem(key);
+  if(saved === 'expanded') shell.dataset.tocState = 'expanded';
+  function syncAria(){
+    toc.setAttribute('aria-expanded', shell.dataset.tocState === 'expanded' ? 'true' : 'false');
+  }
+  function toggle(){
+    const next = shell.dataset.tocState === 'expanded' ? 'collapsed' : 'expanded';
+    shell.dataset.tocState = next;
+    localStorage.setItem(key, next);
+    syncAria();
+  }
+  toc.addEventListener('click', function(event){
+    if(event.target && event.target.closest('a')) return;
+    toggle();
+  });
+  toc.addEventListener('keydown', function(event){
+    if(event.key === 'Enter' || event.key === ' '){
+      if(event.target && event.target.closest('a')) return;
+      event.preventDefault();
+      toggle();
+    }
+  });
+  syncAria();
+})();
+(function(){
+  const topBtn = document.querySelector('.back-to-top-button');
+  const bottomBtn = document.querySelector('.scroll-to-bottom-button');
+  const reader = document.querySelector('.article-reader');
+  if(!topBtn && !bottomBtn) return;
+
+  function resetFloatButtonInlinePosition(btn){
+    if(!btn) return;
+    // v20.20.6：旧版本会动态写入 left/right，导致按钮固定在错位点。
+    // 这里每次更新都清掉这些 inline 位置，让 CSS 的 fixed 右侧按钮组接管。
+    btn.style.removeProperty('left');
+    btn.style.removeProperty('right');
+    btn.style.removeProperty('top');
+    btn.style.removeProperty('bottom');
+    btn.style.removeProperty('position');
+  }
+
+  function update(){
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    if(topBtn) topBtn.classList.toggle('show', y > 520);
+    if(bottomBtn) bottomBtn.classList.toggle('show', maxY - y > 520);
+    resetFloatButtonInlinePosition(topBtn);
+    resetFloatButtonInlinePosition(bottomBtn);
+  }
+  if(topBtn){
+    topBtn.addEventListener('click', function(){
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  }
+  if(bottomBtn){
+    bottomBtn.addEventListener('click', function(){
+      window.scrollTo({top:document.documentElement.scrollHeight, behavior:'smooth'});
+    });
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  window.addEventListener('resize', update);
+  window.updateArticleScrollButtons = update;
+  update();
+})();
+
+(function(){
+  const btn = document.querySelector('[data-md-download]');
+  const sourceEl = document.getElementById('article-md-source');
+  if(!btn || !sourceEl) return;
+  let markdown = '';
+  function decodeBase64Utf8(value){
+    const clean = String(value || '').replace(/\s+/g, '');
+    const binary = atob(clean);
+    const bytes = new Uint8Array(binary.length);
+    for(let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    if(window.TextDecoder){
+      return new TextDecoder('utf-8', {fatal:false}).decode(bytes);
+    }
+    let encoded = '';
+    bytes.forEach(function(b){
+      encoded += '%' + b.toString(16).padStart(2, '0');
+    });
+    return decodeURIComponent(encoded);
+  }
+  try{
+    markdown = JSON.parse(sourceEl.textContent || '""');
+    if(sourceEl.dataset.sourceFormat === 'base64'){
+      markdown = decodeBase64Utf8(markdown);
+    }
+  }catch(e){
+    markdown = '';
+  }
+  const title = {{ .Title | jsonify }};
+  function filenameFromTitle(t){
+    return (t || 'article')
+      .replace(/[\\/:*?"<>|]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 80) || 'article';
+  }
+  async function getMarkdown(){
+    const src = sourceEl.dataset.sourceUrl || '';
+    if(src){
+      try{
+        const res = await fetch(src, {credentials:'same-origin', cache:'no-store'});
+        if(res.ok){
+          const text = await res.text();
+          if(text) return text;
+        }
+      }catch(e){}
+    }
+    return markdown || '';
+  }
+
+  btn.addEventListener('click', async function(){
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '准备中...';
+    try{
+      const text = await getMarkdown();
+      const blob = new Blob(['\ufeff' + (text || '')], {type:'text/markdown;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filenameFromTitle(title) + '.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.setTimeout(function(){ URL.revokeObjectURL(url); }, 600);
+    }finally{
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+  });
+})();
+</script>
+
+{{ $pages := where .Site.RegularPages "Section" "posts" }}
+<section class="prev-next">
+  {{ with .PrevInSection }}<a class="card nav-card" href="{{ .RelPermalink }}"><span>{{ partial "ui-icon.html" "back" }}</span><div><small>上一篇</small><strong>{{ .Title }}</strong><br><small>{{ .Date.Format "2006-01-02" }}</small></div></a>{{ else }}<div></div>{{ end }}
+  {{ with .NextInSection }}<a class="card nav-card" href="{{ .RelPermalink }}"><div><small>下一篇</small><strong>{{ .Title }}</strong><br><small>{{ .Date.Format "2006-01-02" }}</small></div><span>{{ partial "ui-icon.html" "arrow-right" }}</span></a>{{ else }}<div></div>{{ end }}
+</section>
+<section class="section">
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "article" }}</span><h2>相关文章</h2></div>
+  <div class="related-grid">
+    {{ range first 3 (where $pages "Permalink" "ne" .Permalink) }}
+    <article class="card related-card" data-card-link="{{ .RelPermalink }}" role="link" tabindex="0" aria-label="阅读相关文章：{{ .Title }}">
+      <a class="post-thumb lazy-bg cover-mode-{{ .Params.cover_mode | default "cover" }}" href="{{ .RelPermalink }}" data-bg="{{ .Params.cover | default $cfg.pages.article_default_cover | default "/img/hero-article.svg" }}"></a>
+      <div class="post-info"><h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3><div class="meta-row"><span>{{ .Date.Format "2006-01-02" }}</span><span class="views real-views meta-icon-item" data-view-mode="get" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span></div></div>
+    </article>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

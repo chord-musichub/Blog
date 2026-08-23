@@ -1,0 +1,54 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+
+<main class="tool-page reaction-test-page">
+  <section class="reaction-shell" data-reaction-test>
+    <div class="reaction-hero">
+      <div>
+        <p class="eyebrow">Songline Mini Game</p>
+        <h1>反应测试</h1>
+        <p>点击测试区开始等待。屏幕变色后立刻点击，记录你的反应偏移值。</p>
+      </div>
+    </div>
+
+    <section class="reaction-panel">
+      <div class="reaction-stats">
+        <div class="reaction-stat-card">
+          <span>本次</span>
+          <strong data-reaction-current>-- ms</strong>
+        </div>
+        <div class="reaction-stat-card">
+          <span>本地最佳</span>
+          <strong data-reaction-best>-- ms</strong>
+        </div>
+        <button class="reaction-sound-toggle" type="button" data-reaction-sound-toggle aria-pressed="true">
+          <span data-reaction-sound-label>音效开</span>
+        </button>
+      </div>
+
+      <button class="reaction-stage" type="button" data-reaction-stage aria-live="polite">
+        <span class="reaction-stage-kicker" data-reaction-kicker>准备测试</span>
+        <strong data-reaction-title>点击开始</strong>
+        <em data-reaction-text>变色前不要点。变色后越快越好。</em>
+      </button>
+
+      <div class="reaction-actions">
+        <button class="reaction-button" type="button" data-reaction-start>开始 / 再测一次</button>
+        <button class="reaction-button leaderboard-sync-btn" type="button" data-reaction-sync-best>同步本地最佳</button>
+      </div>
+
+      <details class="snake-leaderboard reaction-leaderboard" data-reaction-leaderboard aria-label="反应测试前三名成绩" open>
+        <summary>
+          <span>前三名成绩</span>
+          <small>越低越好</small>
+        </summary>
+        <ol data-reaction-top-scores>
+          <li>暂无记录</li>
+        </ol>
+      </details>
+
+      <p class="reaction-tip">小提示：看到颜色变绿以后再点，提前点不会计入成绩。</p>
+    </section>
+  </section>
+</main>
+{{ end }}

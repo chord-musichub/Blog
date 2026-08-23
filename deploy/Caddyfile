@@ -1,0 +1,9 @@
+# 改成你的真实域名
+write.example.com {
+    reverse_proxy 127.0.0.1:8080
+}
+
+blog.example.com {
+    root * /opt/gexian-blog-mvp-v2/published
+    file_server
+}

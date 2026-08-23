@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{if eq .User.Role "admin"}}账号管理{{else}}账号设置{{end}}</title><script>
+(function(){
+  try{
+    var theme = localStorage.getItem('gexian-admin-theme') || 'dark';
+    document.documentElement.setAttribute('data-admin-theme', theme);
+    document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#fbfaf7';
+  }catch(e){
+    document.documentElement.setAttribute('data-admin-theme', 'dark');
+    document.documentElement.style.backgroundColor = '#0d1728';
+  }
+})();
+</script><link rel="stylesheet" href="/static/style.css?v=20.18.5"><script defer src="/static/admin-theme.js"></script><script defer src="/static/admin-nav.js?v=20.18.5"></script><script defer src="/static/admin-mobile.js?v=20.18.5"></script><script defer src="/static/page-transition.js?v=20.18.5"></script>
+<style>
+:root{
+  --admin-bg:{{default "#fbfaf7" .Theme.Background}};
+  --admin-panel:color-mix(in srgb, {{default "#fffdfa" .Theme.Panel}} 86%, transparent);
+  --admin-panel-strong:{{default "#fffdfa" .Theme.Panel}};
+  --admin-text:{{default "#15345b" .Theme.Text}};
+  --admin-muted:{{default "#64748b" .Theme.Muted}};
+  --admin-accent:{{default "#0ea5e9" .Theme.Accent}};
+  --admin-accent-2:{{default "#2563eb" .Theme.Accent2}};
+  --admin-soft:color-mix(in srgb, {{default "#0ea5e9" .Theme.Accent}} 11%, {{default "#fbfaf7" .Theme.Background}});
+  --admin-warm:color-mix(in srgb, #ffe7bd 36%, {{default "#fbfaf7" .Theme.Background}});
+}
+</style>
+<style id="admin-dark-top-hardfix">
+html[data-admin-theme="dark"],
+html[data-admin-theme="dark"] body,
+html[data-admin-theme="dark"] body::before,
+html[data-admin-theme="dark"] body::after{
+  background:#0d1728!important;
+  background-image:none!important;
+}
+html[data-admin-theme="dark"] body{
+  margin-top:0!important;
+  border-top:0!important;
+  box-shadow:none!important;
+}
+html[data-admin-theme="dark"] .admin-site-bg-layer{
+  display:block!important;
+  visibility:visible!important;
+  opacity:var(--admin-site-bg-opacity, .38)!important;
+  background-image:var(--admin-site-bg-image)!important;
+  background-size:cover!important;
+  background-position:center top!important;
+}
+html[data-admin-theme="dark"] .admin-client-nav{
+  background:#101c30!important;
+  background-image:none!important;
+  border-color:rgba(125,211,252,.18)!important;
+}
+html[data-admin-theme="dark"] .admin-main-nav,
+html[data-admin-theme="dark"] .admin-glass-nav,
+html[data-admin-theme="dark"] main.wrap > nav.nav:first-child,
+html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
+  display:none!important;
+  height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+</style>
+<script defer src="/static/space-ribbons.js?v=20.18.5"></script>
+</head>
+<body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
+{{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
+
+<nav class="admin-client-nav" data-admin-client-nav>
+  <a class="admin-client-brand admin-client-brand-simple" href="{{adminURL "/"}}">后台</a>
+  <div class="admin-client-links">
+    <a href="{{adminURL "/"}}" data-admin-route="dashboard">工作台</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin"}}" data-admin-route="review">审核</a>{{end}}
+    <a href="{{adminURL "/articles/new"}}" data-admin-route="new">新建</a>
+    <a href="{{adminURL "/articles/upload"}}" data-admin-route="upload">上传</a>
+    <a href="{{adminURL "/admin/media"}}" data-admin-route="media">媒体库</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin/site"}}" data-admin-route="site">站点</a>{{end}}
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/users/new"}}" data-admin-route="users">作者</a>{{end}}
+    <a href="{{adminURL "/account"}}" data-admin-route="account">账号</a>
+  </div>
+  <div class="admin-client-actions">
+    <a class="admin-client-home" href="{{publicURL}}" target="_blank" rel="noopener">回主页 ↗</a>
+    <button class="admin-theme-icon-button admin-client-theme" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <a class="admin-client-logout" href="{{adminURL "/logout"}}">退出</a>
+  </div>
+</nav>
+
+<main class="wrap wide">
+  <nav class="nav compact-nav">
+    <a class="btn small ghost admin-back-icon" href="{{adminURL "/"}}" data-admin-back aria-label="返回" title="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
+    {{if eq .User.Role "admin"}}<a class="btn small ghost" href="{{adminURL "/admin"}}">审核后台</a>{{else}}<a class="btn small ghost" href="{{adminURL "/admin/media"}}">我的媒体库</a>{{end}}
+    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></button>
+  </nav>
+
+  <section class="hero compact"><h1>{{if eq .User.Role "admin"}}账号管理{{else}}账号设置{{end}}</h1><p>当前账号：{{.User.Username}}{{if .User.PasswordMustChange}} · <span class="badge pending">需要修改临时密码</span>{{end}}</p></section>
+  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
+
+  {{if eq .User.Role "admin"}}
+  <section class="preview-layout account-admin-layout">
+    <form method="post" class="card form">
+      <input type="hidden" name="action" value="add_user">
+      <h2>添加作者账号</h2>
+      <p class="meta">这里用于创建朋友作者、站长身份或系统公告账号。管理员账号通常不需要填写个人简介。</p>
+      <label>用户名 <input name="username" required placeholder="friend01"><small>只能用字母、数字、下划线、短横线。</small></label>
+      <label>显示名 <input name="display" placeholder="朋友的名字"></label>
+      <label>角色 <select name="role"><option value="author">author 作者</option><option value="admin">admin 管理员</option></select><small>普通创作账号选 author；只有管理站点的人才选 admin。</small></label>
+      <label>账号类型
+        <select name="account_type">
+          <option value="friend">朋友作者：会显示在朋友页</option>
+          <option value="owner">站长 / 主账号：你的个人创作身份</option>
+          <option value="system">系统账号 / 公告：用于通知、公告、更新日志</option>
+        </select>
+        <small>建议：admin 设置为“系统账号 / 公告”；你自己的创作账号设置为“站长 / 主账号”。</small>
+      </label>
+      <label>初始密码 <span class="password-field"><input id="new-user-password" name="password" type="password" required placeholder="至少 6 位"><button class="password-toggle" type="button" data-password-toggle="#new-user-password" aria-label="显示密码"></button></span></label>
+      <button><span class="btn-ico" aria-hidden="true">+</span><span class="btn-text">创建用户</span></button>
+    </form>
+
+    <form method="post" class="card form account-security-card">
+      <h2>管理员密码</h2>
+      <p class="meta">这里仅修改当前登录的管理员密码，不影响其他作者账号。</p>
+      <label>旧密码 <span class="password-field"><input id="old-password" name="old_password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" data-password-toggle="#old-password" aria-label="显示密码"></button></span></label>
+      <label>新密码 <span class="password-field"><input id="new-password" name="new_password" type="password" autocomplete="new-password" minlength="8" required placeholder="至少 8 位"><button class="password-toggle" type="button" data-password-toggle="#new-password" aria-label="显示密码"></button></span></label>
+      <label>确认新密码 <span class="password-field"><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required><button class="password-toggle" type="button" data-password-toggle="#confirm-password" aria-label="显示密码"></button></span></label>
+      <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">保存管理员密码</span></button>
+      <section class="help"><h3>忘记旧密码？</h3><p>如果无法登录，可以在登录页提交密码修改申请；另一个管理员可以在审核后台处理。</p></section>
+    </form>
+  </section>
+  {{else}}
+  <section class="preview-layout">
+    <form method="post" class="card form" enctype="multipart/form-data">
+      <input type="hidden" name="action" value="profile">
+      <h2>个人主页资料</h2>
+      <p class="meta">这些信息会用于朋友详细页。可以直接上传头像/横幅，也可以从「我的媒体库」点选。</p>
+      <label>公开显示名 <input name="display_name" value="{{.User.DisplayName}}" placeholder="显示在朋友页上的名字"></label>
+      <label>个人简介 <textarea name="bio" rows="4" placeholder="一句或几句介绍自己">{{.User.Bio}}</textarea></label>
+      <label>个人主页链接 <input name="homepage" value="{{.User.Homepage}}" placeholder="https://...，可留空"></label>
+      <label>直接上传头像 <input name="avatar_file" type="file" accept="image/*"></label>
+      <label>头像图片路径 <input id="avatarInput" name="avatar" value="{{.User.Avatar}}" placeholder="/uploads/{{.User.Username}}/avatar.png"></label>
+      <label>直接上传朋友页横幅 <input name="cover_file" type="file" accept="image/*"></label>
+      <label>朋友详细页横幅图 <input id="coverInput" name="cover" value="{{.User.Cover}}" placeholder="/uploads/{{.User.Username}}/banner.png"></label>
+      <div class="cover-picker card soft-card">
+        <div class="toolbar"><b>从我的媒体库选择图片</b><a class="btn small secondary" href="{{adminURL "/admin/media"}}" target="_blank">打开媒体库</a></div>
+        <div class="cover-grid">
+          {{range .CoverFiles}}
+            <button type="button" class="cover-option" data-cover="{{.Path}}">
+              <img src="{{.Path}}" alt="{{.Name}}">
+              <span>{{.Name}}</span>
+            </button>
+          {{else}}
+            <p class="meta">你的媒体库还没有图片。先打开媒体库上传。</p>
+          {{end}}
+        </div>
+      </div>
+      <div class="actions">
+        <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">保存个人资料</span></button>
+        <button class="secondary" type="button" id="useAsAvatar">选中图填到头像</button>
+        <button class="secondary" type="button" id="useAsCover">选中图填到横幅</button>
+      </div>
+    </form>
+
+    <form method="post" class="card form">
+      <h2>修改密码</h2>
+      <label>旧密码 <span class="password-field"><input id="old-password" name="old_password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" data-password-toggle="#old-password" aria-label="显示密码"></button></span></label>
+      <label>新密码 <span class="password-field"><input id="new-password" name="new_password" type="password" autocomplete="new-password" minlength="8" required placeholder="至少 8 位"><button class="password-toggle" type="button" data-password-toggle="#new-password" aria-label="显示密码"></button></span></label>
+      <label>确认新密码 <span class="password-field"><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required><button class="password-toggle" type="button" data-password-toggle="#confirm-password" aria-label="显示密码"></button></span></label>
+      <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">保存新密码</span></button>
+      <section class="help"><h3>忘记旧密码？</h3><p>如果你无法登录，可以在登录页提交「密码修改申请」，由管理员批准并设置临时密码。</p></section>
+    </form>
+  </section>
+  {{end}}
+</main>
+{{if ne .User.Role "admin"}}
+<script>
+(function(){
+  let selected = "";
+  document.querySelectorAll('.cover-option[data-cover]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      selected = btn.getAttribute('data-cover') || '';
+      document.querySelectorAll('.cover-option').forEach(function(x){ x.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+  });
+  const avatar = document.getElementById('avatarInput');
+  const cover = document.getElementById('coverInput');
+  const aBtn = document.getElementById('useAsAvatar');
+  const cBtn = document.getElementById('useAsCover');
+  if(aBtn) aBtn.addEventListener('click', function(){ if(selected && avatar) avatar.value = selected; });
+  if(cBtn) cBtn.addEventListener('click', function(){ if(selected && cover) cover.value = selected; });
+})();
+</script>
+{{end}}
+</body>
+</html>

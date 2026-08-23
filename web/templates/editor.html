@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>编辑文章</title><script>
+(function(){
+  try{
+    var theme = localStorage.getItem('gexian-admin-theme') || 'dark';
+    document.documentElement.setAttribute('data-admin-theme', theme);
+    document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#fbfaf7';
+  }catch(e){
+    document.documentElement.setAttribute('data-admin-theme', 'dark');
+    document.documentElement.style.backgroundColor = '#0d1728';
+  }
+})();
+</script><link rel="stylesheet" href="/static/style.css?v=20.18.5"><script defer src="/static/admin-theme.js"></script><script defer src="/static/admin-nav.js?v=20.18.5"></script><script defer src="/static/admin-mobile.js?v=20.18.5"></script><script defer src="/static/page-transition.js?v=20.18.5"></script>
+<style>
+:root{
+  --admin-bg:{{default "#fbfaf7" .Theme.Background}};
+  --admin-panel:color-mix(in srgb, {{default "#fffdfa" .Theme.Panel}} 86%, transparent);
+  --admin-panel-strong:{{default "#fffdfa" .Theme.Panel}};
+  --admin-text:{{default "#15345b" .Theme.Text}};
+  --admin-muted:{{default "#64748b" .Theme.Muted}};
+  --admin-accent:{{default "#0ea5e9" .Theme.Accent}};
+  --admin-accent-2:{{default "#2563eb" .Theme.Accent2}};
+  --admin-soft:color-mix(in srgb, {{default "#0ea5e9" .Theme.Accent}} 11%, {{default "#fbfaf7" .Theme.Background}});
+  --admin-warm:color-mix(in srgb, #ffe7bd 36%, {{default "#fbfaf7" .Theme.Background}});
+}
+</style>
+<style id="admin-dark-top-hardfix">
+html[data-admin-theme="dark"],
+html[data-admin-theme="dark"] body,
+html[data-admin-theme="dark"] body::before,
+html[data-admin-theme="dark"] body::after{
+  background:#0d1728!important;
+  background-image:none!important;
+}
+html[data-admin-theme="dark"] body{
+  margin-top:0!important;
+  border-top:0!important;
+  box-shadow:none!important;
+}
+html[data-admin-theme="dark"] .admin-site-bg-layer{
+  display:block!important;
+  visibility:visible!important;
+  opacity:var(--admin-site-bg-opacity, .38)!important;
+  background-image:var(--admin-site-bg-image)!important;
+  background-size:cover!important;
+  background-position:center top!important;
+}
+html[data-admin-theme="dark"] .admin-client-nav{
+  background:#101c30!important;
+  background-image:none!important;
+  border-color:rgba(125,211,252,.18)!important;
+}
+html[data-admin-theme="dark"] .admin-main-nav,
+html[data-admin-theme="dark"] .admin-glass-nav,
+html[data-admin-theme="dark"] main.wrap > nav.nav:first-child,
+html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
+  display:none!important;
+  height:0!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+</style>
+<script defer src="/static/space-ribbons.js?v=20.18.5"></script>
+</head>
+<body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
+{{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
+
+<nav class="admin-client-nav" data-admin-client-nav>
+  <a class="admin-client-brand admin-client-brand-simple" href="{{adminURL "/"}}">后台</a>
+  <div class="admin-client-links">
+    <a href="{{adminURL "/"}}" data-admin-route="dashboard">工作台</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin"}}" data-admin-route="review">审核</a>{{end}}
+    <a href="{{adminURL "/articles/new"}}" data-admin-route="new">新建</a>
+    <a href="{{adminURL "/articles/upload"}}" data-admin-route="upload">上传</a>
+    <a href="{{adminURL "/admin/media"}}" data-admin-route="media">媒体库</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin/site"}}" data-admin-route="site">站点</a>{{end}}
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/users/new"}}" data-admin-route="users">作者</a>{{end}}
+    <a href="{{adminURL "/account"}}" data-admin-route="account">账号</a>
+  </div>
+  <div class="admin-client-actions">
+    <a class="admin-client-home" href="{{publicURL}}" target="_blank" rel="noopener">回主页 ↗</a>
+    <button class="admin-theme-icon-button admin-client-theme" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <a class="admin-client-logout" href="{{adminURL "/logout"}}">退出</a>
+  </div>
+</nav>
+
+<main class="wrap wide">
+  <nav class="nav compact-nav admin-glass-nav">
+    <strong class="admin-brand"><span class="admin-brand-mark">S</span><span>文章编辑器</span></strong>
+    <a class="btn small ghost admin-back-icon" href="{{adminURL "/"}}" data-admin-back aria-label="返回" title="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
+    <a class="btn small ghost" href="{{adminURL "/admin/media"}}">媒体库</a>
+    <a class="btn small ghost" href="{{publicURL}}tools/markdown-previewer/" target="_blank">MD 工具 ↗</a>
+    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+  <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg></button>
+  </nav>
+
+  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
+
+  <section class="hero compact admin-hero editor-hero">
+    <div>
+<h1>{{if .Article.ID}}编辑文章{{else}}新建文章{{end}}</h1>
+      <p>当前状态：<span class="badge {{statusClass .Article.Status}}">{{statusText .Article.Status}}</span>{{if .Article.ID}} · ID：{{.Article.ID}}{{end}}</p>
+      {{if .Article.RejectNote}}<p class="warn">退回原因：{{.Article.RejectNote}}</p>{{end}}
+    </div>
+  </section>
+
+  <form id="article-form" method="post" action="{{if .Article.ID}}{{adminURL (printf "/articles/%s/edit" .Article.ID)}}{{else}}{{adminURL "/articles/new"}}{{end}}" class="card form editor-form">
+    <div class="grid two">
+      <label>标题 <input name="title" value="{{.Article.Title}}" placeholder="我的第一篇测试文章" required></label>
+      <label>Slug / 网址短名 <input name="slug" value="{{.Article.Slug}}" placeholder="my-first-post，可留空自动生成"></label>
+    </div>
+    <label>摘要 <input name="summary" value="{{.Article.Summary}}" placeholder="{{with .Settings.Manuscript.DefaultSummary}}{{.}}{{else}}一句话介绍这篇文章{{end}}">
+      <small>可留空。留空时公开站会显示管理员设置的默认简介；填写后优先使用你的自定义简介。</small>
+    </label>
+    <label>文章插画 / 封面图
+      <input name="cover" id="coverInput" value="{{.Article.Cover}}" placeholder="/uploads/{{.User.Username}}/article-cover.png；留空则使用站点默认插画">
+      <small>从「我的媒体库」复制路径，或者在下面选择。只建议使用你自己账号目录下的图片。</small>
+    </label>
+    <label>封面展示方式
+      <select name="cover_mode">
+        <option value="cover" {{if ne .Article.CoverMode "contain"}}selected{{end}}>铺满裁切：更像封面，画面充满卡片</option>
+        <option value="contain" {{if eq .Article.CoverMode "contain"}}selected{{end}}>完整显示：适合 1:1 或不能裁切的图</option>
+      </select>
+      <small>推荐默认用「铺满裁切」。如果某张图是 1:1、角色或文字容易被切掉，再改成「完整显示」。</small>
+    </label>
+    <div class="cover-picker card soft-card">
+      <div class="toolbar"><b>从我的媒体库选择封面</b><a class="btn small secondary" href="{{adminURL "/admin/media"}}" target="_blank">打开媒体库</a></div>
+      <div class="cover-grid">
+        {{range .CoverFiles}}
+          <button type="button" class="cover-option" data-cover="{{.Path}}">
+            <img src="{{.Path}}" alt="{{.Name}}">
+            <span>{{.Name}}</span>
+          </button>
+        {{else}}
+          <p class="meta">你的媒体库还没有图片。先打开媒体库上传，再回来选择。</p>
+        {{end}}
+      </div>
+    </div>
+    <label>标签，用英文逗号分隔 <input name="tags" value="{{joinTags .Article.Tags}}" placeholder="测试, Markdown, 博客"></label>
+    <label>Markdown 正文
+      <textarea name="body" id="md" maxlength="204800" required placeholder="# 标题&#10;&#10;从这里开始写 Markdown...">{{.Article.Body}}</textarea>
+    </label>
+    <div class="actions">
+      <button type="submit" name="intent" value="save" class="secondary"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">{{if and (eq .User.Role "admin") (eq .Article.Status "published")}}仅保存后台（不更新公开站）{{else}}保存到草稿箱{{end}}</span></button>
+      {{if eq .User.Role "admin"}}
+        {{if or (not .Article.ID) (canSubmit .Article)}}<button type="submit" name="intent" value="submit" class="ghost"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text">放入审核队列（测试）</span></button>{{end}}
+        <button type="submit" name="intent" value="publish"><span class="btn-ico" aria-hidden="true">↗</span><span class="btn-text">{{if eq .Article.Status "pending"}}审核通过并发布{{else if eq .Article.Status "published"}}保存并更新公开站{{else}}直接发布到公开站{{end}}</span></button>
+      {{else}}
+        {{if or (not .Article.ID) (canSubmit .Article)}}<button type="submit" name="intent" value="submit"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text">提交给管理员审核</span></button>{{end}}
+      {{end}}
+      {{if .Article.ID}}{{if or (eq .User.Role "admin") (or (eq .Article.Status "draft") (eq .Article.Status "rejected"))}}<button type="submit" form="delete-form" class="danger"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text">删除</span></button>{{end}}{{end}}
+      <a class="btn ghost" href="{{adminURL "/"}}"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></span><span class="btn-text">返回</span></a>
+    </div>
+    <p class="meta form-hint">流程：草稿/后台保存不会更新公开站；提交审核会进入「审核后台」的待审核队列；只有管理员点击发布或更新公开站后，首页才会同步。</p>
+  </form>
+
+  {{if .Article.ID}}
+  <form id="delete-form" method="post" action="{{adminURL (printf "/articles/%s/delete" .Article.ID)}}" onsubmit="return confirm('确定删除这篇文章吗？已发布文章会同步从公开博客移除。')"></form>
+  {{end}}
+
+  <section class="preview-layout">
+    <div>
+      <h2>预览</h2>
+      <article class="card preview" id="preview"></article>
+    </div>
+    <aside class="card help">
+      <h3>怎么填？</h3>
+      <p><b>标题</b>：文章名。</p>
+      <p><b>Slug</b>：建议英文小写，比如 <code>my-first-post</code>。</p>
+      <p><b>动作区别</b>：草稿/后台保存不会重建前台；提交审核会进入待审核队列；发布/更新公开站才会重建首页。</p>
+      <p><b>图片引用</b>：从媒体库复制路径后，可在 Markdown 中使用 <code>![](/uploads/...)</code>。</p>
+      <p><b>公开工具</b>：需要临时查看本地文件时，可以打开前台 Markdown 预览器。</p>
+    </aside>
+  </section>
+</main>
+<script>
+(function(){
+  const input = document.getElementById('coverInput');
+  document.querySelectorAll('.cover-option[data-cover]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(!input) return;
+      input.value = btn.getAttribute('data-cover') || '';
+      document.querySelectorAll('.cover-option').forEach(function(x){ x.classList.remove('active'); });
+      btn.classList.add('active');
+    });
+  });
+})();
+</script>
+<script src="/static/markdown-renderer.js?v=20.3.4"></script>
+<script src="/static/editor.js?v=20.3.4"></script>
+</body>
+</html>

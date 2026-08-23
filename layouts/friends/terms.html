@@ -1,0 +1,51 @@
+{{ define "main" }}
+{{ $cfg := .Site.Data.site }}
+<section class="page-hero" style="background-image:url('{{ default "/img/hero-friends.svg" $cfg.pages.friends_hero_image }}')">
+<h1>{{ default "朋友" $cfg.pages.friends_hero_title }}</h1>
+</section>
+{{ $friends := index .Site.Taxonomies "friends" }}
+<section class="card toolbar-panel friends-search-panel">
+  <input id="friendSearch" class="searchbox" type="search" autocomplete="off" placeholder="搜索朋友名称、简介、文章...">
+  <button class="pill search-submit" id="friendSearchSubmit" type="button" data-search-submit="friend" data-no-page-loading>搜索</button>
+  <span class="pill search-count" id="friendSearchCount">{{ with $friends }}{{ len . }}{{ else }}0{{ end }} 位朋友</span>
+</section>
+<section class="section">
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "users" }}</span><h2>推荐朋友</h2></div>
+  <div class="featured-friends friend-search-list">
+    {{ with $friends }}{{ range first 2 .ByCount }}
+      {{ $first := index .Pages 0 }}
+      {{ $avatar := "/img/avatar-default.svg" }}
+      {{ $bio := "记录想法，分享文章。" }}
+      {{ with $first }}{{ with .Params.author_avatar }}{{ $avatar = . }}{{ end }}{{ with .Params.author_bio }}{{ $bio = . }}{{ end }}{{ end }}
+      <a class="card featured-card friend-search-item" data-name="{{ .Page.Title | plainify }}" data-bio="{{ $bio | plainify }}" data-posts="{{ range .Pages }}{{ .Title | plainify }} {{ end }}" href="{{ .Page.RelPermalink }}"><img class="avatar" src="{{ $avatar }}" alt="{{ .Page.Title }}"><div><h2>{{ .Page.Title }}</h2><p style="color:var(--muted)">{{ $bio | plainify | truncate 54 }}</p><div class="meta-row"><span class="meta-icon-item">{{ partial "ui-icon.html" "article" }} 文章 {{ .Count }} 篇</span><span class="btn">访问主页 {{ partial "ui-icon.html" "arrow-right" }}</span></div></div></a>
+    {{ end }}{{ else }}<div class="card" style="padding:28px">还没有朋友作者。发布文章后，这里会自动出现朋友信息。</div>{{ end }}
+  </div>
+</section>
+<section class="section">
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "users" }}</span><h2>所有朋友</h2></div>
+  <div class="all-friends friend-search-list">
+    {{ with $friends }}{{ range .ByCount }}
+      {{ $first := index .Pages 0 }}
+      {{ $avatar := "/img/avatar-default.svg" }}
+      {{ $bio := "" }}
+      {{ with $first }}{{ with .Params.author_avatar }}{{ $avatar = . }}{{ end }}{{ with .Params.author_bio }}{{ $bio = . }}{{ end }}{{ end }}
+      <a class="card small-friend friend-search-item" data-name="{{ .Page.Title | plainify }}" data-bio="{{ $bio | plainify }}" data-posts="{{ range .Pages }}{{ .Title | plainify }} {{ end }}" href="{{ .Page.RelPermalink }}"><img class="avatar" src="{{ $avatar }}" alt="{{ .Page.Title }}"><div><h3>{{ .Page.Title }}</h3><p style="color:var(--muted);margin:0">文章 {{ .Count }} 篇</p></div></a>
+    {{ end }}{{ else }}<div class="card" style="padding:28px">暂无朋友。等第一篇文章发布后，这里会自动生成。</div>{{ end }}
+  </div>
+  <div id="friendEmpty" class="card" style="display:none;padding:24px;margin-top:14px">没有找到匹配的朋友。</div>
+</section>
+<section class="section panel-two">
+  <div class="card">
+    <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "users" }}</span><h2>最近加入</h2></div>
+    <div class="pills">{{ with $friends }}{{ range first 6 .ByCount }}<a class="pill" href="{{ .Page.RelPermalink }}">{{ .Page.Title }}</a>{{ end }}{{ else }}<span class="pill">暂无</span>{{ end }}</div>
+  </div>
+  <div class="card">
+    <div class="section-head"><span class="section-icon">⌁</span><h2>朋友动态</h2></div>
+    <ul class="activity-list">
+      {{ range first 4 (where .Site.RegularPages "Section" "posts") }}
+        <li><a class="activity-link" href="{{ .RelPermalink }}"><span>{{ .Params.author_display | default .Params.author }} 发布了新文章《{{ .Title }}》</span><small>{{ .Date.Format "01-02 15:04" }}</small></a></li>
+      {{ else }}<li><span>暂无动态</span><small></small></li>{{ end }}
+    </ul>
+  </div>
+</section>
+{{ end }}

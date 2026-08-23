@@ -1,0 +1,15 @@
+:root{
+  --bg:#f3f9ff;
+  --panel:#ffffff;
+  --text:#12324d;
+  --muted:#5c7288;
+  --accent:#38bdf8;
+  --accent-2:#0284c7;
+  --radius:24px;
+  --max:1280px;
+  --shadow:0 24px 70px rgba(39,74,112,.16);
+}
+.hero-banner{min-height:320px}
+.page-hero{min-height:calc(320px - 30px)}
+.markdown-body{font-size:17px}
+.article-reader{max-width:880px}

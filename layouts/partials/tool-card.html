@@ -1,0 +1,12 @@
+{{ $class := default "" .class }}
+<a class="card tool-card tool-link-card{{ with $class }} {{ . }}{{ end }}" href="{{ .href }}"{{ with .attrs }} {{ . | safeHTMLAttr }}{{ end }}>
+  <div class="tool-card-icon">{{ .icon }}</div>
+  <div>
+    <h2>{{ .title }}</h2>
+    <p>{{ .desc }}</p>
+    <div class="tool-tags">
+      {{ range .tags }}<span>{{ . }}</span>{{ end }}
+    </div>
+  </div>
+  <span class="tool-card-arrow">{{ partial "ui-icon.html" "arrow-right" }}</span>
+</a>

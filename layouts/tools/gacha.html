@@ -1,0 +1,84 @@
+{{ define "main" }}
+{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+<section class="page-hero tools-hero gacha-hero">
+<h1>抽卡模拟器</h1>
+</section>
+
+<section class="card gacha-tool-panel" data-gacha-tool>
+  <div class="gacha-head">
+    <div>
+      <h2>卡池设置</h2>
+    </div>
+    <div class="gacha-status">
+      <span>当前游戏 <b data-gacha-mode-name>—</b></span>
+      <span>卡池 <b data-gacha-banner-name>UP 池</b></span>
+      <span>抽数 <b data-gacha-total>0</b></span>
+    </div>
+  </div>
+
+  <div class="gacha-config-grid">
+    <label>
+      <span>抽卡机制</span>
+      <select data-gacha-mode>
+        <option value="starRailLike">原神 / 星穹铁道角色池</option>
+        <option value="wutheringLike">鸣潮角色池</option>
+        <option value="arknightsLike">明日方舟标准寻访</option>
+        <option value="blueArchiveLike">蔚蓝档案招募</option>
+      </select>
+    </label>
+
+    <label>
+      <span>卡池类型</span>
+      <select data-gacha-banner>
+        <option value="featured">限定 / UP 池（有 UP 判定）</option>
+        <option value="standard">常驻池（无 UP / 无大保底）</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="gacha-banner-note" data-gacha-banner-note>
+    UP 池会判定是否命中 UP，并参与大小保底；常驻池只模拟稀有度，不判定 UP。
+  </div>
+
+  <div class="gacha-pity-grid">
+    <div class="gacha-pity-card">
+      <span>最高稀有保底进度</span>
+      <strong><b data-gacha-pity>0</b>/<b data-gacha-hard-pity>90</b></strong>
+      <div class="gacha-bar"><i data-gacha-pity-bar></i></div>
+    </div>
+    <div class="gacha-pity-card">
+      <span>UP 状态</span>
+      <strong data-gacha-guarantee>小保底</strong>
+      <p data-gacha-guarantee-note>抽到最高稀有时有概率命中 UP。</p>
+    </div>
+    <div class="gacha-pity-card">
+      <span>井 / 兑换进度</span>
+      <strong><b data-gacha-spark>0</b>/<b data-gacha-spark-target>—</b></strong>
+      <div class="gacha-bar"><i data-gacha-spark-bar></i></div>
+    </div>
+  </div>
+
+  <div class="gacha-actions">
+    <button class="btn gacha-pull-button" type="button" data-gacha-pull-one>单抽</button>
+    <button class="btn gacha-pull-button" type="button" data-gacha-pull-ten>十连</button>
+    <button class="btn secondary" type="button" data-gacha-reset>重置记录</button>
+  </div>
+
+  <div class="gacha-result-box" aria-live="polite">
+    <div class="gacha-result-head">
+      <h2>抽卡结果</h2>
+      <p data-gacha-summary>选择机制后开始抽卡。</p>
+    </div>
+    <div class="gacha-results" data-gacha-results>
+      <div class="gacha-empty">还没有抽卡记录。</div>
+    </div>
+  </div>
+
+  <details class="gacha-rules">
+    <summary>查看当前游戏说明</summary>
+    <div data-gacha-rules></div>
+  </details>
+</section>
+
+<script defer src="/js/tools/gacha.js?v=20.20.6"></script>
+{{ end }}
