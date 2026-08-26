@@ -17,6 +17,11 @@ RELEASE_REF="${BLOG_RELEASE_REF:-main}"
 SSH_COMMAND="${GIT_SSH_COMMAND:-ssh -i /root/.ssh/id_ed25519_blog_deploy -o IdentitiesOnly=yes}"
 PROMOTE=false
 
+# sudo 的 secure_path 经常不包含手动安装的 Go；构建脚本需要它。
+if [[ -x /usr/local/go/bin/go && ":$PATH:" != *":/usr/local/go/bin:"* ]]; then
+    export PATH="/usr/local/go/bin:$PATH"
+fi
+
 usage() {
     cat <<'EOF'
 用法：songline-blog-update [选项]
