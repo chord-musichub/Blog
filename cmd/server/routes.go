@@ -9,6 +9,8 @@ func (app *App) router() http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("static/uploads"))))
+	// Markdown 源文件属于运行时数据，不能依赖公开站的静态目录或 SPA 兜底规则。
+	mux.Handle("/md-source/", http.StripPrefix("/md-source/", http.FileServer(http.Dir("static/md-source"))))
 	mux.HandleFunc("/api/views", app.handleViewsAPI)
 
 	app.registerScoreRoutes(mux, app.handleSnakeScoresAPI, "snake-scores")

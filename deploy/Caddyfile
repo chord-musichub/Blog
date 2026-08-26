@@ -13,6 +13,11 @@
         reverse_proxy 127.0.0.1:8080
     }
 
+    @markdownSources path /md-source/*
+    handle @markdownSources {
+        reverse_proxy 127.0.0.1:8080
+    }
+
     @publicAPI path /api/*
     handle @publicAPI {
         reverse_proxy 127.0.0.1:8080

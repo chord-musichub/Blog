@@ -122,6 +122,11 @@
     }
   }
 
+  // 反代找不到源文件时可能回退到首页；HTTP 200 但内容其实是完整 HTML。
+  function isMarkdownSource(value){
+    return !/^\s*<(?:!doctype\s+html|html|head|body)(?:\s|>)/i.test(String(value || ''));
+  }
+
   function slugify(text, used){
     let base = String(text || '')
       .replace(/<[^>]*>/g, '')
@@ -166,7 +171,7 @@
         const res = await fetch(src, {credentials:'same-origin', cache:'no-store'});
         if(res.ok){
           const text = await res.text();
-          if(text) return text;
+          if(text && isMarkdownSource(text)) return text;
         }
       }catch(e){}
     }
@@ -333,6 +338,9 @@
       .trim()
       .slice(0, 80) || 'article';
   }
+  function isMarkdownSource(value){
+    return !/^\s*<(?:!doctype\s+html|html|head|body)(?:\s|>)/i.test(String(value || ''));
+  }
   async function getMarkdown(){
     const src = sourceEl.dataset.sourceUrl || '';
     if(src){
@@ -340,7 +348,7 @@
         const res = await fetch(src, {credentials:'same-origin', cache:'no-store'});
         if(res.ok){
           const text = await res.text();
-          if(text) return text;
+          if(text && isMarkdownSource(text)) return text;
         }
       }catch(e){}
     }
