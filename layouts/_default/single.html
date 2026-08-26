@@ -88,7 +88,7 @@
 
 <button class="back-to-top-button" type="button" aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "arrow-up" }}</button>
 <button class="scroll-to-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "arrow-down" }}</button>
-<script src="/js/markdown-renderer.js?v=20.20.6"></script>
+<script src="/js/markdown-renderer.js?v={{ partial "asset-version.html" . }}"></script>
 <script id="article-md-source" type="application/json" data-source-format="{{ if .Params.source_md_b64 }}base64{{ else }}text{{ end }}" data-source-url="{{ with .Params.source_md_url }}{{ . }}{{ end }}">{{ with .Params.source_md_b64 }}{{ . | jsonify }}{{ else }}{{ with .RawContent }}{{ . | jsonify }}{{ else }}{{ .Plain | jsonify }}{{ end }}{{ end }}</script>
 
 <script id="article-render-sync">

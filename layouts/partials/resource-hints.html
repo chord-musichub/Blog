@@ -3,7 +3,7 @@ v20.20.6：首屏资源提示。
 只做 preload/modulepreload 提示，不改变脚本执行逻辑。
 */ -}}
 
-{{- $v := "20.20.6" -}}
+{{- $v := partial "asset-version.html" . -}}
 {{- $section := .Section -}}
 {{- $rel := .RelPermalink -}}
 

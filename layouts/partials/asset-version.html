@@ -1,0 +1,5 @@
+{{- /*
+统一公开站静态资源的缓存版本。
+发布脚本会把当前 Git 提交写入 data/build.json；本地开发没有该文件时使用 dev。
+*/ -}}
+{{- default "dev" .Site.Data.build.asset_version -}}

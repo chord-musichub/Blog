@@ -47,6 +47,6 @@
 <button class="back-to-top-button tool-page-top-button" type="button" aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "arrow-up" }}</button>
 <button class="scroll-to-bottom-button tool-page-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "arrow-down" }}</button>
 
-<script src="/js/markdown-renderer.js?v=20.20.6"></script>
-<script defer src="/js/tools/markdown-previewer.js?v=20.20.6"></script>
+<script src="/js/markdown-renderer.js?v={{ partial "asset-version.html" . }}"></script>
+<script defer src="/js/tools/markdown-previewer.js?v={{ partial "asset-version.html" . }}"></script>
 {{ end }}

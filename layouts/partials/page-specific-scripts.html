@@ -3,7 +3,7 @@ v20.20.6：页面级 JS 按需加载。
 只在需要的页面加载对应脚本，减少普通页面无意义执行。
 */ -}}
 
-{{- $v := "20.20.6" -}}
+{{- $v := partial "asset-version.html" . -}}
 {{- $section := .Section -}}
 {{- $rel := .RelPermalink -}}
 

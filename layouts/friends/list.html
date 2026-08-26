@@ -23,7 +23,7 @@
 <h1>{{ default "朋友" $cfg.pages.friends_hero_title }}</h1>
 </section>
 
-<section class="friend-galaxy-shell slv2007-shell" data-friend-galaxy data-friends-src="/friends-data.json?v=20.20.6" data-friend-refactor="20.0.10">
+<section class="friend-galaxy-shell slv2007-shell" data-friend-galaxy data-friends-src="/friends-data.json?v={{ partial "asset-version.html" . }}" data-friend-refactor="20.0.10">
   <div class="slv2004-stage slv2007-stage" data-galaxy-stage>
     <svg class="slv2004-lines" data-galaxy-lines aria-hidden="true"></svg>
     <div class="slv2004-nodes" data-galaxy-nodes></div>

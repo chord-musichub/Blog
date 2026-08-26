@@ -12,7 +12,8 @@
     {{ end }}
   </div>
 </footer>
-<script defer data-core-script="icon-system" src="/js/icon-system.js?v=20.20.6"></script>
-<script defer data-core-script="site" src="/js/site.js?v=20.20.6"></script>
-<script defer data-core-script="desktop-fixed-nav" src="/js/desktop-fixed-nav.js?v=20.20.6"></script>
-<script defer data-core-script="search" src="/js/search.js?v=20.20.6"></script>
+{{ $assetVersion := partial "asset-version.html" . }}
+<script defer data-core-script="icon-system" src="/js/icon-system.js?v={{ $assetVersion }}"></script>
+<script defer data-core-script="site" src="/js/site.js?v={{ $assetVersion }}"></script>
+<script defer data-core-script="desktop-fixed-nav" src="/js/desktop-fixed-nav.js?v={{ $assetVersion }}"></script>
+<script defer data-core-script="search" src="/js/search.js?v={{ $assetVersion }}"></script>
