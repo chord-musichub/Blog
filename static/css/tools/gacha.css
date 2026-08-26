@@ -1,0 +1,342 @@
+/* 抽卡模拟器样式：仅在 /tools/gacha/ 加载。 */
+/* v15.9：抽卡模拟器 */
+.gacha-tool-panel{
+  padding:24px;
+}
+.gacha-head{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  align-items:flex-start;
+  margin-bottom:18px;
+}
+.gacha-head h2{
+  margin:0 0 6px;
+  font-size:26px;
+}
+.gacha-head p{
+  margin:0;
+  color:var(--muted);
+}
+.gacha-status{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:flex-end;
+}
+.gacha-status span,
+.gacha-pity-card{
+  border:1px solid var(--border);
+  background:rgba(234,246,255,.62);
+  border-radius:18px;
+}
+body.dark .gacha-status span,
+body.dark .gacha-pity-card{
+  background:rgba(19,43,66,.76);
+}
+.gacha-status span{
+  padding:8px 12px;
+  color:var(--muted);
+  font-weight:720;
+}
+.gacha-status b{
+  color:var(--accent-2);
+}
+.gacha-config-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin:18px 0;
+}
+.gacha-config-grid label{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  color:var(--muted);
+  font-weight:750;
+}
+.gacha-config-grid select{
+  width:100%;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);
+  border-radius:14px;
+  padding:12px 14px;
+  font:inherit;
+}
+.gacha-pity-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+  margin:18px 0;
+}
+.gacha-pity-card{
+  padding:16px;
+}
+.gacha-pity-card span,
+.gacha-pity-card p{
+  color:var(--muted);
+  margin:0;
+}
+.gacha-pity-card strong{
+  display:block;
+  margin:8px 0;
+  font-size:24px;
+  color:var(--accent-2);
+}
+.gacha-bar{
+  height:9px;
+  background:rgba(148,163,184,.18);
+  border-radius:999px;
+  overflow:hidden;
+}
+.gacha-bar i{
+  display:block;
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  transition:width .24s ease;
+}
+.gacha-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  justify-content:center;
+  margin:20px 0;
+}
+.gacha-result-box{
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  border-radius:22px;
+  padding:18px;
+}
+.gacha-result-head{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-end;
+  margin-bottom:14px;
+}
+.gacha-result-head h2{
+  margin:0;
+}
+.gacha-result-head p{
+  margin:0;
+  color:var(--muted);
+}
+.gacha-results{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(118px,1fr));
+  gap:10px;
+}
+.gacha-card{
+  min-height:88px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  background:rgba(255,255,255,.52);
+}
+body.dark .gacha-card{
+  background:rgba(15,23,42,.44);
+}
+.gacha-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.34;
+  background:radial-gradient(circle at 20% 0%, #fff, transparent 44%);
+  pointer-events:none;
+}
+.gacha-card.top{
+  border-color:rgba(245,158,11,.55);
+  background:linear-gradient(135deg,rgba(255,247,237,.92),rgba(254,243,199,.72));
+  box-shadow:0 16px 34px rgba(245,158,11,.16);
+}
+body.dark .gacha-card.top{
+  background:linear-gradient(135deg,rgba(120,53,15,.55),rgba(69,26,3,.4));
+}
+.gacha-card.mid{
+  border-color:rgba(168,85,247,.42);
+  background:linear-gradient(135deg,rgba(250,245,255,.86),rgba(237,233,254,.62));
+}
+body.dark .gacha-card.mid{
+  background:linear-gradient(135deg,rgba(88,28,135,.46),rgba(49,46,129,.34));
+}
+.gacha-card.low{
+  opacity:.78;
+}
+.gacha-rarity{
+  font-size:20px;
+  font-weight:850;
+  color:var(--text);
+  position:relative;
+}
+.gacha-card.top .gacha-rarity{
+  color:#b45309;
+}
+body.dark .gacha-card.top .gacha-rarity{
+  color:#fde68a;
+}
+.gacha-card.mid .gacha-rarity{
+  color:#7c3aed;
+}
+body.dark .gacha-card.mid .gacha-rarity{
+  color:#ddd6fe;
+}
+.gacha-card small{
+  color:var(--muted);
+  position:relative;
+}
+.gacha-up{
+  position:absolute;
+  right:10px;
+  top:10px;
+  background:linear-gradient(135deg,#f97316,#facc15);
+  color:#fff;
+  border-radius:999px;
+  padding:2px 7px;
+  font-size:12px;
+  font-weight:850;
+  z-index:1;
+}
+.gacha-empty{
+  grid-column:1/-1;
+  color:var(--muted);
+  text-align:center;
+  padding:22px;
+}
+.gacha-rules{
+  margin-top:16px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:12px 15px;
+  background:rgba(255,255,255,.38);
+}
+body.dark .gacha-rules{
+  background:rgba(15,23,42,.36);
+}
+.gacha-rules summary{
+  cursor:pointer;
+  font-weight:800;
+  color:var(--accent-2);
+}
+.gacha-rules li{
+  color:var(--muted);
+  margin:6px 0;
+}
+@media(max-width:820px){
+  .gacha-head,
+  .gacha-result-head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .gacha-config-grid,
+  .gacha-pity-grid{
+    grid-template-columns:1fr;
+  }
+}
+@media(max-width:520px){
+  .gacha-tool-panel{
+    padding:16px;
+  }
+  .gacha-results{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .gacha-actions .btn{
+    flex:1 1 130px;
+  }
+}
+
+
+/* v16.0：抽卡模拟器游戏名区分 + hover 补齐 */
+.gacha-config-grid select,
+.gacha-actions .btn,
+.gacha-card,
+.gacha-rules,
+.gacha-rules summary{
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease, filter .18s ease;
+}
+.gacha-config-grid select:hover,
+.gacha-config-grid select:focus{
+  border-color:rgba(14,165,233,.45);
+  box-shadow:0 12px 26px rgba(55,84,120,.10);
+  outline:none;
+}
+.gacha-actions .btn:hover,
+.gacha-actions .btn:focus-visible{
+  transform:translateY(-2px);
+  box-shadow:0 16px 34px rgba(55,84,120,.13);
+}
+.gacha-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(14,165,233,.42);
+  box-shadow:0 16px 34px rgba(55,84,120,.12);
+}
+.gacha-card.top:hover{
+  box-shadow:0 18px 38px rgba(245,158,11,.22);
+}
+.gacha-card.mid:hover{
+  box-shadow:0 18px 38px rgba(168,85,247,.16);
+}
+.gacha-rules:hover{
+  border-color:rgba(14,165,233,.35);
+  box-shadow:0 14px 30px rgba(55,84,120,.08);
+}
+.gacha-rules summary:hover{
+  color:var(--accent);
+}
+body.dark .gacha-config-grid select:hover,
+body.dark .gacha-config-grid select:focus,
+body.dark .gacha-actions .btn:hover,
+body.dark .gacha-card:hover,
+body.dark .gacha-rules:hover{
+  box-shadow:0 16px 34px rgba(0,0,0,.18);
+}
+@media(max-width:520px){
+  .gacha-card:hover{
+    transform:none;
+  }
+}
+
+
+/* v16.1：抽卡模拟器 UP / 常驻差异提示 */
+.gacha-banner-note{
+  border:1px solid rgba(14,165,233,.22);
+  background:linear-gradient(135deg,rgba(234,246,255,.74),rgba(255,245,231,.48));
+  color:var(--muted);
+  border-radius:18px;
+  padding:12px 14px;
+  font-weight:720;
+  margin:14px 0 4px;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+body.dark .gacha-banner-note{
+  background:linear-gradient(135deg,rgba(19,43,66,.76),rgba(31,35,51,.42));
+}
+.gacha-banner-note:hover{
+  transform:translateY(-1px);
+  border-color:rgba(14,165,233,.42);
+  box-shadow:0 12px 26px rgba(55,84,120,.10);
+}
+.gacha-tool-panel.is-standard-banner .gacha-up{
+  display:none;
+}
+.gacha-tool-panel.is-standard-banner .gacha-pity-card:nth-child(2){
+  border-color:rgba(100,116,139,.28);
+  filter:saturate(.82);
+}
+.gacha-tool-panel.is-standard-banner .gacha-pity-card:nth-child(2) strong{
+  color:var(--muted);
+}
+.gacha-tool-panel.is-standard-banner .gacha-banner-note{
+  border-color:rgba(100,116,139,.28);
+}
+
+

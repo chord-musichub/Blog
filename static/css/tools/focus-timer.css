@@ -1,0 +1,491 @@
+/* 专注钟工具页样式：仅在专注钟页面加载。 */
+
+/* v20.21.0：星轨专注钟 / 学习倒计时工具 */
+.focus-timer-page{
+  --focus-ink:#20324f;
+  --focus-muted:rgba(47,67,99,.72);
+  --focus-card:rgba(255,255,255,.62);
+  --focus-card-strong:rgba(255,255,255,.78);
+  --focus-line:rgba(148,163,184,.26);
+  --focus-glow:rgba(147,197,253,.42);
+  --focus-shadow:0 24px 70px rgba(59,92,138,.16);
+  min-height:calc(100vh - 72px);
+  padding:clamp(24px,4vw,52px) clamp(16px,4vw,42px) 56px;
+  color:var(--focus-ink);
+  position:relative;
+  overflow:hidden;
+}
+.focus-timer-page::before,
+.focus-timer-page::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  border-radius:999px;
+  filter:blur(8px);
+  opacity:.65;
+}
+.focus-timer-page::before{
+  width:420px;height:420px;right:-120px;top:70px;
+  background:radial-gradient(circle,rgba(191,219,254,.52),rgba(255,255,255,0) 68%);
+}
+.focus-timer-page::after{
+  width:360px;height:360px;left:-130px;bottom:30px;
+  background:radial-gradient(circle,rgba(221,214,254,.45),rgba(255,255,255,0) 70%);
+}
+.focus-back-link{z-index:5;}
+.focus-hero{
+  max-width:980px;
+  margin:0 auto 24px;
+  text-align:center;
+  position:relative;
+  z-index:1;
+}
+.focus-kicker{
+  margin:0 0 8px;
+  font-size:.78rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:rgba(74,105,151,.7);
+}
+.focus-hero h1{
+  margin:0;
+  font-size:clamp(2.05rem,5vw,4.2rem);
+  line-height:1.04;
+  letter-spacing:.06em;
+  font-weight:800;
+  background:linear-gradient(120deg,#1e3a5f,#5b86c5 48%,#8b7bd6);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.focus-subtitle{
+  max-width:720px;
+  margin:14px auto 0;
+  line-height:1.8;
+  color:var(--focus-muted);
+}
+.focus-shell{
+  max-width:1120px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);
+  gap:clamp(16px,3vw,24px);
+  align-items:stretch;
+  position:relative;
+  z-index:1;
+}
+.focus-panel{
+  border:1px solid var(--focus-line);
+  background:linear-gradient(145deg,var(--focus-card-strong),var(--focus-card));
+  box-shadow:var(--focus-shadow);
+  border-radius:32px;
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+}
+.focus-main-card{
+  min-height:620px;
+  padding:clamp(22px,4vw,40px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:22px;
+  position:relative;
+  overflow:hidden;
+}
+.focus-main-card::before{
+  content:"";
+  position:absolute;inset:30px;
+  border-radius:34px;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(255,255,255,.66),transparent 38%),
+    radial-gradient(circle at 82% 30%,rgba(191,219,254,.44),transparent 34%),
+    linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,0));
+  opacity:.8;
+  pointer-events:none;
+}
+.focus-orbit{
+  width:min(460px,78vw);
+  aspect-ratio:1;
+  position:relative;
+  display:grid;
+  place-items:center;
+  isolation:isolate;
+}
+.focus-orbit::before{
+  content:"";
+  position:absolute;
+  inset:12%;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.9),rgba(219,234,254,.45) 46%,rgba(255,255,255,0) 72%);
+  box-shadow:0 0 58px rgba(147,197,253,.28), inset 0 0 60px rgba(255,255,255,.56);
+  z-index:-2;
+}
+.focus-orbit::after{
+  content:"";
+  position:absolute;
+  inset:4%;
+  border-radius:50%;
+  border:1px solid rgba(147,197,253,.2);
+  background:conic-gradient(from 210deg,rgba(255,255,255,0),rgba(147,197,253,.24),rgba(196,181,253,.2),rgba(255,255,255,0));
+  animation:focus-orbit-drift 18s linear infinite;
+  z-index:-3;
+}
+.focus-ring{width:100%;height:100%;transform:rotate(-90deg);filter:drop-shadow(0 0 14px var(--focus-glow));}
+.focus-ring-track,.focus-ring-progress{fill:none;stroke-width:13;stroke-linecap:round;}
+.focus-ring-track{stroke:rgba(148,163,184,.18);}
+.focus-ring-progress{
+  stroke:url(#focusRingGradient);
+  stroke-dasharray:703.72;
+  stroke-dashoffset:0;
+  transition:stroke-dashoffset .35s ease, filter .35s ease;
+}
+.focus-core{
+  position:absolute;
+  inset:25%;
+  border-radius:50%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  background:linear-gradient(145deg,rgba(255,255,255,.8),rgba(239,246,255,.58));
+  border:1px solid rgba(255,255,255,.72);
+  box-shadow:inset 0 0 42px rgba(255,255,255,.5),0 20px 48px rgba(59,92,138,.13);
+  text-align:center;
+}
+.focus-time{
+  font-variant-numeric:tabular-nums;
+  font-size:clamp(3rem,8vw,5.9rem);
+  line-height:1;
+  letter-spacing:-.06em;
+  font-weight:850;
+}
+.focus-state{
+  min-height:1.7em;
+  color:var(--focus-muted);
+  font-size:clamp(.86rem,1.8vw,1rem);
+  letter-spacing:.08em;
+}
+.focus-satellite{
+  position:absolute;
+  width:12px;height:12px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 18px rgba(147,197,253,.9),0 0 38px rgba(196,181,253,.44);
+  transform-origin:0 0;
+  pointer-events:none;
+}
+.focus-satellite-a{top:10%;left:51%;animation:focus-satellite-a 11s linear infinite;}
+.focus-satellite-b{bottom:18%;right:18%;width:8px;height:8px;animation:focus-satellite-b 15s linear infinite reverse;opacity:.8;}
+.focus-controls{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;}
+.focus-button,.focus-presets button,.focus-mini-button{
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(255,255,255,.66);
+  color:var(--focus-ink);
+  border-radius:999px;
+  padding:.78rem 1.2rem;
+  font:inherit;
+  cursor:pointer;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease;
+  box-shadow:0 10px 24px rgba(59,92,138,.09);
+}
+.focus-button:hover,.focus-presets button:hover,.focus-mini-button:hover,
+.focus-button:focus-visible,.focus-presets button:focus-visible,.focus-mini-button:focus-visible{
+  transform:translateY(-2px);
+  background:rgba(255,255,255,.86);
+  border-color:rgba(96,165,250,.42);
+  box-shadow:0 16px 34px rgba(59,92,138,.14);
+  outline:none;
+}
+.focus-primary{
+  min-width:128px;
+  background:linear-gradient(135deg,rgba(147,197,253,.9),rgba(196,181,253,.82));
+  color:#123052;
+  border-color:rgba(147,197,253,.48);
+  font-weight:750;
+}
+.focus-presets{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;}
+.focus-presets button.is-active{
+  background:rgba(219,234,254,.95);
+  border-color:rgba(96,165,250,.62);
+  box-shadow:0 0 0 4px rgba(147,197,253,.13),0 16px 30px rgba(59,92,138,.12);
+}
+.focus-custom-time{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  color:var(--focus-muted);
+  position:relative;
+  z-index:1;
+}
+.focus-custom-time input{
+  width:92px;
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(255,255,255,.72);
+  color:var(--focus-ink);
+  border-radius:16px;
+  padding:.66rem .75rem;
+  text-align:center;
+  font:inherit;
+  font-weight:700;
+}
+.focus-side-card{
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.focus-side-section{
+  padding:18px;
+  border-radius:24px;
+  background:rgba(255,255,255,.42);
+  border:1px solid rgba(255,255,255,.56);
+}
+.focus-side-section h2{font-size:1rem;margin:0 0 14px;letter-spacing:.06em;}
+.focus-switch-row,.focus-range-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:10px 0;
+  color:var(--focus-muted);
+}
+.focus-switch-row input{width:20px;height:20px;accent-color:#93c5fd;}
+.focus-range-row{align-items:flex-start;flex-direction:column;gap:8px;}
+.focus-range-row input{width:100%;accent-color:#93c5fd;}
+.focus-mini-button{width:100%;padding:.68rem 1rem;font-size:.92rem;}
+.focus-stats p{margin:8px 0;color:var(--focus-muted);}
+.focus-stats strong{font-size:1.5rem;color:var(--focus-ink);margin-right:6px;}
+.focus-note{
+  max-width:1120px;
+  margin:18px auto 0;
+  padding:16px 20px;
+  border:1px solid rgba(147,197,253,.22);
+  border-radius:22px;
+  color:var(--focus-muted);
+  background:rgba(255,255,255,.42);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  position:relative;
+  z-index:1;
+}
+.focus-finish-overlay{
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  display:grid;
+  place-items:center;
+  padding:22px;
+  background:rgba(15,23,42,.28);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+.focus-finish-overlay[hidden]{display:none!important;}
+.focus-finish-card{
+  width:min(480px,100%);
+  border-radius:32px;
+  border:1px solid rgba(255,255,255,.68);
+  background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(239,246,255,.78));
+  box-shadow:0 28px 90px rgba(15,23,42,.22);
+  padding:34px;
+  text-align:center;
+  color:var(--focus-ink);
+  animation:focus-pop .32s ease both;
+}
+.focus-finish-mark{font-size:2.4rem;margin:0 0 8px;color:#7c8bdc;text-shadow:0 0 18px rgba(147,197,253,.72);}
+.focus-finish-card h2{margin:0;font-size:2rem;}
+.focus-finish-card p{color:var(--focus-muted);line-height:1.75;}
+.focus-finish-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px;}
+.focus-timer-page.is-running .focus-ring-progress{filter:drop-shadow(0 0 18px rgba(147,197,253,.78));}
+.focus-timer-page.is-finished .focus-orbit{animation:focus-finish-pulse .9s ease 0s 3;}
+body.dark .focus-timer-page{
+  --focus-ink:#e5f0ff;
+  --focus-muted:rgba(220,235,255,.72);
+  --focus-card:rgba(15,23,42,.52);
+  --focus-card-strong:rgba(20,31,52,.68);
+  --focus-line:rgba(191,219,254,.2);
+  --focus-shadow:0 24px 80px rgba(0,0,0,.28);
+}
+body.dark .focus-panel,body.dark .focus-note{background:linear-gradient(145deg,rgba(15,23,42,.72),rgba(30,41,59,.46));}
+body.dark .focus-core{background:linear-gradient(145deg,rgba(15,23,42,.82),rgba(30,41,59,.58));border-color:rgba(191,219,254,.18);}
+body.dark .focus-side-section{background:rgba(15,23,42,.38);border-color:rgba(191,219,254,.14);}
+body.dark .focus-button,body.dark .focus-presets button,body.dark .focus-mini-button,body.dark .focus-custom-time input{background:rgba(15,23,42,.48);color:var(--focus-ink);border-color:rgba(191,219,254,.22);}
+body.dark .focus-primary{background:linear-gradient(135deg,rgba(59,130,246,.86),rgba(139,92,246,.76));color:#f8fbff;}
+body.dark .focus-finish-card{background:linear-gradient(145deg,rgba(15,23,42,.96),rgba(30,41,59,.86));}
+@keyframes focus-orbit-drift{to{transform:rotate(360deg);}}
+@keyframes focus-satellite-a{to{transform:rotate(360deg) translateX(150px) rotate(-360deg);}}
+@keyframes focus-satellite-b{to{transform:rotate(360deg) translateX(112px) rotate(-360deg);}}
+@keyframes focus-pop{from{opacity:0;transform:translateY(14px) scale(.96);}to{opacity:1;transform:none;}}
+@keyframes focus-finish-pulse{50%{transform:scale(1.025);filter:drop-shadow(0 0 22px rgba(147,197,253,.75));}}
+@media (max-width: 860px){
+  .focus-timer-page{padding:22px 14px 42px;}
+  .focus-shell{grid-template-columns:1fr;}
+  .focus-main-card{min-height:auto;padding:22px 14px 26px;border-radius:26px;}
+  .focus-side-card{border-radius:26px;padding:16px;}
+  .focus-orbit{width:min(360px,88vw);}
+  .focus-core{inset:23%;}
+  .focus-time{font-size:clamp(2.75rem,14vw,4.8rem);}
+  .focus-presets button{padding:.64rem .82rem;font-size:.92rem;}
+  .focus-custom-time{width:100%;justify-content:space-between;padding:0 6px;}
+  .focus-controls{width:100%;}
+  .focus-button{flex:1;min-width:130px;}
+  .focus-note{font-size:.92rem;}
+}
+@media (prefers-reduced-motion: reduce){
+  .focus-orbit::after,.focus-satellite,.focus-timer-page.is-finished .focus-orbit{animation:none!important;}
+  .focus-button,.focus-presets button,.focus-mini-button{transition:none!important;}
+}
+
+
+/* v20.21.19：星轨专注钟功能与白点循环修复开始 */
+.focus-timer-page .focus-main-card::before,
+.focus-timer-page .focus-orbit::before,
+.focus-timer-page .focus-orbit::after,
+.focus-timer-page .focus-satellite{
+  pointer-events: none !important;
+}
+
+.focus-timer-page .focus-controls,
+.focus-timer-page .focus-presets,
+.focus-timer-page .focus-custom-time,
+.focus-timer-page .focus-side-card,
+.focus-timer-page .focus-side-section,
+.focus-timer-page .focus-button,
+.focus-timer-page .focus-presets button,
+.focus-timer-page .focus-mini-button,
+.focus-timer-page .focus-custom-time input{
+  position: relative;
+  z-index: 5;
+}
+
+.focus-timer-page .focus-time{
+  white-space: nowrap;
+  max-width: 90%;
+  margin-inline: auto;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.focus-timer-page .focus-time.is-long-time{
+  font-size: clamp(46px, 5.7vw, 74px) !important;
+}
+
+.focus-timer-page .focus-time.is-very-long-time{
+  font-size: clamp(40px, 5vw, 64px) !important;
+}
+
+/* 沿用 20.21.0 的白点动画形式，只补 from，避免每轮结束跳回 transform:none */
+@keyframes focus-satellite-a{
+  from{ transform: rotate(0deg) translateX(150px) rotate(0deg); }
+  to{ transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+}
+
+@keyframes focus-satellite-b{
+  from{ transform: rotate(0deg) translateX(112px) rotate(0deg); }
+  to{ transform: rotate(360deg) translateX(112px) rotate(-360deg); }
+}
+/* v20.21.19：星轨专注钟功能与白点循环修复结束 */
+
+
+/* v20.21.20：星轨专注钟点击保障开始 */
+.focus-timer-page .focus-main-card::before,
+.focus-timer-page .focus-main-card::after,
+.focus-timer-page .focus-orbit::before,
+.focus-timer-page .focus-orbit::after,
+.focus-timer-page .focus-satellite{
+  pointer-events:none!important;
+}
+.focus-timer-page .focus-controls,
+.focus-timer-page .focus-presets,
+.focus-timer-page .focus-custom-time,
+.focus-timer-page .focus-side-card{
+  position:relative;
+  z-index:10;
+  pointer-events:auto!important;
+}
+.focus-timer-page button,
+.focus-timer-page input{
+  pointer-events:auto!important;
+}
+/* v20.21.20：星轨专注钟点击保障结束 */
+
+
+/* v20.21.21：星轨专注钟渐变边框修复开始 */
+.focus-timer-page .focus-panel,
+.focus-timer-page .focus-side-section,
+.focus-timer-page .focus-note{
+  border: 1px solid transparent !important;
+  background:
+    linear-gradient(180deg, rgba(9, 20, 39, .58), rgba(8, 18, 35, .42)) padding-box,
+    linear-gradient(
+      135deg,
+      rgba(219, 234, 254, .20) 0%,
+      rgba(147, 197, 253, .11) 24%,
+      rgba(196, 181, 253, .08) 48%,
+      rgba(147, 197, 253, .045) 72%,
+      rgba(219, 234, 254, .13) 100%
+    ) border-box !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .045),
+    0 18px 50px rgba(0, 0, 0, .16) !important;
+}
+
+.focus-timer-page .focus-main-card{
+  background:
+    radial-gradient(circle at 42% 28%, rgba(219, 234, 254, .09), transparent 34%) padding-box,
+    linear-gradient(180deg, rgba(9, 20, 39, .58), rgba(8, 18, 35, .42)) padding-box,
+    linear-gradient(
+      140deg,
+      rgba(219, 234, 254, .22) 0%,
+      rgba(147, 197, 253, .12) 22%,
+      rgba(196, 181, 253, .08) 50%,
+      rgba(147, 197, 253, .035) 76%,
+      rgba(219, 234, 254, .12) 100%
+    ) border-box !important;
+}
+
+.focus-timer-page .focus-side-card{
+  background:
+    linear-gradient(180deg, rgba(9, 20, 39, .54), rgba(8, 18, 35, .40)) padding-box,
+    linear-gradient(
+      145deg,
+      rgba(219, 234, 254, .18) 0%,
+      rgba(147, 197, 253, .09) 34%,
+      rgba(196, 181, 253, .055) 62%,
+      rgba(219, 234, 254, .10) 100%
+    ) border-box !important;
+}
+
+.focus-timer-page .focus-side-section{
+  background:
+    linear-gradient(180deg, rgba(7, 17, 34, .54), rgba(7, 16, 31, .34)) padding-box,
+    linear-gradient(
+      140deg,
+      rgba(219, 234, 254, .16),
+      rgba(147, 197, 253, .055) 45%,
+      rgba(255, 255, 255, .035)
+    ) border-box !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .035),
+    0 10px 28px rgba(0, 0, 0, .10) !important;
+}
+
+.focus-timer-page .focus-note{
+  background:
+    linear-gradient(180deg, rgba(7, 17, 34, .42), rgba(7, 16, 31, .26)) padding-box,
+    linear-gradient(
+      90deg,
+      rgba(219, 234, 254, .18),
+      rgba(147, 197, 253, .045) 48%,
+      rgba(196, 181, 253, .10)
+    ) border-box !important;
+}
+
+.focus-timer-page .focus-panel::before,
+.focus-timer-page .focus-panel::after{
+  pointer-events: none !important;
+}
+/* v20.21.21：星轨专注钟渐变边框修复结束 */
+

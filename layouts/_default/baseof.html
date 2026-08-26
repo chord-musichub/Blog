@@ -58,8 +58,24 @@
   {{ with $favicon }}<link rel="icon" href="{{ . }}">{{ end }}
   {{ with $favicon }}<link rel="apple-touch-icon" href="{{ . }}">{{ end }}
 {{ partial "resource-hints.html" . }}
+  <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
-  <link rel="stylesheet" href="/css/theme-vars.css?v={{ $assetVersion }}">
+  {{ if hasPrefix .RelPermalink "/tools/focus-timer/" }}
+  <link rel="stylesheet" href="/css/tools/focus-timer.css?v={{ $assetVersion }}">
+  {{ end }}
+  {{ if hasPrefix .RelPermalink "/tools/audio-visualizer/" }}
+  <link rel="stylesheet" href="/css/tools/audio-visualizer.css?v={{ $assetVersion }}">
+  {{ end }}
+{{ if hasPrefix .RelPermalink "/tools/2048/" }}
+<link rel="stylesheet" href="/css/tools/game-2048.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if hasPrefix .RelPermalink "/tools/snake/" }}
+<link rel="stylesheet" href="/css/tools/snake.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if hasPrefix .RelPermalink "/tools/gacha/" }}
+<link rel="stylesheet" href="/css/tools/gacha.css?v={{ $assetVersion }}">
+{{ end }}
+<link rel="stylesheet" href="/css/theme-vars.css?v={{ $assetVersion }}">
   <script defer src="/js/performance-guard.js?v={{ $assetVersion }}"></script>
   <script defer src="/js/page-transition.js?v={{ $assetVersion }}"></script>
   <script defer src="/js/mobile-adapt.js?v={{ $assetVersion }}"></script>

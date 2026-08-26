@@ -1,0 +1,301 @@
+/* 贪吃蛇工具页样式：仅在 /tools/snake/ 加载。 */
+/* v15.2：工具页贪吃蛇小游戏 */
+.snake-tool-panel{
+  padding:24px;
+  overflow:hidden;
+}
+.snake-head{
+  display:flex;
+  justify-content:space-between;
+  gap:20px;
+  align-items:flex-start;
+  margin-bottom:18px;
+}
+.snake-head h2{
+  margin:0 0 6px;
+  font-size:26px;
+}
+.snake-head p{
+  margin:0;
+  color:var(--muted);
+}
+.snake-stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.snake-stats span{
+  border:1px solid var(--border);
+  background:rgba(234,246,255,.72);
+  border-radius:999px;
+  padding:7px 12px;
+  font-weight:750;
+  color:#27496c;
+}
+body.dark .snake-stats span{
+  background:rgba(19,43,66,.82);
+  color:#dbeafe;
+}
+.snake-stage-wrap{
+  position:relative;
+  max-width:520px;
+  margin:0 auto;
+  border-radius:26px;
+  padding:14px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,.82), transparent 28%),
+    linear-gradient(135deg,rgba(234,246,255,.88),rgba(255,245,231,.72));
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+body.dark .snake-stage-wrap{
+  background:linear-gradient(135deg,rgba(19,43,66,.92),rgba(31,35,51,.72));
+}
+.snake-canvas{
+  width:100%;
+  height:auto;
+  border-radius:18px;
+  display:block;
+  background:var(--panel);
+}
+.snake-overlay{
+  position:absolute;
+  inset:14px;
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  gap:8px;
+  background:rgba(255,253,250,.76);
+  backdrop-filter:blur(8px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease;
+}
+body.dark .snake-overlay{
+  background:rgba(15,23,42,.72);
+}
+.snake-overlay.show{
+  opacity:1;
+}
+.snake-overlay strong{
+  font-size:34px;
+  color:var(--accent-2);
+}
+.snake-overlay span{
+  color:var(--muted);
+}
+.snake-controls{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:12px;
+  margin-top:20px;
+}
+.snake-sound-toggle{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:9px 13px;
+  color:var(--muted);
+  background:rgba(255,255,255,.42);
+  font-weight:720;
+  user-select:none;
+}
+body.dark .snake-sound-toggle{
+  background:rgba(19,43,66,.72);
+}
+.snake-sound-toggle input{
+  accent-color:var(--accent-2);
+}
+.snake-help{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:16px;
+  color:var(--muted);
+  font-size:14px;
+}
+.snake-help kbd{
+  border:1px solid var(--border);
+  background:var(--panel-2);
+  border-radius:8px;
+  padding:2px 7px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+.snake-mobile-pad{
+  display:none;
+  grid-template-columns:54px 54px 54px;
+  grid-template-areas:
+    ". up ."
+    "left down right";
+  justify-content:center;
+  gap:10px;
+  margin-top:18px;
+}
+.snake-mobile-pad button{
+  width:54px;
+  height:54px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:var(--soft-blue);
+  color:var(--accent-2);
+  font-size:24px;
+  font-weight:850;
+  cursor:pointer;
+}
+.snake-mobile-pad button[data-snake-dir="up"]{grid-area:up}
+.snake-mobile-pad button[data-snake-dir="left"]{grid-area:left}
+.snake-mobile-pad button[data-snake-dir="down"]{grid-area:down}
+.snake-mobile-pad button[data-snake-dir="right"]{grid-area:right}
+.snake-mobile-pad button:hover{
+  transform:translateY(-1px);
+}
+@media(max-width:720px){
+  .snake-head{
+    flex-direction:column;
+  }
+  .snake-stats{
+    justify-content:flex-start;
+  }
+  .snake-mobile-pad{
+    display:grid;
+  }
+}
+
+
+/* v15.3：贪吃蛇交互细节与手机适配 */
+.snake-stage-wrap{
+  touch-action:none;
+}
+.snake-canvas,
+.snake-overlay{
+  cursor:pointer;
+}
+.snake-overlay.show{
+  pointer-events:auto;
+}
+.snake-controls .btn,
+.snake-sound-toggle,
+.snake-mobile-pad button{
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease, filter .18s ease;
+}
+.snake-controls .btn:hover,
+.snake-controls .btn:focus-visible,
+.snake-sound-toggle:hover,
+.snake-sound-toggle:focus-within,
+.snake-mobile-pad button:hover,
+.snake-mobile-pad button:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(14,165,233,.38);
+  box-shadow:0 14px 30px rgba(55,84,120,.12);
+  outline:none;
+}
+.snake-sound-toggle{
+  cursor:pointer;
+}
+.snake-sound-toggle:hover{
+  color:var(--accent-2);
+  background:rgba(234,246,255,.72);
+}
+body.dark .snake-sound-toggle:hover{
+  background:rgba(19,43,66,.9);
+}
+.snake-mobile-pad button:active,
+.snake-controls .btn:active{
+  transform:translateY(0) scale(.98);
+}
+@media(max-width:720px){
+  .snake-tool-panel{
+    padding:18px;
+  }
+  .snake-stage-wrap{
+    max-width:min(92vw, 480px);
+    padding:10px;
+    border-radius:22px;
+  }
+  .snake-overlay{
+    inset:10px;
+    border-radius:16px;
+  }
+  .snake-overlay strong{
+    font-size:28px;
+  }
+  .snake-controls{
+    gap:10px;
+  }
+  .snake-controls .btn{
+    flex:1 1 150px;
+  }
+  .snake-help{
+    font-size:12.5px;
+  }
+}
+@media(max-width:430px){
+  .snake-tool-panel{
+    margin-left:-6px;
+    margin-right:-6px;
+    padding:14px;
+  }
+  .snake-stage-wrap{
+    max-width:calc(100vw - 54px);
+    padding:8px;
+  }
+  .snake-overlay{
+    inset:8px;
+  }
+  .snake-stats span{
+    font-size:12.5px;
+    padding:6px 9px;
+  }
+  .snake-mobile-pad{
+    gap:8px;
+  }
+  .snake-mobile-pad button{
+    width:50px;
+    height:50px;
+    border-radius:16px;
+  }
+}
+
+
+/* v15.4：贪吃蛇音效激活提示 */
+.snake-help span:last-child{
+  color:var(--accent-2);
+}
+
+
+/* v15.5：贪吃蛇特殊果实 */
+.snake-help{
+  align-items:center;
+}
+.snake-help span:nth-last-child(2){
+  color:#8b5cf6;
+}
+
+
+/* v15.6：贪吃蛇边界穿越提示 */
+.snake-hero p::after{
+  content:" 边界已打通，蛇会从另一边出来。";
+}
+
+
+/* v15.7：腐烂果实墙体安全距离说明 */
+.snake-help span:nth-last-child(2){
+  color:#8b5cf6;
+}
+
+
+/* v15.8：贪吃蛇多果实机制 */
+.snake-overlay span{
+  max-width:30rem;
+  padding:0 16px;
+}
+
