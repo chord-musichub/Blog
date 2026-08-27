@@ -1,0 +1,127 @@
+/* v20.20.6：页面从后台 / 其他页面回来时给动画元素一个短暂自然过渡，减少偏移跳变感 */
+html.songline-animation-resuming [data-orbit-satellite],
+html.songline-animation-resuming .waapi-orbit-satellite,
+html.songline-animation-resuming .home-orbit-satellite{
+  transition:transform .62s cubic-bezier(.16,1,.3,1), opacity .46s ease !important;
+  will-change:transform, opacity;
+}
+html.songline-animation-resuming .songline-starstream-layer,
+.songline-starstream-layer.is-soft-resume{
+  transition:opacity .46s ease, filter .46s ease !important;
+  filter:saturate(1.02) brightness(1.02);
+}
+.audio-visualizer-page.is-av-soft-resume .av-canvas{
+  transition:filter .52s ease, opacity .42s ease;
+  filter:saturate(1.02) brightness(1.015);
+}
+
+
+/* v20.20.6：轨道/漂流带相位同步，避免先显示旧位置一帧后跳到实时位置 */
+html.songline-page-hidden *,
+html.songline-page-hidden *::before,
+html.songline-page-hidden *::after{
+  animation-play-state:paused !important;
+}
+html.songline-animation-resuming *,
+html.songline-animation-resuming *::before,
+html.songline-animation-resuming *::after{
+  transition-timing-function:cubic-bezier(.22,1,.36,1) !important;
+}
+main.container.live-page-enter.live-enter-from-right,
+main.container.live-page-enter.live-enter-from-left{
+  transform:translate3d(0, 10px, 0) !important;
+  opacity:.985 !important;
+  filter:none !important;
+}
+main.container.live-page-enter.is-live-enter-ready{
+  transform:translate3d(0,0,0) !important;
+  opacity:1 !important;
+  transition:transform .42s cubic-bezier(.22,1,.36,1), opacity .30s ease !important;
+}
+main.container.live-leave-to-left,
+main.container.live-leave-to-right{
+  transform:translate3d(0, -6px, 0) !important;
+  opacity:.72 !important;
+  filter:blur(.35px) !important;
+  transition:transform .18s ease, opacity .18s ease, filter .18s ease !important;
+}
+main.container.live-enter-from-right .live-nav-item,
+main.container.live-enter-from-left .live-nav-item{
+  transform:translate3d(0, 12px, 0) !important;
+}
+main.container.is-live-enter-ready .live-nav-item{
+  transform:translate3d(0,0,0) !important;
+}
+main.container .live-nav-stable-item,
+main.container.live-enter-from-right .live-nav-stable-item,
+main.container.live-enter-from-left .live-nav-stable-item,
+main.container.is-live-enter-ready .live-nav-stable-item{
+  transform:none !important;
+  filter:none !important;
+  opacity:1 !important;
+  transition:opacity .28s ease !important;
+}
+main.container .live-nav-stable-item .waapi-satellite,
+main.container .live-nav-stable-item [data-orbit-satellite],
+main.container .live-nav-stable-item canvas,
+main.container .live-nav-stable-item svg{
+  transition:none !important;
+}
+@media(max-width:760px){
+  main.container.live-page-enter.live-enter-from-right,
+  main.container.live-page-enter.live-enter-from-left{transform:translate3d(0, 8px, 0) !important;}
+  main.container.live-leave-to-left,
+  main.container.live-leave-to-right{transform:translate3d(0, -4px, 0) !important;}
+  main.container.live-enter-from-right .live-nav-item,
+  main.container.live-enter-from-left .live-nav-item{transform:translate3d(0, 8px, 0) !important;}
+}
+
+
+/* v20.20.6：轨道/漂流带相位同步前短暂隐藏，避免旧位置首帧造成偏移感 */
+.waapi-orbit-gateway.is-orbit-phase-syncing [data-orbit-satellite],
+.waapi-orbit-gateway.is-orbit-phase-syncing [data-waapi-planet],
+.orbit-gateway.is-orbit-phase-syncing [data-orbit-satellite],
+.orbit-gateway.is-orbit-phase-syncing [data-waapi-planet]{
+  opacity:0!important;
+}
+.waapi-orbit-gateway [data-orbit-satellite],
+.waapi-orbit-gateway [data-waapi-planet],
+.orbit-gateway [data-orbit-satellite],
+.orbit-gateway [data-waapi-planet]{
+  transition:opacity .22s ease!important;
+}
+.songline-starstream-layer.is-starstream-phase-syncing{
+  opacity:0!important;
+  transition:opacity .18s ease!important;
+}
+
+
+/* v20.20.6：刷新异常兜底。boot JS 如果竞态失败，不能让页面永久隐藏。 */
+html:not(.is-booting).is-boot-preparing body > :not(.site-boot-overlay){
+  opacity:1 !important;
+  visibility:visible !important;
+}
+html:not(.songline-page-hidden) .waapi-orbit-gateway.is-orbit-phase-syncing [data-orbit-satellite],
+html:not(.songline-page-hidden) .waapi-orbit-gateway.is-orbit-phase-syncing [data-waapi-planet],
+html:not(.songline-page-hidden) .orbit-gateway.is-orbit-phase-syncing [data-orbit-satellite],
+html:not(.songline-page-hidden) .orbit-gateway.is-orbit-phase-syncing [data-waapi-planet]{
+  transition:opacity .18s ease !important;
+}
+
+
+/* v20.20.6：统一旧动画逻辑后的相位恢复层。只软化，不再长时间隐藏。 */
+.songline-starstream-layer.is-starstream-soft-sync{
+  opacity:.72!important;
+  transition:opacity .22s ease!important;
+}
+.songline-animation-resuming .waapi-orbital-section,
+.songline-animation-resuming [data-waapi-orbit],
+.songline-animation-resuming .audio-visualizer-page{
+  will-change:transform,opacity;
+}
+html:not(.is-boot-preparing):not(.is-booting) body{
+  visibility:visible!important;
+}
+html:not(.is-boot-preparing):not(.is-booting) body > :not(.site-boot-overlay){
+  visibility:visible;
+}

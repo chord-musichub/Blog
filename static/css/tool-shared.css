@@ -1,0 +1,102 @@
+/* v20.18.5：2048 本地最佳同步按钮 */
+.game-2048-sync{
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(255,255,255,.7);
+  border-radius:18px;
+  padding:.75rem .95rem;
+  box-shadow:0 12px 28px rgba(15,23,42,.08);
+  cursor:pointer;
+  color:#0f172a;
+  font-weight:800;
+  transition:transform .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease, color .16s ease;
+}
+.game-2048-sync:hover,
+.game-2048-sync:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(14,165,233,.48);
+  background:rgba(224,242,254,.92);
+  color:#075985;
+  box-shadow:0 18px 34px rgba(14,165,233,.18);
+  outline:none;
+}
+.game-2048-sync:active{
+  transform:translateY(1px) scale(.98);
+  box-shadow:0 8px 18px rgba(15,23,42,.08);
+}
+body.dark .game-2048-sync,
+html.dark .game-2048-sync{
+  background:rgba(15,23,42,.66);
+  color:rgba(248,250,252,.92);
+  border-color:rgba(148,163,184,.22);
+}
+body.dark .game-2048-sync:hover,
+html.dark .game-2048-sync:hover,
+body.dark .game-2048-sync:focus-visible,
+html.dark .game-2048-sync:focus-visible{
+  background:rgba(14,165,233,.22);
+  color:#e0f2fe;
+  border-color:rgba(125,211,252,.45);
+}
+@media(max-width:720px){
+  .game-2048-sync{
+    grid-column:1 / -1;
+    min-height:48px;
+  }
+}
+
+
+/* v20.18.5：排行榜本地最佳同步按钮 + 开机动画防穿帮 */
+html{
+  scrollbar-gutter:stable;
+}
+.leaderboard-sync-btn{
+  white-space:nowrap;
+}
+.snake-controls .leaderboard-sync-btn,
+.reaction-actions .leaderboard-sync-btn,
+.flappy-topbar .leaderboard-sync-btn,
+.typing-topbar .leaderboard-sync-btn,
+.game-2048-sync{
+  transition:transform .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease, color .16s ease;
+}
+.snake-controls .leaderboard-sync-btn:hover,
+.snake-controls .leaderboard-sync-btn:focus-visible,
+.reaction-actions .leaderboard-sync-btn:hover,
+.reaction-actions .leaderboard-sync-btn:focus-visible,
+.flappy-topbar .leaderboard-sync-btn:hover,
+.flappy-topbar .leaderboard-sync-btn:focus-visible,
+.typing-topbar .leaderboard-sync-btn:hover,
+.typing-topbar .leaderboard-sync-btn:focus-visible,
+.game-2048-sync:hover,
+.game-2048-sync:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(14,165,233,.48)!important;
+  background:rgba(224,242,254,.92)!important;
+  color:#075985!important;
+  box-shadow:0 18px 34px rgba(14,165,233,.18)!important;
+  outline:none;
+}
+.snake-controls .leaderboard-sync-btn:active,
+.reaction-actions .leaderboard-sync-btn:active,
+.flappy-topbar .leaderboard-sync-btn:active,
+.typing-topbar .leaderboard-sync-btn:active,
+.game-2048-sync:active{
+  transform:translateY(1px) scale(.98);
+}
+.site-boot-overlay.is-opening,
+html.is-boot-interactive .site-boot-overlay{
+  pointer-events:none!important;
+}
+html.boot-frame-settling body{
+  transform:none!important;
+}
+html.boot-frame-settling .hero-banner,
+html.boot-frame-settling [data-waapi-orbit],
+html.boot-frame-settling .modern-site-header,
+html.boot-frame-settling .container{
+  backface-visibility:hidden;
+  transform-style:preserve-3d;
+}
+
+
+

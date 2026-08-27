@@ -60,6 +60,17 @@
 {{ partial "resource-hints.html" . }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
+{{ if hasPrefix .RelPermalink "/tools/reaction-test/" }}
+<link rel="stylesheet" href="/css/tools/reaction-test.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if hasPrefix .RelPermalink "/tools/flappy-bird/" }}
+<link rel="stylesheet" href="/css/tools/flappy-bird.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if hasPrefix .RelPermalink "/tools/typing-practice/" }}
+<link rel="stylesheet" href="/css/tools/typing-practice.css?v={{ $assetVersion }}">
+{{ end }}
+<link rel="stylesheet" href="/css/tool-shared.css?v={{ $assetVersion }}">
+<link rel="stylesheet" href="/css/runtime-animation.css?v={{ $assetVersion }}">
   {{ if hasPrefix .RelPermalink "/tools/focus-timer/" }}
   <link rel="stylesheet" href="/css/tools/focus-timer.css?v={{ $assetVersion }}">
   {{ end }}

@@ -1,0 +1,241 @@
+/* v20.18.5：管道鸟小游戏 */
+.flappy-page{
+  min-height:calc(100vh - 120px);
+  padding:clamp(28px, 5vw, 72px) clamp(16px, 4vw, 56px);
+}
+.flappy-shell{
+  max-width:960px;
+  margin:0 auto;
+}
+.flappy-hero{
+  margin-bottom:22px;
+}
+.flappy-hero h1{
+  margin:.15em 0 .2em;
+  font-size:clamp(2.3rem, 8vw, 5.2rem);
+  line-height:.9;
+  letter-spacing:-.08em;
+}
+.flappy-hero p{
+  max-width:42rem;
+  color:rgba(71,85,105,.88);
+}
+.flappy-panel{
+  position:relative;
+  border:1px solid rgba(148,163,184,.24);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(56,189,248,.13), transparent 32%),
+    radial-gradient(circle at 84% 22%, rgba(34,197,94,.12), transparent 36%),
+    rgba(255,255,255,.72);
+  border-radius:32px;
+  padding:clamp(16px, 4vw, 30px);
+  box-shadow:0 24px 70px rgba(15,23,42,.13);
+  backdrop-filter:blur(18px);
+}
+.flappy-topbar{
+  display:flex;
+  align-items:stretch;
+  gap:12px;
+  margin-bottom:18px;
+}
+.flappy-score-card,
+.flappy-button,
+.flappy-sound-toggle{
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(255,255,255,.72);
+  border-radius:18px;
+  padding:.75rem .95rem;
+  box-shadow:0 12px 28px rgba(15,23,42,.08);
+}
+.flappy-score-card{
+  min-width:104px;
+}
+.flappy-score-card span{
+  display:block;
+  font-size:.76rem;
+  color:rgba(100,116,139,.82);
+}
+.flappy-score-card strong{
+  display:block;
+  margin-top:.1rem;
+  font-size:1.45rem;
+  line-height:1;
+  color:#0f172a;
+}
+.flappy-button,
+.flappy-sound-toggle{
+  cursor:pointer;
+  color:#0f172a;
+  font-weight:850;
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    background-color .16s ease,
+    box-shadow .16s ease,
+    color .16s ease;
+}
+.flappy-button{
+  margin-left:0;
+}
+.flappy-sound-toggle{
+  margin-left:auto;
+}
+.flappy-button:hover,
+.flappy-button:focus-visible,
+.flappy-sound-toggle:hover,
+.flappy-sound-toggle:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(14,165,233,.48);
+  background:rgba(224,242,254,.92);
+  color:#075985;
+  box-shadow:0 18px 34px rgba(14,165,233,.18);
+  outline:none;
+}
+.flappy-button:active,
+.flappy-sound-toggle:active{
+  transform:translateY(1px) scale(.98);
+}
+.flappy-sound-toggle::before{
+  content:"♪";
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:1.35em;
+  height:1.35em;
+  margin-right:.35em;
+  border-radius:999px;
+  background:rgba(14,165,233,.18);
+  color:#0369a1;
+  font-weight:900;
+}
+.flappy-sound-toggle.is-muted::before{
+  content:"×";
+  background:rgba(148,163,184,.18);
+  color:#64748b;
+}
+.flappy-board-wrap{
+  position:relative;
+  width:min(100%, 760px);
+  margin:0 auto;
+  border-radius:30px;
+  overflow:hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.34),
+    0 24px 68px rgba(15,23,42,.18);
+}
+.flappy-canvas{
+  display:block;
+  width:100%;
+  aspect-ratio:900 / 520;
+  min-height:280px;
+  background:#dff7ff;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+.flappy-board-wrap:hover .flappy-canvas,
+.flappy-canvas:focus-visible{
+  filter:saturate(1.05);
+}
+.flappy-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:22px;
+  text-align:center;
+  border:0;
+  cursor:pointer;
+  color:white;
+  background:
+    radial-gradient(circle at 28% 20%, rgba(255,255,255,.24), transparent 30%),
+    rgba(15,23,42,.56);
+  backdrop-filter:blur(6px);
+  transition:
+    background-color .16s ease,
+    transform .16s ease,
+    box-shadow .16s ease;
+}
+.flappy-overlay[hidden]{
+  display:none;
+}
+.flappy-overlay:hover,
+.flappy-overlay:focus-visible{
+  background:
+    radial-gradient(circle at 28% 20%, rgba(255,255,255,.3), transparent 30%),
+    rgba(14,116,144,.56);
+  outline:none;
+}
+.flappy-overlay:active{
+  transform:scale(.995);
+}
+.flappy-overlay span{
+  font-size:.8rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  font-weight:900;
+  color:rgba(240,249,255,.86);
+}
+.flappy-overlay strong{
+  font-size:clamp(2rem, 8vw, 4.8rem);
+  line-height:.95;
+  letter-spacing:-.06em;
+}
+.flappy-overlay em{
+  max-width:28rem;
+  font-style:normal;
+  color:rgba(240,249,255,.9);
+}
+.flappy-leaderboard{
+  width:min(100%, 760px);
+  margin:18px auto 0!important;
+}
+.flappy-tip{
+  margin:16px 0 0;
+  text-align:center;
+  color:rgba(71,85,105,.82);
+  font-size:.94rem;
+}
+body.dark .flappy-hero p,
+html.dark .flappy-hero p,
+body.dark .flappy-tip,
+html.dark .flappy-tip{
+  color:rgba(203,213,225,.76);
+}
+body.dark .flappy-panel,
+html.dark .flappy-panel,
+body.dark .flappy-score-card,
+html.dark .flappy-score-card,
+body.dark .flappy-button,
+html.dark .flappy-button,
+body.dark .flappy-sound-toggle,
+html.dark .flappy-sound-toggle{
+  background:rgba(15,23,42,.66);
+  color:rgba(248,250,252,.92);
+  border-color:rgba(148,163,184,.22);
+}
+body.dark .flappy-score-card strong,
+html.dark .flappy-score-card strong{
+  color:rgba(248,250,252,.94);
+}
+@media(max-width:720px){
+  .flappy-page{
+    padding:18px 12px 34px;
+  }
+  .flappy-topbar{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .flappy-sound-toggle,
+  .flappy-button{
+    margin-left:0;
+    min-height:48px;
+  }
+  .flappy-board-wrap{
+    border-radius:24px;
+  }
+}
+
+

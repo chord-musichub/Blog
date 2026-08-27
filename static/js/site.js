@@ -1,4 +1,3 @@
-
 (function(){
   const btn = document.querySelector('[data-theme-toggle]');
   const KEY = 'songline-theme';
