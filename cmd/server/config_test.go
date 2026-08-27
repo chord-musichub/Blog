@@ -63,6 +63,18 @@ func TestAllowPublicCORS(t *testing.T) {
 	}
 }
 
+func TestAllowPublicCORSAcceptsSameOrigin(t *testing.T) {
+	app := &App{cfg: Config{
+		// 故意只配置生产地址，确保本地同源请求不依赖此项。
+		PublicSiteURL: "https://blog.example.com",
+	}}
+	req := httptest.NewRequest(http.MethodPost, "http://127.0.0.1:8080/api/tools/snake-scores", nil)
+	req.Header.Set("Origin", "http://127.0.0.1:8080")
+	if !app.allowPublicCORS(httptest.NewRecorder(), req) {
+		t.Fatal("expected same-origin request to be allowed")
+	}
+}
+
 func TestRuntimeLimitParsing(t *testing.T) {
 	if got := positiveDurationSeconds("90", 60); got != 90*time.Second {
 		t.Fatalf("positiveDurationSeconds returned %s, want 90s", got)

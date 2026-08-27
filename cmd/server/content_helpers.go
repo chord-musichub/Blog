@@ -9,6 +9,17 @@ import (
 )
 
 // 纯内容处理函数：不读写 HTTP 或文件系统，便于复用与单元测试。
+// 正则在进程启动时预编译，避免文章发布、预览和读取时反复创建相同对象。
+var (
+	markdownHeadingPrefixRE = regexp.MustCompile("(?m)^#+\\s*")
+	markdownCodeBlockRE     = regexp.MustCompile("`{3}[\\s\\S]*?`{3}")
+	usernameInvalidCharRE   = regexp.MustCompile(`[^a-zA-Z0-9_-]`)
+	slugInvalidCharRE       = regexp.MustCompile(`[^a-z0-9\p{Han}]+`)
+	articleLineBreakRE      = regexp.MustCompile(`(?i)(<br\s*/?>|&lt;br\s*/?&gt;)`)
+	dangerousHTMLTagRE      = regexp.MustCompile(`(?is)<\s*/?\s*(script|iframe|object|embed|style|link|meta)[^>]*>`)
+	unsafeHTMLEventAttrRE   = regexp.MustCompile(`(?is)\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)`)
+	unsafeHTMLJSLinkRE      = regexp.MustCompile(`(?is)javascript\s*:`)
+)
 
 func parseFrontMatter(text string) (map[string]string, string) {
 	out := map[string]string{}
@@ -50,8 +61,8 @@ func firstMarkdownHeading(body string) string {
 }
 
 func makeSummary(body string) string {
-	body = regexp.MustCompile("(?m)^#+\\s*").ReplaceAllString(body, "")
-	body = regexp.MustCompile("`{3}[\\s\\S]*?`{3}").ReplaceAllString(body, "")
+	body = markdownHeadingPrefixRE.ReplaceAllString(body, "")
+	body = markdownCodeBlockRE.ReplaceAllString(body, "")
 	body = strings.Join(strings.Fields(body), " ")
 	r := []rune(body)
 	if len(r) > 120 {
@@ -74,11 +85,11 @@ func urlMsg(s string) string { return url.QueryEscape(s) }
 
 func newID() string { b := make([]byte, 8); _, _ = rand.Read(b); return hex.EncodeToString(b) }
 func cleanUsername(s string) string {
-	return regexp.MustCompile(`[^a-zA-Z0-9_-]`).ReplaceAllString(strings.ToLower(strings.TrimSpace(s)), "")
+	return usernameInvalidCharRE.ReplaceAllString(strings.ToLower(strings.TrimSpace(s)), "")
 }
 func slugify(s string) string {
 	s = strings.ToLower(strings.TrimSpace(s))
-	s = regexp.MustCompile(`[^a-z0-9\p{Han}]+`).ReplaceAllString(s, "-")
+	s = slugInvalidCharRE.ReplaceAllString(s, "-")
 	s = strings.Trim(s, "-")
 	if len([]rune(s)) > 80 {
 		s = string([]rune(s)[:80])
@@ -167,19 +178,15 @@ func filterProtectedNoticeTags(tags []string) []string {
 func normalizeArticleBodyForHugo(s string) string {
 	// 临时 Markdown 预览器会把 <br> 当换行；公开文章这里转成 Markdown 硬换行，
 	// 避免 Hugo/Goldmark 环境差异导致文章阅读页不换行。源 Markdown 下载仍保留原文。
-	br := regexp.MustCompile(`(?i)(<br\s*/?>|&lt;br\s*/?&gt;)`)
-	return br.ReplaceAllString(s, "  \n")
+	return articleLineBreakRE.ReplaceAllString(s, "  \n")
 }
 
 func stripUnsafeHTML(s string) string {
 	// Go regexp 不支持 \1 这种反向引用，所以这里不用成对匹配写法。
 	// 第一版做保守过滤：移除危险标签、事件属性和 javascript: 链接。
-	dangerousTags := regexp.MustCompile(`(?is)<\s*/?\s*(script|iframe|object|embed|style|link|meta)[^>]*>`)
-	eventAttrs := regexp.MustCompile(`(?is)\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)`)
-	jsLinks := regexp.MustCompile(`(?is)javascript\s*:`)
-	s = dangerousTags.ReplaceAllString(s, "")
-	s = eventAttrs.ReplaceAllString(s, "")
-	s = jsLinks.ReplaceAllString(s, "")
+	s = dangerousHTMLTagRE.ReplaceAllString(s, "")
+	s = unsafeHTMLEventAttrRE.ReplaceAllString(s, "")
+	s = unsafeHTMLJSLinkRE.ReplaceAllString(s, "")
 	return s
 }
 

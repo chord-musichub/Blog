@@ -135,9 +135,27 @@ func normalizedOrigin(raw string) string {
 	return u.Scheme + "://" + u.Host
 }
 
+func requestOrigin(r *http.Request) string {
+	scheme := "http"
+	if r.TLS != nil {
+		scheme = "https"
+	} else if forwarded := strings.TrimSpace(strings.Split(r.Header.Get("X-Forwarded-Proto"), ",")[0]); forwarded == "https" {
+		scheme = "https"
+	}
+	host := strings.TrimSpace(r.Host)
+	if host == "" {
+		return ""
+	}
+	return scheme + "://" + host
+}
+
 func (app *App) allowPublicCORS(w http.ResponseWriter, r *http.Request) bool {
 	origin := normalizedOrigin(r.Header.Get("Origin"))
 	if origin == "" {
+		return true
+	}
+	// 浏览器同源请求也会为 JSON POST 附带 Origin；它不应依赖部署环境的跨域白名单。
+	if origin == requestOrigin(r) {
 		return true
 	}
 	allowed := map[string]bool{}
