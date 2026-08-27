@@ -11,23 +11,13 @@ import (
 
 // 2048 排行榜接口与记录归一化逻辑。
 
-func game2048ScoreIdentity(item SnakeScoreRecord) string {
-	if strings.TrimSpace(item.Username) != "" {
-		return "user:" + strings.TrimSpace(item.Username)
-	}
-	if strings.TrimSpace(item.PlayerID) != "" {
-		return "guest:" + strings.TrimSpace(item.PlayerID)
-	}
-	return "legacy:" + strings.TrimSpace(item.CreatedAt)
-}
-
 func normalizeGame2048ScoreRecords(scores []SnakeScoreRecord) []SnakeScoreRecord {
 	bestByIdentity := map[string]SnakeScoreRecord{}
 	for _, item := range scores {
 		if item.Score <= 0 {
 			continue
 		}
-		key := game2048ScoreIdentity(item)
+		key := scoreIdentity(item)
 		old, ok := bestByIdentity[key]
 		if !ok || item.Score > old.Score || (item.Score == old.Score && item.CreatedAt < old.CreatedAt) {
 			bestByIdentity[key] = item

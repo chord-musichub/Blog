@@ -9,32 +9,30 @@ import (
 	"time"
 )
 
-// 反应速度排行榜接口与记录归一化逻辑。
+// 打字练习排行榜接口与按模式的记录归一化逻辑。
 
-func reactionScoreDisplay(item SnakeScoreRecord) string {
-	if strings.TrimSpace(item.DisplayName) != "" {
-		return strings.TrimSpace(item.DisplayName)
+func typingScoreMode(raw string) string {
+	mode := strings.ToLower(strings.TrimSpace(raw))
+	switch mode {
+	case "mixed", "zh", "cn", "chinese":
+		return "mixed"
+	default:
+		return "english"
 	}
-	if strings.TrimSpace(item.Username) != "" {
-		return strings.TrimSpace(item.Username)
-	}
-	if strings.TrimSpace(item.PlayerID) != "" {
-		id := strings.TrimSpace(item.PlayerID)
-		if len(id) > 6 {
-			id = id[len(id)-6:]
-		}
-		return "游客 " + id
-	}
-	return "访客"
 }
 
-func normalizeReactionScoreRecords(scores []SnakeScoreRecord) []SnakeScoreRecord {
+func (app *App) typingScoresPath() string {
+	return app.scoreDataPath("typing_scores.json")
+}
+
+func normalizeTypingScoreRecords(scores []SnakeScoreRecord, mode string) []SnakeScoreRecord {
+	mode = typingScoreMode(mode)
 	bestByIdentity := map[string]SnakeScoreRecord{}
 	for _, item := range scores {
-		if item.Score <= 0 {
+		if item.Score <= 0 || typingScoreMode(item.Mode) != mode {
 			continue
 		}
-		item.DisplayName = reactionScoreDisplay(item)
+		item.Mode = mode
 		key := scoreIdentity(item)
 		old, ok := bestByIdentity[key]
 		if !ok || item.Score < old.Score || (item.Score == old.Score && item.CreatedAt < old.CreatedAt) {
@@ -57,19 +55,26 @@ func normalizeReactionScoreRecords(scores []SnakeScoreRecord) []SnakeScoreRecord
 	return cleaned
 }
 
-func (app *App) reactionScoresPath() string {
-	return app.scoreDataPath("reaction_scores.json")
+func normalizeAllTypingScoreRecords(scores []SnakeScoreRecord) []SnakeScoreRecord {
+	cleaned := make([]SnakeScoreRecord, 0, 6)
+	cleaned = append(cleaned, normalizeTypingScoreRecords(scores, "english")...)
+	cleaned = append(cleaned, normalizeTypingScoreRecords(scores, "mixed")...)
+	return cleaned
 }
 
-func (app *App) loadReactionScores() []SnakeScoreRecord {
-	return app.loadScoreRecords(app.reactionScoresPath(), "reaction", normalizeReactionScoreRecords)
+func (app *App) loadAllTypingScores() []SnakeScoreRecord {
+	return app.loadScoreRecords(app.typingScoresPath(), "typing", normalizeAllTypingScoreRecords)
 }
 
-func (app *App) saveReactionScores(scores []SnakeScoreRecord) error {
-	return app.saveScoreRecords(app.reactionScoresPath(), scores, normalizeReactionScoreRecords)
+func (app *App) loadTypingScores(mode string) []SnakeScoreRecord {
+	return normalizeTypingScoreRecords(app.loadAllTypingScores(), mode)
 }
 
-func (app *App) handleReactionScoresAPI(w http.ResponseWriter, r *http.Request) {
+func (app *App) saveTypingScores(scores []SnakeScoreRecord) error {
+	return app.saveScoreRecords(app.typingScoresPath(), scores, normalizeAllTypingScoreRecords)
+}
+
+func (app *App) handleTypingScoresAPI(w http.ResponseWriter, r *http.Request) {
 	if !app.allowPublicCORS(w, r) {
 		http.Error(w, "forbidden origin", http.StatusForbidden)
 		return
@@ -82,10 +87,11 @@ func (app *App) handleReactionScoresAPI(w http.ResponseWriter, r *http.Request) 
 	}
 	switch r.Method {
 	case http.MethodGet:
+		mode := typingScoreMode(r.URL.Query().Get("mode"))
 		app.scoresMu.Lock()
-		scores := app.loadReactionScores()
+		scores := app.loadTypingScores(mode)
 		app.scoresMu.Unlock()
-		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
+		_ = json.NewEncoder(w).Encode(map[string]any{"mode": mode, "scores": scores})
 		return
 	case http.MethodPost:
 		var req snakeScoreRequest
@@ -93,16 +99,20 @@ func (app *App) handleReactionScoresAPI(w http.ResponseWriter, r *http.Request) 
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
-		// 反应时间单位为 ms。这里是网页估测值，允许低于 50ms 的极快记录同步。
-		if req.Score < 1 || req.Score > 5000 {
+		mode := typingScoreMode(req.Mode)
+		// 打字练习成绩单位为 ms。只记录完整完成一篇文章的时间。
+		if req.Score < 1000 || req.Score > 3600000 {
 			http.Error(w, "invalid score", http.StatusBadRequest)
 			return
 		}
 		playerID := cleanScorePlayerID(req.PlayerID)
+		articleID := cleanScorePlayerID(req.ArticleID)
 		record := SnakeScoreRecord{
 			Score:     req.Score,
 			CreatedAt: time.Now().UTC().Format(time.RFC3339),
 			PlayerID:  playerID,
+			Mode:      mode,
+			ArticleID: articleID,
 		}
 		if u, ok := app.currentUser(r); ok {
 			record.Username = u.Username
@@ -111,21 +121,19 @@ func (app *App) handleReactionScoresAPI(w http.ResponseWriter, r *http.Request) 
 				record.DisplayName = u.Username
 			}
 			record.PlayerID = ""
-		} else {
-			record.DisplayName = reactionScoreDisplay(record)
 		}
 		app.scoresMu.Lock()
-		scores := app.loadReactionScores()
-		scores = append(scores, record)
-		if err := app.saveReactionScores(scores); err != nil {
+		all := app.loadAllTypingScores()
+		all = append(all, record)
+		if err := app.saveTypingScores(all); err != nil {
 			app.scoresMu.Unlock()
-			log.Printf("save reaction scores error: %v", err)
+			log.Printf("save typing scores error: %v", err)
 			http.Error(w, "save failed", http.StatusInternalServerError)
 			return
 		}
-		scores = app.loadReactionScores()
+		scores := app.loadTypingScores(mode)
 		app.scoresMu.Unlock()
-		_ = json.NewEncoder(w).Encode(map[string]any{"scores": scores})
+		_ = json.NewEncoder(w).Encode(map[string]any{"mode": mode, "scores": scores})
 		return
 	default:
 		w.Header().Set("Allow", "GET, POST")

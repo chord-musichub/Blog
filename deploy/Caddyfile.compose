@@ -22,6 +22,10 @@
         reverse_proxy blog-admin:8080
     }
 
+    # 这两类资源均由构建版本号查询参数失效，可安全长期缓存。
+    @versionedAssets path /css/* /js/*
+    header @versionedAssets Cache-Control "public, max-age=31536000, immutable"
+
     # 其余请求均为 Hugo 已生成的公开博客。
     handle {
         root * /srv

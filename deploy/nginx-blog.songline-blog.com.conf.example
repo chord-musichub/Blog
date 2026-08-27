@@ -27,6 +27,19 @@ server {
     root /opt/songline-blog/current/published;
     index index.html;
 
+    # 模板为 CSS/JS 附带 Git 版本号查询参数；仅这两类构建资源长期缓存。
+    # 不缓存 HTML、文章、上传文件，保证后台发布内容能立即更新。
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    location ~* ^/(?:css|js)/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        access_log off;
+    }
+
     location = /write {
         return 301 /write/;
     }
