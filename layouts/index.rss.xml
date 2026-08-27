@@ -1,0 +1,37 @@
+{{- $cfg := .Site.Data.site -}}
+{{- $siteTitle := default .Site.Title $cfg.site.title -}}
+{{- $siteDescription := default .Site.Params.description $cfg.site.description -}}
+{{- $posts := where .Site.RegularPages "Section" "posts" -}}
+{{- $posts = $posts.ByDate.Reverse -}}
+{{- $publishedPaths := slice -}}
+{{- range $article := .Site.Data.articles -}}
+  {{- if eq $article.status "published" -}}
+    {{- $publishedPaths = $publishedPaths | append (printf "posts/%s/index.md" $article.slug) -}}
+  {{- end -}}
+{{- end -}}
+{{- $feedState := newScratch -}}
+{{- $feedState.Set "count" 0 -}}
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{{ $siteTitle }}</title>
+    <link>{{ .Site.BaseURL }}</link>
+    <description>{{ $siteDescription }}</description>
+    <language>{{ .Site.LanguageCode }}</language>
+    <generator>Hugo</generator>
+    <atom:link href="{{ "index.xml" | absURL }}" rel="self" type="application/rss+xml" />
+    {{- range $posts }}
+    {{- if and (in $publishedPaths .File.Path) (lt ($feedState.Get "count") 30) -}}
+      {{- $summary := default .Summary .Params.summary | plainify -}}
+    <item>
+      <title>{{ .Title }}</title>
+      <link>{{ .Permalink }}</link>
+      <guid isPermaLink="true">{{ .Permalink }}</guid>
+      <pubDate>{{ .Date.Format "Mon, 02 Jan 2006 15:04:05 -0700" }}</pubDate>
+      <description>{{ $summary }}</description>
+    </item>
+      {{- $feedState.Add "count" 1 -}}
+    {{- end -}}
+    {{- end }}
+  </channel>
+</rss>

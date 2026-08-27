@@ -5,6 +5,9 @@ summaryLength = 120
 hasCJKLanguage = true
 enableRobotsTXT = true
 
+[outputs]
+home = ['HTML', 'RSS']
+
 [pagination]
 pagerSize = 10
 

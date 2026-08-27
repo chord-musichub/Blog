@@ -57,6 +57,7 @@
   {{ end }}
   {{ with $favicon }}<link rel="icon" href="{{ . }}">{{ end }}
   {{ with $favicon }}<link rel="apple-touch-icon" href="{{ . }}">{{ end }}
+  <link rel="alternate" type="application/rss+xml" title="{{ $siteTitle }} RSS" href="{{ "index.xml" | relURL }}">
 {{ partial "resource-hints.html" . }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
