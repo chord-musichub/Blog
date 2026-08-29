@@ -1,0 +1,276 @@
+/* 全站固定导航、飘带与星轨背景效果：从 responsive.css 拆出，保持原始加载顺序。 */
+
+/* v20.18.5：手机端导航改为真正 fixed + 背景飘带增强 */
+.songline-ribbon-layer{
+  z-index:1!important;
+  opacity:1!important;
+  mix-blend-mode:normal!important;
+}
+.songline-space-ribbon{
+  filter:drop-shadow(0 0 14px rgba(125,211,252,.32)) drop-shadow(0 0 28px rgba(168,85,247,.12))!important;
+}
+.songline-space-ribbon.is-ribbon{
+  filter:blur(.08px) drop-shadow(0 0 20px rgba(125,211,252,.34)) drop-shadow(0 0 36px rgba(168,85,247,.14))!important;
+}
+.songline-space-ribbon.is-wave{
+  filter:drop-shadow(0 0 12px rgba(147,197,253,.38))!important;
+}
+.site-bg-layer{
+  z-index:0!important;
+}
+.site-header,
+.modern-site-header,
+.container,
+.footer,
+.site-footer,
+.site-boot-overlay{
+  position:relative;
+  z-index:3;
+}
+
+@media(max-width:980px){
+  html.has-fixed-mobile-nav body{
+    padding-top:var(--songline-mobile-nav-height, 118px)!important;
+  }
+  html.has-fixed-mobile-nav .site-header,
+  html.has-fixed-mobile-nav .modern-site-header,
+  .site-header.modern-site-header{
+    position:fixed!important;
+    top:0!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    z-index:12000!important;
+    margin:0!important;
+    transform:none!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+    will-change:auto!important;
+    backface-visibility:hidden!important;
+  }
+  html.has-fixed-mobile-nav .modern-site-header,
+  .modern-site-header{
+    padding:8px var(--mobile-safe-r, 10px) 0 var(--mobile-safe-x, 10px)!important;
+    background:linear-gradient(180deg, color-mix(in srgb, var(--bg) 98%, transparent), color-mix(in srgb, var(--bg) 84%, transparent), transparent)!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  html.has-fixed-mobile-nav .modern-navbar,
+  .modern-navbar{
+    transform:none!important;
+  }
+  html.is-live-nav-swapping .site-header,
+  html.is-live-nav-swapping .modern-site-header,
+  html.is-nav-swapping .site-header,
+  html.is-nav-swapping .modern-site-header,
+  html.nav-leave-to-left .site-header,
+  html.nav-leave-to-right .site-header,
+  html.nav-enter-from-left .site-header,
+  html.nav-enter-from-right .site-header,
+  html.nav-leave-to-left .modern-site-header,
+  html.nav-leave-to-right .modern-site-header,
+  html.nav-enter-from-left .modern-site-header,
+  html.nav-enter-from-right .modern-site-header{
+    position:fixed!important;
+    top:0!important;
+    transform:none!important;
+    opacity:1!important;
+    visibility:visible!important;
+    z-index:12000!important;
+    animation:none!important;
+    transition:none!important;
+  }
+  html{
+    scroll-padding-top:calc(var(--songline-mobile-nav-height, 118px) + 8px)!important;
+  }
+
+  .songline-ribbon-layer{
+    z-index:1!important;
+    opacity:1!important;
+  }
+  .songline-space-ribbon{
+    filter:drop-shadow(0 0 16px rgba(125,211,252,.42)) drop-shadow(0 0 32px rgba(168,85,247,.16))!important;
+  }
+}
+
+@media(max-width:430px){
+  html.has-fixed-mobile-nav body{
+    padding-top:var(--songline-mobile-nav-height, 112px)!important;
+  }
+  html{
+    scroll-padding-top:calc(var(--songline-mobile-nav-height, 112px) + 8px)!important;
+  }
+}
+
+
+/* v20.18.5-cleanup：已移除旧随机飘带/慢漂/防闪/白线实验段，保留白色星轨流线实现。 */
+
+/* v20.18.5：参考现代网页的白色星轨流线背景 */
+.songline-starstream-layer{
+  position:fixed!important;
+  inset:-4vh -4vw!important;
+  width:108vw!important;
+  height:108vh!important;
+  z-index:1!important;
+  opacity:1!important;
+  pointer-events:none!important;
+  overflow:hidden!important;
+  contain:layout paint style!important;
+  isolation:isolate!important;
+  transform:translate3d(0,0,0)!important;
+  backface-visibility:hidden!important;
+  -webkit-backface-visibility:hidden!important;
+  mix-blend-mode:normal!important;
+}
+
+.songline-starstream-svg{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  transform:translateZ(0)!important;
+  backface-visibility:hidden!important;
+  -webkit-backface-visibility:hidden!important;
+}
+
+.starstream-path{
+  fill:none!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  vector-effect:non-scaling-stroke!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  transform:none!important;
+  will-change:auto!important;
+}
+
+.starstream-base{
+  opacity:1!important;
+  animation:none!important;
+}
+
+.starstream-flow{
+  opacity:1!important;
+  filter:none!important;
+  animation:starstreamDashFlow var(--starstream-duration, 28000ms) linear infinite!important;
+  will-change:stroke-dashoffset!important;
+}
+
+@keyframes starstreamDashFlow{
+  from{
+    stroke-dashoffset:0;
+  }
+  to{
+    stroke-dashoffset:var(--starstream-distance, -1000);
+  }
+}
+
+/* 旧版本各种 ribbon 规则全部降级，避免跟新星轨流线冲突 */
+.songline-starstream-layer .songline-space-ribbon,
+.songline-starstream-layer .white-flow-ribbon,
+.songline-starstream-layer .safe-ribbon,
+.songline-starstream-layer .slow-ribbon{
+  animation:none!important;
+  filter:none!important;
+}
+
+/* 开机动画期间仍不显示背景线条，避免抢首屏 */
+html.is-boot-preparing .songline-starstream-layer,
+body.is-boot-preparing .songline-starstream-layer{
+  display:none!important;
+}
+
+@media(max-width:820px){
+  .songline-starstream-layer{
+    inset:-3vh -5vw!important;
+    width:110vw!important;
+    height:106vh!important;
+  }
+  .starstream-flow{
+    animation-duration:calc(var(--starstream-duration, 26000ms) * .86)!important;
+  }
+}
+
+@media(prefers-reduced-motion: reduce){
+  .starstream-flow{
+    animation:none!important;
+  }
+}
+
+
+/* v20.18.5：星轨背景渐入 + 轨迹缓慢变形 */
+.songline-starstream-layer.songline-starstream-morph-layer{
+  opacity:0!important;
+  transition:opacity 1200ms ease!important;
+}
+.songline-starstream-layer.songline-starstream-morph-layer.is-visible{
+  opacity:1!important;
+}
+
+.starstream-morph-group{
+  transform-box:fill-box!important;
+  transform-origin:center!important;
+  animation:starstreamGroupDrift var(--group-drift-duration, 62000ms) ease-in-out infinite alternate!important;
+  animation-delay:var(--group-drift-delay, 0ms)!important;
+  will-change:transform!important;
+}
+
+.starstream-morph-base,
+.starstream-morph-flow{
+  transition:none!important;
+}
+
+@keyframes starstreamGroupDrift{
+  0%{
+    transform:translate3d(-8px, -5px, 0) rotate(-.35deg) scale(1);
+  }
+  48%{
+    transform:translate3d(5px, 4px, 0) rotate(.28deg) scale(1.006);
+  }
+  100%{
+    transform:translate3d(11px, 7px, 0) rotate(-.18deg) scale(1.01);
+  }
+}
+
+/* 让移动速度更容易观察，但仍保持背景感 */
+.starstream-morph-flow{
+  animation-timing-function:linear!important;
+}
+
+@media(max-width:820px){
+  .songline-starstream-layer.songline-starstream-morph-layer{
+    transition-duration:1050ms!important;
+  }
+  .starstream-morph-group{
+    animation-duration:calc(var(--group-drift-duration, 56000ms) * .82)!important;
+  }
+}
+
+@media(prefers-reduced-motion: reduce){
+  .songline-starstream-layer.songline-starstream-morph-layer{
+    opacity:1!important;
+    transition:none!important;
+  }
+  .starstream-morph-group{
+    animation:none!important;
+  }
+}
+
+
+/* v20.18.5-cleanup：星轨速度统一入口。阅读浮动按钮统一由 body portal 段接管。 */
+.starstream-morph-flow{
+  animation-duration:calc(var(--starstream-duration, 22000ms) * .78)!important;
+}
+.starstream-morph-group{
+  animation-duration:calc(var(--group-drift-duration, 56000ms) * .78)!important;
+}
+
+/* v20.18.5-cleanup：已移除旧阅读按钮 fixed 覆盖层，保留 body portal 作为唯一最终方案。 */
+
+/* v20.18.5-cleanup 最终说明：
+   当前稳定交互入口：
+   - 星轨背景：.songline-starstream-layer / .starstream-*
+   - 手机端目录：mobile-toc.js + .mobile-toc-drawer / .mobile-toc-fab
+   - 阅读浮动按钮：reader-floating-controls.js + reader-floating-controls.css
+   后续迭代优先修改这些最终入口，避免重新追加历史 override。
+*/

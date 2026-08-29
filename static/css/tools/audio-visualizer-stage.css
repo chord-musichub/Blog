@@ -1,0 +1,1043 @@
+/* 音频可视化样式层：audio-visualizer-stage。按 baseof.html 与 page-modules.js 的既定顺序加载。 */
+
+/* v20.18.5：音频可视化视口比例与页面级控制按钮修复 */
+.audio-visualizer-page{
+  --av-page-nav-offset: clamp(96px, 10vh, 124px);
+  --av-stage-gap: clamp(10px, 1.5vw, 22px);
+  padding:0!important;
+  min-height:calc(100svh - var(--av-page-nav-offset))!important;
+}
+.audio-visualizer-page .av-stage{
+  width:min(1640px, calc(100vw - clamp(22px, 3.2vw, 56px)))!important;
+  height:clamp(620px, calc(100svh - var(--av-page-nav-offset) - var(--av-stage-gap) * 2), 860px)!important;
+  min-height:0!important;
+  margin:var(--av-stage-gap) auto!important;
+  position:relative!important;
+  border-radius:clamp(32px, 3.4vw, 54px)!important;
+}
+
+/* 初始态：按舞台自身比例排布，不再被整页高度拖偏 */
+.audio-visualizer-page:not(.is-visual-live) .av-topbar{
+  padding:
+    clamp(34px, 4.2vh, 56px)
+    clamp(44px, 5vw, 84px)
+    0!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-topbar h1{
+  font-size:clamp(4.2rem, 6.6vw, 7.6rem)!important;
+  line-height:.82!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-subtitle{
+  max-width:min(920px, 72vw)!important;
+  line-height:1.45!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-status-stack{
+  transform:none!important;
+  margin-right:0!important;
+}
+
+/* 来源卡片固定在舞台下方，但保证整卡在舞台内完整显示 */
+.audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+  position:absolute!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:clamp(34px, 5.2vh, 58px)!important;
+  transform:translateX(-50%)!important;
+  width:min(1220px, calc(100% - clamp(58px, 7vw, 122px)))!important;
+  margin:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(3, minmax(0, 1fr))!important;
+  gap:clamp(16px, 1.8vw, 24px)!important;
+  align-items:stretch!important;
+  z-index:6!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-card{
+  min-height:clamp(188px, 23vh, 248px)!important;
+  max-height:268px!important;
+  padding:clamp(18px, 1.7vw, 26px)!important;
+  border-radius:32px!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-card strong{
+  font-size:clamp(1.08rem, 1.25vw, 1.38rem)!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-card p{
+  line-height:1.62!important;
+  margin:.65rem 0 .95rem!important;
+}
+
+/* 初始态不显示全屏/停止，避免挤在视觉中心造成误会 */
+.audio-visualizer-page:not(.is-visual-live) .av-controls{
+  display:none!important;
+}
+
+/* live 后：不再让舞台裁切页面级按钮 */
+.audio-visualizer-page.is-visual-live .av-stage{
+  overflow:visible!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-canvas{
+  overflow:hidden!important;
+  border-radius:inherit!important;
+  clip-path:inset(0 round inherit)!important;
+}
+
+/* live 后按钮固定到整个页面，而不是被舞台内部裁切 */
+.audio-visualizer-page.is-visual-live .av-controls{
+  display:flex!important;
+  position:fixed!important;
+  top:calc(var(--av-page-nav-offset) + 18px)!important;
+  right:clamp(26px, 4vw, 58px)!important;
+  left:auto!important;
+  bottom:auto!important;
+  width:auto!important;
+  margin:0!important;
+  gap:12px!important;
+  opacity:1!important;
+  transform:none!important;
+  z-index:9999!important;
+  pointer-events:auto!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button{
+  min-width:108px!important;
+  min-height:48px!important;
+  padding:.78rem 1.12rem!important;
+  border-radius:999px!important;
+  background:rgba(9,17,34,.78)!important;
+  border:1px solid rgba(186,230,253,.38)!important;
+  color:rgba(248,250,252,.98)!important;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.42),
+    inset 0 1px 0 rgba(255,255,255,.12)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button:hover,
+.audio-visualizer-page.is-visual-live .av-controls .av-button:focus-visible{
+  transform:translateY(-1px)!important;
+  background:rgba(14,165,233,.42)!important;
+  border-color:rgba(125,211,252,.72)!important;
+}
+
+/* 浏览器捕获系统声：明确不显示歌曲信息小卡 */
+.audio-visualizer-page.is-browser-audio-live .av-now,
+.audio-visualizer-page.is-visual-live.is-browser-audio-live .av-now,
+.audio-visualizer-page.is-visual-live.is-browser-audio-live.has-track .av-now{
+  display:none!important;
+}
+
+/* live 后提示文字不占舞台中心 */
+.audio-visualizer-page.is-visual-live .av-hint,
+.audio-visualizer-page.is-visual-live .av-source-panel,
+.audio-visualizer-page.is-visual-live .av-topbar{
+  opacity:0!important;
+  pointer-events:none!important;
+  transform:translateY(-12px)!important;
+}
+
+/* 较矮屏幕：降低标题与卡片高度，防止压出舞台 */
+@media(max-height:760px){
+  .audio-visualizer-page{
+    --av-page-nav-offset: clamp(88px, 10vh, 112px);
+  }
+  .audio-visualizer-page .av-stage{
+    height:calc(100svh - var(--av-page-nav-offset) - 16px)!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-topbar{
+    padding:26px 46px 0!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-topbar h1{
+    font-size:clamp(3.4rem, 5.8vw, 5.8rem)!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+    bottom:24px!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-card{
+    min-height:168px!important;
+    max-height:220px!important;
+    padding:18px!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-card p{
+    line-height:1.48!important;
+  }
+}
+
+/* 中小屏：回到自然流，避免三列过窄 */
+@media(max-width:1120px){
+  .audio-visualizer-page .av-stage{
+    height:auto!important;
+    min-height:calc(100svh - var(--av-page-nav-offset) - 20px)!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+    position:relative!important;
+    left:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    width:min(720px, calc(100% - 40px))!important;
+    margin:clamp(28px, 5vh, 46px) auto 34px!important;
+    grid-template-columns:1fr!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-card{
+    min-height:auto!important;
+    max-height:none!important;
+  }
+}
+@media(max-width:720px){
+  .audio-visualizer-page{
+    --av-page-nav-offset: 88px;
+  }
+  .audio-visualizer-page .av-stage{
+    width:calc(100vw - 16px)!important;
+    margin:8px auto!important;
+    border-radius:30px!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls{
+    top:auto!important;
+    left:16px!important;
+    right:16px!important;
+    bottom:16px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+
+/* v20.18.5：音频可视化默认界面铺满导航栏下方整屏 */
+html:has(.audio-visualizer-page),
+body:has(.audio-visualizer-page){
+  min-height:100svh!important;
+  overflow-x:hidden!important;
+  background:#020617!important;
+}
+body:has(.audio-visualizer-page){
+  --av-nav-real-height: 82px;
+}
+body:has(.audio-visualizer-page) .site-main,
+body:has(.audio-visualizer-page) .page-main,
+body:has(.audio-visualizer-page) main:not(.audio-visualizer-page),
+body:has(.audio-visualizer-page) .content,
+body:has(.audio-visualizer-page) .content-shell,
+body:has(.audio-visualizer-page) .page-shell,
+body:has(.audio-visualizer-page) .main-shell,
+body:has(.audio-visualizer-page) .tool-shell,
+body:has(.audio-visualizer-page) .container,
+body:has(.audio-visualizer-page) .wrap{
+  max-width:none!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+main.tool-page.audio-visualizer-page,
+.audio-visualizer-page{
+  width:100vw!important;
+  max-width:none!important;
+  min-height:calc(100svh - var(--av-nav-real-height))!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+.audio-visualizer-page .av-stage{
+  width:100vw!important;
+  height:calc(100svh - var(--av-nav-real-height))!important;
+  min-height:640px!important;
+  max-height:none!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+  overflow:hidden!important;
+  box-shadow:none!important;
+  background:#020617!important;
+}
+.audio-visualizer-page .av-stage::before,
+.audio-visualizer-page .av-stage::after{
+  content:none!important;
+  display:none!important;
+}
+.audio-visualizer-page .av-canvas{
+  border-radius:0!important;
+  width:100%!important;
+  height:100%!important;
+}
+
+/* 默认入口：内容按整块屏幕排，不再按“居中舞台卡片”排 */
+.audio-visualizer-page:not(.is-visual-live) .av-topbar{
+  padding:
+    clamp(42px, 6vh, 78px)
+    clamp(54px, 8vw, 128px)
+    0!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-topbar h1{
+  font-size:clamp(4.6rem, 7.4vw, 8.6rem)!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-status-stack{
+  margin-top:0!important;
+  margin-right:0!important;
+  transform:none!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+  position:absolute!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:clamp(46px, 7vh, 92px)!important;
+  transform:translateX(-50%)!important;
+  width:min(1320px, calc(100vw - clamp(96px, 10vw, 190px)))!important;
+  max-width:none!important;
+  margin:0!important;
+  grid-template-columns:repeat(3, minmax(0, 1fr))!important;
+  gap:clamp(18px, 2vw, 30px)!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-card{
+  min-height:clamp(198px, 24vh, 270px)!important;
+  max-height:300px!important;
+}
+
+/* live 后视觉也铺满导航栏下方整块区域 */
+.audio-visualizer-page.is-visual-live .av-stage{
+  width:100vw!important;
+  height:calc(100svh - var(--av-nav-real-height))!important;
+  min-height:640px!important;
+  margin:0!important;
+  overflow:visible!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-canvas{
+  border-radius:0!important;
+  clip-path:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls{
+  top:calc(var(--av-nav-real-height) + 20px)!important;
+  right:clamp(26px, 4vw, 64px)!important;
+  z-index:9999!important;
+}
+
+/* 让返回按钮别在全屏舞台上显得突兀 */
+body:has(.audio-visualizer-page) .back-icon,
+body:has(.audio-visualizer-page) .back-button,
+body:has(.audio-visualizer-page) [data-back-icon]{
+  z-index:50!important;
+}
+
+/* 矮屏时保持铺满，只压缩内部内容 */
+@media(max-height:760px){
+  .audio-visualizer-page .av-stage,
+  .audio-visualizer-page.is-visual-live .av-stage{
+    height:calc(100svh - var(--av-nav-real-height))!important;
+    min-height:560px!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-topbar{
+    padding:28px clamp(44px, 7vw, 92px) 0!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-topbar h1{
+    font-size:clamp(3.8rem, 6.2vw, 6.3rem)!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+    bottom:28px!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-card{
+    min-height:166px!important;
+    max-height:220px!important;
+  }
+}
+@media(max-width:1120px){
+  .audio-visualizer-page .av-stage{
+    height:auto!important;
+    min-height:calc(100svh - var(--av-nav-real-height))!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+    position:relative!important;
+    left:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    width:min(760px, calc(100vw - 32px))!important;
+    margin:clamp(28px, 5vh, 46px) auto 42px!important;
+    grid-template-columns:1fr!important;
+  }
+}
+@media(max-width:720px){
+  body:has(.audio-visualizer-page){
+    --av-nav-real-height: 74px;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-topbar{
+    padding:26px 22px 0!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls{
+    top:auto!important;
+    left:16px!important;
+    right:16px!important;
+    bottom:16px!important;
+  }
+}
+
+
+/* v20.18.5：音频可视化改回大卡片舞台，不再横向铺满 */
+html:has(.audio-visualizer-page),
+body:has(.audio-visualizer-page){
+  background:
+    radial-gradient(circle at 12% 18%, rgba(14,165,233,.16), transparent 34%),
+    radial-gradient(circle at 84% 10%, rgba(168,85,247,.13), transparent 34%),
+    #071426!important;
+  overflow-x:hidden!important;
+}
+body:has(.audio-visualizer-page){
+  --av-nav-real-height: 82px;
+  --av-card-gap-y: clamp(18px, 2.5vh, 34px);
+  --av-card-gap-x: clamp(44px, 7vw, 128px);
+}
+main.tool-page.audio-visualizer-page,
+.audio-visualizer-page{
+  width:100%!important;
+  max-width:none!important;
+  min-height:calc(100svh - var(--av-nav-real-height))!important;
+  margin:0!important;
+  padding:var(--av-card-gap-y) 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+
+/* 只有这一张大卡片：不贴边、不横向满屏 */
+.audio-visualizer-page .av-stage,
+.audio-visualizer-page.is-visual-live .av-stage{
+  width:min(1540px, calc(100vw - var(--av-card-gap-x) * 2))!important;
+  height:calc(100svh - var(--av-nav-real-height) - var(--av-card-gap-y) * 2)!important;
+  min-height:620px!important;
+  max-height:900px!important;
+  margin:0 auto!important;
+  position:relative!important;
+  border:1px solid rgba(186,230,253,.22)!important;
+  border-radius:clamp(38px, 4vw, 64px)!important;
+  background:#020617!important;
+  overflow:hidden!important;
+  clip-path:inset(0 round clamp(38px, 4vw, 64px))!important;
+  -webkit-clip-path:inset(0 round clamp(38px, 4vw, 64px))!important;
+  box-shadow:
+    0 34px 110px rgba(0,0,0,.44),
+    inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+.audio-visualizer-page .av-stage::before,
+.audio-visualizer-page .av-stage::after{
+  content:none!important;
+  display:none!important;
+}
+.audio-visualizer-page .av-canvas{
+  width:100%!important;
+  height:100%!important;
+  border-radius:inherit!important;
+}
+
+/* 默认入口：按大卡片内部排布 */
+.audio-visualizer-page:not(.is-visual-live) .av-topbar{
+  padding:
+    clamp(38px, 5vh, 70px)
+    clamp(50px, 6vw, 110px)
+    0!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-topbar h1{
+  font-size:clamp(4.2rem, 6.8vw, 8rem)!important;
+  line-height:.82!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-subtitle{
+  max-width:min(920px, 72%)!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+  position:absolute!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:clamp(42px, 6vh, 78px)!important;
+  transform:translateX(-50%)!important;
+  width:min(1220px, calc(100% - clamp(70px, 8vw, 150px)))!important;
+  max-width:none!important;
+  margin:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(3, minmax(0, 1fr))!important;
+  gap:clamp(18px, 2vw, 28px)!important;
+  align-items:stretch!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-card{
+  min-height:clamp(190px, 23vh, 260px)!important;
+  max-height:285px!important;
+  border-radius:34px!important;
+}
+
+/* 初始态不显示全屏/停止，进入可视化后再显示 */
+.audio-visualizer-page:not(.is-visual-live) .av-controls{
+  display:none!important;
+}
+
+/* live 后仍然保持大卡片，不变成横向全屏 */
+.audio-visualizer-page.is-visual-live .av-stage{
+  overflow:visible!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-canvas{
+  overflow:hidden!important;
+  border-radius:clamp(38px, 4vw, 64px)!important;
+  clip-path:inset(0 round clamp(38px, 4vw, 64px))!important;
+  -webkit-clip-path:inset(0 round clamp(38px, 4vw, 64px))!important;
+}
+
+/* 控制按钮显示在页面级右上，但贴近卡片右上角 */
+.audio-visualizer-page.is-visual-live .av-controls{
+  display:flex!important;
+  position:fixed!important;
+  top:calc(var(--av-nav-real-height) + var(--av-card-gap-y) + 18px)!important;
+  right:max(clamp(28px, 4vw, 64px), calc((100vw - 1540px) / 2 + 32px))!important;
+  left:auto!important;
+  bottom:auto!important;
+  width:auto!important;
+  margin:0!important;
+  gap:12px!important;
+  opacity:1!important;
+  transform:none!important;
+  z-index:9999!important;
+  pointer-events:auto!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button{
+  min-width:108px!important;
+  min-height:48px!important;
+  padding:.78rem 1.12rem!important;
+  border-radius:999px!important;
+  background:rgba(9,17,34,.78)!important;
+  border:1px solid rgba(186,230,253,.38)!important;
+  color:rgba(248,250,252,.98)!important;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.42),
+    inset 0 1px 0 rgba(255,255,255,.12)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button:hover,
+.audio-visualizer-page.is-visual-live .av-controls .av-button:focus-visible{
+  transform:translateY(-1px)!important;
+  background:rgba(14,165,233,.42)!important;
+  border-color:rgba(125,211,252,.72)!important;
+}
+
+/* 浏览器系统音频模式不显示歌曲小卡 */
+.audio-visualizer-page.is-browser-audio-live .av-now,
+.audio-visualizer-page.is-visual-live.is-browser-audio-live .av-now,
+.audio-visualizer-page.is-visual-live.is-browser-audio-live.has-track .av-now{
+  display:none!important;
+}
+
+/* 矮屏压缩内部，不改变大卡片外形 */
+@media(max-height:760px){
+  body:has(.audio-visualizer-page){
+    --av-card-gap-y: 14px;
+  }
+  .audio-visualizer-page .av-stage,
+  .audio-visualizer-page.is-visual-live .av-stage{
+    min-height:560px!important;
+    height:calc(100svh - var(--av-nav-real-height) - var(--av-card-gap-y) * 2)!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-topbar{
+    padding:26px clamp(42px, 6vw, 90px) 0!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-topbar h1{
+    font-size:clamp(3.6rem, 6vw, 6rem)!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+    bottom:24px!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-card{
+    min-height:166px!important;
+    max-height:218px!important;
+  }
+}
+@media(max-width:1120px){
+  body:has(.audio-visualizer-page){
+    --av-card-gap-x: 24px;
+  }
+  .audio-visualizer-page .av-stage,
+  .audio-visualizer-page.is-visual-live .av-stage{
+    height:auto!important;
+    min-height:calc(100svh - var(--av-nav-real-height) - var(--av-card-gap-y) * 2)!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+    position:relative!important;
+    left:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    width:min(760px, calc(100% - 36px))!important;
+    margin:clamp(28px, 5vh, 46px) auto 42px!important;
+    grid-template-columns:1fr!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-card{
+    min-height:auto!important;
+    max-height:none!important;
+  }
+}
+@media(max-width:720px){
+  body:has(.audio-visualizer-page){
+    --av-nav-real-height: 74px;
+    --av-card-gap-y: 8px;
+    --av-card-gap-x: 8px;
+  }
+  .audio-visualizer-page .av-stage,
+  .audio-visualizer-page.is-visual-live .av-stage{
+    border-radius:30px!important;
+    clip-path:inset(0 round 30px)!important;
+    -webkit-clip-path:inset(0 round 30px)!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls{
+    top:auto!important;
+    left:16px!important;
+    right:16px!important;
+    bottom:16px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+
+/* v20.18.5：音频可视化移除本地助手 + 本地音频封面/音量 */
+.audio-visualizer-page .av-status-stack{
+  gap:10px!important;
+}
+.audio-visualizer-page .av-source-panel{
+  grid-template-columns:repeat(2, minmax(0, 1fr))!important;
+  width:min(980px, calc(100% - clamp(70px, 8vw, 150px)))!important;
+}
+.audio-visualizer-page .av-source-card{
+  min-height:clamp(198px, 23vh, 260px)!important;
+}
+.audio-visualizer-page .av-source-card.is-primary{
+  border-color:rgba(56,189,248,.36)!important;
+}
+.audio-visualizer-page .av-bridge-card,
+.audio-visualizer-page [data-av-connect-bridge],
+.audio-visualizer-page [data-av-bridge-state]{
+  display:none!important;
+}
+.audio-visualizer-page.is-local-audio-live.has-track .av-now{
+  display:flex!important;
+}
+.audio-visualizer-page.is-browser-audio-live .av-now,
+.audio-visualizer-page.is-visual-live.is-browser-audio-live .av-now,
+.audio-visualizer-page.is-visual-live.is-browser-audio-live.has-track .av-now{
+  display:none!important;
+}
+.audio-visualizer-page .av-volume-control{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  min-height:48px;
+  padding:.62rem .9rem;
+  border:1px solid rgba(186,230,253,.28);
+  border-radius:999px;
+  background:rgba(15,23,42,.58);
+  color:rgba(248,250,252,.95);
+  font-weight:850;
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 18px 46px rgba(0,0,0,.28);
+}
+.audio-visualizer-page .av-volume-control span{
+  white-space:nowrap;
+}
+.audio-visualizer-page .av-volume-control small{
+  min-width:38px;
+  text-align:right;
+  color:rgba(226,232,240,.82);
+  font-weight:800;
+}
+.audio-visualizer-page .av-volume-control input[type="range"]{
+  width:120px;
+  accent-color:#38bdf8;
+}
+.audio-visualizer-page:not(.is-local-audio-live) .av-volume-control{
+  opacity:.46;
+}
+.audio-visualizer-page.is-browser-audio-live .av-volume-control{
+  display:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls{
+  align-items:center!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-volume-control{
+  display:inline-flex!important;
+  opacity:1!important;
+}
+.audio-visualizer-page.is-visual-live.is-browser-audio-live .av-controls .av-volume-control{
+  display:none!important;
+}
+@media(max-width:1120px){
+  .audio-visualizer-page .av-source-panel{
+    grid-template-columns:1fr!important;
+    width:min(760px, calc(100% - 36px))!important;
+  }
+}
+@media(max-width:720px){
+  .audio-visualizer-page.is-visual-live .av-controls{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-volume-control{
+    grid-column:1 / -1;
+    justify-content:center;
+  }
+  .audio-visualizer-page .av-volume-control input[type="range"]{
+    width:min(180px, 42vw);
+  }
+}
+
+
+/* v20.18.5：本地音频进度条可拖动 + 双来源卡片居中 + live 圆角修正 */
+.audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+  grid-template-columns:repeat(2, minmax(280px, 440px))!important;
+  justify-content:center!important;
+  justify-items:stretch!important;
+  align-items:stretch!important;
+  width:min(980px, calc(100% - clamp(64px, 8vw, 150px)))!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-card{
+  width:100%!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-card:nth-child(1),
+.audio-visualizer-page:not(.is-visual-live) .av-source-card:nth-child(2){
+  justify-self:stretch!important;
+}
+
+/* 本地音频歌曲进度条：可点击、可拖动、可键盘微调 */
+.audio-visualizer-page .av-progress{
+  cursor:pointer!important;
+  position:relative!important;
+  overflow:visible!important;
+  touch-action:none!important;
+}
+.audio-visualizer-page .av-progress span{
+  position:relative!important;
+  overflow:visible!important;
+}
+.audio-visualizer-page .av-progress span::after{
+  content:"";
+  position:absolute;
+  right:-7px;
+  top:50%;
+  width:14px;
+  height:14px;
+  border-radius:999px;
+  transform:translateY(-50%) scale(.78);
+  background:rgba(248,250,252,.96);
+  box-shadow:
+    0 0 0 5px rgba(56,189,248,.16),
+    0 8px 20px rgba(0,0,0,.28);
+  opacity:0;
+  transition:opacity .16s ease, transform .16s ease;
+}
+.audio-visualizer-page .av-progress:hover span::after,
+.audio-visualizer-page .av-progress:focus-visible span::after,
+.audio-visualizer-page.is-seeking-local-audio .av-progress span::after{
+  opacity:1;
+  transform:translateY(-50%) scale(1);
+}
+.audio-visualizer-page .av-progress:focus-visible{
+  outline:2px solid rgba(125,211,252,.72)!important;
+  outline-offset:4px!important;
+}
+
+/* 正式播放后，舞台/画布保持圆角裁切，不再回到方形 */
+.audio-visualizer-page.is-visual-live .av-stage{
+  border-radius:clamp(38px, 4vw, 64px)!important;
+  overflow:hidden!important;
+  clip-path:inset(0 round clamp(38px, 4vw, 64px))!important;
+  -webkit-clip-path:inset(0 round clamp(38px, 4vw, 64px))!important;
+}
+.audio-visualizer-page.is-visual-live .av-canvas{
+  border-radius:inherit!important;
+  overflow:hidden!important;
+  clip-path:inset(0 round clamp(38px, 4vw, 64px))!important;
+  -webkit-clip-path:inset(0 round clamp(38px, 4vw, 64px))!important;
+}
+
+/* 控制按钮保持页面级，不依赖歌曲信息卡 */
+.audio-visualizer-page.is-visual-live .av-controls{
+  z-index:9999!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+
+/* 中小屏保持单列居中 */
+@media(max-width:900px){
+  .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+    grid-template-columns:minmax(0, 1fr)!important;
+    width:min(640px, calc(100% - 32px))!important;
+  }
+}
+@media(max-width:720px){
+  .audio-visualizer-page.is-visual-live .av-stage,
+  .audio-visualizer-page.is-visual-live .av-canvas{
+    border-radius:30px!important;
+    clip-path:inset(0 round 30px)!important;
+    -webkit-clip-path:inset(0 round 30px)!important;
+  }
+}
+
+
+/* v20.18.5：音频可视化卡片尺寸、返回键、live 控制区修正 */
+body:has(.audio-visualizer-page){
+  --av-nav-real-height: 82px;
+  --av-card-gutter: clamp(24px, 3vw, 52px);
+  --av-card-gap-y: clamp(10px, 1.6vh, 20px);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(14,165,233,.16), transparent 34%),
+    radial-gradient(circle at 84% 10%, rgba(168,85,247,.13), transparent 34%),
+    #071426!important;
+}
+main.tool-page.audio-visualizer-page,
+.audio-visualizer-page{
+  width:100%!important;
+  max-width:none!important;
+  min-height:calc(100svh - var(--av-nav-real-height))!important;
+  margin:0!important;
+  padding:var(--av-card-gap-y) 0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+
+/* 大卡片占据导航栏下方主要空间：不是横向贴边，也不是小卡嵌套 */
+.audio-visualizer-page .av-stage,
+.audio-visualizer-page.is-visual-live .av-stage{
+  width:calc(100vw - var(--av-card-gutter) * 2)!important;
+  max-width:1880px!important;
+  height:calc(100svh - var(--av-nav-real-height) - var(--av-card-gap-y) * 2)!important;
+  min-height:600px!important;
+  max-height:none!important;
+  margin:0 auto!important;
+  position:relative!important;
+  border:1px solid rgba(186,230,253,.22)!important;
+  border-radius:clamp(34px, 3.4vw, 56px)!important;
+  background:#020617!important;
+  overflow:hidden!important;
+  clip-path:inset(0 round clamp(34px, 3.4vw, 56px))!important;
+  -webkit-clip-path:inset(0 round clamp(34px, 3.4vw, 56px))!important;
+  box-shadow:
+    0 30px 95px rgba(0,0,0,.42),
+    inset 0 1px 0 rgba(255,255,255,.12)!important;
+}
+.audio-visualizer-page .av-stage::before,
+.audio-visualizer-page .av-stage::after{
+  content:none!important;
+  display:none!important;
+}
+.audio-visualizer-page .av-canvas{
+  width:100%!important;
+  height:100%!important;
+  border-radius:inherit!important;
+}
+
+/* 返回键对齐到音频大卡片左上角附近，而不是贴到页面最左 */
+body:has(.audio-visualizer-page) .back-icon-link[data-back-icon]{
+  position:fixed!important;
+  left:calc(var(--av-card-gutter) + 18px)!important;
+  top:calc(var(--av-nav-real-height) + var(--av-card-gap-y) + 18px)!important;
+  margin:0!important;
+  z-index:10000!important;
+  width:42px!important;
+  height:42px!important;
+  border-radius:999px!important;
+  background:rgba(15,23,42,.52)!important;
+  border:1px solid rgba(186,230,253,.22)!important;
+  color:rgba(248,250,252,.92)!important;
+  box-shadow:0 16px 38px rgba(0,0,0,.24)!important;
+  backdrop-filter:blur(14px)!important;
+  -webkit-backdrop-filter:blur(14px)!important;
+}
+
+/* 初始态双来源卡片保持居中对称 */
+.audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+  grid-template-columns:repeat(2, minmax(300px, 460px))!important;
+  justify-content:center!important;
+  justify-items:stretch!important;
+  width:min(1020px, calc(100% - clamp(70px, 8vw, 150px)))!important;
+  left:50%!important;
+  bottom:clamp(38px, 6vh, 76px)!important;
+  transform:translateX(-50%)!important;
+  margin:0!important;
+}
+.audio-visualizer-page:not(.is-visual-live) .av-source-card{
+  width:100%!important;
+  min-height:clamp(190px, 23vh, 260px)!important;
+}
+
+/* live 后：舞台仍然圆角；控制按钮是可视化卡片右上角的页面级控制区 */
+.audio-visualizer-page.is-visual-live .av-stage{
+  overflow:hidden!important;
+  border-radius:clamp(34px, 3.4vw, 56px)!important;
+  clip-path:inset(0 round clamp(34px, 3.4vw, 56px))!important;
+  -webkit-clip-path:inset(0 round clamp(34px, 3.4vw, 56px))!important;
+}
+.audio-visualizer-page.is-visual-live .av-canvas{
+  border-radius:inherit!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls{
+  display:flex!important;
+  position:absolute!important;
+  top:22px!important;
+  right:24px!important;
+  left:auto!important;
+  bottom:auto!important;
+  width:auto!important;
+  margin:0!important;
+  gap:12px!important;
+  align-items:center!important;
+  opacity:1!important;
+  transform:none!important;
+  z-index:80!important;
+  pointer-events:auto!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button,
+.audio-visualizer-page.is-visual-live .av-controls .av-volume-control{
+  flex:0 0 auto!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button{
+  min-width:104px!important;
+  min-height:46px!important;
+  padding:.76rem 1.02rem!important;
+  border-radius:999px!important;
+  background:rgba(9,17,34,.78)!important;
+  border:1px solid rgba(186,230,253,.36)!important;
+  color:rgba(248,250,252,.98)!important;
+  box-shadow:
+    0 18px 46px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.12)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button:hover,
+.audio-visualizer-page.is-visual-live .av-controls .av-button:focus-visible{
+  transform:translateY(-1px)!important;
+  background:rgba(14,165,233,.40)!important;
+  border-color:rgba(125,211,252,.68)!important;
+}
+
+/* 浏览器系统声没有本地文件，所以隐藏音量；本地文件显示音量与打开新文件 */
+.audio-visualizer-page.is-browser-audio-live .av-volume-control{
+  display:none!important;
+}
+
+/* 浏览器系统音频模式不显示歌曲小卡 */
+.audio-visualizer-page.is-browser-audio-live .av-now,
+.audio-visualizer-page.is-visual-live.is-browser-audio-live .av-now,
+.audio-visualizer-page.is-visual-live.is-browser-audio-live.has-track .av-now{
+  display:none!important;
+}
+
+/* 全屏时舞台真正铺满，控制区回到全屏右上角，不留导航栏空余 */
+.audio-visualizer-page .av-stage:fullscreen,
+.audio-visualizer-page .av-stage:-webkit-full-screen{
+  width:100vw!important;
+  height:100vh!important;
+  max-width:none!important;
+  max-height:none!important;
+  min-height:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  overflow:hidden!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+}
+.audio-visualizer-page .av-stage:fullscreen .av-canvas,
+.audio-visualizer-page .av-stage:-webkit-full-screen .av-canvas{
+  border-radius:0!important;
+  width:100%!important;
+  height:100%!important;
+}
+.audio-visualizer-page .av-stage:fullscreen .av-controls,
+.audio-visualizer-page .av-stage:-webkit-full-screen .av-controls{
+  position:absolute!important;
+  top:18px!important;
+  right:22px!important;
+  left:auto!important;
+  bottom:auto!important;
+  z-index:100!important;
+}
+
+/* 矮屏压缩，避免标题/卡片挤出 */
+@media(max-height:760px){
+  body:has(.audio-visualizer-page){
+    --av-card-gap-y: 10px;
+  }
+  .audio-visualizer-page .av-stage,
+  .audio-visualizer-page.is-visual-live .av-stage{
+    min-height:540px!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-topbar{
+    padding:26px clamp(42px, 6vw, 90px) 0!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-topbar h1{
+    font-size:clamp(3.6rem, 6vw, 6rem)!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+    bottom:24px!important;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-card{
+    min-height:166px!important;
+  }
+}
+@media(max-width:900px){
+  body:has(.audio-visualizer-page){
+    --av-card-gutter: 16px;
+  }
+  .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
+    grid-template-columns:minmax(0, 1fr)!important;
+    width:min(640px, calc(100% - 32px))!important;
+    position:relative!important;
+    left:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    margin:clamp(28px, 5vh, 46px) auto 42px!important;
+  }
+}
+@media(max-width:720px){
+  body:has(.audio-visualizer-page){
+    --av-nav-real-height: 74px;
+    --av-card-gap-y: 8px;
+    --av-card-gutter: 8px;
+  }
+  body:has(.audio-visualizer-page) .back-icon-link[data-back-icon]{
+    left:18px!important;
+    top:calc(var(--av-nav-real-height) + 14px)!important;
+  }
+  .audio-visualizer-page .av-stage,
+  .audio-visualizer-page.is-visual-live .av-stage{
+    border-radius:30px!important;
+    clip-path:inset(0 round 30px)!important;
+    -webkit-clip-path:inset(0 round 30px)!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls{
+    top:auto!important;
+    left:16px!important;
+    right:16px!important;
+    bottom:16px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls .av-volume-control{
+    grid-column:1 / -1!important;
+  }
+}

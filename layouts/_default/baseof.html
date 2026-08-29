@@ -61,6 +61,9 @@
 {{ partial "resource-hints.html" . }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/mobile-foundation.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/responsive.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-effects.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/navigation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/navigation-motion.css?v={{ $assetVersion }}">
 {{ if hasPrefix .RelPermalink "/tools/markdown-previewer/" }}
@@ -108,7 +111,11 @@
   <link id="songline-focus-style" rel="stylesheet" href="/css/tools/focus-timer.css?v={{ $assetVersion }}">
   {{ end }}
   {{ if hasPrefix .RelPermalink "/tools/audio-visualizer/" }}
-  <link id="songline-audio-style" rel="stylesheet" href="/css/tools/audio-visualizer.css?v={{ $assetVersion }}">
+  {{/* 音频可视化按原来的层叠顺序分层加载，避免后层覆盖关系改变。 */}}
+  <link id="songline-audio-foundation-style" rel="stylesheet" href="/css/tools/audio-visualizer-foundation.css?v={{ $assetVersion }}">
+  <link id="songline-audio-interface-style" rel="stylesheet" href="/css/tools/audio-visualizer-interface.css?v={{ $assetVersion }}">
+  <link id="songline-audio-stage-style" rel="stylesheet" href="/css/tools/audio-visualizer-stage.css?v={{ $assetVersion }}">
+  <link id="songline-audio-playback-style" rel="stylesheet" href="/css/tools/audio-visualizer-playback.css?v={{ $assetVersion }}">
   {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/2048/" }}
 <link id="songline-2048-style" rel="stylesheet" href="/css/tools/game-2048.css?v={{ $assetVersion }}">

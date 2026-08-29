@@ -37,6 +37,13 @@
       ensureStylesheet('songline-reader-floating-controls-style', '/css/reader-floating-controls.css');
       ensureStylesheet('songline-markdown-previewer-style', '/css/tools/markdown-previewer.css');
     }
+    if(path.indexOf('/tools/audio-visualizer/') === 0 || !!query(root, '[data-audio-visualizer], .audio-visualizer-page')){
+      // 与服务端直开页面保持一致：后面的样式层覆盖前面的历史规则。
+      ensureStylesheet('songline-audio-foundation-style', '/css/tools/audio-visualizer-foundation.css');
+      ensureStylesheet('songline-audio-interface-style', '/css/tools/audio-visualizer-interface.css');
+      ensureStylesheet('songline-audio-stage-style', '/css/tools/audio-visualizer-stage.css');
+      ensureStylesheet('songline-audio-playback-style', '/css/tools/audio-visualizer-playback.css');
+    }
     [
       ['songline-snake-style', '/tools/snake/', '[data-snake-game], .snake-tool-panel', '/css/tools/snake.css'],
       ['songline-2048-style', '/tools/2048/', '[data-game-2048], .tool-2048-page', '/css/tools/game-2048.css'],
@@ -44,8 +51,7 @@
       ['songline-reaction-style', '/tools/reaction-test/', '[data-reaction-test], .reaction-test-page', '/css/tools/reaction-test.css'],
       ['songline-flappy-style', '/tools/flappy-bird/', '[data-flappy-bird], .flappy-bird-page', '/css/tools/flappy-bird.css'],
       ['songline-typing-style', '/tools/typing-practice/', '[data-typing-practice], .typing-page', '/css/tools/typing-practice.css'],
-      ['songline-focus-style', '/tools/focus-timer/', '[data-focus-timer], .focus-timer-page', '/css/tools/focus-timer.css'],
-      ['songline-audio-style', '/tools/audio-visualizer/', '[data-audio-visualizer], .audio-visualizer-page', '/css/tools/audio-visualizer.css']
+      ['songline-focus-style', '/tools/focus-timer/', '[data-focus-timer], .focus-timer-page', '/css/tools/focus-timer.css']
     ].forEach(function(style){
       if(path.indexOf(style[1]) === 0 || !!query(root, style[2])){
         ensureStylesheet(style[0], style[3]);
@@ -145,6 +151,14 @@
       }
     },
     {
+      key:'audio-metadata',
+      src:'/js/tools/audio-metadata.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-audio-visualizer], .audio-visualizer-page, .av-canvas');
+      },
+      init:function(){}
+    },
+    {
       key:'audio-visualizer',
       src:'/js/tools/audio-visualizer.js?v=' + VERSION,
       test:function(root){
@@ -227,6 +241,8 @@
 
     loading[mod.key] = true;
     var script = document.createElement('script');
+    // 站内换页时，存在依赖关系的工具脚本也要按插入顺序执行。
+    script.async = false;
     script.defer = true;
     script.src = mod.src;
     script.dataset.pageScript = mod.key;

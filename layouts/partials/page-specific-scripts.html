@@ -46,6 +46,7 @@ v20.20.6：页面级 JS 按需加载。
 
 
 {{- if hasPrefix $rel "/tools/audio-visualizer/" }}
+<script defer data-page-script="audio-metadata" src="/js/tools/audio-metadata.js?v={{ $v }}"></script>
 <script defer data-page-script="audio-visualizer" src="/js/tools/audio-visualizer.js?v={{ $v }}"></script>
 {{- end }}
 {{- if hasPrefix $rel "/tools/focus-timer/" }}

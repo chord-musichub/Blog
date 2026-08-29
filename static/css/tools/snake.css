@@ -181,6 +181,7 @@ body.dark .snake-sound-toggle{
   body:not(.dark) .snake-mobile-pad button,body:not(.dark) .snake-mobile-pad [data-snake-dir]{background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.64),transparent 34%),linear-gradient(145deg,rgba(255,255,255,.90),rgba(226,236,248,.86))!important;color:#1e293b!important;border-color:rgba(148,163,184,.35)!important}
   .snake-mobile-pad button svg,.snake-mobile-pad button .ui-icon{width:30px!important;height:30px!important}
   .snake-mobile-pad [data-snake-dir="up"]{grid-column:2!important;grid-row:1!important}.snake-mobile-pad [data-snake-dir="left"]{grid-column:1!important;grid-row:2!important}.snake-mobile-pad [data-snake-dir="down"]{grid-column:2!important;grid-row:3!important}.snake-mobile-pad [data-snake-dir="right"]{grid-column:3!important;grid-row:2!important}
+  .snake-stage-wrap{margin-bottom:4px!important}
 }
 @media(max-width:430px){.snake-mobile-pad{grid-template-columns:repeat(3,70px)!important;grid-template-rows:repeat(3,62px)!important;gap:8px!important}.snake-mobile-pad button,.snake-mobile-pad [data-snake-dir]{width:70px!important;height:62px!important;min-width:70px!important;min-height:62px!important}}
 

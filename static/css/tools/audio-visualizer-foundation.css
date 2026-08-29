@@ -1,0 +1,271 @@
+/* 音频可视化样式层：audio-visualizer-foundation。按 baseof.html 与 page-modules.js 的既定顺序加载。 */
+
+/* 音频可视化工具页样式：仅在该工具页面加载。 */
+
+/* v20.18.5：音频可视化工具 */
+.audio-visualizer-page{
+  padding:0!important;
+  min-height:100vh;
+  background:#020617;
+  color:#f8fafc;
+}
+.av-stage{
+  position:relative;
+  min-height:100vh;
+  overflow:hidden;
+  isolation:isolate;
+  background:#020617;
+}
+.av-canvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  background:#020617;
+  z-index:0;
+}
+.av-noise{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  opacity:.12;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,.18) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,.12) 0 1px, transparent 1.5px);
+  background-size:42px 42px, 67px 67px;
+  mix-blend-mode:screen;
+}
+.av-vignette{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at center, transparent 0 44%, rgba(2,6,23,.44) 70%, rgba(2,6,23,.9) 100%),
+    linear-gradient(180deg, rgba(2,6,23,.52), transparent 28%, rgba(2,6,23,.72));
+}
+.av-topbar,
+.av-now,
+.av-controls,
+.av-bridge-card,
+.av-hint{
+  position:relative;
+  z-index:4;
+}
+.av-topbar{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  padding:clamp(22px, 4vw, 42px);
+}
+.av-topbar h1{
+  margin:.12em 0 0;
+  font-size:clamp(2.4rem, 7vw, 5.8rem);
+  line-height:.82;
+  letter-spacing:-.09em;
+  text-shadow:0 20px 70px rgba(56,189,248,.38);
+}
+.av-status-pill{
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(15,23,42,.42);
+  color:rgba(226,232,240,.88);
+  backdrop-filter:blur(14px);
+  border-radius:999px;
+  padding:.65rem .95rem;
+  box-shadow:0 16px 40px rgba(0,0,0,.22);
+  font-weight:850;
+}
+.av-status-pill.is-ok{
+  border-color:rgba(34,197,94,.38);
+  color:#dcfce7;
+  background:rgba(22,101,52,.32);
+}
+.av-now{
+  display:flex;
+  align-items:center;
+  gap:clamp(18px, 4vw, 34px);
+  width:min(920px, calc(100% - 32px));
+  margin:clamp(40px, 12vh, 130px) auto 0;
+  padding:clamp(18px, 3vw, 28px);
+  border:1px solid rgba(148,163,184,.22);
+  border-radius:34px;
+  background:linear-gradient(135deg, rgba(15,23,42,.54), rgba(15,23,42,.28));
+  backdrop-filter:blur(22px);
+  box-shadow:0 30px 100px rgba(0,0,0,.32);
+}
+.av-cover{
+  width:clamp(110px, 18vw, 190px);
+  aspect-ratio:1/1;
+  flex:0 0 auto;
+  border-radius:28px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.22);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255,255,255,.24), transparent 28%),
+    linear-gradient(135deg, rgba(14,165,233,.62), rgba(168,85,247,.42), rgba(244,63,94,.38));
+  box-shadow:0 24px 70px rgba(14,165,233,.24);
+}
+.av-cover img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.av-cover span{
+  font-size:clamp(3rem, 9vw, 6rem);
+  font-weight:900;
+  color:rgba(255,255,255,.9);
+}
+.av-track{
+  min-width:0;
+  flex:1;
+}
+.av-track > p:first-child{
+  margin:0 0 .45rem;
+  color:rgba(186,230,253,.9);
+  font-size:.82rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-weight:900;
+}
+.av-track h2{
+  margin:0;
+  font-size:clamp(2rem, 6vw, 4.6rem);
+  line-height:.92;
+  letter-spacing:-.07em;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.av-track h2 + p{
+  margin:.75rem 0 1rem;
+  color:rgba(226,232,240,.82);
+  font-weight:650;
+}
+.av-progress{
+  position:relative;
+  height:9px;
+  border-radius:999px;
+  background:rgba(148,163,184,.22);
+  overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.av-progress span{
+  display:block;
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg, #38bdf8, #a78bfa, #fb7185);
+  box-shadow:0 0 22px rgba(56,189,248,.6);
+  transition:width .28s linear;
+}
+.av-track small{
+  display:block;
+  margin-top:.55rem;
+  color:rgba(203,213,225,.72);
+  font-weight:750;
+}
+.av-controls{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+  width:min(920px, calc(100% - 32px));
+  margin:22px auto 0;
+}
+.av-button,
+.av-link-button{
+  border:1px solid rgba(148,163,184,.24);
+  background:rgba(15,23,42,.46);
+  color:rgba(248,250,252,.94);
+  border-radius:999px;
+  padding:.82rem 1.08rem;
+  font-weight:900;
+  cursor:pointer;
+  text-decoration:none;
+  backdrop-filter:blur(14px);
+  box-shadow:0 18px 42px rgba(0,0,0,.24);
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    background-color .16s ease,
+    box-shadow .16s ease,
+    color .16s ease;
+}
+.av-button.primary{
+  border-color:rgba(56,189,248,.42);
+  background:rgba(14,165,233,.28);
+}
+.av-button.danger{
+  border-color:rgba(251,113,133,.28);
+}
+.av-button:hover,
+.av-button:focus-visible,
+.av-link-button:hover,
+.av-link-button:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(125,211,252,.62);
+  background:rgba(14,165,233,.32);
+  box-shadow:0 24px 54px rgba(14,165,233,.24);
+  outline:none;
+}
+.av-button:active,
+.av-link-button:active{
+  transform:translateY(1px) scale(.985);
+}
+.av-bridge-card{
+  width:min(620px, calc(100% - 32px));
+  margin:22px auto 0;
+  padding:16px 18px;
+  border:1px solid rgba(148,163,184,.18);
+  border-radius:24px;
+  background:rgba(15,23,42,.34);
+  backdrop-filter:blur(16px);
+  color:rgba(226,232,240,.84);
+  box-shadow:0 18px 48px rgba(0,0,0,.22);
+}
+.av-bridge-card strong{
+  color:#f8fafc;
+}
+.av-bridge-card p{
+  margin:.45rem 0 .85rem;
+}
+.av-link-button{
+  display:inline-flex;
+  padding:.62rem .9rem;
+  font-size:.92rem;
+}
+.av-hint{
+  width:min(820px, calc(100% - 32px));
+  margin:18px auto 38px;
+  text-align:center;
+  color:rgba(203,213,225,.75);
+}
+@media(max-width:720px){
+  .av-topbar{
+    flex-direction:column;
+  }
+  .av-now{
+    align-items:flex-start;
+    flex-direction:column;
+    margin-top:18px;
+  }
+  .av-cover{
+    width:132px;
+    border-radius:22px;
+  }
+  .av-track h2{
+    white-space:normal;
+  }
+  .av-controls{
+    display:grid;
+    grid-template-columns:1fr;
+  }
+  .av-button{
+    min-height:48px;
+  }
+}

@@ -1,0 +1,990 @@
+/* 音频可视化样式层：audio-visualizer-interface。按 baseof.html 与 page-modules.js 的既定顺序加载。 */
+
+/* v20.18.5：音频可视化引导与站点风格统一 */
+.av-subtitle{
+  margin:.8rem 0 0;
+  color:rgba(203,213,225,.76);
+  font-weight:650;
+  max-width:38rem;
+}
+.av-status-stack{
+  display:flex;
+  align-items:flex-end;
+  flex-direction:column;
+  gap:8px;
+}
+.av-status-pill.is-soft{
+  background:rgba(15,23,42,.28);
+  color:rgba(203,213,225,.72);
+}
+.av-guide-panel{
+  position:relative;
+  z-index:4;
+  width:min(920px, calc(100% - 32px));
+  margin:18px auto 0;
+  display:grid;
+  grid-template-columns:1.25fr 1fr 1fr;
+  gap:12px;
+}
+.av-guide-card{
+  border:1px solid rgba(148,163,184,.2);
+  background:linear-gradient(135deg, rgba(15,23,42,.42), rgba(15,23,42,.22));
+  backdrop-filter:blur(18px);
+  border-radius:24px;
+  padding:15px 16px;
+  color:rgba(226,232,240,.82);
+  box-shadow:0 18px 46px rgba(0,0,0,.2);
+}
+.av-guide-card.is-primary{
+  border-color:rgba(56,189,248,.34);
+  background:
+    radial-gradient(circle at 18% 14%, rgba(56,189,248,.18), transparent 42%),
+    linear-gradient(135deg, rgba(15,23,42,.54), rgba(15,23,42,.25));
+}
+.av-guide-card span{
+  display:inline-flex;
+  align-items:center;
+  height:1.55rem;
+  padding:0 .55rem;
+  border-radius:999px;
+  background:rgba(14,165,233,.15);
+  color:#bae6fd;
+  font-size:.72rem;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.av-guide-card strong{
+  display:block;
+  margin:.62rem 0 .34rem;
+  color:#f8fafc;
+  font-size:1.05rem;
+}
+.av-guide-card p{
+  margin:0;
+  line-height:1.58;
+  font-size:.92rem;
+}
+.audio-visualizer-page .av-now,
+.audio-visualizer-page .av-guide-card,
+.audio-visualizer-page .av-bridge-card,
+.audio-visualizer-page .av-button,
+.audio-visualizer-page .av-link-button,
+.audio-visualizer-page .av-status-pill{
+  box-shadow:0 18px 54px rgba(2,6,23,.26);
+}
+.audio-visualizer-page .av-button.primary{
+  background:linear-gradient(135deg, rgba(14,165,233,.38), rgba(168,85,247,.24));
+}
+.audio-visualizer-page .av-bridge-card{
+  border-color:rgba(56,189,248,.2);
+}
+@media(max-width:900px){
+  .av-guide-panel{ grid-template-columns:1fr; }
+  .av-status-stack{ align-items:flex-start; }
+}
+
+
+/* v20.18.5：音频可视化 UI 聚焦优化 */
+.audio-visualizer-page .av-now,
+.audio-visualizer-page .av-guide-card,
+.audio-visualizer-page .av-bridge-card,
+.audio-visualizer-page .av-status-pill,
+.audio-visualizer-page .av-button,
+.audio-visualizer-page .av-link-button{
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+  mask-image:none!important;
+  -webkit-mask-image:none!important;
+}
+.audio-visualizer-page .av-now{
+  border-radius:38px!important;
+  overflow:hidden;
+  border-color:rgba(186,230,253,.2);
+  background:
+    radial-gradient(circle at 16% 12%, rgba(56,189,248,.14), transparent 34%),
+    linear-gradient(135deg, rgba(15,23,42,.62), rgba(15,23,42,.28))!important;
+}
+.audio-visualizer-page .av-guide-card,
+.audio-visualizer-page .av-bridge-card{
+  border-radius:30px!important;
+  overflow:hidden;
+}
+.audio-visualizer-page .av-cover{
+  border-radius:30px!important;
+}
+.audio-visualizer-page .av-button,
+.audio-visualizer-page .av-link-button{
+  border-radius:999px!important;
+}
+.av-source-guide{
+  align-items:stretch;
+}
+.av-capture-fallback{
+  cursor:default;
+}
+.av-capture-fallback summary{
+  list-style:none;
+  cursor:pointer;
+}
+.av-capture-fallback summary::-webkit-details-marker{
+  display:none;
+}
+.av-capture-fallback summary span,
+.av-capture-fallback summary strong{
+  pointer-events:none;
+}
+.av-capture-fallback .av-button{
+  margin-top:12px;
+  padding:.62rem .9rem;
+  font-size:.9rem;
+}
+.av-button.subtle{
+  background:rgba(15,23,42,.3);
+  color:rgba(226,232,240,.86);
+}
+.audio-visualizer-page.is-bridge-trying .av-guide-panel{
+  opacity:.72;
+}
+
+/* 正式接入音频后：把视觉中心还给 Canvas，只保留悬浮控制 */
+.audio-visualizer-page.is-visual-live .av-topbar{
+  opacity:0;
+  transform:translateY(-24px);
+  pointer-events:none;
+}
+.audio-visualizer-page.is-visual-live .av-guide-panel,
+.audio-visualizer-page.is-visual-live .av-bridge-card,
+.audio-visualizer-page.is-visual-live .av-hint{
+  opacity:0;
+  transform:translateY(28px);
+  pointer-events:none;
+}
+.audio-visualizer-page .av-topbar,
+.audio-visualizer-page .av-guide-panel,
+.audio-visualizer-page .av-bridge-card,
+.audio-visualizer-page .av-hint,
+.audio-visualizer-page .av-now,
+.audio-visualizer-page .av-controls{
+  transition:
+    opacity .36s ease,
+    transform .36s cubic-bezier(.22,1,.36,1),
+    width .36s cubic-bezier(.22,1,.36,1),
+    margin .36s cubic-bezier(.22,1,.36,1),
+    padding .36s cubic-bezier(.22,1,.36,1),
+    border-radius .36s cubic-bezier(.22,1,.36,1);
+}
+.audio-visualizer-page.is-visual-live .av-now{
+  position:fixed;
+  left:24px;
+  bottom:24px;
+  width:min(430px, calc(100vw - 48px));
+  margin:0;
+  padding:12px 14px;
+  gap:12px;
+  border-radius:28px!important;
+  opacity:.24;
+  transform:translateY(8px) scale(.985);
+  z-index:7;
+  background:rgba(15,23,42,.36)!important;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 20px 58px rgba(0,0,0,.25);
+}
+.audio-visualizer-page.is-visual-live .av-now:hover,
+.audio-visualizer-page.is-visual-live .av-now:focus-within{
+  opacity:1;
+  transform:translateY(0) scale(1);
+}
+.audio-visualizer-page.is-visual-live .av-cover{
+  width:64px;
+  border-radius:20px!important;
+}
+.audio-visualizer-page.is-visual-live .av-cover span{
+  font-size:2.4rem;
+}
+.audio-visualizer-page.is-visual-live .av-track > p:first-child{
+  margin-bottom:.18rem;
+  font-size:.68rem;
+  opacity:.75;
+}
+.audio-visualizer-page.is-visual-live .av-track h2{
+  font-size:1.35rem;
+  line-height:1;
+  letter-spacing:-.04em;
+}
+.audio-visualizer-page.is-visual-live .av-track h2 + p{
+  display:none;
+}
+.audio-visualizer-page.is-visual-live .av-progress{
+  height:6px;
+  margin-top:.5rem;
+}
+.audio-visualizer-page.is-visual-live .av-track small{
+  margin-top:.36rem;
+  font-size:.72rem;
+}
+.audio-visualizer-page.is-visual-live .av-controls{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  width:auto;
+  margin:0;
+  justify-content:flex-end;
+  opacity:.24;
+  transform:translateY(8px);
+  z-index:8;
+}
+.audio-visualizer-page.is-visual-live .av-controls:hover,
+.audio-visualizer-page.is-visual-live .av-controls:focus-within{
+  opacity:1;
+  transform:translateY(0);
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button{
+  padding:.66rem .88rem;
+  box-shadow:0 14px 34px rgba(0,0,0,.24);
+}
+.audio-visualizer-page.is-visual-live .av-canvas{
+  cursor:none;
+}
+@media(max-width:720px){
+  .audio-visualizer-page.is-visual-live .av-now{
+    left:12px;
+    right:12px;
+    bottom:96px;
+    width:auto;
+    opacity:.38;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls{
+    left:12px;
+    right:12px;
+    bottom:14px;
+    width:auto;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    opacity:.42;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls .av-button{
+    min-height:44px;
+  }
+}
+
+
+/* v20.18.5：音频可视化真实修复：移除原生捕获流程 + 中心无遮挡 */
+.audio-visualizer-page .av-source-panel{
+  position:relative;
+  z-index:4;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:16px;
+  width:min(920px, calc(100% - 32px));
+  margin:22px auto 0;
+}
+.audio-visualizer-page .av-source-card{
+  border:1px solid rgba(186,230,253,.18);
+  border-radius:34px!important;
+  padding:20px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(56,189,248,.13), transparent 38%),
+    linear-gradient(135deg, rgba(15,23,42,.56), rgba(15,23,42,.25));
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 24px 70px rgba(0,0,0,.24);
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+}
+.audio-visualizer-page .av-source-card.is-primary{
+  border-color:rgba(56,189,248,.36);
+  box-shadow:0 26px 80px rgba(14,165,233,.18);
+}
+.audio-visualizer-page .av-source-card span{
+  display:inline-flex;
+  margin-bottom:.55rem;
+  color:rgba(186,230,253,.86);
+  font-size:.72rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  font-weight:900;
+}
+.audio-visualizer-page .av-source-card strong{
+  display:block;
+  margin-bottom:.4rem;
+  color:#f8fafc;
+  font-size:1.2rem;
+}
+.audio-visualizer-page .av-source-card p{
+  margin:0 0 1rem;
+  color:rgba(203,213,225,.78);
+}
+.audio-visualizer-page .av-now,
+.audio-visualizer-page .av-source-card,
+.audio-visualizer-page .av-bridge-card{
+  border-radius:36px!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+  mask:none!important;
+  -webkit-mask:none!important;
+}
+.audio-visualizer-page .av-now::before,
+.audio-visualizer-page .av-now::after,
+.audio-visualizer-page .av-source-card::before,
+.audio-visualizer-page .av-source-card::after,
+.audio-visualizer-page .av-bridge-card::before,
+.audio-visualizer-page .av-bridge-card::after{
+  border-radius:inherit!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-source-panel{
+  opacity:0!important;
+  transform:translateY(28px)!important;
+  pointer-events:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-topbar,
+.audio-visualizer-page.is-visual-live .av-bridge-card,
+.audio-visualizer-page.is-visual-live .av-hint{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-now{
+  position:fixed!important;
+  left:20px!important;
+  bottom:20px!important;
+  top:auto!important;
+  width:min(390px, calc(100vw - 40px))!important;
+  margin:0!important;
+  padding:10px 12px!important;
+  gap:10px!important;
+  opacity:.18!important;
+  z-index:8!important;
+  border-radius:28px!important;
+  transform:translateY(10px) scale(.98)!important;
+  background:rgba(15,23,42,.28)!important;
+}
+.audio-visualizer-page.is-visual-live .av-now:hover,
+.audio-visualizer-page.is-visual-live .av-now:focus-within{
+  opacity:1!important;
+  transform:translateY(0) scale(1)!important;
+}
+.audio-visualizer-page.is-visual-live .av-cover{
+  width:58px!important;
+  border-radius:18px!important;
+}
+.audio-visualizer-page.is-visual-live .av-track h2{
+  font-size:1.18rem!important;
+  white-space:nowrap!important;
+}
+.audio-visualizer-page.is-visual-live .av-track h2 + p,
+.audio-visualizer-page.is-visual-live .av-track > p:first-child{
+  display:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls{
+  position:fixed!important;
+  right:20px!important;
+  bottom:20px!important;
+  width:auto!important;
+  margin:0!important;
+  opacity:.18!important;
+  z-index:9!important;
+  transform:translateY(10px)!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls:hover,
+.audio-visualizer-page.is-visual-live .av-controls:focus-within{
+  opacity:1!important;
+  transform:translateY(0)!important;
+}
+.audio-visualizer-page.is-visual-live .av-canvas{
+  z-index:0!important;
+}
+@media(max-width:720px){
+  .audio-visualizer-page .av-source-panel{
+    grid-template-columns:1fr;
+  }
+  .audio-visualizer-page.is-visual-live .av-now{
+    left:12px!important;
+    right:12px!important;
+    bottom:90px!important;
+    width:auto!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls{
+    left:12px!important;
+    right:12px!important;
+    bottom:12px!important;
+    width:auto!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+
+/* v20.18.5：音频可视化自动接入 + 初始隐藏歌曲信息 + 外框圆润 */
+.audio-visualizer-page{
+  padding:clamp(8px, 1.5vw, 18px)!important;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(14,165,233,.12), transparent 32%),
+    radial-gradient(circle at 80% 0%, rgba(168,85,247,.1), transparent 34%),
+    #020617!important;
+}
+.audio-visualizer-page .av-stage{
+  min-height:calc(100vh - clamp(16px, 3vw, 36px))!important;
+  border:1px solid rgba(186,230,253,.2)!important;
+  border-radius:clamp(28px, 4vw, 56px)!important;
+  overflow:hidden!important;
+  clip-path:inset(0 round clamp(28px, 4vw, 56px))!important;
+  -webkit-clip-path:inset(0 round clamp(28px, 4vw, 56px))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 28px 90px rgba(0,0,0,.38)!important;
+}
+.audio-visualizer-page .av-stage::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:inherit;
+}
+.audio-visualizer-page .av-canvas{
+  border-radius:inherit!important;
+}
+.audio-visualizer-page:fullscreen,
+.audio-visualizer-page .av-stage:fullscreen{
+  padding:0!important;
+  border-radius:0!important;
+  clip-path:none!important;
+}
+.audio-visualizer-page .av-now{
+  display:none!important;
+}
+.audio-visualizer-page.has-track .av-now,
+.audio-visualizer-page.is-visual-live.has-track .av-now{
+  display:flex!important;
+}
+.audio-visualizer-page .av-source-panel{
+  position:relative;
+  z-index:4;
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:16px;
+  width:min(920px, calc(100% - 32px));
+  margin:clamp(34px, 8vh, 92px) auto 0;
+}
+.audio-visualizer-page .av-source-card,
+.audio-visualizer-page .av-bridge-card,
+.audio-visualizer-page .av-now{
+  border-radius:36px!important;
+  overflow:hidden!important;
+  clip-path:none!important;
+  -webkit-clip-path:none!important;
+  mask:none!important;
+  -webkit-mask:none!important;
+  background-clip:padding-box!important;
+}
+.audio-visualizer-page .av-source-card{
+  border:1px solid rgba(186,230,253,.18);
+  padding:22px;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(56,189,248,.13), transparent 38%),
+    linear-gradient(135deg, rgba(15,23,42,.58), rgba(15,23,42,.25));
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 24px 70px rgba(0,0,0,.24);
+}
+.audio-visualizer-page .av-source-card.is-primary{
+  border-color:rgba(56,189,248,.38);
+  box-shadow:0 26px 80px rgba(14,165,233,.18);
+}
+.audio-visualizer-page .av-source-card span{
+  display:inline-flex;
+  margin-bottom:.55rem;
+  color:rgba(186,230,253,.86);
+  font-size:.72rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  font-weight:900;
+}
+.audio-visualizer-page .av-source-card strong{
+  display:block;
+  margin-bottom:.42rem;
+  color:#f8fafc;
+  font-size:1.24rem;
+}
+.audio-visualizer-page .av-source-card p{
+  margin:0 0 1rem;
+  color:rgba(203,213,225,.78);
+}
+.audio-visualizer-page .av-source-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.audio-visualizer-page .av-link-button.primary{
+  border-color:rgba(56,189,248,.42);
+  background:rgba(14,165,233,.28);
+}
+.audio-visualizer-page .av-topbar,
+.audio-visualizer-page .av-source-panel,
+.audio-visualizer-page .av-bridge-card,
+.audio-visualizer-page .av-hint,
+.audio-visualizer-page .av-controls,
+.audio-visualizer-page .av-now{
+  transition:
+    opacity .34s ease,
+    transform .34s cubic-bezier(.22,1,.36,1),
+    width .34s cubic-bezier(.22,1,.36,1),
+    bottom .34s cubic-bezier(.22,1,.36,1),
+    border-radius .34s cubic-bezier(.22,1,.36,1);
+}
+.audio-visualizer-page.is-visual-live .av-topbar,
+.audio-visualizer-page.is-visual-live .av-source-panel,
+.audio-visualizer-page.is-visual-live .av-bridge-card,
+.audio-visualizer-page.is-visual-live .av-hint{
+  opacity:0!important;
+  transform:translateY(24px)!important;
+  pointer-events:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-now{
+  position:fixed!important;
+  left:clamp(18px, 2vw, 28px)!important;
+  bottom:clamp(18px, 2vw, 28px)!important;
+  top:auto!important;
+  width:min(390px, calc(100vw - 40px))!important;
+  margin:0!important;
+  padding:10px 12px!important;
+  gap:10px!important;
+  opacity:.16!important;
+  z-index:8!important;
+  border-radius:28px!important;
+  transform:translateY(10px) scale(.98)!important;
+  background:rgba(15,23,42,.3)!important;
+}
+.audio-visualizer-page.is-visual-live .av-now:hover,
+.audio-visualizer-page.is-visual-live .av-now:focus-within{
+  opacity:1!important;
+  transform:translateY(0) scale(1)!important;
+}
+.audio-visualizer-page.is-visual-live .av-cover{
+  width:58px!important;
+  border-radius:18px!important;
+}
+.audio-visualizer-page.is-visual-live .av-track > p:first-child,
+.audio-visualizer-page.is-visual-live .av-track h2 + p{
+  display:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-track h2{
+  font-size:1.18rem!important;
+  white-space:nowrap!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls{
+  position:fixed!important;
+  right:clamp(18px, 2vw, 28px)!important;
+  bottom:clamp(18px, 2vw, 28px)!important;
+  width:auto!important;
+  margin:0!important;
+  opacity:.18!important;
+  z-index:9!important;
+  transform:translateY(10px)!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls:hover,
+.audio-visualizer-page.is-visual-live .av-controls:focus-within{
+  opacity:1!important;
+  transform:translateY(0)!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button{
+  padding:.66rem .88rem;
+}
+.audio-visualizer-page.is-visual-live .av-canvas{
+  cursor:none;
+}
+@media(max-width:720px){
+  .audio-visualizer-page{
+    padding:8px!important;
+  }
+  .audio-visualizer-page .av-stage{
+    min-height:calc(100vh - 16px)!important;
+    border-radius:30px!important;
+    clip-path:inset(0 round 30px)!important;
+  }
+  .audio-visualizer-page .av-source-panel{
+    grid-template-columns:1fr;
+    margin-top:20px;
+  }
+  .audio-visualizer-page.is-visual-live .av-now{
+    left:14px!important;
+    right:14px!important;
+    bottom:88px!important;
+    width:auto!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls{
+    left:14px!important;
+    right:14px!important;
+    bottom:14px!important;
+    width:auto!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+
+/* v20.18.5：音频可视化边框/来源区修正 */
+main.tool-page.audio-visualizer-page,
+.audio-visualizer-page{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+main.tool-page.audio-visualizer-page::before,
+main.tool-page.audio-visualizer-page::after,
+.audio-visualizer-page::before,
+.audio-visualizer-page::after{
+  display:none!important;
+}
+.audio-visualizer-page .av-stage{
+  border:1px solid rgba(186,230,253,.22)!important;
+  outline:0!important;
+  box-shadow:
+    0 26px 80px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.1)!important;
+}
+.audio-visualizer-page .av-stage::before,
+.audio-visualizer-page .av-stage::after{
+  display:none!important;
+}
+.audio-visualizer-page .av-bridge-card{
+  display:none!important;
+}
+.audio-visualizer-page .av-source-panel{
+  grid-template-columns:repeat(3, minmax(0, 1fr))!important;
+  width:min(1100px, calc(100% - 32px))!important;
+  margin-top:clamp(28px, 7vh, 82px)!important;
+}
+.audio-visualizer-page .av-source-card{
+  border-radius:34px!important;
+}
+.audio-visualizer-page .av-source-actions{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:10px!important;
+}
+.audio-visualizer-page .av-source-actions .av-link-button,
+.audio-visualizer-page .av-source-actions .av-button{
+  flex:0 1 auto;
+}
+.audio-visualizer-page.is-visual-live .av-source-panel{
+  opacity:0!important;
+  transform:translateY(24px)!important;
+  pointer-events:none!important;
+}
+@media(max-width:980px){
+  .audio-visualizer-page .av-source-panel{
+    grid-template-columns:1fr!important;
+    width:min(640px, calc(100% - 32px))!important;
+  }
+}
+@media(max-width:720px){
+  .audio-visualizer-page .av-source-panel{
+    width:calc(100% - 24px)!important;
+  }
+}
+
+
+/* v20.18.5：音频可视化单边框舞台 + live 后控制按钮/鼠标可见 */
+html:has(.audio-visualizer-page),
+body:has(.audio-visualizer-page){
+  background:#061226!important;
+}
+body:has(.audio-visualizer-page) main,
+body:has(.audio-visualizer-page) .site-main,
+body:has(.audio-visualizer-page) .page-main,
+body:has(.audio-visualizer-page) .content,
+body:has(.audio-visualizer-page) .content-shell,
+body:has(.audio-visualizer-page) .page-shell,
+body:has(.audio-visualizer-page) .main-shell,
+body:has(.audio-visualizer-page) .tool-shell{
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+main.tool-page.audio-visualizer-page,
+.audio-visualizer-page{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  min-height:100vh!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  background:transparent!important;
+  overflow:visible!important;
+}
+main.tool-page.audio-visualizer-page::before,
+main.tool-page.audio-visualizer-page::after,
+.audio-visualizer-page::before,
+.audio-visualizer-page::after{
+  content:none!important;
+  display:none!important;
+}
+.audio-visualizer-page .av-stage{
+  width:min(1680px, calc(100vw - clamp(28px, 4vw, 64px)))!important;
+  min-height:calc(100vh - clamp(28px, 4vw, 64px))!important;
+  margin:clamp(14px, 2vw, 32px) auto!important;
+  border:1px solid rgba(186,230,253,.22)!important;
+  border-radius:clamp(34px, 4vw, 58px)!important;
+  background:#020617!important;
+  overflow:hidden!important;
+  clip-path:inset(0 round clamp(34px, 4vw, 58px))!important;
+  -webkit-clip-path:inset(0 round clamp(34px, 4vw, 58px))!important;
+  box-shadow:
+    0 30px 95px rgba(0,0,0,.40),
+    inset 0 1px 0 rgba(255,255,255,.11)!important;
+}
+.audio-visualizer-page .av-stage::before,
+.audio-visualizer-page .av-stage::after{
+  content:none!important;
+  display:none!important;
+}
+.audio-visualizer-page .av-canvas{
+  border-radius:inherit!important;
+}
+
+/* 授权/播放后不要藏鼠标，控制按钮也不要半透明到找不到 */
+.audio-visualizer-page.is-visual-live .av-canvas,
+.audio-visualizer-page.is-browser-audio-live .av-canvas,
+.audio-visualizer-page .av-canvas{
+  cursor:auto!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls{
+  display:flex!important;
+  position:fixed!important;
+  right:clamp(22px, 3vw, 44px)!important;
+  bottom:clamp(22px, 3vw, 44px)!important;
+  width:auto!important;
+  margin:0!important;
+  opacity:.92!important;
+  z-index:20!important;
+  transform:none!important;
+  pointer-events:auto!important;
+  filter:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls:hover,
+.audio-visualizer-page.is-visual-live .av-controls:focus-within{
+  opacity:1!important;
+  transform:none!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:92px!important;
+  min-height:44px!important;
+  padding:.72rem 1rem!important;
+  border-radius:999px!important;
+  background:rgba(15,23,42,.58)!important;
+  border-color:rgba(186,230,253,.28)!important;
+  color:rgba(248,250,252,.96)!important;
+  backdrop-filter:blur(16px)!important;
+  -webkit-backdrop-filter:blur(16px)!important;
+  box-shadow:0 18px 46px rgba(0,0,0,.28)!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button:hover,
+.audio-visualizer-page.is-visual-live .av-controls .av-button:focus-visible{
+  background:rgba(14,165,233,.34)!important;
+  border-color:rgba(125,211,252,.62)!important;
+}
+.audio-visualizer-page.is-visual-live .av-source-panel,
+.audio-visualizer-page.is-visual-live .av-topbar,
+.audio-visualizer-page.is-visual-live .av-hint,
+.audio-visualizer-page.is-visual-live .av-bridge-card{
+  opacity:0!important;
+  pointer-events:none!important;
+}
+@media(max-width:720px){
+  .audio-visualizer-page .av-stage{
+    width:calc(100vw - 16px)!important;
+    min-height:calc(100vh - 16px)!important;
+    margin:8px auto!important;
+    border-radius:30px!important;
+    clip-path:inset(0 round 30px)!important;
+    -webkit-clip-path:inset(0 round 30px)!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls{
+    left:16px!important;
+    right:16px!important;
+    bottom:16px!important;
+    width:auto!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+}
+
+
+/* v20.18.5：音频可视化入口比例 + 浏览器音频无歌曲卡 + 全局控制按钮 */
+.audio-visualizer-page .av-stage{
+  position:relative!important;
+}
+.audio-visualizer-page .av-topbar{
+  position:relative!important;
+  z-index:5!important;
+  padding:
+    clamp(30px, 4.2vw, 66px)
+    clamp(36px, 5vw, 76px)
+    0!important;
+}
+.audio-visualizer-page .av-topbar h1{
+  font-size:clamp(3.4rem, 6.2vw, 7.2rem)!important;
+  letter-spacing:-.085em!important;
+}
+.audio-visualizer-page .av-status-stack{
+  margin-top:clamp(6px, 1vw, 14px)!important;
+}
+.audio-visualizer-page .av-source-panel{
+  position:absolute!important;
+  left:50%!important;
+  bottom:clamp(88px, 12vh, 150px)!important;
+  transform:translateX(-50%)!important;
+  width:min(1260px, calc(100% - clamp(72px, 8vw, 150px)))!important;
+  margin:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(3, minmax(0, 1fr))!important;
+  gap:clamp(18px, 2vw, 28px)!important;
+  align-items:stretch!important;
+  z-index:6!important;
+}
+.audio-visualizer-page .av-source-card{
+  min-height:clamp(208px, 24vh, 292px)!important;
+  padding:clamp(22px, 2vw, 30px)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  border-radius:34px!important;
+}
+.audio-visualizer-page .av-source-card span{
+  margin-bottom:.7rem!important;
+}
+.audio-visualizer-page .av-source-card strong{
+  font-size:clamp(1.15rem, 1.3vw, 1.45rem)!important;
+  line-height:1.18!important;
+}
+.audio-visualizer-page .av-source-card p{
+  flex:1 1 auto!important;
+  margin:.8rem 0 1.15rem!important;
+  line-height:1.72!important;
+}
+.audio-visualizer-page .av-source-actions{
+  margin-top:auto!important;
+}
+.audio-visualizer-page .av-controls{
+  z-index:18!important;
+}
+
+/* 浏览器授权系统声音只有频谱，不显示歌曲信息小浮窗 */
+.audio-visualizer-page.is-browser-audio-live .av-now{
+  display:none!important;
+}
+
+/* 正式进入可视化后：全屏/停止作为页面级浮动控制，而不是缩在信息卡里 */
+.audio-visualizer-page.is-visual-live .av-controls{
+  position:fixed!important;
+  top:clamp(34px, 4vw, 64px)!important;
+  right:clamp(34px, 4vw, 64px)!important;
+  left:auto!important;
+  bottom:auto!important;
+  width:auto!important;
+  margin:0!important;
+  display:flex!important;
+  gap:12px!important;
+  opacity:1!important;
+  transform:none!important;
+  z-index:60!important;
+  pointer-events:auto!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button{
+  min-width:104px!important;
+  min-height:46px!important;
+  padding:.78rem 1.08rem!important;
+  border-radius:999px!important;
+  background:rgba(15,23,42,.68)!important;
+  border:1px solid rgba(186,230,253,.32)!important;
+  color:rgba(248,250,252,.98)!important;
+  box-shadow:
+    0 18px 46px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.10)!important;
+  backdrop-filter:blur(18px)!important;
+  -webkit-backdrop-filter:blur(18px)!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button:hover,
+.audio-visualizer-page.is-visual-live .av-controls .av-button:focus-visible{
+  background:rgba(14,165,233,.38)!important;
+  border-color:rgba(125,211,252,.66)!important;
+  transform:translateY(-1px)!important;
+}
+.audio-visualizer-page.is-visual-live .av-controls .av-button.danger:hover,
+.audio-visualizer-page.is-visual-live .av-controls .av-button.danger:focus-visible{
+  background:rgba(244,63,94,.34)!important;
+  border-color:rgba(251,113,133,.58)!important;
+}
+
+/* 本地助手有真实歌曲时，歌曲卡仍保留在左下角；浏览器系统声不会显示 */
+.audio-visualizer-page.is-visual-live.has-track:not(.is-browser-audio-live) .av-now{
+  display:flex!important;
+  opacity:.34!important;
+}
+.audio-visualizer-page.is-visual-live.has-track:not(.is-browser-audio-live) .av-now:hover,
+.audio-visualizer-page.is-visual-live.has-track:not(.is-browser-audio-live) .av-now:focus-within{
+  opacity:1!important;
+}
+
+/* 入口高度不足时，卡片改成普通文档流，避免比例挤压 */
+@media(max-height:760px){
+  .audio-visualizer-page .av-source-panel{
+    position:relative!important;
+    left:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    width:min(1180px, calc(100% - 48px))!important;
+    margin:clamp(28px, 5vh, 42px) auto 0!important;
+  }
+  .audio-visualizer-page .av-source-card{
+    min-height:190px!important;
+  }
+}
+@media(max-width:1120px){
+  .audio-visualizer-page .av-source-panel{
+    position:relative!important;
+    left:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    width:min(720px, calc(100% - 40px))!important;
+    margin:clamp(28px, 5vh, 46px) auto 0!important;
+    grid-template-columns:1fr!important;
+  }
+  .audio-visualizer-page .av-source-card{
+    min-height:auto!important;
+  }
+}
+@media(max-width:720px){
+  .audio-visualizer-page .av-topbar{
+    padding:28px 24px 0!important;
+  }
+  .audio-visualizer-page .av-topbar h1{
+    font-size:clamp(2.8rem, 16vw, 4.6rem)!important;
+  }
+  .audio-visualizer-page.is-visual-live .av-controls{
+    top:auto!important;
+    left:16px!important;
+    right:16px!important;
+    bottom:16px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+}
