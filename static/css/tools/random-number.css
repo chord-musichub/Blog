@@ -1,0 +1,92 @@
+/* 随机数生成器：只在 /tools/random-number/ 加载。 */
+.random-tool-panel{
+  max-width:860px;
+  margin:24px auto 0;
+  padding:26px;
+}
+.random-form{
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:16px;
+  align-items:end;
+}
+.random-form label{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  color:var(--muted);
+  font-weight:750;
+}
+.random-form input{
+  width:100%;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--text);
+  border-radius:14px;
+  padding:12px 14px;
+  font:inherit;
+  outline:none;
+}
+.random-form input:focus{
+  border-color:var(--accent-2);
+  box-shadow:0 0 0 4px rgba(14,165,233,.10);
+}
+.random-generate-button{
+  min-height:50px;
+  white-space:nowrap;
+  border:1px solid rgba(14,165,233,.20);
+  transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.random-generate-button:hover,
+.random-generate-button:focus-visible{
+  background:var(--soft-blue)!important;
+  border-color:var(--accent-2)!important;
+  color:var(--accent-2)!important;
+  transform:translateY(-1px);
+  box-shadow:0 12px 28px rgba(14,165,233,.14);
+  filter:none;
+  outline:none;
+}
+.random-result-box{
+  margin-top:22px;
+  min-height:190px;
+  border:1px solid var(--border);
+  border-radius:22px;
+  background:radial-gradient(circle at 28% 20%, rgba(255,255,255,.72), transparent 34%),linear-gradient(135deg, var(--soft-blue), rgba(14,165,233,.08));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:26px;
+}
+.random-result-label{
+  color:var(--muted);
+  font-weight:800;
+  letter-spacing:.12em;
+  font-size:12.5px;
+}
+.random-result-box strong{
+  font-size:72px;
+  line-height:1.08;
+  color:var(--accent-2);
+  margin:8px 0;
+  word-break:break-all;
+}
+.random-result-box p{margin:0;color:var(--muted)}
+.random-result-box .error-note{color:#dc2626}
+body.dark .random-form input{background:rgba(15,23,42,.35)}
+body.dark .random-result-box{
+  background:radial-gradient(circle at 28% 20%, rgba(255,255,255,.08), transparent 34%),linear-gradient(135deg, #132b42, rgba(56,189,248,.10));
+}
+body.dark .random-generate-button:hover,
+body.dark .random-generate-button:focus-visible{
+  background:rgba(19,43,66,.96)!important;
+  border-color:#7dd3fc!important;
+  color:#ffffff!important;
+}
+@media(max-width:760px){
+  .random-form{grid-template-columns:1fr}
+  .random-generate-button{width:100%}
+  .random-result-box strong{font-size:56px}
+}

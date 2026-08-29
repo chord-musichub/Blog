@@ -98,5 +98,150 @@ html.boot-frame-settling .container{
   transform-style:preserve-3d;
 }
 
+/* 工具入口页卡片：只在 /tools/ 下按需加载。 */
+.tools-hero{
+  background-image:linear-gradient(135deg, rgba(234,246,255,.96), rgba(255,245,231,.76));
+}
+body.dark .tools-hero{
+  background-image:linear-gradient(135deg, rgba(19,43,66,.92), rgba(31,35,51,.72));
+}
+.tools-grid{
+  margin-top:28px;
+}
+.tool-card{
+  padding:24px;
+  display:grid;
+  grid-template-columns:74px minmax(0,1fr);
+  gap:20px;
+  align-items:center;
+}
+.tool-card-icon{
+  width:74px;
+  height:74px;
+  border-radius:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:850;
+  letter-spacing:.08em;
+  color:var(--accent-2);
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.76), transparent 34%),
+    linear-gradient(135deg, var(--soft-blue), rgba(14,165,233,.10));
+  border:1px solid rgba(14,165,233,.16);
+}
+.tool-card h2{margin:0 0 8px;font-size:26px}
+.tool-card p{margin:0;color:var(--muted)}
+.tool-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tool-tags span{
+  padding:5px 10px;
+  border-radius:999px;
+  background:rgba(234,246,255,.9);
+  color:var(--accent-2);
+  font-size:12.5px;
+  font-weight:700;
+}
+body.dark .tool-tags span{background:rgba(19,43,66,.86)}
+@media(max-width:620px){
+  .tool-card{
+    grid-template-columns:1fr;
+  }
+}
 
+/* 工具入口链接、详情返回入口及其交互。 */
+.tool-link-card{
+  position:relative;
+  color:inherit;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+.tool-link-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(14,165,233,.32);
+  box-shadow:0 22px 52px rgba(55,84,120,.12);
+}
+.tool-card-arrow{
+  position:absolute;
+  right:22px;
+  top:50%;
+  transform:translateY(-50%);
+  width:38px;
+  height:38px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--accent-2);
+  background:rgba(234,246,255,.86);
+  border:1px solid rgba(14,165,233,.16);
+  font-size:22px;
+  font-weight:800;
+}
+body.dark .tool-card-arrow{
+  background:rgba(19,43,66,.86);
+  border-color:rgba(125,211,252,.22);
+}
+.tool-detail-crumb{
+  position:relative;
+  z-index:1;
+  margin-bottom:12px;
+}
 
+/* 多个小游戏共用的前三名排行榜。 */
+.snake-leaderboard{margin-top:14px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--accent) 16%,var(--border));border-radius:18px;background:color-mix(in srgb,var(--panel) 78%,transparent)}
+.snake-leaderboard-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.snake-leaderboard-head strong{font-size:15px}.snake-leaderboard-head small{color:var(--muted)}
+.snake-leaderboard ol{display:grid;gap:8px;margin:0;padding:0;list-style:none}.snake-leaderboard li{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;border-radius:14px;background:color-mix(in srgb,var(--accent) 7%,transparent);color:var(--muted)}.snake-leaderboard li b{color:var(--text);font-size:18px}body.dark .snake-leaderboard{background:rgba(15,23,42,.42)}
+.tool-detail-crumb a{
+  display:inline-flex;
+  padding:7px 12px;
+  border-radius:999px;
+  background:rgba(255,253,250,.74);
+  color:var(--accent-2);
+  border:1px solid rgba(14,165,233,.16);
+  font-size:14px;
+  font-weight:750;
+}
+body.dark .tool-detail-crumb a{
+  background:rgba(15,23,42,.52);
+}
+.tool-card-icon,
+.tool-card-arrow,
+.tool-detail-crumb a{
+  transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease,filter .18s ease;
+}
+.tool-link-card:hover .tool-card-icon{
+  transform:translateY(-2px) scale(1.03);
+  border-color:var(--accent-2);
+  color:#ffffff;
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow:0 14px 30px rgba(14,165,233,.18);
+}
+.tool-link-card:hover .tool-card-arrow{
+  transform:translateY(-50%) translateX(3px);
+  border-color:var(--accent-2);
+  color:#ffffff;
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow:0 12px 24px rgba(14,165,233,.16);
+}
+.tool-detail-crumb a:hover{
+  transform:translateX(-2px);
+  border-color:var(--accent-2);
+  background:var(--soft-blue);
+  color:var(--accent-2);
+  box-shadow:0 10px 24px rgba(14,165,233,.10);
+}
+body.dark .tool-link-card:hover .tool-card-icon,
+body.dark .tool-link-card:hover .tool-card-arrow{
+  color:#fff;
+  border-color:#7dd3fc;
+  background:linear-gradient(135deg,#38bdf8,#2563eb);
+}
+@media(max-width:620px){
+  .tool-card-arrow{
+    position:static;
+    transform:none;
+    margin-top:8px;
+  }
+  .tool-link-card:hover .tool-card-arrow{
+    transform:translateX(3px);
+  }
+}

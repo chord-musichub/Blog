@@ -1,0 +1,21 @@
+/* 文章页与 Markdown 预览器共用的扩展渲染样式。 */
+.markdown-body ul ul,.markdown-body ul ol,.markdown-body ol ul,.markdown-body ol ol,
+.md-live-preview ul ul,.md-live-preview ul ol,.md-live-preview ol ul,.md-live-preview ol ol,
+.markdown-body li > ul,.markdown-body li > ol,.md-live-preview li > ul,.md-live-preview li > ol{
+  margin-top:.35em;
+  margin-bottom:.35em;
+}
+.markdown-body li > p,.md-live-preview li > p{margin:.35em 0}
+.md-code-block{margin:20px 0;border-radius:14px;overflow:hidden;background:#111827;box-shadow:0 12px 28px rgba(15,23,42,.10)}
+.md-code-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px;padding:7px 10px 7px 14px;background:#0b1220;border-bottom:1px solid rgba(148,163,184,.18)}
+.md-code-lang{color:#cbd5e1;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.md-code-copy{border:1px solid rgba(148,163,184,.28);border-radius:999px;background:rgba(15,23,42,.74);color:#e5edf8;padding:4px 10px;font-size:12px;font-weight:750;cursor:pointer;transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}
+.md-code-copy:hover,.md-code-copy.copied{background:rgba(56,189,248,.16);border-color:#38bdf8;color:#ffffff;transform:translateY(-1px)}
+.markdown-body .md-code-block pre,.md-live-preview .md-code-block pre{margin:0!important;border-radius:0!important;box-shadow:none!important}
+.markdown-body .md-code-block pre code,.md-live-preview .md-code-block pre code{white-space:pre}
+body.dark .md-code-block{box-shadow:0 16px 36px rgba(0,0,0,.25)}
+.markdown-body .footnotes,.md-live-preview .footnotes{margin-top:28px;color:var(--muted);font-size:.94em}
+.markdown-body .footnotes ol,.md-live-preview .footnotes ol{padding-left:1.45em}
+.markdown-body .footnote-ref,.md-live-preview .footnote-ref{font-size:.78em;padding-left:2px}
+.markdown-body .footnote-backref,.md-live-preview .footnote-backref{color:var(--accent-2);margin-left:6px}
+.markdown-body .md-code-block + .md-code-block,.md-live-preview .md-code-block + .md-code-block{margin-top:18px}

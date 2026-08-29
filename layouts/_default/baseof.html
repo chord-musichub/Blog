@@ -61,6 +61,14 @@
 {{ partial "resource-hints.html" . }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/navigation.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/navigation-motion.css?v={{ $assetVersion }}">
+{{ if hasPrefix .RelPermalink "/tools/markdown-previewer/" }}
+<link id="songline-markdown-previewer-base-style" rel="stylesheet" href="/css/tools/markdown-previewer-base.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if or (and .IsPage (eq .Section "posts")) (hasPrefix .RelPermalink "/tools/markdown-previewer/") }}
+<link id="songline-markdown-renderer-style" rel="stylesheet" href="/css/markdown-renderer.css?v={{ $assetVersion }}">
+{{ end }}
 {{ if .IsHome }}
 <link id="songline-home-style" rel="stylesheet" href="/css/home.css?v={{ $assetVersion }}">
 {{ end }}
@@ -74,36 +82,42 @@
 <link id="songline-article-reader-style" rel="stylesheet" href="/css/article-reader.css?v={{ $assetVersion }}">
 <link id="songline-reader-floating-controls-style" rel="stylesheet" href="/css/reader-floating-controls.css?v={{ $assetVersion }}">
 {{ end }}
+{{ if hasPrefix .RelPermalink "/tools/markdown-previewer/" }}
+<link id="songline-markdown-previewer-style" rel="stylesheet" href="/css/tools/markdown-previewer.css?v={{ $assetVersion }}">
+{{ end }}
 {{ if and .IsSection (eq .Section "posts") }}
 <link id="songline-posts-list-style" rel="stylesheet" href="/css/posts-list.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/reaction-test/" }}
-<link rel="stylesheet" href="/css/tools/reaction-test.css?v={{ $assetVersion }}">
+<link id="songline-reaction-style" rel="stylesheet" href="/css/tools/reaction-test.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/flappy-bird/" }}
-<link rel="stylesheet" href="/css/tools/flappy-bird.css?v={{ $assetVersion }}">
+<link id="songline-flappy-style" rel="stylesheet" href="/css/tools/flappy-bird.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/typing-practice/" }}
-<link rel="stylesheet" href="/css/tools/typing-practice.css?v={{ $assetVersion }}">
+<link id="songline-typing-style" rel="stylesheet" href="/css/tools/typing-practice.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if hasPrefix .RelPermalink "/tools/random-number/" }}
+<link id="songline-random-number-style" rel="stylesheet" href="/css/tools/random-number.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/" }}
 <link id="songline-tool-shared-style" rel="stylesheet" href="/css/tool-shared.css?v={{ $assetVersion }}">
 {{ end }}
 <link rel="stylesheet" href="/css/runtime-animation.css?v={{ $assetVersion }}">
   {{ if hasPrefix .RelPermalink "/tools/focus-timer/" }}
-  <link rel="stylesheet" href="/css/tools/focus-timer.css?v={{ $assetVersion }}">
+  <link id="songline-focus-style" rel="stylesheet" href="/css/tools/focus-timer.css?v={{ $assetVersion }}">
   {{ end }}
   {{ if hasPrefix .RelPermalink "/tools/audio-visualizer/" }}
-  <link rel="stylesheet" href="/css/tools/audio-visualizer.css?v={{ $assetVersion }}">
+  <link id="songline-audio-style" rel="stylesheet" href="/css/tools/audio-visualizer.css?v={{ $assetVersion }}">
   {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/2048/" }}
-<link rel="stylesheet" href="/css/tools/game-2048.css?v={{ $assetVersion }}">
+<link id="songline-2048-style" rel="stylesheet" href="/css/tools/game-2048.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/snake/" }}
-<link rel="stylesheet" href="/css/tools/snake.css?v={{ $assetVersion }}">
+<link id="songline-snake-style" rel="stylesheet" href="/css/tools/snake.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/gacha/" }}
-<link rel="stylesheet" href="/css/tools/gacha.css?v={{ $assetVersion }}">
+<link id="songline-gacha-style" rel="stylesheet" href="/css/tools/gacha.css?v={{ $assetVersion }}">
 {{ end }}
 <link rel="stylesheet" href="/css/theme-vars.css?v={{ $assetVersion }}">
   <script defer src="/js/performance-guard.js?v={{ $assetVersion }}"></script>

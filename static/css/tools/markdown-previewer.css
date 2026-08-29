@@ -1,0 +1,57 @@
+/* Markdown 预览器：编辑区、渲染区和目录抽屉的页面专属布局。 */
+.md-tool-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:28px;align-items:start}
+.md-tool-layout .md-tool-panel{min-width:0}
+.md-tool-toc{position:sticky;top:110px;max-height:calc(100vh - 130px);overflow:auto}
+@media(max-width:980px){
+  .md-tool-layout{grid-template-columns:1fr}
+  .md-tool-toc{display:block;position:static;max-height:none}
+}
+
+.md-tool-layout.article-shell{display:grid!important;grid-template-columns:minmax(0,1fr) 260px!important;gap:28px!important;align-items:start!important;width:100%}
+.md-tool-layout .md-tool-panel{min-width:0;padding:24px}
+.md-tool-layout .md-tool-toc{padding:22px;position:sticky;top:110px;max-height:calc(100vh - 130px);overflow:auto;box-sizing:border-box}
+.md-tool-layout[data-toc-state="collapsed"]{grid-template-columns:minmax(0,1fr) 64px!important}
+.md-tool-layout[data-toc-state="collapsed"] .md-tool-toc{width:64px;min-height:64px;padding:14px 10px;overflow:hidden;cursor:pointer}
+.md-tool-layout[data-toc-state="collapsed"] .md-tool-toc .toc-head h3{writing-mode:vertical-rl;margin:auto;font-size:16px;white-space:nowrap}
+.md-tool-layout[data-toc-state="collapsed"] .md-tool-toc .toc-body{display:none}
+.md-tool-layout[data-toc-state="expanded"]{grid-template-columns:minmax(0,1fr) 260px!important}
+.md-tool-layout[data-toc-state="expanded"] .md-tool-toc{width:auto;cursor:pointer}
+.md-tool-layout .md-tool-toc .toc-body{margin-top:14px}
+.md-tool-layout .md-tool-toc nav ul{list-style:none;padding-left:0;margin:0}
+.md-tool-layout .md-tool-toc nav li{margin:4px 0}
+.md-tool-layout .md-tool-toc .toc-level-1{margin-left:0;font-weight:800}
+.md-tool-layout .md-tool-toc .toc-level-2{margin-left:14px}
+.md-tool-layout .md-tool-toc .toc-level-3{margin-left:28px}
+.md-tool-layout .md-tool-toc .toc-level-4{margin-left:42px}
+.md-tool-layout.article-shell .md-tool-panel-single{width:100%;max-width:none!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box}
+.md-tool-layout .md-live-preview.md-render-only{min-height:640px;width:100%;box-sizing:border-box}
+.md-tool-layout .md-live-preview .md-empty-state{min-height:520px}
+.md-tool-layout .md-drop-zone{min-height:120px}
+@media(max-width:980px){
+  .md-tool-layout.article-shell,
+  .md-tool-layout[data-toc-state="collapsed"],
+  .md-tool-layout[data-toc-state="expanded"]{grid-template-columns:1fr!important}
+  .md-tool-layout .md-tool-toc{position:static;width:auto!important;max-height:none;min-height:auto;padding:18px 20px}
+  .md-tool-layout[data-toc-state="collapsed"] .md-tool-toc .toc-head h3{writing-mode:horizontal-tb;margin:0}
+  .md-tool-layout[data-toc-state="collapsed"] .md-tool-toc .toc-body{display:none}
+  .md-tool-layout .md-live-preview.md-render-only{min-height:520px}
+  .md-tool-layout .md-live-preview .md-empty-state{min-height:420px}
+}
+
+/* 预览器阅读区外侧的快捷置顶 / 置底按钮。 */
+.tool-page-top-button,
+.tool-page-bottom-button{
+  right:max(22px, calc((100vw - 1280px)/2 + 76px)) !important;
+}
+.tool-page-top-button{bottom:118px !important}
+.tool-page-bottom-button{bottom:58px !important}
+@media(max-width:760px){
+  .tool-page-top-button{
+    right:14px !important;
+    bottom:124px !important;
+  }
+  .tool-page-bottom-button{
+    right:14px !important;
+    bottom:70px !important;
+  }
+}

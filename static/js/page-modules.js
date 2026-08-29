@@ -20,10 +20,37 @@
 
   function syncPageStyles(root){
     var path = window.location.pathname || '';
+    if(path.indexOf('/posts/') === 0 || !!query(root, '.markdown-body, [data-article-renderer="songline-markdown"]')){
+      ensureStylesheet('songline-markdown-renderer-style', '/css/markdown-renderer.css');
+    }
     var isToolsPage = path.indexOf('/tools/') === 0 || !!query(root, '.tools-grid, .tool-card, .md-tool-layout, [data-snake-game], [data-game-2048]');
     if(isToolsPage){
       ensureStylesheet('songline-tool-shared-style', '/css/tool-shared.css');
     }
+    if(path.indexOf('/tools/random-number/') === 0 || !!query(root, '[data-random-tool], .random-tool-panel')){
+      ensureStylesheet('songline-random-number-style', '/css/tools/random-number.css');
+    }
+    if(path.indexOf('/tools/markdown-previewer/') === 0 || !!query(root, '[data-md-tool], .md-tool-layout')){
+      // 动态换页时明确维持与服务端直开一致的层级顺序。
+      ensureStylesheet('songline-markdown-previewer-base-style', '/css/tools/markdown-previewer-base.css');
+      ensureStylesheet('songline-article-reader-style', '/css/article-reader.css');
+      ensureStylesheet('songline-reader-floating-controls-style', '/css/reader-floating-controls.css');
+      ensureStylesheet('songline-markdown-previewer-style', '/css/tools/markdown-previewer.css');
+    }
+    [
+      ['songline-snake-style', '/tools/snake/', '[data-snake-game], .snake-tool-panel', '/css/tools/snake.css'],
+      ['songline-2048-style', '/tools/2048/', '[data-game-2048], .tool-2048-page', '/css/tools/game-2048.css'],
+      ['songline-gacha-style', '/tools/gacha/', '[data-gacha], .gacha-tool-panel', '/css/tools/gacha.css'],
+      ['songline-reaction-style', '/tools/reaction-test/', '[data-reaction-test], .reaction-test-page', '/css/tools/reaction-test.css'],
+      ['songline-flappy-style', '/tools/flappy-bird/', '[data-flappy-bird], .flappy-bird-page', '/css/tools/flappy-bird.css'],
+      ['songline-typing-style', '/tools/typing-practice/', '[data-typing-practice], .typing-page', '/css/tools/typing-practice.css'],
+      ['songline-focus-style', '/tools/focus-timer/', '[data-focus-timer], .focus-timer-page', '/css/tools/focus-timer.css'],
+      ['songline-audio-style', '/tools/audio-visualizer/', '[data-audio-visualizer], .audio-visualizer-page', '/css/tools/audio-visualizer.css']
+    ].forEach(function(style){
+      if(path.indexOf(style[1]) === 0 || !!query(root, style[2])){
+        ensureStylesheet(style[0], style[3]);
+      }
+    });
   }
 
   var modules = [

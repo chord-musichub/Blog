@@ -158,6 +158,8 @@ body.dark .snake-sound-toggle{
 .snake-mobile-pad button:hover{
   transform:translateY(-1px);
 }
+.snake-mobile-pad button{display:grid;place-items:center}
+.snake-mobile-pad svg{width:22px!important;height:22px!important}
 @media(max-width:720px){
   .snake-head{
     flex-direction:column;
@@ -169,6 +171,18 @@ body.dark .snake-sound-toggle{
     display:grid;
   }
 }
+
+/* 手机端最终操作层：只保留方向键，棋盘点击/遮罩负责开始与暂停。 */
+@media(max-width:820px){
+  .snake-game [data-snake-start],.snake-game [data-snake-pause],.snake-game [data-snake-mobile-start],.snake-tool-panel [data-snake-start],.snake-tool-panel [data-snake-pause],.snake-tool-panel [data-snake-mobile-start],.snake-controls,.snake-mobile-action{display:none!important;visibility:hidden!important;opacity:0!important;width:0!important;height:0!important;min-width:0!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;overflow:hidden!important;pointer-events:none!important}
+  .snake-mobile-panel{display:grid!important;grid-template-columns:1fr!important;justify-items:center!important;align-items:center!important;width:100%!important;max-width:430px!important;margin-inline:auto!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+  .snake-mobile-pad{display:grid!important;grid-template-columns:repeat(3,76px)!important;grid-template-rows:repeat(3,68px)!important;gap:9px!important;justify-content:center!important;align-items:center!important;width:auto!important;max-width:none!important;margin:0 auto!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+  .snake-mobile-pad button,.snake-mobile-pad [data-snake-dir]{display:grid!important;place-items:center!important;width:76px!important;height:68px!important;min-width:76px!important;min-height:68px!important;padding:0!important;margin:0!important;border-radius:22px!important;border:1px solid color-mix(in srgb,var(--accent) 28%,transparent)!important;background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.18),transparent 32%),linear-gradient(145deg,rgba(15,23,42,.72),rgba(30,41,59,.82))!important;color:var(--text)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 12px 26px rgba(15,23,42,.18)!important;appearance:none!important;-webkit-appearance:none!important}
+  body:not(.dark) .snake-mobile-pad button,body:not(.dark) .snake-mobile-pad [data-snake-dir]{background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.64),transparent 34%),linear-gradient(145deg,rgba(255,255,255,.90),rgba(226,236,248,.86))!important;color:#1e293b!important;border-color:rgba(148,163,184,.35)!important}
+  .snake-mobile-pad button svg,.snake-mobile-pad button .ui-icon{width:30px!important;height:30px!important}
+  .snake-mobile-pad [data-snake-dir="up"]{grid-column:2!important;grid-row:1!important}.snake-mobile-pad [data-snake-dir="left"]{grid-column:1!important;grid-row:2!important}.snake-mobile-pad [data-snake-dir="down"]{grid-column:2!important;grid-row:3!important}.snake-mobile-pad [data-snake-dir="right"]{grid-column:3!important;grid-row:2!important}
+}
+@media(max-width:430px){.snake-mobile-pad{grid-template-columns:repeat(3,70px)!important;grid-template-rows:repeat(3,62px)!important;gap:8px!important}.snake-mobile-pad button,.snake-mobile-pad [data-snake-dir]{width:70px!important;height:62px!important;min-width:70px!important;min-height:62px!important}}
 
 
 /* v15.3：贪吃蛇交互细节与手机适配 */
@@ -299,3 +313,63 @@ body.dark .snake-sound-toggle:hover{
   padding:0 16px;
 }
 
+/* 贪吃蛇小屏操作区与棋盘比例。 */
+@media(max-width:760px){
+  .snake-tool-panel{padding:18px 14px!important;margin-left:-2px;margin-right:-2px}
+  .snake-head{gap:14px!important}
+  .snake-head h2{font-size:24px}
+  .snake-head p{font-size:14px}
+  .snake-stats{width:100%;display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px!important}
+  .snake-stats span{justify-content:center;padding:8px 7px!important;font-size:12.5px}
+  .snake-stage-wrap{width:100%;max-width:min(92vw, 430px);margin:0 auto}
+  .snake-canvas{width:100%!important;height:auto!important;aspect-ratio:1 / 1;touch-action:none}
+  .snake-controls{display:grid!important;grid-template-columns:1fr 1fr;gap:10px!important}
+  .snake-controls .btn{min-height:48px;padding:12px 10px;font-size:15px}
+  .snake-sound-toggle{grid-column:1 / -1;justify-content:center;min-height:46px}
+  .snake-help{display:none!important}
+  .snake-mobile-pad{display:grid!important;grid-template-columns:76px 76px 76px!important;gap:14px!important;margin-top:20px!important;touch-action:none;user-select:none}
+  .snake-mobile-pad button{width:76px!important;height:76px!important;border-radius:24px!important;font-size:34px!important;box-shadow:0 12px 28px rgba(55,84,120,.12);-webkit-tap-highlight-color:transparent}
+  .snake-mobile-pad button:active{transform:scale(.96)}
+}
+@media(max-width:380px){
+  .snake-mobile-pad{grid-template-columns:68px 68px 68px!important;gap:12px!important}
+  .snake-mobile-pad button{width:68px!important;height:68px!important;font-size:30px!important}
+}
+
+/* 街机 HUD、特殊道具和可读性收口。 */
+.snake-head p{max-width:520px}
+.snake-arcade-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:-4px auto 16px}
+.snake-chip{
+  display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 12px;border-radius:999px;
+  border:1px solid color-mix(in srgb, var(--accent) 18%, var(--border));background:color-mix(in srgb, var(--panel) 76%, transparent);
+  color:var(--muted);font-weight:780;font-size:13px;box-shadow:0 10px 24px rgba(55,84,120,.06);
+}
+.snake-chip.is-hot{
+  color:#12345a;border-color:rgba(250,204,21,.46);
+  background:radial-gradient(circle at 18% 20%, rgba(255,255,255,.70), transparent 34%),linear-gradient(135deg, rgba(254,243,199,.92), rgba(224,242,254,.74));
+  box-shadow:0 12px 28px rgba(250,204,21,.13);
+}
+body.dark .snake-chip{background:rgba(15,23,42,.48);border-color:rgba(56,189,248,.20)}
+body.dark .snake-chip.is-hot{color:#f8fafc;border-color:rgba(250,204,21,.42);background:linear-gradient(135deg, rgba(120,53,15,.62), rgba(30,41,59,.74))}
+.snake-tip{color:var(--accent-2);max-width:min(100%, 760px)!important;letter-spacing:.01em}
+.snake-stage-wrap{position:relative}
+.snake-stage-wrap::after{
+  content:"";position:absolute;inset:14px;border-radius:18px;pointer-events:none;
+  background:radial-gradient(circle at 16% 18%, rgba(250,204,21,.10), transparent 22%),radial-gradient(circle at 82% 16%, rgba(34,197,94,.09), transparent 20%),radial-gradient(circle at 70% 78%, rgba(168,85,247,.08), transparent 24%);
+  mix-blend-mode:screen;opacity:.72;
+}
+.snake-rush.is-hot{
+  border-color:rgba(251,113,133,.55)!important;background:linear-gradient(135deg, rgba(251,113,133,.22), rgba(250,204,21,.16))!important;
+  color:#be123c!important;box-shadow:0 0 0 1px rgba(251,113,133,.18), 0 12px 26px rgba(251,113,133,.12)!important;animation:snakeRushChipPulse 950ms ease-in-out infinite alternate;
+}
+body.dark .snake-rush.is-hot{color:#fecdd3!important}
+.snake-overlay [data-snake-overlay-text]{max-width:34rem;line-height:1.75}
+@keyframes snakeRushChipPulse{
+  from{transform:translateY(0);filter:saturate(1)}
+  to{transform:translateY(-1px);filter:saturate(1.16)}
+}
+@media(max-width:720px){
+  .snake-arcade-strip{justify-content:flex-start;margin-top:0}
+  .snake-chip{min-height:30px;padding:6px 9px;font-size:12px}
+  .snake-tip{flex-basis:100%;justify-content:flex-start}
+}
