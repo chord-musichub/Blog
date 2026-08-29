@@ -16,7 +16,9 @@ var (
 	unsafeUploadNameRE = regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
 	allowedMediaExts   = map[string]struct{}{
 		".jpg": {}, ".jpeg": {}, ".png": {}, ".webp": {}, ".svg": {}, ".gif": {}, ".ico": {},
-		".pdf": {}, ".zip": {}, ".mp3": {}, ".wav": {}, ".txt": {}, ".md": {}, ".markdown": {},
+		".pdf": {}, ".zip": {}, ".mp3": {}, ".wav": {}, ".m4a": {}, ".ogg": {},
+		".mp4": {}, ".webm": {}, ".mov": {},
+		".txt": {}, ".md": {}, ".markdown": {},
 	}
 )
 

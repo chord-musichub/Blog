@@ -87,7 +87,7 @@ func (app *App) uploadMediaFile(w http.ResponseWriter, r *http.Request, media me
 
 	ext := strings.ToLower(filepath.Ext(header.Filename))
 	if !isAllowedMediaExtension(ext) {
-		app.renderMediaLibrary(w, r, media, map[string]any{"Error": "只允许上传图片、pdf、zip、mp3、wav、txt、md"})
+		app.renderMediaLibrary(w, r, media, map[string]any{"Error": "只允许上传图片、视频（mp4/webm/mov）、音频、pdf、zip、txt、md"})
 		return
 	}
 	name := safeUploadName(strings.TrimSpace(r.FormValue("filename")))

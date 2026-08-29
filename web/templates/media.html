@@ -109,14 +109,14 @@ html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
   <section class="card">
     <h2>上传文件</h2>
     <form method="post" action="{{adminURL "/admin/media"}}" enctype="multipart/form-data" class="media-upload-form">
-      <input type="file" name="media" accept=".jpg,.jpeg,.png,.webp,.svg,.gif,.ico,.pdf,.zip,.mp3,.wav,.txt,.md,.markdown,image/*,application/pdf,audio/*">
+      <input type="file" name="media" accept=".jpg,.jpeg,.png,.webp,.svg,.gif,.ico,.pdf,.zip,.mp3,.wav,.m4a,.ogg,.mp4,.webm,.mov,.txt,.md,.markdown,image/*,application/pdf,audio/*,video/mp4,video/webm,video/quicktime">
       <label class="media-name-field">自定义文件名，可选
         <input name="filename" placeholder="例如 logo.png / notes.pdf / demo.zip / music.mp3">
         <small>留空会使用原文件名；只建议用英文、数字、横线和下划线。</small>
       </label>
       <button><span class="btn-ico" aria-hidden="true">⇧</span><span class="btn-text">上传并重建公开站</span></button>
     </form>
-    <p class="meta">支持图片、pdf、zip、mp3、wav、txt、md。每个账号的文件会放在自己的目录里，不会和其他作者混在一起。</p>
+    <p class="meta">支持图片、视频（mp4 / webm / mov）、音频、pdf、zip、txt、md；默认单文件上限 512MB。每个账号的文件会放在自己的目录里，不会和其他作者混在一起。</p>
   </section>
 
   <section class="card">

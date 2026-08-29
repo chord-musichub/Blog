@@ -97,6 +97,14 @@ body.dark .modern-nav-links a.active{
 .modern-nav-links a:not(:hover):not(.active):not(:focus-visible){
   text-shadow:none!important;
 }
+.header-icons .header-submit-link{
+  width:auto;
+  min-width:0;
+  padding:0 15px;
+  font-size:14px;
+  font-weight:800;
+  text-decoration:none;
+}
 body.dark .modern-nav-links .songline-nav-slider{
   background:
     linear-gradient(135deg, rgba(56,189,248,.38), rgba(37,99,235,.28)),

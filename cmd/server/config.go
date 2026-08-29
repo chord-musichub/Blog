@@ -72,7 +72,7 @@ func loadConfig() Config {
 		PublicAPIURL:      strings.TrimRight(strings.TrimSpace(get("PUBLIC_API_URL", "")), "/"),
 		PublicCORSOrigins: get("PUBLIC_CORS_ORIGINS", ""),
 		HugoBuildTimeout:  positiveDurationSeconds(get("HUGO_BUILD_TIMEOUT_SECONDS", "180"), 180),
-		MaxUploadBytes:    positiveByteLimit(get("MAX_UPLOAD_BYTES", "104857600"), 100*1024*1024),
+		MaxUploadBytes:    positiveByteLimit(get("MAX_UPLOAD_BYTES", "536870912"), 512*1024*1024),
 	}
 }
 
