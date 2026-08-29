@@ -75,7 +75,15 @@ func (app *App) deleteMediaFile(w http.ResponseWriter, r *http.Request, media me
 func (app *App) uploadMediaFile(w http.ResponseWriter, r *http.Request, media mediaLibraryContext) {
 	r.Body = http.MaxBytesReader(w, r.Body, app.cfg.MaxUploadBytes)
 	if err := r.ParseMultipartForm(app.cfg.MaxUploadBytes); err != nil {
-		app.renderMediaLibrary(w, r, media, map[string]any{"Error": "上传失败：文件过大或表单格式错误"})
+		// 记录原始错误，避免前端将所有失败都误报为“文件过大”。
+		log.Printf("media upload multipart parse failed: limit=%d content_length=%d content_type=%q error=%v", app.cfg.MaxUploadBytes, r.ContentLength, r.Header.Get("Content-Type"), err)
+
+		message := "上传失败：表单解析失败或上传中断，请重试"
+		var maxBytesErr *http.MaxBytesError
+		if errors.As(err, &maxBytesErr) {
+			message = "上传失败：文件超过服务器允许的大小"
+		}
+		app.renderMediaLibrary(w, r, media, map[string]any{"Error": message})
 		return
 	}
 	file, header, err := r.FormFile("media")
