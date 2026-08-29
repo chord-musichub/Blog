@@ -9,6 +9,23 @@
   var loaded = Object.create(null);
   var loading = Object.create(null);
 
+  function ensureStylesheet(id, href){
+    if(document.getElementById(id)) return;
+    var style = document.createElement('link');
+    style.id = id;
+    style.rel = 'stylesheet';
+    style.href = href + '?v=' + encodeURIComponent(VERSION);
+    document.head.appendChild(style);
+  }
+
+  function syncPageStyles(root){
+    var path = window.location.pathname || '';
+    var isToolsPage = path.indexOf('/tools/') === 0 || !!query(root, '.tools-grid, .tool-card, .md-tool-layout, [data-snake-game], [data-game-2048]');
+    if(isToolsPage){
+      ensureStylesheet('songline-tool-shared-style', '/css/tool-shared.css');
+    }
+  }
+
   var modules = [
     {
       key:'home-orbit',
@@ -214,6 +231,7 @@
     if(now - lastScanAt < 90 && root === document) return;
     lastScanAt = now;
     if(window.SonglinePageModules) window.SonglinePageModules.lastScanAt = now;
+    syncPageStyles(root);
     modules.forEach(function(mod){
       if(mod.test(root)){
         loadScript(mod, root);

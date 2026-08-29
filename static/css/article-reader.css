@@ -1,0 +1,604 @@
+/* 文章与 Markdown 阅读页样式：仅在文章详情和 Markdown 预览器加载。 */
+/* 从 site.css 迁移，保持原始规则顺序。 */
+
+/* v8.6：文章详情页深色阅读体验优化 */
+.article-reader.markdown-body{
+  line-height:1.84;
+}
+.article-toc{
+  color:var(--text);
+}
+.article-toc h3{
+  color:var(--text);
+}
+.article-toc nav a{
+  display:block;
+  padding:4px 0;
+  color:var(--muted);
+  transition:color .16s ease, transform .16s ease;
+}
+.article-toc nav a:hover{
+  color:var(--accent);
+  transform:translateX(2px);
+}
+
+body.dark .article-toc{
+  background:rgba(14,27,45,.88);
+  border-color:rgba(125,211,252,.20);
+}
+body.dark .article-toc h3{
+  color:#eef7ff;
+}
+body.dark .article-toc nav a{
+  color:#b8cce4;
+}
+body.dark .article-toc nav a:hover{
+  color:#7dd3fc;
+}
+
+body.dark .article-reader.markdown-body{
+  background:rgba(14,27,45,.92);
+  color:#d8e7f7;
+  border-color:rgba(125,211,252,.18);
+}
+body.dark .markdown-body,
+body.dark .markdown-body p,
+body.dark .markdown-body li{
+  color:#d8e7f7;
+}
+body.dark .markdown-body h1,
+body.dark .markdown-body h2,
+body.dark .markdown-body h3,
+body.dark .markdown-body h4{
+  color:#f4f9ff;
+  border-color:rgba(148,163,184,.26);
+}
+body.dark .markdown-body a{
+  color:#7dd3fc;
+}
+body.dark .markdown-body a:hover{
+  color:#bae6fd;
+}
+body.dark .markdown-body strong{
+  color:#ffffff;
+}
+body.dark .markdown-body em{
+  color:#c8ddf4;
+}
+body.dark .markdown-body code{
+  background:rgba(15,23,42,.92);
+  color:#bfdbfe;
+  border-color:rgba(125,211,252,.22);
+}
+body.dark .markdown-body pre{
+  background:#08111f;
+  color:#dbeafe;
+  border:1px solid rgba(125,211,252,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+body.dark .markdown-body pre code{
+  color:inherit;
+}
+body.dark .markdown-body blockquote{
+  background:rgba(56,189,248,.08);
+  color:#d2e6fb;
+  border-left-color:#38bdf8;
+}
+body.dark .markdown-body table th{
+  background:rgba(30,48,76,.86);
+  color:#f4f9ff;
+}
+body.dark .markdown-body table td{
+  color:#d8e7f7;
+  border-color:rgba(148,163,184,.26);
+}
+body.dark .markdown-body hr{
+  border-top-color:rgba(148,163,184,.24);
+}
+
+/* v9.5：深色模式组件回归深色 + Markdown 阅读区重编排 */
+
+/* 深色模式下，所有文章/列表/卡片容器必须跟随深色主题，不再残留羊皮纸色 */
+body.dark .container,
+body.dark .page-grid,
+body.dark .section,
+body.dark .article-list,
+body.dark .related-grid{
+  color:var(--text);
+}
+body.dark .card,
+body.dark .post-card,
+body.dark .related-card,
+body.dark .featured-card,
+body.dark .small-friend,
+body.dark .hot-card,
+body.dark .area-card,
+body.dark .friend-card,
+body.dark .sidebar-card,
+body.dark .toolbar-panel,
+body.dark .article-main,
+body.dark .article-toc,
+body.dark .prose-panel,
+body.dark .prose-card,
+body.dark .friend-detail-hero{
+  background:rgba(17,28,46,.84) !important;
+  background-color:rgba(17,28,46,.84) !important;
+  border-color:#243449 !important;
+  color:#e6f0ff;
+}
+body.dark .post-card p,
+body.dark .related-card p,
+body.dark .area-card p,
+body.dark .friend-card p,
+body.dark .prose-card p,
+body.dark .about-mini p{
+  color:#a8bad1;
+}
+body.dark .post-thumb,
+body.dark .page-hero,
+body.dark .hero-banner,
+body.dark .friend-cover{
+  background-color:#101d31 !important;
+}
+body.dark .post-thumb.cover-mode-contain,
+body.dark .page-hero.cover-mode-contain,
+body.dark .related-card .post-thumb.cover-mode-contain,
+body.dark .tag-detail-hero.cover-mode-contain{
+  background-color:#101d31 !important;
+}
+body.dark .tag,
+body.dark .pill,
+body.dark .area-more,
+body.dark .btn{
+  background:rgba(19,43,66,.72) !important;
+  background-color:rgba(19,43,66,.72) !important;
+  border-color:#2b4360 !important;
+  color:#cfe6ff !important;
+}
+body.dark .searchbox,
+body.dark input,
+body.dark textarea,
+body.dark select{
+  background:#0f1a2b !important;
+  border-color:#334155 !important;
+  color:#e6f0ff !important;
+}
+body.dark .section-head,
+body.dark .section-head h2,
+body.dark .logo{
+  color:#e6f0ff !important;
+}
+body.dark .nav-links a{
+  color:#cbdcf2 !important;
+}
+
+/* Markdown 正文：浅色羊皮纸阅读感 */
+.prose,
+.article-content,
+.article-body,
+.markdown-body,
+.post-content{
+  color:#3f2f22;
+}
+.prose h1,.prose h2,.prose h3,.prose h4,
+.article-content h1,.article-content h2,.article-content h3,.article-content h4,
+.article-body h1,.article-body h2,.article-body h3,.article-body h4,
+.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,
+.post-content h1,.post-content h2,.post-content h3,.post-content h4{
+  color:#3b2a1e;
+  letter-spacing:.01em;
+}
+.prose p,.article-content p,.article-body p,.markdown-body p,.post-content p,
+.prose li,.article-content li,.article-body li,.markdown-body li,.post-content li{
+  color:#4f3c2c;
+}
+.prose a,.article-content a,.article-body a,.markdown-body a,.post-content a{
+  color:#8f5f2a;
+  border-bottom:1px solid rgba(143,95,42,.32);
+}
+.prose blockquote,.article-content blockquote,.article-body blockquote,.markdown-body blockquote,.post-content blockquote{
+  margin:1.4em 0;
+  padding:14px 18px;
+  border-left:4px solid #b7793b;
+  background:rgba(246,220,181,.50);
+  color:#5e4632;
+  border-radius:0 14px 14px 0;
+}
+.prose code,.article-content code,.article-body code,.markdown-body code,.post-content code{
+  background:#f1d6ab;
+  color:#71431e;
+  border:1px solid rgba(183,121,59,.22);
+  border-radius:7px;
+  padding:.14em .38em;
+  font-size:.92em;
+}
+.prose pre,.article-content pre,.article-body pre,.markdown-body pre,.post-content pre{
+  background:#2f251f !important;
+  color:#f3e6d4 !important;
+  border:1px solid rgba(143,95,42,.42);
+  border-radius:16px;
+  padding:18px 20px;
+  overflow:auto;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.prose pre code,.article-content pre code,.article-body pre code,.markdown-body pre code,.post-content pre code{
+  background:transparent !important;
+  color:inherit !important;
+  border:0;
+  padding:0;
+}
+.prose table,.article-content table,.article-body table,.markdown-body table,.post-content table{
+  border:1px solid rgba(217,189,148,.82);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(255,242,220,.58);
+}
+.prose th,.article-content th,.article-body th,.markdown-body th,.post-content th{
+  background:#ead2ae;
+  color:#3f2f22;
+}
+.prose td,.prose th,
+.article-content td,.article-content th,
+.article-body td,.article-body th,
+.markdown-body td,.markdown-body th,
+.post-content td,.post-content th{
+  border-color:rgba(217,189,148,.82);
+}
+.prose hr,.article-content hr,.article-body hr,.markdown-body hr,.post-content hr{
+  border:0;
+  border-top:1px solid rgba(217,189,148,.82);
+  margin:2em 0;
+}
+
+/* Markdown 正文：深色阅读感，去掉浅绿/突兀代码块 */
+body.dark .prose,
+body.dark .article-content,
+body.dark .article-body,
+body.dark .markdown-body,
+body.dark .post-content{
+  color:#dbeafe;
+}
+body.dark .prose h1,body.dark .prose h2,body.dark .prose h3,body.dark .prose h4,
+body.dark .article-content h1,body.dark .article-content h2,body.dark .article-content h3,body.dark .article-content h4,
+body.dark .article-body h1,body.dark .article-body h2,body.dark .article-body h3,body.dark .article-body h4,
+body.dark .markdown-body h1,body.dark .markdown-body h2,body.dark .markdown-body h3,body.dark .markdown-body h4,
+body.dark .post-content h1,body.dark .post-content h2,body.dark .post-content h3,body.dark .post-content h4{
+  color:#f0f7ff !important;
+}
+body.dark .prose p,body.dark .article-content p,body.dark .article-body p,body.dark .markdown-body p,body.dark .post-content p,
+body.dark .prose li,body.dark .article-content li,body.dark .article-body li,body.dark .markdown-body li,body.dark .post-content li{
+  color:#c7d9ee !important;
+}
+body.dark .prose a,body.dark .article-content a,body.dark .article-body a,body.dark .markdown-body a,body.dark .post-content a{
+  color:#7dd3fc !important;
+  border-bottom:1px solid rgba(125,211,252,.32);
+}
+body.dark .prose blockquote,body.dark .article-content blockquote,body.dark .article-body blockquote,body.dark .markdown-body blockquote,body.dark .post-content blockquote{
+  background:rgba(19,43,66,.66) !important;
+  border-left-color:#38bdf8 !important;
+  color:#cfe6ff !important;
+}
+body.dark .prose code,body.dark .article-content code,body.dark .article-body code,body.dark .markdown-body code,body.dark .post-content code{
+  background:#172033 !important;
+  color:#bae6fd !important;
+  border:1px solid #2b4360 !important;
+}
+body.dark .prose pre,body.dark .article-content pre,body.dark .article-body pre,body.dark .markdown-body pre,body.dark .post-content pre{
+  background:#08111f !important;
+  color:#dbeafe !important;
+  border:1px solid #243449 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 12px 32px rgba(0,0,0,.22);
+}
+body.dark .prose pre code,body.dark .article-content pre code,body.dark .article-body pre code,body.dark .markdown-body pre code,body.dark .post-content pre code{
+  background:transparent !important;
+  color:inherit !important;
+  border:0 !important;
+}
+body.dark .prose table,body.dark .article-content table,body.dark .article-body table,body.dark .markdown-body table,body.dark .post-content table{
+  background:rgba(15,26,43,.76) !important;
+  border-color:#243449 !important;
+}
+body.dark .prose th,body.dark .article-content th,body.dark .article-body th,body.dark .markdown-body th,body.dark .post-content th{
+  background:#172033 !important;
+  color:#e6f0ff !important;
+}
+body.dark .prose td,body.dark .prose th,
+body.dark .article-content td,body.dark .article-content th,
+body.dark .article-body td,body.dark .article-body th,
+body.dark .markdown-body td,body.dark .markdown-body th,
+body.dark .post-content td,body.dark .post-content th{
+  border-color:#243449 !important;
+}
+body.dark .prose hr,body.dark .article-content hr,body.dark .article-body hr,body.dark .markdown-body hr,body.dark .post-content hr{
+  border-top-color:#243449 !important;
+}
+
+/* highlight.js / Chroma 常见 token 兜底：避免浅绿背景块 */
+body.dark .chroma,
+body.dark .highlight,
+body.dark .highlight pre,
+body.dark pre.chroma{
+  background:#08111f !important;
+  color:#dbeafe !important;
+}
+body.dark .chroma .k,body.dark .highlight .k{color:#93c5fd !important}
+body.dark .chroma .s,body.dark .highlight .s{color:#a7f3d0 !important;background:transparent !important}
+body.dark .chroma .c,body.dark .highlight .c{color:#7e91aa !important;background:transparent !important}
+body.dark .chroma .n,body.dark .highlight .n{color:#dbeafe !important;background:transparent !important}
+body.dark .chroma span,
+body.dark .highlight span{
+  background:transparent !important;
+}
+
+
+/* v9.6：文章目录折叠，给 Markdown 正文让出空间 */
+.article-shell{
+  grid-template-columns:minmax(0,1fr) 72px !important;
+  gap:18px !important;
+}
+.article-shell[data-toc-state="expanded"]{
+  grid-template-columns:minmax(0,1fr) 240px !important;
+}
+.article-reader{
+  max-width:960px;
+  width:100%;
+  justify-self:center;
+}
+.article-toc{
+  padding:12px !important;
+  width:72px;
+  min-height:64px;
+  transition:width .2s ease, padding .2s ease, opacity .2s ease;
+}
+.article-shell[data-toc-state="expanded"] .article-toc{
+  width:240px;
+  padding:18px !important;
+}
+.toc-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.toc-head h3{
+  margin:0;
+  white-space:nowrap;
+  font-size:15px;
+}
+.toc-toggle{
+  border:1px solid var(--border);
+  background:rgba(246,220,181,.72);
+  color:var(--accent-2);
+  border-radius:999px;
+  width:34px;
+  height:34px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  padding:0;
+}
+.article-shell[data-toc-state="collapsed"] .article-toc h3{
+  writing-mode:vertical-rl;
+  letter-spacing:.12em;
+  margin:0 auto;
+}
+.article-shell[data-toc-state="collapsed"] .toc-head{
+  flex-direction:column;
+}
+.article-shell[data-toc-state="collapsed"] .toc-body{
+  display:none;
+}
+.article-shell[data-toc-state="expanded"] .toc-body{
+  display:block;
+  margin-top:12px;
+}
+.article-shell[data-toc-state="expanded"] .article-toc a{
+  line-height:1.55;
+}
+.floating-toc-button{
+  display:none;
+  position:fixed;
+  right:18px;
+  bottom:78px;
+  z-index:40;
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:rgba(255,242,220,.92);
+  color:var(--accent-2);
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+body.dark .toc-toggle,
+body.dark .floating-toc-button{
+  background:rgba(19,43,66,.86) !important;
+  border-color:#2b4360 !important;
+  color:#cfe6ff !important;
+}
+@media (min-width: 1180px){
+  .article-shell{
+    grid-template-columns:minmax(0,1fr) 72px !important;
+  }
+  .article-shell[data-toc-state="expanded"]{
+    grid-template-columns:minmax(0,1fr) 240px !important;
+  }
+}
+@media (max-width: 980px){
+  .article-shell{
+    grid-template-columns:1fr !important;
+  }
+  .article-toc{
+    display:none !important;
+  }
+  .floating-toc-button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+}
+
+/* v9.8：进一步增宽 Markdown 阅读区 */
+.article-shell{
+  grid-template-columns:minmax(0,1fr) 56px !important;
+  gap:14px !important;
+}
+.article-shell[data-toc-state="expanded"]{
+  grid-template-columns:minmax(0,1fr) 210px !important;
+  gap:18px !important;
+}
+.article-reader{
+  max-width:1120px !important;
+  width:100%;
+  padding-left:42px !important;
+  padding-right:42px !important;
+}
+.article-toc{
+  width:56px !important;
+}
+.article-shell[data-toc-state="expanded"] .article-toc{
+  width:210px !important;
+}
+.markdown-body{
+  font-size:17.5px;
+}
+.markdown-body p,
+.markdown-body li{
+  line-height:1.82;
+}
+
+/* 宽屏再给正文多一点空间，但不拉到难读的程度 */
+@media (min-width: 1380px){
+  .article-reader{
+    max-width:1180px !important;
+  }
+}
+
+/* 小平板/窄桌面也尽量正文优先 */
+@media (min-width: 761px) and (max-width: 1100px){
+  .article-shell{
+    grid-template-columns:minmax(0,1fr) 52px !important;
+    gap:12px !important;
+  }
+  .article-shell[data-toc-state="expanded"]{
+    grid-template-columns:minmax(0,1fr) 190px !important;
+  }
+  .article-reader{
+    max-width:none !important;
+    padding-left:30px !important;
+    padding-right:30px !important;
+  }
+  .article-toc{
+    width:52px !important;
+  }
+  .article-shell[data-toc-state="expanded"] .article-toc{
+    width:190px !important;
+  }
+}
+
+/* 手机端也稍微吃满屏幕，但保留一点呼吸感 */
+@media (max-width: 760px){
+  .container{
+    padding-left:8px !important;
+    padding-right:8px !important;
+  }
+  .article-reader{
+    max-width:none !important;
+    padding-left:14px !important;
+    padding-right:14px !important;
+  }
+}
+@media (max-width: 420px){
+  .container{
+    padding-left:6px !important;
+    padding-right:6px !important;
+  }
+  .article-reader{
+    padding-left:12px !important;
+    padding-right:12px !important;
+  }
+}
+
+/* 文章封面：取消历史遮罩与白边，保持原图展示策略。 */
+.article-cover-hero{
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  background-color:transparent!important;
+  background-repeat:no-repeat!important;
+  background-size:cover!important;
+  background-position:center!important;
+  overflow:hidden!important;
+  padding:0!important;
+  min-height:270px!important;
+}
+.article-cover-hero::before,
+.article-cover-hero::after{
+  display:none!important;
+  content:none!important;
+  opacity:0!important;
+  background:none!important;
+  pointer-events:none!important;
+}
+body.dark .article-cover-hero::before,
+body.dark .article-cover-hero::after{
+  display:none!important;
+  content:none!important;
+  opacity:0!important;
+  background:none!important;
+}
+.article-cover-hero.cover-mode-contain{
+  background-size:contain!important;
+  background-position:center!important;
+  background-color:transparent!important;
+}
+body.dark .article-cover-hero.cover-mode-contain{
+  background-color:transparent!important;
+}
+@media(max-width:820px){
+  .article-cover-hero{
+    min-height:210px!important;
+    border-radius:22px!important;
+    margin-bottom:22px!important;
+  }
+}
+@media(max-width:430px){
+  .article-cover-hero{
+    min-height:178px!important;
+    border-radius:18px!important;
+  }
+}
+
+/* 真实封面图片不使用 cover，避免裁切和比例失真。 */
+.article-cover-hero.article-cover-actual-image{
+  display:block!important;
+  min-height:0!important;
+  height:auto!important;
+  padding:0!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+  background-image:none!important;
+  background-color:transparent!important;
+}
+.article-cover-hero.article-cover-actual-image::before,
+.article-cover-hero.article-cover-actual-image::after{
+  display:none!important;
+  content:none!important;
+  opacity:0!important;
+  background:none!important;
+}
+.article-cover-img{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  max-width:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  border:0!important;
+  outline:0!important;
+  margin:0!important;
+  padding:0!important;
+}

@@ -61,6 +61,9 @@
 {{ partial "resource-hints.html" . }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
+{{ if .IsHome }}
+<link id="songline-home-style" rel="stylesheet" href="/css/home.css?v={{ $assetVersion }}">
+{{ end }}
 {{ if or (eq .Section "friends") (hasPrefix .RelPermalink "/friends/") }}
 <link id="songline-friends-galaxy-style" rel="stylesheet" href="/css/friends-galaxy.css?v={{ $assetVersion }}">
 {{ end }}
@@ -68,6 +71,7 @@
 <link id="songline-tags-style" rel="stylesheet" href="/css/tags.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if or (and .IsPage (eq .Section "posts")) (hasPrefix .RelPermalink "/tools/markdown-previewer/") }}
+<link id="songline-article-reader-style" rel="stylesheet" href="/css/article-reader.css?v={{ $assetVersion }}">
 <link id="songline-reader-floating-controls-style" rel="stylesheet" href="/css/reader-floating-controls.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if and .IsSection (eq .Section "posts") }}
@@ -82,7 +86,9 @@
 {{ if hasPrefix .RelPermalink "/tools/typing-practice/" }}
 <link rel="stylesheet" href="/css/tools/typing-practice.css?v={{ $assetVersion }}">
 {{ end }}
-<link rel="stylesheet" href="/css/tool-shared.css?v={{ $assetVersion }}">
+{{ if hasPrefix .RelPermalink "/tools/" }}
+<link id="songline-tool-shared-style" rel="stylesheet" href="/css/tool-shared.css?v={{ $assetVersion }}">
+{{ end }}
 <link rel="stylesheet" href="/css/runtime-animation.css?v={{ $assetVersion }}">
   {{ if hasPrefix .RelPermalink "/tools/focus-timer/" }}
   <link rel="stylesheet" href="/css/tools/focus-timer.css?v={{ $assetVersion }}">

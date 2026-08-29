@@ -7,6 +7,21 @@
   'use strict';
 
   var VERSION = '20.20.6';
+  var STYLE_ID = 'songline-home-style';
+  var assetVersion = VERSION;
+  try{
+    var sourceURL = new URL((document.currentScript && document.currentScript.src) || '', window.location.href);
+    assetVersion = sourceURL.searchParams.get('v') || assetVersion;
+  }catch(e){}
+
+  function ensureStylesheet(){
+    if(document.getElementById(STYLE_ID)) return;
+    var style = document.createElement('link');
+    style.id = STYLE_ID;
+    style.rel = 'stylesheet';
+    style.href = '/css/home.css?v=' + encodeURIComponent(assetVersion);
+    document.head.appendChild(style);
+  }
   var reduceMotionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
   var mobileQuery = window.matchMedia ? window.matchMedia('(max-width: 760px)') : null;
   var instances = [];
@@ -461,6 +476,8 @@
         if(roots.indexOf(item) === -1) roots.push(item);
       });
     }
+
+    if(roots.length) ensureStylesheet();
 
     roots.forEach(function(rootItem){
       // v20.18.5：AJAX 回到首页时，新 DOM 需要重新初始化；

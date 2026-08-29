@@ -1,6 +1,7 @@
 // 阅读页的置顶/置底按钮统一移到 body，避免被文章容器的定位和裁剪影响。
 (function(){
   const STYLE_ID = 'songline-reader-floating-controls-style';
+  const ARTICLE_STYLE_ID = 'songline-article-reader-style';
   const READER_SELECTOR = [
     '.article-reader',
     '.article-shell',
@@ -18,13 +19,18 @@
     assetVersion = sourceURL.searchParams.get('v') || '';
   }catch(e){}
 
-  function ensureStylesheet(){
-    if(document.getElementById(STYLE_ID)) return;
+  function ensureStylesheet(id, path){
+    if(document.getElementById(id)) return;
     const style = document.createElement('link');
-    style.id = STYLE_ID;
+    style.id = id;
     style.rel = 'stylesheet';
-    style.href = '/css/reader-floating-controls.css' + (assetVersion ? '?v=' + encodeURIComponent(assetVersion) : '');
+    style.href = path + (assetVersion ? '?v=' + encodeURIComponent(assetVersion) : '');
     document.head.appendChild(style);
+  }
+
+  function ensureReaderStylesheets(){
+    ensureStylesheet(ARTICLE_STYLE_ID, '/css/article-reader.css');
+    ensureStylesheet(STYLE_ID, '/css/reader-floating-controls.css');
   }
 
   function hasReaderPage(){
@@ -100,7 +106,7 @@
       return;
     }
 
-    ensureStylesheet();
+    ensureReaderStylesheets();
 
     const topButton = portalButton(pickButton('.back-to-top-button'), 'top');
     const bottomButton = portalButton(pickButton('.scroll-to-bottom-button'), 'bottom');

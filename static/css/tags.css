@@ -531,3 +531,89 @@ html body .tag-river-lane:hover .tag-river-strip,
 html body .tag-river-lane:focus-within .tag-river-strip{
   animation-play-state:running !important;
 }
+
+/* 标签搜索：隐藏历史热门入口，并统一桌面与手机端的搜索栏布局。 */
+html body .tag-river-hot-section{
+  display:none!important;
+}
+html body .tag-river-search{
+  display:grid!important;
+  grid-template-columns:minmax(170px,.56fr) minmax(420px,1.44fr)!important;
+  align-items:center!important;
+  gap:18px!important;
+}
+html body .tag-river-searchbox{
+  display:grid!important;
+  grid-template-columns:32px minmax(0,1fr) 64px 112px!important;
+  align-items:center!important;
+  gap:8px!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+}
+html body .tag-river-searchbox .tag-river-status{
+  grid-column:4!important;
+  min-width:0!important;
+  width:112px!important;
+  max-width:112px!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+html body .tag-river-results{
+  grid-column:1 / -1!important;
+}
+
+@media(max-width:820px){
+  html body .tag-river-search{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:10px!important;
+  }
+  html body .tag-river-searchbox{
+    grid-template-columns:minmax(0,1fr) 48px 72px!important;
+    gap:6px!important;
+  }
+  html body .tag-river-search-icon{
+    display:none!important;
+  }
+  html body .tag-river-searchbox .searchbox,
+  html body .tag-river-searchbox input{
+    grid-column:1!important;
+    min-width:0!important;
+  }
+  html body .tag-river-searchbox .search-submit,
+  html body .tag-river-searchbox button{
+    grid-column:2!important;
+    width:48px!important;
+    min-width:48px!important;
+    padding:0!important;
+  }
+  html body .tag-river-searchbox .tag-river-status,
+  html body .tag-river-status{
+    grid-column:3!important;
+    width:72px!important;
+    min-width:72px!important;
+    max-width:72px!important;
+    padding:0 5px!important;
+    font-size:10.5px!important;
+  }
+}
+@media(max-width:430px){
+  html body .tag-river-searchbox{
+    grid-template-columns:minmax(0,1fr) 44px 58px!important;
+    gap:5px!important;
+  }
+  html body .tag-river-searchbox .search-submit,
+  html body .tag-river-searchbox button{
+    width:44px!important;
+    min-width:44px!important;
+    font-size:12px!important;
+  }
+  html body .tag-river-searchbox .tag-river-status,
+  html body .tag-river-status{
+    width:58px!important;
+    min-width:58px!important;
+    max-width:58px!important;
+    font-size:10px!important;
+  }
+}
