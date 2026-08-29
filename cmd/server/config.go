@@ -73,6 +73,9 @@ func loadConfig() Config {
 		PublicCORSOrigins: get("PUBLIC_CORS_ORIGINS", ""),
 		HugoBuildTimeout:  positiveDurationSeconds(get("HUGO_BUILD_TIMEOUT_SECONDS", "180"), 180),
 		MaxUploadBytes:    positiveByteLimit(get("MAX_UPLOAD_BYTES", "536870912"), 512*1024*1024),
+		HTTPReadTimeout:   positiveDurationSeconds(get("HTTP_READ_TIMEOUT_SECONDS", "900"), 900),
+		HTTPWriteTimeout:  positiveDurationSeconds(get("HTTP_WRITE_TIMEOUT_SECONDS", "900"), 900),
+		RuntimeStaticDir:  get("RUNTIME_STATIC_DIR", "static"),
 	}
 }
 

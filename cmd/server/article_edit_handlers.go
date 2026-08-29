@@ -18,7 +18,7 @@ func (app *App) showEditor(w http.ResponseWriter, r *http.Request, id string, u 
 		http.Error(w, "forbidden", 403)
 		return
 	}
-	app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "edit", "Flash": r.URL.Query().Get("msg"), "CoverFiles": listMediaFiles(userMediaDir(u.Username), userMediaPublicPrefix(u.Username))})
+	app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "edit", "Flash": r.URL.Query().Get("msg"), "CoverFiles": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username))})
 }
 
 func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id string, u User) {
@@ -178,5 +178,5 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 }
 
 func (app *App) editorError(w http.ResponseWriter, u User, a Article, msg string) {
-	app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "edit", "Error": msg, "CoverFiles": listMediaFiles(userMediaDir(u.Username), userMediaPublicPrefix(u.Username))})
+	app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "edit", "Error": msg, "CoverFiles": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username))})
 }

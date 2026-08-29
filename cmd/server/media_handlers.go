@@ -32,7 +32,7 @@ func (app *App) handleMediaLibrary(w http.ResponseWriter, r *http.Request) {
 	media := mediaLibraryContext{
 		user:  user,
 		owner: mediaOwner(user.Username),
-		dir:   userMediaDir(user.Username),
+		dir:   app.userMediaDir(user.Username),
 	}
 	if err := os.MkdirAll(media.dir, 0755); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

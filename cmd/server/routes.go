@@ -2,15 +2,16 @@ package main
 
 import (
 	"net/http"
+	"path/filepath"
 	"time"
 )
 
 func (app *App) router() http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
-	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("static/uploads"))))
+	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir(app.mediaRootDir()))))
 	// Markdown 源文件属于运行时数据，不能依赖公开站的静态目录或 SPA 兜底规则。
-	mux.Handle("/md-source/", http.StripPrefix("/md-source/", http.FileServer(http.Dir("static/md-source"))))
+	mux.Handle("/md-source/", http.StripPrefix("/md-source/", http.FileServer(http.Dir(filepath.Join(app.runtimeStaticDir(), "md-source")))))
 	mux.HandleFunc("/api/views", app.handleViewsAPI)
 
 	app.registerScoreRoutes(mux, app.handleSnakeScoresAPI, "snake-scores")
@@ -56,8 +57,10 @@ func newHTTPServer(cfg Config, app *App) *http.Server {
 		Addr:              cfg.Addr,
 		Handler:           securityHeaders(cfg, app.router()),
 		ReadHeaderTimeout: 5 * time.Second,
-		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      30 * time.Second,
-		MaxHeaderBytes:    1 << 20,
+		// ReadTimeout 覆盖整个请求体。媒体上传不能沿用普通页面的短超时。
+		ReadTimeout: cfg.HTTPReadTimeout,
+		// 上传完成后还会触发 Hugo 构建，响应超时同样由配置控制。
+		WriteTimeout:   cfg.HTTPWriteTimeout,
+		MaxHeaderBytes: 1 << 20,
 	}
 }

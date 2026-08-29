@@ -17,7 +17,7 @@ func (app *App) handleNewArticle(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
 	if r.Method == http.MethodGet {
 		a := Article{Author: u.Username, Status: stDraft}
-		app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "new", "CoverFiles": listMediaFiles(userMediaDir(u.Username), userMediaPublicPrefix(u.Username))})
+		app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "new", "CoverFiles": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username))})
 		return
 	}
 	if r.Method != http.MethodPost {
@@ -45,7 +45,7 @@ func (app *App) saveAccountImageUpload(r *http.Request, username, field, prefix 
 	}
 
 	owner := mediaOwner(username)
-	dir := userMediaDir(owner)
+	dir := app.userMediaDir(owner)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return "", err
 	}
@@ -75,7 +75,7 @@ func (app *App) saveAccountImageUpload(r *http.Request, username, field, prefix 
 
 func (app *App) handleAccount(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
-	coverFiles := listMediaFiles(userMediaDir(u.Username), userMediaPublicPrefix(u.Username))
+	coverFiles := listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username))
 	if r.Method == http.MethodGet {
 		app.render(w, "account.html", map[string]any{"User": u, "CoverFiles": coverFiles, "Flash": r.URL.Query().Get("msg")})
 		return

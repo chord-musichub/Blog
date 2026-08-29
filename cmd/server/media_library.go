@@ -81,12 +81,22 @@ func mediaOwner(username string) string {
 	return u
 }
 
-func mediaRootDir() string {
-	return filepath.Join("static", "uploads")
+// runtimeStaticDir 保存不会随发布版本替换的媒体和 Markdown 源文件。
+// 本地默认使用项目 static 目录，服务器由 RUNTIME_STATIC_DIR 指向 shared/static。
+func (app *App) runtimeStaticDir() string {
+	dir := strings.TrimSpace(app.cfg.RuntimeStaticDir)
+	if dir == "" {
+		return "static"
+	}
+	return filepath.Clean(dir)
 }
 
-func userMediaDir(username string) string {
-	return filepath.Join(mediaRootDir(), mediaOwner(username))
+func (app *App) mediaRootDir() string {
+	return filepath.Join(app.runtimeStaticDir(), "uploads")
+}
+
+func (app *App) userMediaDir(username string) string {
+	return filepath.Join(app.mediaRootDir(), mediaOwner(username))
 }
 
 func userMediaPublicPrefix(username string) string {

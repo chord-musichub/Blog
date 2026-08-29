@@ -43,7 +43,7 @@ func (app *App) handleUserRoutes(w http.ResponseWriter, r *http.Request) {
 			app.redirect(w, r, "/admin?msg="+urlMsg(err.Error()), http.StatusSeeOther)
 			return
 		}
-		mediaDir := userMediaDir(username)
+		mediaDir := app.userMediaDir(username)
 		if err := os.RemoveAll(mediaDir); err != nil {
 			log.Printf("remove user media dir after delete user error: user=%s dir=%s err=%v", username, mediaDir, err)
 			app.redirect(w, r, "/admin?msg=用户已删除，但媒体库清理失败，请看日志", http.StatusSeeOther)

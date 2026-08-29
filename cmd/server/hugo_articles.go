@@ -22,8 +22,7 @@ func (app *App) writeArticleSourceMarkdown(a Article, source string) (string, er
 	if strings.TrimSpace(a.Slug) == "" {
 		return "", nil
 	}
-	root := app.hugoRootDir()
-	dir := filepath.Join(root, "static", "md-source")
+	dir := filepath.Join(app.runtimeStaticDir(), "md-source")
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return "", err
 	}

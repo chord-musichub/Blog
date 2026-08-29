@@ -43,6 +43,9 @@ type Config struct {
 	PublicCORSOrigins string
 	HugoBuildTimeout  time.Duration
 	MaxUploadBytes    int64
+	HTTPReadTimeout   time.Duration
+	HTTPWriteTimeout  time.Duration
+	RuntimeStaticDir  string
 }
 
 // App 保存 HTTP 服务运行所需的共享依赖和构建锁。

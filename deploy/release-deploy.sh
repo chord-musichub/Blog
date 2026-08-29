@@ -53,6 +53,12 @@ if [[ ! -r "$SHARED_DIR/blog-admin.env" ]]; then
   exit 1
 fi
 
+# 旧发布方案会在 static/ 下放运行时目录的符号链接，旧版 Hugo 会因此拒绝构建。
+# 新版本由后台直接读取 shared/static；只在尚未配置时补充默认值，不覆盖用户已有设置。
+if ! grep -q '^RUNTIME_STATIC_DIR=' "$SHARED_DIR/blog-admin.env"; then
+  printf '\nRUNTIME_STATIC_DIR=%s/static\n' "$SHARED_DIR" >> "$SHARED_DIR/blog-admin.env"
+fi
+
 git clone --quiet --branch "$RELEASE_REF" --depth 1 "$REPOSITORY_URL" "$WORK_DIR/source"
 REVISION="$(git -C "$WORK_DIR/source" rev-parse --short HEAD)"
 RELEASE_DIR="$RELEASES_DIR/${STAMP}-${REVISION}"
@@ -76,8 +82,6 @@ link_shared_path data
 link_shared_path content/posts
 link_shared_path content/friends
 link_shared_path content/tags
-link_shared_path static/uploads
-link_shared_path static/md-source
 
 # 公开站模板统一用此版本作为静态资源缓存标识。它位于运行时 data 目录，
 # 不会进入 Git，也不会覆盖文章、用户或上传文件。
