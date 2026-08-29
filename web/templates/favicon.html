@@ -1,0 +1,5 @@
+{{define "admin-favicon"}}
+  {{ $icon := .Settings.Site.LogoIcon }}
+  {{ if not $icon }}{{ $icon = .Settings.Site.Favicon }}{{ end }}
+  {{ if $icon }}<link rel="icon" href="{{ $icon }}"><link rel="apple-touch-icon" href="{{ $icon }}">{{ end }}
+{{end}}

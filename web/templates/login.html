@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>登录</title><link rel="icon" href="{{if .Settings.Site.LogoIcon}}{{.Settings.Site.LogoIcon}}{{else}}{{.Settings.Site.Favicon}}{{end}}"><link rel="apple-touch-icon" href="{{if .Settings.Site.LogoIcon}}{{.Settings.Site.LogoIcon}}{{else}}{{.Settings.Site.Favicon}}{{end}}"><script>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>登录</title>{{template "admin-favicon" .}}<script>
 (function(){
   try{
     var theme = localStorage.getItem('gexian-admin-theme') || 'dark';
@@ -89,6 +89,7 @@ html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
     <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span><span class="btn-text">进入后台</span></button>
   </form>
   <p class="meta"><a href="{{adminURL "/password/request"}}">忘记密码？提交修改申请</a></p>
+  <p class="meta"><a href="{{publicURL}}">← 返回主页</a></p>
 </main>
 </body>
 </html>
