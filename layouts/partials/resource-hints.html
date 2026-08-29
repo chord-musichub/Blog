@@ -17,7 +17,7 @@ v20.20.6：首屏资源提示。
 <link rel="preload" href="/js/friend-galaxy.js?v={{ $v }}" as="script">
 {{- end }}
 
-{{- if or (eq $section "tags") (hasPrefix $rel "/tags/") (eq .Kind "taxonomy") (eq .Kind "term") }}
+{{- if or (eq $section "tags") (hasPrefix $rel "/tags/") }}
 <link rel="preload" href="/js/tag-flow.js?v={{ $v }}" as="script">
 {{- end }}
 

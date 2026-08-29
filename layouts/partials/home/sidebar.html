@@ -1,0 +1,49 @@
+{{- $cfg := .Site.Data.site -}}
+{{- $posts := where .Site.RegularPages "Section" "posts" -}}
+<aside class="sidebar">
+  <section class="card sidebar-card about-mini" id="site-about">
+    <h3>{{ default "关于本站" $cfg.about_card.title }}</h3>
+    {{ with $cfg.about_card.avatar_image }}
+      <img class="b-avatar b-avatar-img" src="{{ . }}" alt="{{ default "Blog" $cfg.about_card.name }}" loading="lazy" decoding="async">
+    {{ else }}
+      <div class="b-avatar">{{ default "B" $cfg.about_card.avatar_text }}</div>
+    {{ end }}
+    <div class="name">{{ default "Blog" $cfg.about_card.name }}</div>
+    <p>{{ default "这是一个记录学习、创作与生活的个人博客。" $cfg.about_card.body }}</p>
+  </section>
+  <section class="card sidebar-card">
+    <h3>站点统计</h3>
+    <ul class="stat-list">
+      <li><span>{{ partial "ui-icon.html" "article" }} 文章数</span><b>{{ len $posts }}</b></li>
+      {{ $tagTax := index .Site.Taxonomies "tags" }}
+      <li><span>◇ 标签数</span><b>{{ if $tagTax }}{{ len $tagTax }}{{ else }}0{{ end }}</b></li>
+      {{ $publicFriends := .Site.Data.friends | default slice }}
+      <li><span>♧ 朋友数</span><b>{{ len $publicFriends }}</b></li>
+      <li><span>{{ partial "ui-icon.html" "calendar" }} 创站时间</span><b>{{ default "2026/5/8" $cfg.home.founded_at }}</b></li>
+      <li><span>{{ partial "ui-icon.html" "eye" }} 已发布</span><b>{{ len $posts }}</b></li>
+      <li><span>◷ 最近更新</span><b>{{ with index $posts 0 }}{{ .Date.Format "01-02" }}{{ else }}暂无{{ end }}</b></li>
+    </ul>
+  </section>
+  <section class="sidebar-card recent-updates-card">
+    <h3>最近更新</h3>
+    <ul class="recent-list">
+      {{ range first 5 $posts }}
+      <li><a class="recent-link" href="{{ .RelPermalink }}"><span class="recent-title">{{ .Title }}</span><span class="recent-date">{{ .Date.Format "01-02" }}</span></a></li>
+      {{ else }}<li>还没有文章<span></span></li>{{ end }}
+    </ul>
+  </section>
+  <section class="card sidebar-card">
+    <h3>联系我</h3>
+    <p style="color:var(--muted);margin:0">如果你有想交流的想法，欢迎通过以下方式联系我。</p>
+    <div class="social-row">
+      {{ if $cfg.social.show_github }}<a href="{{ $cfg.social.github }}" target="_blank" rel="noopener" aria-label="GitHub">{{ partial "ui-icon.html" "github" }}</a>{{ end }}
+      {{ if $cfg.social.show_email }}
+        {{ $emailHref := $cfg.social.email }}
+        {{ if and $emailHref (not (hasPrefix $emailHref "mailto:")) }}{{ $emailHref = printf "mailto:%s" $emailHref }}{{ end }}
+        {{ $emailText := replace $emailHref "mailto:" "" }}
+        <a class="email-contact" href="{{ $emailHref | safeURL }}" data-email="{{ $emailText }}" aria-label="Email" title="点击打开邮件；若没有邮件客户端，会复制邮箱">{{ partial "ui-icon.html" "mail" }}<span class="contact-tip">已复制邮箱</span></a>
+      {{ end }}
+      {{ if $cfg.social.show_bilibili }}<a href="{{ $cfg.social.bilibili }}" target="_blank" rel="noopener" aria-label="Bilibili"><img src="{{ default "/uploads/admin/bilibili.png" $cfg.social.bilibili_icon }}" alt="B站"></a>{{ end }}
+    </div>
+  </section>
+</aside>

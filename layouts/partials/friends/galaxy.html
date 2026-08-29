@@ -1,0 +1,78 @@
+{{ $cfg := .Site.Data.site }}
+{{ $friends := .Site.Data.friends | default slice }}
+{{ $first := dict }}
+{{ if gt (len $friends) 0 }}{{ $first = index $friends 0 }}{{ end }}
+{{ $firstName := "朋友星图" }}
+{{ $firstBio := "搜索或点击头像，切换中心朋友。" }}
+{{ $firstAvatar := "/uploads/admin/main_logo.png" }}
+{{ $firstURL := "/friends/" }}
+{{ $firstCount := 0 }}
+{{ $firstUpdated := "最近更新 —" }}
+{{ with $first }}
+  {{ $firstName = default (default .username .name) (default .display_name .name) }}
+  {{ $firstBio = default "这个朋友还没有写简介。" .bio }}
+  {{ $firstAvatar = default "/uploads/admin/main_logo.png" .avatar }}
+  {{ $firstURL = default "/friends/" .url }}
+  {{ $firstCount = default 0 .post_count }}
+  {{ if .updated_at }}{{ $firstUpdated = printf "最近更新 %s" (substr .updated_at 0 10) }}{{ end }}
+{{ end }}
+
+<section class="page-hero minimal-page-hero page-title-plain">
+  <h1>{{ default "朋友" $cfg.pages.friends_hero_title }}</h1>
+</section>
+
+<section class="friend-galaxy-shell slv2007-shell" data-friend-galaxy data-friends-src="/friends-data.json?v={{ partial "asset-version.html" . }}" data-friend-refactor="20.0.10">
+  <div class="slv2004-stage slv2007-stage" data-galaxy-stage>
+    <svg class="slv2004-lines" data-galaxy-lines aria-hidden="true"></svg>
+    <div class="slv2004-nodes" data-galaxy-nodes></div>
+    <button class="slv2004-core" type="button" data-center-open aria-label="进入当前朋友主页">
+      <span class="slv2007-core-frame" aria-hidden="true"><img data-center-avatar src="{{ $firstAvatar }}" alt="{{ $firstName }}" decoding="async" loading="lazy"></span>
+    </button>
+    <aside class="slv2004-profile" data-galaxy-profile>
+      <h2 data-center-name>{{ $firstName }}</h2>
+      <p data-center-bio>{{ $firstBio }}</p>
+      <div class="meta-row">
+        <span data-center-count>文章 {{ $firstCount }} 篇</span>
+        <span data-center-updated>{{ $firstUpdated }}</span>
+      </div>
+      <a class="btn slv2004-center-link" data-center-link href="{{ $firstURL }}">进入主页 {{ partial "ui-icon.html" "arrow-right" }}</a>
+    </aside>
+  </div>
+
+  <div class="card friend-galaxy-control">
+    <div><h2>快速寻找</h2></div>
+    <div class="friend-search-box">
+      <span class="site-search-icon friend-search-icon" aria-hidden="true">{{ partial "ui-icon.html" "search" }}</span>
+      <input id="friendGalaxySearch" class="searchbox" type="search" autocomplete="off" placeholder="搜索朋友名称或用户名...">
+      <button class="friend-search-submit" type="button" data-friend-search-submit data-no-page-loading aria-label="搜索朋友">搜索</button>
+    </div>
+    <div class="friend-galaxy-results" data-galaxy-results></div>
+  </div>
+
+  <script id="friend-galaxy-data" type="application/json">
+  [
+    {{- range $i, $f := $friends -}}
+      {{- if $i -}},{{- end -}}
+      {{- $name := default (default $f.username $f.name) (default $f.display_name $f.name) -}}
+      {{- $slug := default (urlize $name) $f.slug -}}
+      {
+        "id": {{ default (default $f.username $slug) $f.id | jsonify }},
+        "slug": {{ $slug | jsonify }},
+        "username": {{ $f.username | jsonify }},
+        "name": {{ $name | jsonify }},
+        "display_name": {{ $name | jsonify }},
+        "bio": {{ default "这个朋友还没有写简介。" $f.bio | jsonify }},
+        "url": {{ default (printf "/friends/%s/" $slug) $f.url | jsonify }},
+        "avatar": {{ default "/uploads/admin/main_logo.png" $f.avatar | jsonify }},
+        "cover": {{ $f.cover | jsonify }},
+        "post_count": {{ default 0 $f.post_count | jsonify }},
+        "post_titles": {{ default slice $f.post_titles | jsonify }},
+        "updated_at": {{ $f.updated_at | jsonify }},
+        "links": {{ default (default slice $f.relations) $f.links | jsonify }}
+      }
+    {{- end -}}
+  ]
+  </script>
+</section>
+
+<script>window.SonglineInitFriendGalaxy && window.SonglineInitFriendGalaxy();</script>

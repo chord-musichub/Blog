@@ -1,95 +1,6 @@
 package main
 
-import (
-	"html/template"
-	"sync"
-	"time"
-)
-
-const (
-	roleAdmin  = "admin"
-	roleAuthor = "author"
-
-	accountSystem = "system"
-	accountOwner  = "owner"
-	accountFriend = "friend"
-
-	stDraft     = "draft"
-	stPending   = "pending"
-	stPublished = "published"
-	stRejected  = "rejected"
-	stDeleted   = "deleted"
-
-	scoreRequestMaxBytes     int64 = 4 * 1024
-	maxAcceptedGameScore           = 9_999_999
-	passwordPBKDF2Iterations       = 120_000
-	passwordHashBytes              = 32
-)
-
-type Config struct {
-	Addr              string
-	DataDir           string
-	HugoContentDir    string
-	PublicDir         string
-	HugoCommand       string
-	SessionSecret     string
-	AdminUser         string
-	AdminPass         string
-	AdminBasePath     string
-	PublicBaseURL     string
-	PublicSiteURL     string
-	PublicAPIURL      string
-	PublicCORSOrigins string
-	HugoBuildTimeout  time.Duration
-	MaxUploadBytes    int64
-}
-
-type App struct {
-	cfg       Config
-	store     *Store
-	tpl       *template.Template
-	limiter   *Limiter
-	startedAt time.Time
-	buildMu   sync.Mutex
-	// 运行时统计文件不再占用用户/文章仓储锁，避免小游戏请求阻塞后台操作。
-	viewsMu    sync.Mutex
-	scoresMu   sync.Mutex
-	scoreCache map[string][]SnakeScoreRecord
-}
-
-type User struct {
-	Username           string    `json:"username"`
-	DisplayName        string    `json:"display_name"`
-	Role               string    `json:"role"`
-	AccountType        string    `json:"account_type,omitempty"`
-	Bio                string    `json:"bio,omitempty"`
-	Homepage           string    `json:"homepage,omitempty"`
-	Avatar             string    `json:"avatar,omitempty"`
-	Cover              string    `json:"cover,omitempty"`
-	ShowInFriends      bool      `json:"show_in_friends,omitempty"`
-	PasswordHash       string    `json:"password_hash"`
-	CreatedAt          time.Time `json:"created_at"`
-	Disabled           bool      `json:"disabled,omitempty"`
-	PasswordMustChange bool      `json:"password_must_change,omitempty"`
-}
-
-type SnakeScoreRecord struct {
-	Score       int    `json:"score"`
-	CreatedAt   string `json:"created_at"`
-	PlayerID    string `json:"player_id,omitempty"`
-	Username    string `json:"username,omitempty"`
-	DisplayName string `json:"display_name,omitempty"`
-	Mode        string `json:"mode,omitempty"`
-	ArticleID   string `json:"article_id,omitempty"`
-}
-
-type snakeScoreRequest struct {
-	Score     int    `json:"score"`
-	PlayerID  string `json:"player_id,omitempty"`
-	Mode      string `json:"mode,omitempty"`
-	ArticleID string `json:"article_id,omitempty"`
-}
-
+// PublicFriend 是构建公开朋友页时写出的最小资料集。
 type PublicFriend struct {
 	Username    string   `json:"username"`
 	DisplayName string   `json:"display_name"`
@@ -104,35 +15,7 @@ type PublicFriend struct {
 	UpdatedAt   string   `json:"updated_at,omitempty"`
 }
 
-type Article struct {
-	ID          string     `json:"id"`
-	Title       string     `json:"title"`
-	Slug        string     `json:"slug"`
-	Author      string     `json:"author"`
-	Tags        []string   `json:"tags"`
-	Summary     string     `json:"summary"`
-	Cover       string     `json:"cover,omitempty"`
-	CoverMode   string     `json:"cover_mode,omitempty"`
-	Body        string     `json:"body"`
-	SourceMD    string     `json:"source_md,omitempty"`
-	Status      string     `json:"status"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
-	PublishedAt *time.Time `json:"published_at,omitempty"`
-	RejectedAt  *time.Time `json:"rejected_at,omitempty"`
-	RejectNote  string     `json:"reject_note,omitempty"`
-}
-
-type PasswordResetRequest struct {
-	ID         string    `json:"id"`
-	Username   string    `json:"username"`
-	Note       string    `json:"note,omitempty"`
-	Status     string    `json:"status"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	ResolvedBy string    `json:"resolved_by,omitempty"`
-}
-
+// SiteSettings 是公开站可在后台编辑的配置集合。
 type SiteSettings struct {
 	Site         SiteBasic          `json:"site"`
 	Home         HomeSettings       `json:"home"`
@@ -243,6 +126,7 @@ type ContentArea struct {
 	Link        string `json:"link"`
 }
 
+// ThemeSettings 是 CSS 变量生成器读取的主题配置。
 type ThemeSettings struct {
 	Preset       string `json:"preset"`
 	Accent       string `json:"accent"`
@@ -258,12 +142,4 @@ type ThemeSettings struct {
 	ContentWidth string `json:"content_width"`
 	BodyFontSize string `json:"body_font_size"`
 	Watercolor   bool   `json:"watercolor"`
-}
-
-type Store struct {
-	mu       sync.Mutex
-	dataDir  string
-	users    map[string]User
-	articles map[string]Article
-	resets   map[string]PasswordResetRequest
 }

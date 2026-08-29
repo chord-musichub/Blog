@@ -2,6 +2,21 @@
 (function(){
   'use strict';
   var VERSION = 'v20.3.5';
+  var STYLE_ID = 'songline-tags-style';
+  var assetVersion = VERSION;
+  try{
+    var sourceURL = new URL((document.currentScript && document.currentScript.src) || '', window.location.href);
+    assetVersion = sourceURL.searchParams.get('v') || assetVersion;
+  }catch(e){}
+
+  function ensureStylesheet(){
+    if(document.getElementById(STYLE_ID)) return;
+    var style = document.createElement('link');
+    style.id = STYLE_ID;
+    style.rel = 'stylesheet';
+    style.href = '/css/tags.css?v=' + encodeURIComponent(assetVersion);
+    document.head.appendChild(style);
+  }
 
   function ready(fn){
     if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, {once:true});
@@ -378,6 +393,8 @@
   function init(root){
     // root 参数用于和 page-modules.js 的生命周期接口保持一致；
     // 当前标签数据使用全局唯一 DOM id，因此这里仍从 document 读取。
+    if(!document.querySelector('[data-tag-river]')) return;
+    ensureStylesheet();
     var tags = parseTags();
     renderRiver(tags);
     bindSearch(tags);

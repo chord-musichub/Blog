@@ -1,0 +1,533 @@
+/* 标签漂流与标签详情页样式：仅在 /tags/ 页面加载。 */
+/* 从 site.css 迁移，保留原始层叠顺序。 */
+
+/* v20.1.2：标签页漂流横幅 + 搜索直达 */
+html body .tag-river-hero{
+  text-align:left !important;
+}
+html body .tag-river-hero .meta{
+  max-width:760px;
+  margin-top:10px;
+}
+html body .tag-river-shell,
+html body .tag-river-search{
+  position:relative;
+  overflow:hidden;
+  padding:26px;
+  border-radius:30px;
+  border:1px solid color-mix(in srgb, var(--accent) 13%, var(--border));
+  background:
+    radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 28%),
+    radial-gradient(circle at 82% 76%, rgba(168,85,247,.10), transparent 26%),
+    color-mix(in srgb, var(--panel) 82%, transparent);
+  box-shadow:0 22px 68px rgba(15,23,42,.08);
+  transform:none !important;
+  transition:border-color .18s ease, box-shadow .18s ease !important;
+}
+html body.dark .tag-river-shell,
+html body.dark .tag-river-search{
+  background:
+    radial-gradient(circle at 16% 18%, rgba(56,189,248,.12), transparent 28%),
+    radial-gradient(circle at 82% 76%, rgba(168,85,247,.13), transparent 26%),
+    rgba(15,23,42,.52);
+  box-shadow:0 28px 78px rgba(0,0,0,.22);
+}
+html body .tag-river-shell:hover,
+html body .tag-river-search:hover{
+  transform:none !important;
+}
+html body .tag-river-head,
+html body .tag-river-search{
+  display:flex;
+  gap:18px;
+  align-items:flex-start;
+  justify-content:space-between;
+}
+html body .tag-river-head h2,
+html body .tag-river-search h2{
+  margin:2px 0 8px;
+  font-size:clamp(24px, 3vw, 38px);
+}
+html body .tag-river-head .meta,
+html body .tag-river-search .meta{
+  margin:0;
+  color:var(--muted);
+}
+html body .tag-river-count{
+  flex:0 0 auto;
+  margin-top:4px;
+  background:color-mix(in srgb, var(--accent) 12%, var(--panel));
+}
+html body .tag-river-stage{
+  position:relative;
+  min-height:280px;
+  margin-top:24px;
+  overflow:hidden;
+  border-radius:28px;
+  border:1px solid color-mix(in srgb, var(--accent) 10%, var(--border));
+  background:
+    radial-gradient(circle at 20% 18%, rgba(125,211,252,.16), transparent 22%),
+    radial-gradient(circle at 78% 64%, rgba(196,181,253,.12), transparent 28%),
+    linear-gradient(135deg, rgba(11,27,44,.66), rgba(19,25,48,.58) 48%, rgba(9,18,35,.68));
+  isolation:isolate;
+  transform:none !important;
+  transition:none !important;
+}
+html body .tag-river-stage::before,
+html body .tag-river-stage::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  transform:none !important;
+  transition:none !important;
+}
+html body .tag-river-stage::before{
+  opacity:.72;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.42) 0 1px, transparent 1.15px),
+    radial-gradient(circle, rgba(125,211,252,.28) 0 1.2px, transparent 1.35px),
+    radial-gradient(circle, rgba(196,181,253,.18) 0 1px, transparent 1.15px);
+  background-size:84px 68px, 146px 112px, 220px 176px;
+  background-position:10px 8px, 54px 42px, 28px 112px;
+}
+html body .tag-river-stage::after{
+  inset:-18%;
+  opacity:.35;
+  background:
+    radial-gradient(circle at 26% 66%, rgba(14,165,233,.16), transparent 30%),
+    radial-gradient(circle at 58% 26%, rgba(139,92,246,.16), transparent 26%),
+    radial-gradient(circle at 82% 72%, rgba(59,130,246,.10), transparent 24%);
+  filter:blur(9px);
+}
+html body .tag-river-stage:hover,
+html body .tag-river-stage:focus-within,
+html body .tag-river-stage:hover::before,
+html body .tag-river-stage:hover::after,
+html body .tag-river-stage:focus-within::before,
+html body .tag-river-stage:focus-within::after{
+  transform:none !important;
+  scale:1 !important;
+  translate:none !important;
+  transition:none !important;
+}
+html body .tag-river-lane{
+  position:absolute;
+  left:0;
+  right:0;
+  z-index:2;
+  height:72px;
+  display:flex;
+  align-items:center;
+  overflow:visible;
+  pointer-events:none;
+}
+html body .tag-river-lane.lane-one{ top:34px; }
+html body .tag-river-lane.lane-two{ top:108px; }
+html body .tag-river-lane.lane-three{ top:182px; }
+html body .tag-river-strip{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  width:max-content;
+  min-width:200%;
+  padding-left:100%;
+  animation:tagRiverMove var(--tag-river-duration, 56s) linear infinite;
+  will-change:transform;
+  pointer-events:auto;
+}
+html body .tag-river-lane:nth-child(2) .tag-river-strip{
+  animation-duration:calc(var(--tag-river-duration, 60s) * 1.06);
+  animation-delay:-12s;
+}
+html body .tag-river-lane:nth-child(3) .tag-river-strip{
+  animation-duration:calc(var(--tag-river-duration, 72s) * 1.12);
+  animation-delay:-24s;
+}
+html body .tag-river-lane:hover .tag-river-strip,
+html body .tag-river-lane:focus-within .tag-river-strip{
+  animation-play-state:paused;
+}
+@keyframes tagRiverMove{
+  from{ transform:translateX(0); }
+  to{ transform:translateX(-50%); }
+}
+html body .tag-river-chip{
+  --tag-scale:1;
+  --tag-tilt:0deg;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-width:max-content;
+  padding:10px 15px;
+  border-radius:999px;
+  color:rgba(241,245,249,.92);
+  text-decoration:none;
+  font-weight:850;
+  letter-spacing:.01em;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.13), rgba(255,255,255,.055)),
+    color-mix(in srgb, var(--accent) 18%, rgba(15,23,42,.58));
+  border:1px solid rgba(186,230,253,.20);
+  box-shadow:0 16px 34px rgba(3,7,18,.18), inset 0 1px 0 rgba(255,255,255,.12);
+  transform:rotate(var(--tag-tilt)) scale(var(--tag-scale));
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+  backdrop-filter:blur(12px);
+}
+html body .tag-river-chip b{
+  min-width:24px;
+  padding:2px 7px;
+  border-radius:999px;
+  text-align:center;
+  font-size:12px;
+  color:rgba(15,23,42,.86);
+  background:rgba(255,255,255,.76);
+}
+html body .tag-river-chip:hover,
+html body .tag-river-chip:focus-visible{
+  color:white;
+  border-color:rgba(125,211,252,.56);
+  box-shadow:0 20px 44px rgba(56,189,248,.18), inset 0 1px 0 rgba(255,255,255,.18);
+  transform:rotate(0deg) scale(calc(var(--tag-scale) + .05));
+  outline:none;
+}
+html body .tag-river-search{
+  margin-top:22px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+html body .tag-river-search-copy{
+  flex:1 1 330px;
+}
+html body .tag-river-searchbox{
+  flex:1 1 390px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:8px;
+  border-radius:999px;
+  background:color-mix(in srgb, var(--panel) 78%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
+  box-shadow:0 14px 34px rgba(15,23,42,.06);
+}
+html body.dark .tag-river-searchbox{
+  background:rgba(15,23,42,.46);
+}
+html body .tag-river-search-icon{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  color:var(--accent);
+  font-size:20px;
+}
+html body .tag-river-searchbox .searchbox{
+  width:100%;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  padding:10px 4px !important;
+  min-width:0;
+}
+html body .tag-river-searchbox .search-submit{
+  border:0;
+  cursor:pointer;
+  background:var(--accent);
+  color:white;
+}
+html body .tag-river-status{
+  flex:1 0 100%;
+  color:var(--muted);
+  font-weight:750;
+  margin-top:6px;
+}
+html body .tag-river-status.is-empty{
+  color:#ef4444;
+}
+html body .tag-river-results{
+  flex:1 0 100%;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+  gap:12px;
+  margin-top:2px;
+}
+html body .tag-river-result{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:14px;
+  border-radius:20px;
+  color:var(--text);
+  text-decoration:none;
+  background:color-mix(in srgb, var(--panel) 74%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
+  transform:none !important;
+  transition:border-color .18s ease, box-shadow .18s ease, background .18s ease !important;
+}
+html body.dark .tag-river-result{
+  background:rgba(15,23,42,.42);
+}
+html body .tag-river-result:hover,
+html body .tag-river-result:focus-visible{
+  border-color:color-mix(in srgb, var(--accent) 38%, var(--border));
+  box-shadow:0 16px 40px color-mix(in srgb, var(--accent) 12%, transparent);
+  outline:none;
+}
+html body .tag-river-result-mark{
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border-radius:14px;
+  color:var(--accent);
+  background:color-mix(in srgb, var(--accent) 12%, transparent);
+  font-weight:900;
+}
+html body .tag-river-result-main{
+  min-width:0;
+}
+html body .tag-river-result-main b,
+html body .tag-river-result-main small{
+  display:block;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+html body .tag-river-result-main small{
+  margin-top:4px;
+  color:var(--muted);
+}
+html body .tag-river-result em{
+  color:var(--accent-2);
+  font-style:normal;
+  font-weight:800;
+  white-space:nowrap;
+}
+html body .tag-river-empty-card,
+html body .tag-river-empty{
+  padding:18px;
+  border-radius:18px;
+  color:var(--muted);
+  background:color-mix(in srgb, var(--panel) 70%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 10%, var(--border));
+}
+html body .tag-river-hot-section{
+  margin-top:30px;
+}
+html body .tag-hot-card h3{
+  overflow-wrap:anywhere;
+}
+@media (prefers-reduced-motion: reduce){
+  html body .tag-river-strip{
+    animation:none !important;
+    flex-wrap:wrap;
+    padding:20px !important;
+    transform:none !important;
+  }
+  html body .tag-river-stage{
+    min-height:auto;
+  }
+  html body .tag-river-lane{
+    position:relative;
+    top:auto !important;
+    height:auto;
+  }
+}
+@media (max-width: 780px){
+  html body .tag-river-shell,
+  html body .tag-river-search{
+    padding:18px;
+    border-radius:24px;
+  }
+  html body .tag-river-head{
+    flex-direction:column;
+  }
+  html body .tag-river-stage{
+    min-height:270px;
+    margin-top:18px;
+  }
+  html body .tag-river-lane{ height:66px; }
+  html body .tag-river-lane.lane-one{ top:30px; }
+  html body .tag-river-lane.lane-two{ top:104px; }
+  html body .tag-river-lane.lane-three{ top:178px; }
+  html body .tag-river-chip{
+    padding:9px 13px;
+    font-size:14px;
+  }
+  html body .tag-river-searchbox{
+    grid-template-columns:auto 1fr;
+    border-radius:22px;
+  }
+  html body .tag-river-searchbox .search-submit{
+    grid-column:1 / -1;
+    width:100%;
+    justify-content:center;
+  }
+  html body .tag-river-results{
+    grid-template-columns:1fr;
+  }
+  html body .tag-river-result{
+    grid-template-columns:auto 1fr;
+  }
+  html body .tag-river-result em{
+    grid-column:2;
+  }
+}
+
+/* v20.1.2：标签漂流微调。
+   1. 首屏先铺满，不再等标签全部从右侧慢慢入场。
+   2. chip 减小边框和内边距，减少臃肿感。
+   3. 搜索逻辑对应 JS：只按标签名匹配。 */
+html body .tag-river-strip{
+  gap:12px !important;
+  min-width:max-content !important;
+  padding-left:0 !important;
+  animation-name:tagRiverMove211 !important;
+  animation-duration:var(--tag-river-duration, 42s) !important;
+  animation-timing-function:linear !important;
+  animation-iteration-count:infinite !important;
+}
+@keyframes tagRiverMove211{
+  from{ transform:translateX(0); }
+  to{ transform:translateX(-50%); }
+}
+html body .tag-river-chip{
+  gap:6px !important;
+  padding:7px 11px !important;
+  border-radius:18px !important;
+  font-size:14px !important;
+  line-height:1.1 !important;
+  letter-spacing:0 !important;
+  border-color:rgba(186,230,253,.13) !important;
+  box-shadow:0 10px 22px rgba(3,7,18,.13), inset 0 1px 0 rgba(255,255,255,.09) !important;
+  backdrop-filter:blur(8px) !important;
+}
+html body .tag-river-chip b{
+  min-width:18px !important;
+  padding:1px 5px !important;
+  font-size:11px !important;
+  background:rgba(255,255,255,.60) !important;
+}
+html body .tag-river-chip:hover,
+html body .tag-river-chip:focus-visible{
+  box-shadow:0 14px 30px rgba(56,189,248,.15), inset 0 1px 0 rgba(255,255,255,.14) !important;
+  transform:rotate(0deg) scale(calc(var(--tag-scale) + .035)) !important;
+}
+html body .tag-river-lane{ height:62px !important; }
+html body .tag-river-lane.lane-one{ top:36px !important; }
+html body .tag-river-lane.lane-two{ top:106px !important; }
+html body .tag-river-lane.lane-three{ top:176px !important; }
+@media (max-width: 780px){
+  html body .tag-river-strip{ gap:10px !important; }
+  html body .tag-river-chip{ padding:7px 10px !important; font-size:13px !important; }
+  html body .tag-river-lane{ height:58px !important; }
+}
+
+/* v20.1.2：标签漂流带“散开”版。
+   不再固定三条规整行，也不做密不透风的连续传送带。 */
+html body .tag-river-stage{
+  min-height:330px !important;
+}
+html body .tag-river-shell.is-scattered .tag-river-lane,
+html body .tag-river-lane-free{
+  top:var(--tag-lane-top, 40px) !important;
+  height:94px !important;
+  opacity:var(--tag-lane-depth, 1) !important;
+  overflow:visible !important;
+  pointer-events:none !important;
+}
+html body .tag-river-shell.is-scattered .tag-river-strip,
+html body .tag-river-strip-scattered{
+  gap:9px !important;
+  padding-left:0 !important;
+  min-width:max-content !important;
+  transform:translateX(var(--tag-river-shift, 0px));
+  animation-name:tagRiverScatterMove !important;
+  animation-duration:var(--tag-river-duration, 54s) !important;
+  animation-timing-function:linear !important;
+  animation-iteration-count:infinite !important;
+}
+@keyframes tagRiverScatterMove{
+  from{ transform:translateX(calc(4vw + var(--tag-river-shift, 0px))); }
+  to{ transform:translateX(calc(-52% + var(--tag-river-shift, 0px))); }
+}
+html body .tag-river-spacer{
+  display:inline-block !important;
+  width:var(--tag-gap-width, 86px) !important;
+  min-width:var(--tag-gap-width, 86px) !important;
+  height:1px !important;
+  pointer-events:none !important;
+}
+html body .tag-river-shell.is-scattered .tag-river-chip,
+html body .tag-river-strip-scattered .tag-river-chip{
+  padding:6px 10px !important;
+  border-radius:16px !important;
+  font-size:13px !important;
+  transform:translateY(calc(var(--tag-float-y, 0px) + var(--tag-local-drift, 0px) * .08)) rotate(var(--tag-tilt, 0deg)) scale(var(--tag-scale, 1)) !important;
+  border-color:rgba(186,230,253,.105) !important;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.105), rgba(255,255,255,.04)),
+    color-mix(in srgb, var(--accent) 13%, rgba(15,23,42,.50)) !important;
+  box-shadow:0 8px 18px rgba(3,7,18,.12), inset 0 1px 0 rgba(255,255,255,.075) !important;
+}
+html body .tag-river-shell.is-scattered .tag-river-chip b,
+html body .tag-river-strip-scattered .tag-river-chip b{
+  min-width:16px !important;
+  padding:1px 4px !important;
+  font-size:10px !important;
+  opacity:.82 !important;
+}
+html body .tag-river-shell.is-scattered .tag-river-chip:hover,
+html body .tag-river-shell.is-scattered .tag-river-chip:focus-visible,
+html body .tag-river-strip-scattered .tag-river-chip:hover,
+html body .tag-river-strip-scattered .tag-river-chip:focus-visible{
+  transform:translateY(calc(var(--tag-float-y, 0px) - 3px)) rotate(0deg) scale(calc(var(--tag-scale, 1) + .04)) !important;
+  border-color:rgba(125,211,252,.42) !important;
+  box-shadow:0 14px 30px rgba(56,189,248,.15), inset 0 1px 0 rgba(255,255,255,.14) !important;
+}
+html body .tag-river-lane:hover .tag-river-strip,
+html body .tag-river-lane:focus-within .tag-river-strip{
+  animation-play-state:paused !important;
+}
+@media (max-width: 780px){
+  html body .tag-river-stage{ min-height:315px !important; }
+  html body .tag-river-shell.is-scattered .tag-river-lane,
+  html body .tag-river-lane-free{ height:78px !important; }
+  html body .tag-river-shell.is-scattered .tag-river-chip,
+  html body .tag-river-strip-scattered .tag-river-chip{
+    padding:6px 9px !important;
+    font-size:12px !important;
+  }
+  html body .tag-river-spacer{
+    width:calc(var(--tag-gap-width, 82px) * .72) !important;
+    min-width:calc(var(--tag-gap-width, 82px) * .72) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce){
+  html body .tag-river-shell.is-scattered .tag-river-strip,
+  html body .tag-river-strip-scattered{
+    animation:none !important;
+    transform:none !important;
+    flex-wrap:wrap !important;
+    padding:18px !important;
+  }
+  html body .tag-river-spacer{ display:none !important; }
+}
+
+/* v20.3.5：修复标签漂流带被历史 transform:none !important 卡住的问题。
+   实际位移由 tag-flow.js 的 requestAnimationFrame 驱动；CSS 动画只保留兜底。 */
+html body .tag-river-strip-seamless,
+html body .tag-river-shell.is-scattered .tag-river-strip-seamless{
+  animation:none !important;
+  transform:translate3d(0,0,0) !important;
+  will-change:transform !important;
+}
+html body .tag-river-lane:hover .tag-river-strip-seamless,
+html body .tag-river-lane:focus-within .tag-river-strip-seamless,
+html body .tag-river-lane:hover .tag-river-strip,
+html body .tag-river-lane:focus-within .tag-river-strip{
+  animation-play-state:running !important;
+}

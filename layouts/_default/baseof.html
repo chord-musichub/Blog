@@ -61,6 +61,18 @@
 {{ partial "resource-hints.html" . }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
+{{ if or (eq .Section "friends") (hasPrefix .RelPermalink "/friends/") }}
+<link id="songline-friends-galaxy-style" rel="stylesheet" href="/css/friends-galaxy.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if or (eq .Section "tags") (hasPrefix .RelPermalink "/tags/") }}
+<link id="songline-tags-style" rel="stylesheet" href="/css/tags.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if or (and .IsPage (eq .Section "posts")) (hasPrefix .RelPermalink "/tools/markdown-previewer/") }}
+<link id="songline-reader-floating-controls-style" rel="stylesheet" href="/css/reader-floating-controls.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if and .IsSection (eq .Section "posts") }}
+<link id="songline-posts-list-style" rel="stylesheet" href="/css/posts-list.css?v={{ $assetVersion }}">
+{{ end }}
 {{ if hasPrefix .RelPermalink "/tools/reaction-test/" }}
 <link rel="stylesheet" href="/css/tools/reaction-test.css?v={{ $assetVersion }}">
 {{ end }}
@@ -94,7 +106,7 @@
   <script defer src="/js/mobile-fixed-nav.js?v={{ $assetVersion }}"></script>
 <script defer src="/js/space-ribbons.js?v={{ $assetVersion }}"></script>
 </head>
-<body data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-boot-welcome="{{ default "欢迎回来" $cfg.boot.welcome_text }}"{{ with $cfg.background.image }} class="has-site-bg"{{ end }}>
+<body data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-page-section="{{ if .IsHome }}home{{ else }}{{ default "general" .Section }}{{ end }}" data-page-layout="{{ .Layout }}" data-boot-welcome="{{ default "欢迎回来" $cfg.boot.welcome_text }}"{{ with $cfg.background.image }} class="has-site-bg"{{ end }}>
   <script>
     (function(){
       try{

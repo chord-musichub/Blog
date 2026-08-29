@@ -5,6 +5,21 @@
 (function(){
   'use strict';
   var VERSION = '20.20.6';
+  var STYLE_ID = 'songline-friends-galaxy-style';
+  var assetVersion = VERSION;
+  try{
+    var sourceURL = new URL((document.currentScript && document.currentScript.src) || '', window.location.href);
+    assetVersion = sourceURL.searchParams.get('v') || assetVersion;
+  }catch(e){}
+
+  function ensureStylesheet(){
+    if(document.getElementById(STYLE_ID)) return;
+    var style = document.createElement('link');
+    style.id = STYLE_ID;
+    style.rel = 'stylesheet';
+    style.href = '/css/friends-galaxy.css?v=' + encodeURIComponent(assetVersion);
+    document.head.appendChild(style);
+  }
 
   function ready(fn){
     if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, {once:true});
@@ -677,6 +692,7 @@
   function init(){
     var shell = document.querySelector('[data-friend-galaxy]');
     if(!shell) return;
+    ensureStylesheet();
     if(shell.dataset.friendGalaxyReady === VERSION) return;
     shell.dataset.friendGalaxyReady = VERSION;
     shell.classList.add('slv2010-booting');

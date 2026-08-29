@@ -15,7 +15,7 @@ v20.20.6：页面级 JS 按需加载。
 <script defer data-page-script="friend-galaxy" src="/js/friend-galaxy.js?v={{ $v }}"></script>
 {{- end }}
 
-{{- if or (eq $section "tags") (hasPrefix $rel "/tags/") (eq .Kind "taxonomy") (eq .Kind "term") }}
+{{- if or (eq $section "tags") (hasPrefix $rel "/tags/") }}
 <script defer data-page-script="tag-flow" src="/js/tag-flow.js?v={{ $v }}"></script>
 {{- end }}
 

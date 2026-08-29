@@ -485,9 +485,14 @@
       const currentThemeClass = isDark ? 'dark' : '';
       document.body.className = nextBody.className || '';
       if(currentThemeClass) document.body.classList.add(currentThemeClass);
-      if(nextBody.dataset && nextBody.dataset.pageKind){
-        document.body.dataset.pageKind = nextBody.dataset.pageKind;
-      }
+      // AJAX 换页时同步页面语义，供按页加载的样式与模块判断当前页面。
+      ['pageKind', 'pageSection', 'pageLayout', 'bootWelcome'].forEach(function(name){
+        if(nextBody.dataset && nextBody.dataset[name]){
+          document.body.dataset[name] = nextBody.dataset[name];
+        }else{
+          delete document.body.dataset[name];
+        }
+      });
     }
 
     bindNavIndicatorHover();

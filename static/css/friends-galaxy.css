@@ -1,0 +1,1808 @@
+/* 好友星图页面样式：仅在 /friends/ 及朋友详情页加载。 */
+/* 从 site.css 的历史迭代块迁移而来，保持原有顺序与优先级。 */
+
+/* 早期星图规则保留在同一页面模块，兼容缓存页面与旧 DOM。 */
+/* v19.6：朋友页动态星图重构
+   中心不再用大信息卡压住星图；中心只保留头像，资料卡移到右侧浮层。
+*/
+.friend-galaxy-shell{
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
+.friend-galaxy-stage{
+  position:relative;
+  min-height:640px;
+  overflow:hidden;
+  padding:0;
+  background:
+    radial-gradient(circle at 42% 52%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 33%),
+    radial-gradient(circle at 72% 18%, rgba(148, 197, 255, .13), transparent 26%),
+    color-mix(in srgb, var(--panel) 82%, transparent);
+}
+body.dark .friend-galaxy-stage{
+  background:
+    radial-gradient(circle at 42% 52%, rgba(56,189,248,.13), transparent 33%),
+    radial-gradient(circle at 72% 18%, rgba(99,102,241,.14), transparent 26%),
+    rgba(17,28,46,.66);
+}
+.friend-galaxy-lines,
+.friend-galaxy-nodes{
+  position:absolute;
+  inset:0;
+}
+.friend-galaxy-lines{
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+.galaxy-line{
+  stroke:color-mix(in srgb, var(--accent) 25%, transparent);
+  stroke-width:1.15;
+  opacity:.35;
+  transition:opacity .18s ease, stroke-width .18s ease;
+}
+.galaxy-line.center-line{
+  opacity:.48;
+}
+.galaxy-line.web-line{
+  opacity:.22;
+  stroke-dasharray:3 8;
+}
+.galaxy-line.is-lit,
+.galaxy-line.is-related{
+  opacity:.68;
+  stroke-width:1.7;
+}
+.galaxy-line.is-dim{
+  opacity:.08;
+}
+.friend-galaxy-core{
+  position:absolute;
+  left:42%;
+  top:52%;
+  width:148px;
+  height:148px;
+  transform:translate(-50%, -50%);
+  border:0;
+  border-radius:999px;
+  padding:0;
+  background:transparent;
+  cursor:pointer;
+  z-index:4;
+}
+.friend-galaxy-core img{
+  position:relative;
+  z-index:2;
+  width:148px;
+  height:148px;
+  border-radius:999px;
+  object-fit:cover;
+  border:3px solid color-mix(in srgb, var(--accent) 45%, white);
+  background:var(--panel);
+  box-shadow:0 26px 64px rgba(15,23,42,.24);
+  transition:transform .34s ease, border-color .22s ease;
+}
+.friend-galaxy-core:hover img{
+  transform:scale(1.035);
+  border-color:var(--accent);
+}
+.friend-core-orbit{
+  position:absolute;
+  inset:-18px;
+  border-radius:999px;
+  border:1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  animation:friendCorePulse 4.2s ease-in-out infinite;
+}
+.friend-core-orbit::after{
+  content:"";
+  position:absolute;
+  inset:13px;
+  border-radius:999px;
+  border:1px dashed color-mix(in srgb, var(--accent) 24%, transparent);
+  animation:friendCoreSpin 18s linear infinite;
+}
+.friend-galaxy-stage.is-switching .friend-galaxy-core img{
+  animation:friendCoreSwitch .46s ease;
+}
+.friend-node{
+  position:absolute;
+  left:var(--x);
+  top:var(--y);
+  width:82px;
+  height:82px;
+  border:0;
+  background:transparent;
+  padding:0;
+  cursor:pointer;
+  transform:translate(-50%, -50%) scale(var(--scale, 1));
+  transition:transform .42s cubic-bezier(.2,.8,.2,1), opacity .22s ease, filter .22s ease;
+  z-index:2;
+}
+.friend-node img{
+  width:66px;
+  height:66px;
+  border-radius:999px;
+  object-fit:cover;
+  border:2px solid rgba(255,255,255,.86);
+  box-shadow:0 16px 38px rgba(15,23,42,.16);
+  background:var(--panel);
+}
+.friend-node-ring{
+  position:absolute;
+  inset:1px;
+  border-radius:999px;
+  border:1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+  animation:friendPulse 4s ease-in-out infinite;
+}
+.friend-node-name{
+  position:absolute;
+  left:50%;
+  top:72px;
+  transform:translateX(-50%);
+  padding:3px 8px;
+  border-radius:999px;
+  background:color-mix(in srgb, var(--panel) 86%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
+  font-size:12px;
+  color:var(--muted);
+  white-space:nowrap;
+  box-shadow:0 8px 18px rgba(15,23,42,.08);
+}
+.friend-node.is-active{
+  opacity:0;
+  pointer-events:none;
+}
+.friend-node.is-preview:not(.is-active){
+  filter:saturate(1.16) brightness(1.04);
+}
+.friend-node.is-preview:not(.is-active) img{
+  border-color:var(--accent);
+}
+.friend-node.is-dim{
+  opacity:.24;
+  filter:grayscale(.4);
+}
+.friend-galaxy-profile{
+  position:absolute;
+  right:34px;
+  bottom:34px;
+  z-index:5;
+  width:min(360px, calc(100% - 68px));
+  padding:24px;
+  border-radius:28px;
+  background:color-mix(in srgb, var(--panel) 76%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+  box-shadow:0 24px 70px rgba(15,23,42,.14);
+  backdrop-filter:blur(18px);
+}
+body.dark .friend-galaxy-profile{
+  background:rgba(15,23,42,.62);
+}
+.friend-galaxy-profile h2{
+  margin:4px 0 8px;
+  font-size:32px;
+}
+.friend-galaxy-profile p{
+  margin:0 0 14px;
+  color:var(--muted);
+  line-height:1.75;
+}
+.friend-center-link{
+  margin-top:14px;
+}
+.friend-galaxy-control{
+  padding:22px 24px;
+  display:grid;
+  grid-template-columns:minmax(220px, .8fr) minmax(260px, 1fr);
+  gap:18px 22px;
+  align-items:center;
+}
+.friend-galaxy-control h2{
+  margin:0 0 4px;
+}
+.friend-galaxy-results{
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+  gap:10px;
+}
+.friend-result{
+  border:1px solid var(--border);
+  background:color-mix(in srgb, var(--panel) 78%, transparent);
+  border-radius:18px;
+  padding:10px;
+  display:grid;
+  grid-template-columns:42px minmax(0, 1fr) auto;
+  gap:10px;
+  align-items:center;
+  color:var(--text);
+  cursor:pointer;
+  text-align:left;
+  transition:transform .18s ease, border-color .18s ease;
+}
+.friend-result:hover{
+  border-color:var(--accent);
+  transform:translateY(-1px);
+}
+.friend-result img{
+  width:42px;
+  height:42px;
+  border-radius:999px;
+  object-fit:cover;
+}
+.friend-result b,
+.friend-result small{
+  display:block;
+}
+.friend-result small{
+  color:var(--muted);
+}
+.friend-result em{
+  font-style:normal;
+  color:var(--accent-2);
+  font-size:12.5px;
+  font-weight:800;
+}
+.friend-galaxy-empty{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:var(--muted);
+  padding:28px;
+  text-align:center;
+}
+@keyframes friendPulse{
+  0%,100%{transform:scale(.92);opacity:.24}
+  50%{transform:scale(1.08);opacity:.66}
+}
+@keyframes friendCorePulse{
+  0%,100%{transform:scale(.96);opacity:.32}
+  50%{transform:scale(1.08);opacity:.78}
+}
+@keyframes friendCoreSpin{
+  to{transform:rotate(360deg)}
+}
+@keyframes friendCoreSwitch{
+  0%{transform:scale(.94)}
+  55%{transform:scale(1.06)}
+  100%{transform:scale(1)}
+}
+@media(max-width:900px){
+  .friend-galaxy-stage{
+    min-height:680px;
+  }
+  .friend-galaxy-core{
+    left:50%;
+    top:34%;
+  }
+  .friend-galaxy-profile{
+    left:18px;
+    right:18px;
+    bottom:18px;
+    width:auto;
+    text-align:center;
+  }
+  .friend-galaxy-profile .meta-row{
+    justify-content:center;
+  }
+  .friend-galaxy-control{
+    grid-template-columns:1fr;
+  }
+}
+@media(max-width:640px){
+  .friend-galaxy-stage{
+    min-height:620px;
+  }
+  .friend-galaxy-core{
+    width:118px;
+    height:118px;
+  }
+  .friend-galaxy-core img{
+    width:118px;
+    height:118px;
+  }
+  .friend-node{
+    width:66px;
+    height:66px;
+  }
+  .friend-node img{
+    width:52px;
+    height:52px;
+  }
+  .friend-node-name{
+    top:58px;
+    font-size:11px;
+    max-width:78px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .friend-galaxy-profile h2{
+    font-size:26px;
+  }
+}
+
+
+/* v19.6：修复朋友星图显示异常
+   处理旧数据带引号、头像路径异常后，顺手把星图区域放大、中心位置和搜索反馈重新调了一版。
+*/
+body .friend-galaxy-stage{
+  min-height:680px !important;
+  overflow:hidden !important;
+}
+body .friend-galaxy-core{
+  left:38% !important;
+  top:50% !important;
+  width:176px !important;
+  height:176px !important;
+}
+body .friend-galaxy-core img{
+  width:176px !important;
+  height:176px !important;
+}
+body .friend-core-orbit{
+  inset:-22px !important;
+}
+body .friend-node{
+  width:92px !important;
+  height:92px !important;
+}
+body .friend-node img{
+  width:74px !important;
+  height:74px !important;
+}
+body .friend-node-name{
+  top:80px !important;
+  color:var(--text) !important;
+  background:color-mix(in srgb, var(--panel) 90%, transparent) !important;
+}
+body .friend-galaxy-profile{
+  right:36px !important;
+  bottom:42px !important;
+  width:min(390px, calc(100% - 72px)) !important;
+}
+body .friend-galaxy-profile h2{
+  word-break:break-word;
+}
+body .friend-galaxy-profile p{
+  white-space:pre-line;
+  word-break:break-word;
+}
+body .friend-galaxy-results:empty{
+  display:none;
+}
+body .friend-galaxy-results{
+  min-height:0;
+}
+body .friend-result{
+  min-width:0;
+}
+body .friend-result span{
+  min-width:0;
+}
+body .friend-result b{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+body .friend-result img,
+body .friend-node img,
+body .friend-galaxy-core img{
+  background:linear-gradient(135deg, rgba(125,211,252,.20), rgba(216,180,254,.16)), var(--panel);
+}
+body .page-hero.minimal-page-hero{
+  overflow:visible !important;
+}
+@media(max-width:900px){
+  body .friend-galaxy-stage{
+    min-height:700px !important;
+  }
+  body .friend-galaxy-core{
+    left:50% !important;
+    top:31% !important;
+    width:136px !important;
+    height:136px !important;
+  }
+  body .friend-galaxy-core img{
+    width:136px !important;
+    height:136px !important;
+  }
+  body .friend-galaxy-profile{
+    left:18px !important;
+    right:18px !important;
+    bottom:18px !important;
+    width:auto !important;
+  }
+}
+@media(max-width:640px){
+  body .friend-galaxy-stage{
+    min-height:640px !important;
+  }
+  body .friend-node{
+    width:70px !important;
+    height:70px !important;
+  }
+  body .friend-node img{
+    width:54px !important;
+    height:54px !important;
+  }
+  body .friend-node-name{
+    top:60px !important;
+  }
+}
+
+
+/* v19.6：朋友星图交互细节修复
+   1. 节点按统一中心点对齐
+   2. 中心头像下方显示名字
+   3. 资料简介截断，完整简介放 title
+   4. 搜索结果增加明确状态与当前项反馈
+*/
+body .friend-galaxy-stage{
+  min-height:700px !important;
+}
+body .friend-galaxy-core{
+  position:absolute !important;
+  transform:translate(-50%, -50%) !important;
+  left:38% !important;
+  top:48% !important;
+  width:176px !important;
+  height:214px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+}
+body .friend-galaxy-core img{
+  flex:0 0 auto;
+}
+body .friend-core-orbit{
+  left:-22px !important;
+  right:-22px !important;
+  top:-22px !important;
+  width:auto !important;
+  height:176px !important;
+  bottom:auto !important;
+}
+body .friend-core-name{
+  position:relative;
+  z-index:3;
+  display:inline-flex;
+  max-width:210px;
+  margin-top:12px;
+  padding:6px 12px;
+  border-radius:999px;
+  background:color-mix(in srgb, var(--panel) 88%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+  color:var(--text);
+  font-size:15px;
+  font-weight:800;
+  line-height:1.2;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  box-shadow:0 10px 24px rgba(15,23,42,.12);
+}
+body .friend-node{
+  transform:translate(-50%, -50%) scale(var(--scale, 1)) !important;
+  transform-origin:center center !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+}
+body .friend-node-ring{
+  left:0 !important;
+  top:0 !important;
+  width:92px !important;
+  height:92px !important;
+  right:auto !important;
+  bottom:auto !important;
+}
+body .friend-node img{
+  position:relative;
+  z-index:2;
+  flex:0 0 auto;
+}
+body .friend-node-name{
+  position:relative !important;
+  left:auto !important;
+  top:auto !important;
+  transform:none !important;
+  z-index:3;
+  margin-top:6px;
+  max-width:116px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+body .friend-galaxy-profile p[data-center-bio],
+body .friend-galaxy-profile [data-center-bio]{
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  white-space:normal !important;
+}
+body .friend-search-status{
+  grid-column:1 / -1;
+  color:var(--muted);
+  font-size:12.5px;
+  padding:2px 2px 0;
+}
+body .friend-result.is-current{
+  border-color:var(--accent) !important;
+  background:color-mix(in srgb, var(--accent) 10%, var(--panel)) !important;
+}
+body .friend-result small{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+@media(max-width:900px){
+  body .friend-galaxy-core{
+    left:50% !important;
+    top:30% !important;
+    width:136px !important;
+    height:174px !important;
+  }
+  body .friend-core-orbit{
+    height:136px !important;
+  }
+  body .friend-core-name{
+    max-width:170px;
+  }
+}
+@media(max-width:640px){
+  body .friend-node-ring{
+    width:70px !important;
+    height:70px !important;
+  }
+  body .friend-core-name{
+    font-size:12.5px;
+    max-width:150px;
+  }
+}
+
+
+/* v19.6：朋友星图细节继续修
+   - 名字不再被头像容器挤掉
+   - 头像背后的圆圈改成清晰同心圆，不再和名字/头像错位混乱
+   - 快速寻找增加放大镜入口、搜索按钮和 Enter 触发反馈
+*/
+body .friend-galaxy-core{
+  overflow:visible !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  height:238px !important;
+}
+body .friend-galaxy-core img{
+  display:block !important;
+}
+body .friend-core-name{
+  flex:0 0 auto !important;
+  position:static !important;
+  transform:none !important;
+  width:max-content !important;
+  max-width:260px !important;
+  min-height:30px !important;
+  box-sizing:border-box !important;
+  text-align:center !important;
+}
+body .friend-core-orbit{
+  pointer-events:none !important;
+  box-sizing:border-box !important;
+  left:50% !important;
+  top:88px !important;
+  right:auto !important;
+  bottom:auto !important;
+  width:218px !important;
+  height:218px !important;
+  transform:translate(-50%, -50%) !important;
+  border:1px solid color-mix(in srgb, var(--accent) 36%, transparent) !important;
+  box-shadow:0 0 0 18px color-mix(in srgb, var(--accent) 5%, transparent) inset !important;
+  opacity:.9 !important;
+}
+body .friend-core-orbit::after{
+  left:18px !important;
+  top:18px !important;
+  right:18px !important;
+  bottom:18px !important;
+  width:auto !important;
+  height:auto !important;
+  border-style:solid !important;
+  opacity:.62 !important;
+}
+body .friend-node{
+  overflow:visible !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  height:124px !important;
+}
+body .friend-node-ring{
+  pointer-events:none !important;
+  box-sizing:border-box !important;
+  left:50% !important;
+  top:37px !important;
+  width:92px !important;
+  height:92px !important;
+  transform:translate(-50%, -50%) !important;
+  border:1px solid color-mix(in srgb, var(--accent) 32%, transparent) !important;
+  box-shadow:0 0 0 10px color-mix(in srgb, var(--accent) 4%, transparent) inset !important;
+  animation:none !important;
+}
+body .friend-node.is-preview .friend-node-ring{
+  border-color:var(--accent) !important;
+  box-shadow:0 0 0 12px color-mix(in srgb, var(--accent) 10%, transparent) inset !important;
+}
+body .friend-node-name{
+  min-height:22px !important;
+  max-width:136px !important;
+  box-sizing:border-box !important;
+  text-align:center !important;
+  line-height:1.2 !important;
+}
+.friend-search-box{
+  position:relative;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  border-radius:16px;
+  padding:8px 10px 8px 14px;
+}
+.friend-search-box .searchbox{
+  border:0 !important;
+  background:transparent !important;
+  padding:8px 4px !important;
+  min-width:0;
+  box-shadow:none !important;
+  outline:none !important;
+}
+.friend-search-icon{
+  color:var(--muted);
+  font-size:22px;
+  line-height:1;
+}
+.friend-search-submit{
+  border:1px solid color-mix(in srgb, var(--accent) 26%, var(--border));
+  background:color-mix(in srgb, var(--accent) 10%, var(--panel));
+  color:var(--accent-2);
+  border-radius:12px;
+  padding:8px 14px;
+  font-weight:800;
+  cursor:pointer;
+}
+.friend-search-submit:hover{
+  border-color:var(--accent);
+  transform:translateY(-1px);
+}
+body .friend-search-status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+body .friend-search-status::before{
+  content:"";
+  color:var(--accent-2);
+}
+body .friend-result.is-current em{
+  color:var(--accent);
+}
+@media(max-width:900px){
+  body .friend-galaxy-core{
+    height:190px !important;
+  }
+  body .friend-core-orbit{
+    top:68px !important;
+    width:170px !important;
+    height:170px !important;
+  }
+}
+@media(max-width:640px){
+  .friend-search-box{
+    grid-template-columns:auto minmax(0,1fr);
+  }
+  .friend-search-submit{
+    grid-column:1 / -1;
+    width:100%;
+  }
+  body .friend-node-ring{
+    width:70px !important;
+    height:70px !important;
+    top:27px !important;
+  }
+  body .friend-node-name{
+    max-width:92px !important;
+  }
+}
+
+/* 朋友星图稳定兜底规则，保留在新结构规则之前。 */
+/* v20.0.8：朋友星图背景取消 hover；朋友搜索未命中明确反馈。 */
+html body .friend-galaxy-stage,
+html body .friend-galaxy-stage.card,
+html body .friend-galaxy-stage:hover,
+html body .friend-galaxy-stage.card:hover,
+html body .friend-galaxy-stage:focus-within{
+  transform:none !important;
+  translate:none !important;
+}
+html body .friend-galaxy-stage:hover,
+html body .friend-galaxy-stage.card:hover{
+  border-color:var(--border) !important;
+  box-shadow:var(--shadow) !important;
+}
+body.dark .friend-galaxy-stage:hover,
+body.dark .friend-galaxy-stage.card:hover{
+  border-color:var(--border) !important;
+  background:rgba(17,28,46,.66) !important;
+  box-shadow:var(--shadow) !important;
+}
+html body .friend-galaxy-stage::before,
+html body .friend-galaxy-stage::after{
+  pointer-events:none !important;
+}
+html body .friend-search-status.is-not-found{
+  color:#ef4444 !important;
+  background:rgba(239,68,68,.08) !important;
+  border:1px solid rgba(239,68,68,.20) !important;
+  border-radius:14px !important;
+  padding:10px 12px !important;
+}
+html body .friend-search-empty-hint{
+  margin:0 !important;
+  padding:0 4px !important;
+}
+html body .friend-galaxy-shell.friend-search-not-found .friend-search-box{
+  border-color:rgba(239,68,68,.38) !important;
+  box-shadow:0 0 0 4px rgba(239,68,68,.08) !important;
+}
+html body .friend-node.is-search-hit .friend-node-ring{
+  border-color:color-mix(in srgb, var(--accent) 64%, transparent) !important;
+  box-shadow:0 0 0 5px color-mix(in srgb, var(--accent) 13%, transparent) !important;
+}
+
+
+/* v20.0.8：朋友星图回滚式修复
+   搜索只切换中心与高亮，不再把非命中节点隐藏成空关系；星图背景卡片取消 hover 位移。 */
+body .friend-galaxy-stage.card:hover,
+body .friend-galaxy-stage:hover{
+  transform:none !important;
+  border-color:transparent !important;
+}
+body .friend-galaxy-stage.card:hover::before,
+body .friend-galaxy-stage.card:hover::after,
+body .friend-galaxy-stage:hover::before,
+body .friend-galaxy-stage:hover::after{
+  transform:none !important;
+}
+body .friend-galaxy-stage .friend-node.is-search-hit .friend-node-name{
+  color:var(--accent-2) !important;
+  border-color:color-mix(in srgb, var(--accent) 46%, var(--border)) !important;
+  box-shadow:0 10px 24px color-mix(in srgb, var(--accent) 14%, transparent) !important;
+}
+body .friend-galaxy-stage .friend-node.is-search-hit img{
+  border-color:var(--accent) !important;
+  box-shadow:0 18px 44px color-mix(in srgb, var(--accent) 18%, transparent) !important;
+}
+body .friend-galaxy-stage .friend-node.is-search-hidden{
+  display:flex !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+  filter:none !important;
+}
+body .friend-search-status.is-not-found,
+body .friend-galaxy-shell.friend-search-not-found .friend-search-status{
+  color:#ef4444 !important;
+  font-weight:800 !important;
+}
+
+/* v20.0.8：朋友星图稳定兜底。星图背景完全不响应 hover，节点/连线强制显示。 */
+html body .friend-galaxy-stage,
+html body .friend-galaxy-stage.card,
+html body .friend-galaxy-stage:hover,
+html body .friend-galaxy-stage.card:hover,
+html body .friend-galaxy-stage:focus-within{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  animation:none !important;
+  border-color:transparent !important;
+  box-shadow:0 22px 70px rgba(39,74,112,.10) !important;
+}
+html body.dark .friend-galaxy-stage,
+html body.dark .friend-galaxy-stage.card,
+html body.dark .friend-galaxy-stage:hover,
+html body.dark .friend-galaxy-stage.card:hover,
+html body.dark .friend-galaxy-stage:focus-within{
+  transform:none !important;
+  border-color:transparent !important;
+  box-shadow:0 28px 80px rgba(0,0,0,.28) !important;
+}
+html body .friend-galaxy-stage:hover::before,
+html body .friend-galaxy-stage:hover::after,
+html body .friend-galaxy-stage.card:hover::before,
+html body .friend-galaxy-stage.card:hover::after{
+  transform:none !important;
+  scale:1 !important;
+}
+html body .friend-galaxy-lines{
+  display:block !important;
+  opacity:1 !important;
+  z-index:1 !important;
+}
+html body .friend-galaxy-nodes{
+  display:block !important;
+  z-index:3 !important;
+}
+html body .friend-node{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:1;
+  visibility:visible;
+}
+html body .friend-node[hidden],
+html body .friend-node.is-active{
+  display:none !important;
+}
+html body .friend-node.is-search-hit img{
+  border-color:var(--accent) !important;
+  box-shadow:0 18px 44px color-mix(in srgb, var(--accent) 20%, transparent) !important;
+}
+html body .friend-search-status.is-not-found{
+  color:#ef4444 !important;
+  background:rgba(239,68,68,.08) !important;
+  border:1px solid rgba(239,68,68,.22) !important;
+  border-radius:14px !important;
+  padding:10px 12px !important;
+}
+
+/* v20.0.8：朋友星图关系网稳定修复。
+   1) 星图舞台不再响应 card:hover 的抬起/变框。
+   2) 关系线和节点强制可见，避免只剩中心头像。
+*/
+html body .friend-galaxy-stage,
+html body .friend-galaxy-stage.card,
+html body .friend-galaxy-stage:hover,
+html body .friend-galaxy-stage.card:hover,
+html body .friend-galaxy-stage:focus,
+html body .friend-galaxy-stage:focus-within{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  animation:none !important;
+  transition:none !important;
+  border-color:transparent !important;
+  outline:none !important;
+}
+html body .friend-galaxy-stage:hover,
+html body .friend-galaxy-stage.card:hover{
+  background:
+    radial-gradient(circle at 35% 46%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(216,180,254,.18), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(125,211,252,.12), transparent 26%),
+    color-mix(in srgb, var(--panel) 56%, transparent) !important;
+  box-shadow:0 22px 70px rgba(39,74,112,.10) !important;
+}
+html body.dark .friend-galaxy-stage:hover,
+html body.dark .friend-galaxy-stage.card:hover{
+  background:
+    radial-gradient(circle at 35% 46%, rgba(56,189,248,.16), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(168,85,247,.16), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(96,165,250,.12), transparent 26%),
+    rgba(11,22,38,.54) !important;
+  box-shadow:0 28px 80px rgba(0,0,0,.28) !important;
+}
+html body .friend-galaxy-stage:hover::before,
+html body .friend-galaxy-stage:hover::after,
+html body .friend-galaxy-stage.card:hover::before,
+html body .friend-galaxy-stage.card:hover::after{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  animation:none !important;
+}
+html body .friend-galaxy-lines{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+html body .galaxy-line.center-line{
+  opacity:.52 !important;
+  stroke-width:1.25 !important;
+}
+html body .galaxy-line.web-line{
+  opacity:.30 !important;
+  stroke-width:1 !important;
+}
+html body .galaxy-line.web-line.is-dim{
+  opacity:.16 !important;
+}
+html body .friend-galaxy-nodes{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+html body .friend-node:not(.is-active){
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+}
+html body .friend-node[hidden],
+html body .friend-node.is-active{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+}
+
+/* v20.0.8：朋友星图重构最终兜底
+   舞台不再继承 card hover；搜索只切换中心，不隐藏关系网。 */
+html body .friend-galaxy-stage-v20,
+html body .friend-galaxy-stage-v20:hover,
+html body .friend-galaxy-stage-v20:focus,
+html body .friend-galaxy-stage-v20:focus-within{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  transition:none !important;
+  border:1px solid color-mix(in srgb, var(--accent) 10%, var(--border)) !important;
+  box-shadow:0 22px 70px rgba(39,74,112,.10) !important;
+  background:
+    radial-gradient(circle at 35% 46%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(216,180,254,.18), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(125,211,252,.12), transparent 26%),
+    color-mix(in srgb, var(--panel) 56%, transparent) !important;
+}
+html body.dark .friend-galaxy-stage-v20,
+html body.dark .friend-galaxy-stage-v20:hover,
+html body.dark .friend-galaxy-stage-v20:focus,
+html body.dark .friend-galaxy-stage-v20:focus-within{
+  border:1px solid rgba(125,211,252,.10) !important;
+  box-shadow:0 28px 80px rgba(0,0,0,.28) !important;
+  background:
+    radial-gradient(circle at 35% 46%, rgba(56,189,248,.16), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(168,85,247,.16), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(96,165,250,.12), transparent 26%),
+    rgba(11,22,38,.54) !important;
+}
+html body .friend-galaxy-stage-v20::before,
+html body .friend-galaxy-stage-v20::after,
+html body .friend-galaxy-stage-v20:hover::before,
+html body .friend-galaxy-stage-v20:hover::after{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  pointer-events:none !important;
+}
+html body .friend-galaxy-v20 .friend-galaxy-lines{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  z-index:1 !important;
+}
+html body .friend-galaxy-v20 .friend-galaxy-nodes{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  z-index:3 !important;
+}
+html body .friend-galaxy-v20 .friend-node:not(.is-active){
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+}
+html body .friend-galaxy-v20 .friend-node[hidden],
+html body .friend-galaxy-v20 .friend-node.is-active{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+}
+html body .friend-galaxy-v20 .galaxy-line.center-line{
+  opacity:.58 !important;
+  stroke-width:1.35 !important;
+}
+html body .friend-galaxy-v20 .galaxy-line.web-line{
+  opacity:.30 !important;
+  stroke-width:1 !important;
+}
+html body .friend-galaxy-v20 .galaxy-line.is-explicit{
+  opacity:.64 !important;
+  stroke-width:1.45 !important;
+  stroke-dasharray:none !important;
+}
+html body .friend-galaxy-v20 .galaxy-line.is-fallback{
+  opacity:.24 !important;
+}
+html body .friend-galaxy-v20 .galaxy-line.is-dim{
+  opacity:.14 !important;
+}
+html body .friend-galaxy-v20 .friend-search-status.is-not-found{
+  color:#ef4444 !important;
+  background:rgba(239,68,68,.08) !important;
+  border:1px solid rgba(239,68,68,.22) !important;
+  border-radius:14px !important;
+  padding:10px 12px !important;
+  font-weight:800 !important;
+}
+html body .friend-galaxy-v20 .friend-node.is-search-hit img,
+html body .friend-galaxy-v20 .friend-node.is-search-hit .friend-node-name{
+  border-color:var(--accent) !important;
+  box-shadow:0 18px 44px color-mix(in srgb, var(--accent) 20%, transparent) !important;
+}
+html body .friend-galaxy-v20 .friend-node.is-search-hit .friend-node-name{
+  color:var(--accent-2) !important;
+}
+
+/* v20.0.8：朋友星图数据/节点显示最终兜底。JS 会用 inline style 强制定位，这里负责避免旧规则遮挡。 */
+html body .friend-galaxy-v20 .friend-galaxy-stage-v20{
+  overflow:hidden !important;
+  transform:none !important;
+  transition:none !important;
+}
+html body .friend-galaxy-v20 .friend-galaxy-lines{
+  position:absolute !important;
+  inset:0 !important;
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+  z-index:1 !important;
+}
+html body .friend-galaxy-v20 .friend-galaxy-nodes{
+  position:absolute !important;
+  inset:0 !important;
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+  z-index:6 !important;
+}
+html body .friend-galaxy-v20 .friend-node-v20{
+  pointer-events:auto !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:88px !important;
+  height:88px !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  filter:none !important;
+}
+html body .friend-galaxy-v20 .friend-node-v20[hidden],
+html body .friend-galaxy-v20 .friend-node-v20.is-active{
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+}
+html body .friend-galaxy-v20 .friend-node-v20 img{
+  width:68px !important;
+  height:68px !important;
+  display:block !important;
+  opacity:1 !important;
+}
+html body .friend-galaxy-v20 .galaxy-line.center-line{
+  opacity:.62 !important;
+  stroke-width:1.45 !important;
+}
+html body .friend-galaxy-v20 .galaxy-line.web-line{
+  opacity:.34 !important;
+  stroke-width:1 !important;
+}
+
+/* v20.0.8：朋友星图硬重构。使用 slv2004 专属类，避开旧 friend-node 规则污染。 */
+html body .friend-galaxy-shell.friend-galaxy-v20,
+html body .friend-galaxy-shell.friend-galaxy-v2004{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:22px !important;
+}
+html body .slv2004-stage,
+html body .slv2004-stage:hover,
+html body .slv2004-stage:focus,
+html body .slv2004-stage:focus-within{
+  position:relative !important;
+  min-height:700px !important;
+  overflow:hidden !important;
+  padding:0 !important;
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  transition:none !important;
+  border:1px solid color-mix(in srgb, var(--accent) 10%, var(--border)) !important;
+  box-shadow:0 22px 70px rgba(39,74,112,.10) !important;
+  background:
+    radial-gradient(circle at 35% 46%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(216,180,254,.18), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(125,211,252,.12), transparent 26%),
+    color-mix(in srgb, var(--panel) 56%, transparent) !important;
+}
+html body.dark .slv2004-stage,
+html body.dark .slv2004-stage:hover,
+html body.dark .slv2004-stage:focus,
+html body.dark .slv2004-stage:focus-within{
+  border:1px solid rgba(125,211,252,.10) !important;
+  box-shadow:0 28px 80px rgba(0,0,0,.28) !important;
+  background:
+    radial-gradient(circle at 35% 46%, rgba(56,189,248,.16), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(168,85,247,.16), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(96,165,250,.12), transparent 26%),
+    rgba(11,22,38,.54) !important;
+}
+html body .slv2004-stage::before,
+html body .slv2004-stage::after,
+html body .slv2004-stage:hover::before,
+html body .slv2004-stage:hover::after{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  pointer-events:none !important;
+}
+html body .slv2004-lines{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+  z-index:1 !important;
+}
+html body .slv2004-nodes{
+  position:absolute !important;
+  inset:0 !important;
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:none !important;
+  z-index:7 !important;
+}
+html body .slv2004-line{
+  stroke:color-mix(in srgb, var(--accent) 28%, transparent) !important;
+  stroke-width:1.25 !important;
+  opacity:.48 !important;
+  vector-effect:non-scaling-stroke !important;
+}
+html body .slv2004-center-line{
+  opacity:.62 !important;
+  stroke-width:1.45 !important;
+}
+html body .slv2004-web-line{
+  opacity:.30 !important;
+  stroke-width:1 !important;
+  stroke-dasharray:3 8 !important;
+}
+html body .slv2004-web-line.is-explicit{
+  opacity:.66 !important;
+  stroke-width:1.45 !important;
+  stroke-dasharray:none !important;
+}
+html body .slv2004-web-line.is-dim{
+  opacity:.14 !important;
+}
+html body .slv2004-core{
+  position:absolute !important;
+  width:150px !important;
+  height:150px !important;
+  transform:translate(-50%, -50%) !important;
+  border:0 !important;
+  border-radius:999px !important;
+  padding:0 !important;
+  background:transparent !important;
+  cursor:pointer !important;
+  z-index:8 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  transition:none !important;
+}
+html body .slv2004-core img{
+  width:148px !important;
+  height:148px !important;
+  display:block !important;
+  border-radius:999px !important;
+  object-fit:cover !important;
+  border:3px solid color-mix(in srgb, var(--accent) 45%, white) !important;
+  background:var(--panel) !important;
+  box-shadow:0 26px 64px rgba(15,23,42,.24) !important;
+}
+html body .slv2004-core:hover img{
+  transform:scale(1.035) !important;
+  border-color:var(--accent) !important;
+}
+html body .slv2004-node{
+  position:absolute !important;
+  width:92px !important;
+  height:112px !important;
+  border:0 !important;
+  background:transparent !important;
+  padding:0 !important;
+  cursor:pointer !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  pointer-events:auto !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  z-index:9 !important;
+  filter:none !important;
+  transition:filter .18s ease !important;
+}
+html body .slv2004-node.is-active{
+  display:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+html body .slv2004-node-ring{
+  position:absolute !important;
+  left:0 !important;
+  top:0 !important;
+  width:92px !important;
+  height:92px !important;
+  border-radius:999px !important;
+  border:1px solid color-mix(in srgb, var(--accent) 34%, transparent) !important;
+  pointer-events:none !important;
+}
+html body .slv2004-node img{
+  position:relative !important;
+  z-index:2 !important;
+  width:68px !important;
+  height:68px !important;
+  margin-top:12px !important;
+  border-radius:999px !important;
+  object-fit:cover !important;
+  border:2px solid rgba(255,255,255,.88) !important;
+  background:var(--panel) !important;
+  box-shadow:0 16px 38px rgba(15,23,42,.16) !important;
+}
+html body .slv2004-node-name{
+  position:relative !important;
+  z-index:3 !important;
+  max-width:118px !important;
+  margin-top:6px !important;
+  padding:3px 8px !important;
+  border-radius:999px !important;
+  background:color-mix(in srgb, var(--panel) 88%, transparent) !important;
+  border:1px solid color-mix(in srgb, var(--accent) 14%, var(--border)) !important;
+  font-size:12px !important;
+  color:var(--muted) !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  box-shadow:0 8px 18px rgba(15,23,42,.08) !important;
+}
+html body .slv2004-node:hover img,
+html body .slv2004-node:focus-visible img,
+html body .slv2004-node.is-search-hit img{
+  border-color:var(--accent) !important;
+  box-shadow:0 18px 44px color-mix(in srgb, var(--accent) 22%, transparent) !important;
+}
+html body .slv2004-node:hover .slv2004-node-name,
+html body .slv2004-node:focus-visible .slv2004-node-name,
+html body .slv2004-node.is-search-hit .slv2004-node-name{
+  color:var(--accent-2) !important;
+}
+html body .slv2004-profile{
+  position:absolute !important;
+  right:34px !important;
+  bottom:34px !important;
+  z-index:10 !important;
+  width:min(360px, calc(100% - 68px)) !important;
+  padding:24px !important;
+  border-radius:28px !important;
+  background:color-mix(in srgb, var(--panel) 76%, transparent) !important;
+  border:1px solid color-mix(in srgb, var(--accent) 18%, var(--border)) !important;
+  box-shadow:0 24px 70px rgba(15,23,42,.14) !important;
+  backdrop-filter:blur(18px) !important;
+}
+html body.dark .slv2004-profile{
+  background:rgba(15,23,42,.62) !important;
+}
+html body .slv2004-profile h2{
+  margin:0 0 8px !important;
+  font-size:clamp(26px, 3vw, 42px) !important;
+}
+html body .slv2004-profile p{
+  color:var(--muted) !important;
+}
+html body .slv2004-empty{
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%, -50%) !important;
+  color:var(--muted) !important;
+  font-weight:800 !important;
+}
+html body .friend-galaxy-shell.friend-search-not-found .friend-search-status,
+html body .friend-search-status.is-not-found{
+  color:#ef4444 !important;
+  background:rgba(239,68,68,.08) !important;
+  border:1px solid rgba(239,68,68,.22) !important;
+  border-radius:14px !important;
+  padding:10px 12px !important;
+  font-weight:800 !important;
+}
+@media (max-width: 760px){
+  html body .slv2004-stage{min-height:780px !important;}
+  html body .slv2004-core{width:118px !important;height:118px !important;}
+  html body .slv2004-core img{width:116px !important;height:116px !important;}
+  html body .slv2004-profile{left:18px !important;right:18px !important;bottom:20px !important;width:auto !important;padding:18px !important;}
+  html body .slv2004-node{width:72px !important;height:94px !important;}
+  html body .slv2004-node-ring{width:72px !important;height:72px !important;}
+  html body .slv2004-node img{width:54px !important;height:54px !important;margin-top:9px !important;}
+  html body .slv2004-node-name{max-width:92px !important;font-size:11px !important;}
+}
+
+
+/* v20.0.8：朋友星图账号过滤后的中心头像校准。圆形背景、头像、点击区域共用同一圆心。 */
+html body .slv2004-core,
+html body .slv2004-core:hover,
+html body .slv2004-core:focus,
+html body .slv2004-core:focus-visible{
+  width:158px !important;
+  height:158px !important;
+  box-sizing:border-box !important;
+  transform:translate(-50%, -50%) !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  display:block !important;
+  padding:0 !important;
+  margin:0 !important;
+  overflow:visible !important;
+}
+html body .slv2004-core::before{
+  content:"" !important;
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  width:158px !important;
+  height:158px !important;
+  transform:translate(-50%, -50%) !important;
+  border-radius:999px !important;
+  box-sizing:border-box !important;
+  background:
+    radial-gradient(circle at 36% 30%, rgba(255,255,255,.82), transparent 0 20%, transparent 40%),
+    radial-gradient(circle, color-mix(in srgb, var(--accent) 20%, var(--panel)) 0%, color-mix(in srgb, var(--panel) 86%, transparent) 68%, transparent 100%) !important;
+  border:1px solid color-mix(in srgb, var(--accent) 32%, transparent) !important;
+  box-shadow:0 24px 62px rgba(15,23,42,.20), inset 0 0 0 10px color-mix(in srgb, var(--panel) 48%, transparent) !important;
+  pointer-events:none !important;
+}
+html body .slv2004-core img,
+html body .slv2004-core:hover img,
+html body .slv2004-core:focus-visible img{
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  width:132px !important;
+  height:132px !important;
+  margin:0 !important;
+  padding:0 !important;
+  transform:translate(-50%, -50%) !important;
+  box-sizing:border-box !important;
+  border-radius:999px !important;
+  object-fit:cover !important;
+  border:3px solid color-mix(in srgb, var(--accent) 42%, white) !important;
+  background:var(--panel) !important;
+  box-shadow:0 18px 42px rgba(15,23,42,.22) !important;
+  display:block !important;
+}
+html body .slv2004-core:hover img,
+html body .slv2004-core:focus-visible img{
+  transform:translate(-50%, -50%) scale(1.035) !important;
+  border-color:var(--accent) !important;
+}
+@media (max-width: 760px){
+  html body .slv2004-core,
+  html body .slv2004-core:hover,
+  html body .slv2004-core:focus,
+  html body .slv2004-core:focus-visible{
+    width:124px !important;
+    height:124px !important;
+  }
+  html body .slv2004-core::before{
+    width:124px !important;
+    height:124px !important;
+    box-shadow:0 18px 44px rgba(15,23,42,.18), inset 0 0 0 8px color-mix(in srgb, var(--panel) 48%, transparent) !important;
+  }
+  html body .slv2004-core img,
+  html body .slv2004-core:hover img,
+  html body .slv2004-core:focus-visible img{
+    width:104px !important;
+    height:104px !important;
+  }
+}
+
+
+/* v20.0.8：朋友星图最终头像对齐。
+   用一个真实背景圆承载头像，禁用 ::before 叠层，避免背景圆和图片两套坐标产生偏移。 */
+html body .slv2004-core,
+html body .slv2004-core:hover,
+html body .slv2004-core:focus,
+html body .slv2004-core:focus-visible{
+  width:164px !important;
+  height:164px !important;
+  box-sizing:border-box !important;
+  left:auto;
+  top:auto;
+  transform:translate(-50%, -50%) !important;
+  border-radius:999px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:1px solid color-mix(in srgb, var(--accent) 32%, transparent) !important;
+  background:
+    radial-gradient(circle at 36% 28%, rgba(255,255,255,.78), transparent 0 18%, transparent 42%),
+    radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, var(--panel)) 0%, color-mix(in srgb, var(--panel) 90%, transparent) 72%, transparent 100%) !important;
+  box-shadow:0 24px 62px rgba(15,23,42,.20), inset 0 0 0 12px color-mix(in srgb, var(--panel) 46%, transparent) !important;
+  display:grid !important;
+  place-items:center !important;
+  overflow:visible !important;
+}
+html body .slv2004-core::before,
+html body .slv2004-core::after{
+  content:none !important;
+  display:none !important;
+}
+html body .slv2004-core img,
+html body .slv2004-core:hover img,
+html body .slv2004-core:focus-visible img{
+  position:static !important;
+  left:auto !important;
+  top:auto !important;
+  width:136px !important;
+  height:136px !important;
+  margin:0 !important;
+  padding:0 !important;
+  transform:none !important;
+  box-sizing:border-box !important;
+  border-radius:999px !important;
+  object-fit:cover !important;
+  object-position:center center !important;
+  border:3px solid color-mix(in srgb, var(--accent) 42%, white) !important;
+  background:var(--panel) !important;
+  box-shadow:0 18px 42px rgba(15,23,42,.20) !important;
+  display:block !important;
+}
+html body .slv2004-core:hover img,
+html body .slv2004-core:focus-visible img{
+  transform:scale(1.025) !important;
+}
+@media (max-width: 760px){
+  html body .slv2004-core,
+  html body .slv2004-core:hover,
+  html body .slv2004-core:focus,
+  html body .slv2004-core:focus-visible{
+    width:128px !important;
+    height:128px !important;
+    box-shadow:0 18px 44px rgba(15,23,42,.18), inset 0 0 0 9px color-mix(in srgb, var(--panel) 46%, transparent) !important;
+  }
+  html body .slv2004-core img,
+  html body .slv2004-core:hover img,
+  html body .slv2004-core:focus-visible img{
+    width:106px !important;
+    height:106px !important;
+  }
+}
+
+/* v20.0.8：朋友星图去旧样式闪烁 + 中心头像单圆心重校准。
+   这段只使用 slv2007/slv2004 专属结构，旧 friend-core-orbit / friend-galaxy-core 不再参与渲染。 */
+html body .slv2007-shell .friend-core-orbit,
+html body .slv2007-shell .friend-galaxy-core,
+html body .slv2007-shell .friend-galaxy-lines,
+html body .slv2007-shell .friend-galaxy-nodes{
+  display:none !important;
+}
+html body .slv2007-stage,
+html body .slv2007-stage:hover,
+html body .slv2007-stage:focus,
+html body .slv2007-stage:focus-within{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  transition:none !important;
+}
+html body .slv2004-core,
+html body .slv2004-core:hover,
+html body .slv2004-core:focus,
+html body .slv2004-core:focus-visible{
+  position:absolute !important;
+  width:170px !important;
+  height:170px !important;
+  transform:translate(-50%, -50%) !important;
+  display:grid !important;
+  place-items:center !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+}
+html body .slv2004-core::before,
+html body .slv2004-core::after{
+  content:none !important;
+  display:none !important;
+}
+html body .slv2007-core-frame{
+  width:166px !important;
+  height:166px !important;
+  border-radius:999px !important;
+  box-sizing:border-box !important;
+  display:grid !important;
+  place-items:center !important;
+  position:relative !important;
+  padding:0 !important;
+  margin:0 !important;
+  background:
+    radial-gradient(circle at 36% 28%, rgba(255,255,255,.78), transparent 0 18%, transparent 42%),
+    radial-gradient(circle, color-mix(in srgb, var(--accent) 18%, var(--panel)) 0%, color-mix(in srgb, var(--panel) 90%, transparent) 72%, transparent 100%) !important;
+  border:1px solid color-mix(in srgb, var(--accent) 32%, transparent) !important;
+  box-shadow:0 24px 62px rgba(15,23,42,.20), inset 0 0 0 12px color-mix(in srgb, var(--panel) 46%, transparent) !important;
+  overflow:hidden !important;
+  pointer-events:none !important;
+}
+html body .slv2004-core img,
+html body .slv2004-core:hover img,
+html body .slv2004-core:focus-visible img,
+html body .slv2007-core-frame img{
+  position:static !important;
+  left:auto !important;
+  top:auto !important;
+  width:134px !important;
+  height:134px !important;
+  max-width:134px !important;
+  max-height:134px !important;
+  margin:0 !important;
+  padding:0 !important;
+  transform:none !important;
+  border-radius:999px !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  display:block !important;
+  pointer-events:none !important;
+}
+html body .slv2004-core:hover .slv2007-core-frame,
+html body .slv2004-core:focus-visible .slv2007-core-frame{
+  border-color:var(--accent) !important;
+  box-shadow:0 26px 68px color-mix(in srgb, var(--accent) 18%, rgba(15,23,42,.22)), inset 0 0 0 12px color-mix(in srgb, var(--panel) 46%, transparent) !important;
+}
+@media (max-width: 760px){
+  html body .slv2004-core,
+  html body .slv2004-core:hover,
+  html body .slv2004-core:focus,
+  html body .slv2004-core:focus-visible{
+    width:132px !important;
+    height:132px !important;
+  }
+  html body .slv2007-core-frame{
+    width:128px !important;
+    height:128px !important;
+    box-shadow:0 18px 44px rgba(15,23,42,.18), inset 0 0 0 9px color-mix(in srgb, var(--panel) 46%, transparent) !important;
+  }
+  html body .slv2004-core img,
+  html body .slv2007-core-frame img{
+    width:104px !important;
+    height:104px !important;
+    max-width:104px !important;
+    max-height:104px !important;
+  }
+}
+
+/* v20.0.8：恢复朋友页星图背景。
+   只恢复背景星尘/星云，不恢复旧 friend-galaxy-core DOM，避免旧样式闪烁和 hover 位移。 */
+html body .slv2004-stage,
+html body .slv2007-stage{
+  isolation:isolate !important;
+  background:
+    radial-gradient(circle at 35% 46%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(216,180,254,.18), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(125,211,252,.12), transparent 26%),
+    linear-gradient(135deg, rgba(14,35,57,.72), rgba(18,24,45,.68) 48%, rgba(9,18,33,.72)) !important;
+}
+html body.dark .slv2004-stage,
+html body.dark .slv2007-stage{
+  background:
+    radial-gradient(circle at 35% 46%, rgba(56,189,248,.16), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(168,85,247,.16), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(96,165,250,.12), transparent 26%),
+    linear-gradient(135deg, rgba(9,22,39,.82), rgba(19,24,50,.76) 48%, rgba(6,14,28,.84)) !important;
+}
+html body .slv2004-stage::before,
+html body .slv2007-stage::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  opacity:.78 !important;
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  background-image:
+    radial-gradient(circle, rgba(125,211,252,.62) 0 1.2px, transparent 1.35px),
+    radial-gradient(circle, rgba(226,232,240,.42) 0 1.05px, transparent 1.2px),
+    radial-gradient(circle, rgba(147,197,253,.25) 0 1px, transparent 1.15px);
+  background-size:82px 70px, 136px 104px, 190px 150px !important;
+  background-position:18px 14px, 64px 48px, 12px 90px !important;
+  mix-blend-mode:screen !important;
+}
+html body .slv2004-stage::after,
+html body .slv2007-stage::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:-18% !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  opacity:.45 !important;
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  background:
+    radial-gradient(circle at 28% 64%, rgba(14,165,233,.18), transparent 30%),
+    radial-gradient(circle at 57% 34%, rgba(139,92,246,.18), transparent 26%),
+    radial-gradient(circle at 78% 74%, rgba(59,130,246,.10), transparent 24%) !important;
+  filter:blur(2px) !important;
+}
+html body .slv2004-stage:hover::before,
+html body .slv2004-stage:hover::after,
+html body .slv2007-stage:hover::before,
+html body .slv2007-stage:hover::after{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+}
+html body .slv2004-lines{z-index:2 !important;}
+html body .slv2004-nodes{z-index:8 !important;}
+html body .slv2004-core{z-index:9 !important;}
+html body .slv2004-profile{z-index:10 !important;}
+
+
+/* v20.0.9：朋友星图美术回调。
+   目标：让节点分布更松弛、更有“星图”感；同时彻底去掉舞台背景 hover。 */
+html body .friend-galaxy-shell.slv2007-shell,
+html body .friend-galaxy-shell.slv2007-shell:hover,
+html body .friend-galaxy-shell.slv2007-shell:focus,
+html body .friend-galaxy-shell.slv2007-shell:focus-within{
+  transform:none !important;
+  box-shadow:none !important;
+}
+html body .slv2004-stage,
+html body .slv2007-stage,
+html body .slv2004-stage:hover,
+html body .slv2007-stage:hover,
+html body .slv2004-stage:focus,
+html body .slv2007-stage:focus,
+html body .slv2004-stage:focus-within,
+html body .slv2007-stage:focus-within{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  transition:none !important;
+  cursor:default !important;
+  border:1px solid color-mix(in srgb, var(--accent) 10%, var(--border)) !important;
+  box-shadow:0 22px 70px rgba(39,74,112,.10) !important;
+  background:
+    radial-gradient(circle at 22% 20%, rgba(125,211,252,.15), transparent 0 18%),
+    radial-gradient(circle at 70% 18%, rgba(196,181,253,.16), transparent 0 18%),
+    radial-gradient(circle at 14% 76%, rgba(56,189,248,.09), transparent 0 20%),
+    radial-gradient(circle at 82% 72%, rgba(129,140,248,.08), transparent 0 18%),
+    linear-gradient(135deg, rgba(11,27,44,.78), rgba(20,25,48,.70) 46%, rgba(9,19,35,.78)) !important;
+}
+html body.dark .slv2004-stage,
+html body.dark .slv2007-stage,
+html body.dark .slv2004-stage:hover,
+html body.dark .slv2007-stage:hover,
+html body.dark .slv2004-stage:focus,
+html body.dark .slv2007-stage:focus,
+html body.dark .slv2004-stage:focus-within,
+html body.dark .slv2007-stage:focus-within{
+  border:1px solid rgba(125,211,252,.10) !important;
+  box-shadow:0 28px 80px rgba(0,0,0,.28) !important;
+}
+html body .slv2004-stage::before,
+html body .slv2007-stage::before,
+html body .slv2004-stage::after,
+html body .slv2007-stage::after,
+html body .slv2004-stage:hover::before,
+html body .slv2007-stage:hover::before,
+html body .slv2004-stage:hover::after,
+html body .slv2007-stage:hover::after{
+  transform:none !important;
+  opacity:inherit !important;
+}
+html body .slv2004-stage::before,
+html body .slv2007-stage::before{
+  opacity:.86 !important;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.52) 0 1.05px, transparent 1.2px),
+    radial-gradient(circle, rgba(125,211,252,.38) 0 1.25px, transparent 1.4px),
+    radial-gradient(circle, rgba(196,181,253,.22) 0 1px, transparent 1.15px) !important;
+  background-size:74px 64px, 142px 118px, 220px 170px !important;
+  background-position:6px 8px, 58px 36px, 22px 98px !important;
+}
+html body .slv2004-stage::after,
+html body .slv2007-stage::after{
+  opacity:.50 !important;
+  filter:blur(10px) !important;
+}
+html body .slv2004-line{ opacity:.42 !important; }
+html body .slv2004-center-line{ opacity:.58 !important; }
+html body .slv2004-web-line{ opacity:.24 !important; }
+html body .slv2004-web-line.is-explicit{ opacity:.52 !important; }
+html body .slv2004-node{ transition:transform .22s ease, filter .22s ease !important; }
+html body .slv2004-node img{
+  border-radius:24px !important;
+  object-fit:cover !important;
+  box-shadow:0 14px 32px rgba(15,23,42,.18) !important;
+}
+html body .slv2004-node-ring{
+  width:86px !important;
+  height:86px !important;
+  left:3px !important;
+  top:3px !important;
+  border:1px solid color-mix(in srgb, var(--accent) 22%, transparent) !important;
+  box-shadow:0 0 0 10px rgba(255,255,255,.03) inset !important;
+}
+html body .slv2004-node:hover,
+html body .slv2004-node:focus-visible,
+html body .slv2004-node.is-search-hit{
+  transform:translate(-50%,-52%) scale(1.04) !important;
+  filter:drop-shadow(0 10px 18px rgba(96,165,250,.18)) !important;
+}
+html body .slv2004-node-name{
+  background:rgba(15,23,42,.42) !important;
+  color:rgba(241,245,249,.92) !important;
+  border-color:rgba(125,211,252,.16) !important;
+}
+
+
+/* v20.0.10：朋友页从个人主页返回时，中心头像不再先错位再平移。
+   原因是静态模板首帧没有 left/top，JS 在测量舞台后才写入 px 坐标；返回 BFCache 或重新渲染时会看到这一帧。
+   这里先用与 JS 相同的百分比圆心占位，并在 JS 稳定布局前隐藏头像/节点，避免肉眼看到平移。 */
+html body .slv2004-core,
+html body .slv2004-core:hover,
+html body .slv2004-core:focus,
+html body .slv2004-core:focus-visible{
+  left:36% !important;
+  top:46% !important;
+}
+@media (max-width: 899px){
+  html body .slv2004-core,
+  html body .slv2004-core:hover,
+  html body .slv2004-core:focus,
+  html body .slv2004-core:focus-visible{
+    left:50% !important;
+    top:31% !important;
+  }
+}
+html body .friend-galaxy-shell.slv2010-booting .slv2004-core,
+html body .friend-galaxy-shell.slv2010-booting .slv2004-lines,
+html body .friend-galaxy-shell.slv2010-booting .slv2004-nodes,
+html body .friend-galaxy-shell.slv2010-booting .slv2004-profile{
+  opacity:0 !important;
+  transition:none !important;
+}
+html body .friend-galaxy-shell.slv2010-ready .slv2004-core,
+html body .friend-galaxy-shell.slv2010-ready .slv2004-lines,
+html body .friend-galaxy-shell.slv2010-ready .slv2004-nodes,
+html body .friend-galaxy-shell.slv2010-ready .slv2004-profile{
+  opacity:1 !important;
+}
+html body .friend-galaxy-shell.slv2010-ready .slv2004-core,
+html body .friend-galaxy-shell.slv2010-ready .slv2004-core *,
+html body .friend-galaxy-shell.slv2010-ready .slv2007-core-frame,
+html body .friend-galaxy-shell.slv2010-ready .slv2007-core-frame img{
+  transition:border-color .16s ease, box-shadow .16s ease, filter .16s ease !important;
+}

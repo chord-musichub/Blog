@@ -2,6 +2,10 @@
   'use strict';
 
   var VERSION = '20.20.6';
+  try{
+    var sourceURL = new URL((document.currentScript && document.currentScript.src) || '', window.location.href);
+    VERSION = sourceURL.searchParams.get('v') || VERSION;
+  }catch(e){}
   var loaded = Object.create(null);
   var loading = Object.create(null);
 
@@ -14,6 +18,16 @@
       },
       init:function(root){
         if(window.SonglineInitHomeOrbit) window.SonglineInitHomeOrbit(root || document);
+      }
+    },
+    {
+      key:'home-friend-carousel',
+      src:'/js/home-friend-carousel.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-home-friend-carousel], [data-home-friend-track]');
+      },
+      init:function(root){
+        if(window.SonglineInitHomeFriendCarousel) window.SonglineInitHomeFriendCarousel(root || document);
       }
     },
     {
@@ -104,6 +118,26 @@
       },
       init:function(root){
         if(window.SonglineInitMobileToc) window.SonglineInitMobileToc(root || document);
+      }
+    },
+    {
+      key:'reader-floating-controls',
+      src:'/js/reader-floating-controls.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '.article-reader, .article-shell, .article-layout, .post-single, .post-layout, .md-tool-layout, .md-tool-preview, [data-article-renderer="songline-markdown"]');
+      },
+      init:function(){
+        if(window.SonglineNormalizeFloatReadingButtons) window.SonglineNormalizeFloatReadingButtons();
+      }
+    },
+    {
+      key:'posts-list-flat',
+      src:'/js/posts-list-flat.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '.posts-list, #postList');
+      },
+      init:function(root){
+        if(window.SonglineInitPostsListFlat) window.SonglineInitPostsListFlat(root || document);
       }
     }
   ];
@@ -207,6 +241,7 @@
   window.SonglinePageModules = {
     scan: scan,
     loaded: loaded,
+    assetVersion: VERSION,
     lastScanAt: 0
   };
 
