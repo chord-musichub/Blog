@@ -455,6 +455,28 @@
       flushParagraph(); flushQuote(); flushTable(); flushHtmlBlock();
     }
 
+    // 文章详情会在浏览器中用本渲染器刷新正文。将完整媒体块作为一个单元保留，
+    // 避免 <source> 与回退文字被拆成段落后让浏览器提前关闭播放器。
+    function collectMediaBlock(start){
+      var opening = String(lines[start] || '').trim();
+      var match = opening.match(/^<(video|audio)\b/i);
+      if(!match) return null;
+      var tagName = match[1].toLowerCase();
+      var closeRE = new RegExp('</' + tagName + '\\s*>', 'i');
+      var parts = [];
+      for(var end = start; end < lines.length; end++){
+        var value = String(lines[end] || '').trim();
+        if(/^<\/?(?:video|audio|source|track)\b/i.test(value)){
+          parts.push(sanitizeHtmlTag(value));
+        }else{
+          parts.push(escapeHtml(value));
+        }
+        if(closeRE.test(value)) return {html:parts.join('\n'), index:end};
+      }
+      // 未闭合标签仍走普通 Markdown 流程，避免吞掉后续全文。
+      return null;
+    }
+
     for(var i=0; i<lines.length; i++){
       var line = lines[i];
 
@@ -471,6 +493,14 @@
           i++;
         }
         out.push('<pre data-lang="' + escapeHtml(lang) + '"><code class="language-' + escapeHtml(lang) + '">' + highlightCode(codeLines.join('\n'), lang) + '</code></pre>');
+        continue;
+      }
+
+      var mediaBlock = collectMediaBlock(i);
+      if(mediaBlock){
+        flushAll();
+        out.push(mediaBlock.html);
+        i = mediaBlock.index;
         continue;
       }
 

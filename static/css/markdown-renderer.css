@@ -19,3 +19,21 @@ body.dark .md-code-block{box-shadow:0 16px 36px rgba(0,0,0,.25)}
 .markdown-body .footnote-ref,.md-live-preview .footnote-ref{font-size:.78em;padding-left:2px}
 .markdown-body .footnote-backref,.md-live-preview .footnote-backref{color:var(--accent-2);margin-left:6px}
 .markdown-body .md-code-block + .md-code-block,.md-live-preview .md-code-block + .md-code-block{margin-top:18px}
+
+/* 原生媒体块：文章正文与后台 Markdown 预览共用，宽度不超出阅读容器。 */
+.markdown-body video,.md-live-preview video{
+  display:block;
+  width:min(100%,720px);
+  max-width:100%;
+  height:auto;
+  margin:22px auto;
+  border-radius:14px;
+  background:#050b14;
+  box-shadow:0 12px 28px rgba(15,23,42,.2);
+}
+.markdown-body audio,.md-live-preview audio{
+  display:block;
+  width:min(100%,560px);
+  max-width:100%;
+  margin:18px 0;
+}
