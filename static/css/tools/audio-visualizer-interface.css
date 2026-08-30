@@ -244,9 +244,6 @@
   padding:.66rem .88rem;
   box-shadow:0 14px 34px rgba(0,0,0,.24);
 }
-.audio-visualizer-page.is-visual-live .av-canvas{
-  cursor:none;
-}
 @media(max-width:720px){
   .audio-visualizer-page.is-visual-live .av-now{
     left:12px;
@@ -298,24 +295,11 @@
   border-color:rgba(56,189,248,.36);
   box-shadow:0 26px 80px rgba(14,165,233,.18);
 }
-.audio-visualizer-page .av-source-card span{
-  display:inline-flex;
-  margin-bottom:.55rem;
-  color:rgba(186,230,253,.86);
-  font-size:.72rem;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  font-weight:900;
-}
 .audio-visualizer-page .av-source-card strong{
   display:block;
   margin-bottom:.4rem;
   color:#f8fafc;
   font-size:1.2rem;
-}
-.audio-visualizer-page .av-source-card p{
-  margin:0 0 1rem;
-  color:rgba(203,213,225,.78);
 }
 .audio-visualizer-page .av-now,
 .audio-visualizer-page .av-source-card,
@@ -362,19 +346,6 @@
   transform:translateY(10px) scale(.98)!important;
   background:rgba(15,23,42,.28)!important;
 }
-.audio-visualizer-page.is-visual-live .av-now:hover,
-.audio-visualizer-page.is-visual-live .av-now:focus-within{
-  opacity:1!important;
-  transform:translateY(0) scale(1)!important;
-}
-.audio-visualizer-page.is-visual-live .av-cover{
-  width:58px!important;
-  border-radius:18px!important;
-}
-.audio-visualizer-page.is-visual-live .av-track h2{
-  font-size:1.18rem!important;
-  white-space:nowrap!important;
-}
 .audio-visualizer-page.is-visual-live .av-track h2 + p,
 .audio-visualizer-page.is-visual-live .av-track > p:first-child{
   display:none!important;
@@ -388,11 +359,6 @@
   opacity:.18!important;
   z-index:9!important;
   transform:translateY(10px)!important;
-}
-.audio-visualizer-page.is-visual-live .av-controls:hover,
-.audio-visualizer-page.is-visual-live .av-controls:focus-within{
-  opacity:1!important;
-  transform:translateY(0)!important;
 }
 .audio-visualizer-page.is-visual-live .av-canvas{
   z-index:0!important;
@@ -445,9 +411,6 @@
   pointer-events:none;
   border:1px solid rgba(255,255,255,.08);
   border-radius:inherit;
-}
-.audio-visualizer-page .av-canvas{
-  border-radius:inherit!important;
 }
 .audio-visualizer-page:fullscreen,
 .audio-visualizer-page .av-stage:fullscreen{

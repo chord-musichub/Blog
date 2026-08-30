@@ -66,16 +66,7 @@
 }
 
 /* 初始态不显示全屏/停止，避免挤在视觉中心造成误会 */
-.audio-visualizer-page:not(.is-visual-live) .av-controls{
-  display:none!important;
-}
-
 /* live 后：不再让舞台裁切页面级按钮 */
-.audio-visualizer-page.is-visual-live .av-stage{
-  overflow:visible!important;
-  clip-path:none!important;
-  -webkit-clip-path:none!important;
-}
 .audio-visualizer-page.is-visual-live .av-canvas{
   overflow:hidden!important;
   border-radius:inherit!important;
@@ -98,34 +89,6 @@
   z-index:9999!important;
   pointer-events:auto!important;
 }
-.audio-visualizer-page.is-visual-live .av-controls .av-button{
-  min-width:108px!important;
-  min-height:48px!important;
-  padding:.78rem 1.12rem!important;
-  border-radius:999px!important;
-  background:rgba(9,17,34,.78)!important;
-  border:1px solid rgba(186,230,253,.38)!important;
-  color:rgba(248,250,252,.98)!important;
-  box-shadow:
-    0 18px 48px rgba(0,0,0,.42),
-    inset 0 1px 0 rgba(255,255,255,.12)!important;
-  backdrop-filter:blur(18px)!important;
-  -webkit-backdrop-filter:blur(18px)!important;
-}
-.audio-visualizer-page.is-visual-live .av-controls .av-button:hover,
-.audio-visualizer-page.is-visual-live .av-controls .av-button:focus-visible{
-  transform:translateY(-1px)!important;
-  background:rgba(14,165,233,.42)!important;
-  border-color:rgba(125,211,252,.72)!important;
-}
-
-/* 浏览器捕获系统声：明确不显示歌曲信息小卡 */
-.audio-visualizer-page.is-browser-audio-live .av-now,
-.audio-visualizer-page.is-visual-live.is-browser-audio-live .av-now,
-.audio-visualizer-page.is-visual-live.is-browser-audio-live.has-track .av-now{
-  display:none!important;
-}
-
 /* live 后提示文字不占舞台中心 */
 .audio-visualizer-page.is-visual-live .av-hint,
 .audio-visualizer-page.is-visual-live .av-source-panel,
@@ -259,11 +222,6 @@ main.tool-page.audio-visualizer-page,
   box-shadow:none!important;
   background:#020617!important;
 }
-.audio-visualizer-page .av-stage::before,
-.audio-visualizer-page .av-stage::after{
-  content:none!important;
-  display:none!important;
-}
 .audio-visualizer-page .av-canvas{
   border-radius:0!important;
   width:100%!important;
@@ -395,20 +353,6 @@ body:has(.audio-visualizer-page){
   --av-card-gap-y: clamp(18px, 2.5vh, 34px);
   --av-card-gap-x: clamp(44px, 7vw, 128px);
 }
-main.tool-page.audio-visualizer-page,
-.audio-visualizer-page{
-  width:100%!important;
-  max-width:none!important;
-  min-height:calc(100svh - var(--av-nav-real-height))!important;
-  margin:0!important;
-  padding:var(--av-card-gap-y) 0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
-  overflow:visible!important;
-}
-
 /* 只有这一张大卡片：不贴边、不横向满屏 */
 .audio-visualizer-page .av-stage,
 .audio-visualizer-page.is-visual-live .av-stage{
@@ -428,17 +372,6 @@ main.tool-page.audio-visualizer-page,
     0 34px 110px rgba(0,0,0,.44),
     inset 0 1px 0 rgba(255,255,255,.12)!important;
 }
-.audio-visualizer-page .av-stage::before,
-.audio-visualizer-page .av-stage::after{
-  content:none!important;
-  display:none!important;
-}
-.audio-visualizer-page .av-canvas{
-  width:100%!important;
-  height:100%!important;
-  border-radius:inherit!important;
-}
-
 /* 默认入口：按大卡片内部排布 */
 .audio-visualizer-page:not(.is-visual-live) .av-topbar{
   padding:
@@ -526,13 +459,6 @@ main.tool-page.audio-visualizer-page,
   transform:translateY(-1px)!important;
   background:rgba(14,165,233,.42)!important;
   border-color:rgba(125,211,252,.72)!important;
-}
-
-/* 浏览器系统音频模式不显示歌曲小卡 */
-.audio-visualizer-page.is-browser-audio-live .av-now,
-.audio-visualizer-page.is-visual-live.is-browser-audio-live .av-now,
-.audio-visualizer-page.is-visual-live.is-browser-audio-live.has-track .av-now{
-  display:none!important;
 }
 
 /* 矮屏压缩内部，不改变大卡片外形 */
@@ -627,11 +553,6 @@ main.tool-page.audio-visualizer-page,
 .audio-visualizer-page.is-local-audio-live.has-track .av-now{
   display:flex!important;
 }
-.audio-visualizer-page.is-browser-audio-live .av-now,
-.audio-visualizer-page.is-visual-live.is-browser-audio-live .av-now,
-.audio-visualizer-page.is-visual-live.is-browser-audio-live.has-track .av-now{
-  display:none!important;
-}
 .audio-visualizer-page .av-volume-control{
   display:inline-flex;
   align-items:center;
@@ -662,9 +583,6 @@ main.tool-page.audio-visualizer-page,
 }
 .audio-visualizer-page:not(.is-local-audio-live) .av-volume-control{
   opacity:.46;
-}
-.audio-visualizer-page.is-browser-audio-live .av-volume-control{
-  display:none!important;
 }
 .audio-visualizer-page.is-visual-live .av-controls{
   align-items:center!important;

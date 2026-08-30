@@ -1446,11 +1446,6 @@ html body .slv2004-core:focus-visible{
   place-items:center !important;
   overflow:visible !important;
 }
-html body .slv2004-core::before,
-html body .slv2004-core::after{
-  content:none !important;
-  display:none !important;
-}
 html body .slv2004-core img,
 html body .slv2004-core:hover img,
 html body .slv2004-core:focus-visible img{
