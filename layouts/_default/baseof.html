@@ -59,18 +59,33 @@
   {{ with $favicon }}<link rel="apple-touch-icon" href="{{ . }}">{{ end }}
   <link rel="alternate" type="application/rss+xml" title="{{ $siteTitle }} RSS" href="{{ "index.xml" | relURL }}">
   {{ partial "resource-hints.html" . }}
+  {{ $isArticleSurface := or (and .IsPage (eq .Section "posts")) (hasPrefix .RelPermalink "/tools/markdown-previewer/") }}
+  {{ $isToolsSurface := hasPrefix .RelPermalink "/tools/" }}
+  {{ $isSearchSurface := or .IsHome (eq .Section "posts") (eq .Section "friends") (eq .Section "tags") $isToolsSurface }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site-runtime.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site-modern.css?v={{ $assetVersion }}">
+  {{ if $isSearchSurface }}
   <link rel="stylesheet" href="/css/site-search-overrides.css?v={{ $assetVersion }}">
+  {{ end }}
+  {{ if $isArticleSurface }}
   <link rel="stylesheet" href="/css/site-article-compat.css?v={{ $assetVersion }}">
+  {{ end }}
+  {{ if .IsHome }}
   <link rel="stylesheet" href="/css/site-home-compat.css?v={{ $assetVersion }}">
+  {{ end }}
+  {{ if $isToolsSurface }}
   <link rel="stylesheet" href="/css/site-tools-compat.css?v={{ $assetVersion }}">
+  {{ end }}
   <link rel="stylesheet" href="/css/site-friends-compat.css?v={{ $assetVersion }}">
+  {{ if $isArticleSurface }}
   <link rel="stylesheet" href="/css/site-markdown-compat.css?v={{ $assetVersion }}">
+  {{ end }}
   <link rel="stylesheet" href="/css/site-navigation-overrides.css?v={{ $assetVersion }}">
+  {{ if $isArticleSurface }}
   <link rel="stylesheet" href="/css/site-article-overrides.css?v={{ $assetVersion }}">
+  {{ end }}
   <link rel="stylesheet" href="/css/mobile-foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/responsive.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site-effects.css?v={{ $assetVersion }}">
@@ -160,8 +175,8 @@
   {{ partial "header.html" . }}
   <main class="container">{{ block "main" . }}{{ end }}</main>
   {{ partial "footer.html" . }}
-<script defer src="/js/page-modules.js?v={{ $assetVersion }}"></script>
 <script defer src="/runtime-config.js"></script>
 {{ partial "page-specific-scripts.html" . }}
+<script defer src="/js/page-modules.js?v={{ $assetVersion }}"></script>
 </body>
 </html>

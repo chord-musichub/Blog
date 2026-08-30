@@ -493,22 +493,6 @@
 
   window.SonglineInitHomeOrbit = boot;
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ boot(document); });
-  }else{
-    boot(document);
-  }
-
-  window.addEventListener('pageshow', function(){
-    boot(document);
-  });
-
-  window.addEventListener('songline:page-swap', function(event){
-    var root = event.detail && event.detail.root ? event.detail.root : document;
-    window.setTimeout(function(){ boot(root); }, 40);
-    window.setTimeout(function(){ boot(document); }, 160);
-  });
-
   window.addEventListener('songline:animation-before-resume', function(){
     instances.forEach(function(instance){
       try{ if(instance && instance.alignPhaseBeforeResume) instance.alignPhaseBeforeResume(); }catch(e){}

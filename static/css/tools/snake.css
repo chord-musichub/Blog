@@ -302,12 +302,6 @@ body.dark .snake-sound-toggle:hover{
 }
 
 
-/* v15.7：腐烂果实墙体安全距离说明 */
-.snake-help span:nth-last-child(2){
-  color:#8b5cf6;
-}
-
-
 /* v15.8：贪吃蛇多果实机制 */
 .snake-overlay span{
   max-width:30rem;

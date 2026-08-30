@@ -300,10 +300,6 @@ main.container.live-enter-from-right .live-nav-item{
 main.container.live-enter-from-left .live-nav-item{
   transform:translateX(-28px);
 }
-main.container.is-live-enter-ready .live-nav-item{
-  opacity:1;
-  transform:translateX(0);
-}
 @media(prefers-reduced-motion: reduce){
   main.container.live-leave-to-left,
   main.container.live-leave-to-right,
@@ -315,60 +311,6 @@ main.container.is-live-enter-ready .live-nav-item{
 }
 
 
-/* v20.18.5：导航蓝色滑块 + 真实 DOM 横向切换加强版 */
-.modern-nav-links{
-  position:relative!important;
-  overflow:hidden;
-  isolation:isolate;
-}
-.modern-nav-links .nav-active-indicator{
-  position:absolute;
-  left:0;
-  top:5px;
-  bottom:5px;
-  width:var(--nav-indicator-w, 52px);
-  transform:translateX(var(--nav-indicator-x, 5px));
-  border-radius:999px;
-  z-index:0;
-  pointer-events:none;
-  background:
-    linear-gradient(135deg, rgba(125,211,252,.30), rgba(59,130,246,.18)),
-    color-mix(in srgb, var(--accent) 16%, transparent);
-  border:1px solid color-mix(in srgb, var(--accent) 24%, transparent);
-  box-shadow:0 8px 24px rgba(14,165,233,.14), inset 0 1px 0 rgba(255,255,255,.22);
-  transition:
-    transform .38s cubic-bezier(.22,1,.36,1),
-    width .38s cubic-bezier(.22,1,.36,1),
-    opacity .22s ease;
-}
-.modern-nav-links .nav-active-indicator.is-instant{
-  transition:none!important;
-}
-.modern-nav-links a{
-  position:relative;
-  z-index:1;
-  background:transparent!important;
-}
-.modern-nav-links a:hover,
-.modern-nav-links a.active{
-  background:transparent!important;
-  box-shadow:none!important;
-}
-body.dark .modern-nav-links .nav-active-indicator{
-  background:
-    linear-gradient(135deg, rgba(56,189,248,.24), rgba(59,130,246,.20)),
-    rgba(14,165,233,.10);
-  border-color:rgba(125,211,252,.28);
-  box-shadow:0 10px 28px rgba(14,165,233,.16), inset 0 1px 0 rgba(255,255,255,.12);
-}
-html.is-live-nav-swapping .page-loading-orb,
-html.is-live-nav-swapping .page-loading-pill,
-html.is-live-nav-swapping .page-loading-ring,
-html.is-live-nav-swapping .page-loading-text{
-  display:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
-}
 main.container.is-live-swap-cut{
   opacity:.98;
 }
@@ -399,10 +341,6 @@ main.container.is-live-enter-ready .live-nav-item{
   transform:translateX(0);
 }
 @media(max-width:760px){
-  .modern-nav-links .nav-active-indicator{
-    top:4px;
-    bottom:4px;
-  }
   main.container.live-enter-from-right .live-nav-item{
     transform:translateX(38px);
   }
@@ -412,17 +350,7 @@ main.container.is-live-enter-ready .live-nav-item{
 }
 
 
-/* v20.18.5：点击导航滑块明确滑动 + 页面横向滚动切换增强 + 朋友星图圆角 */
-.modern-nav-links.is-click-sliding .nav-active-indicator{
-  transition:
-    transform .46s cubic-bezier(.16,1,.3,1),
-    width .46s cubic-bezier(.16,1,.3,1),
-    opacity .22s ease;
-  box-shadow:0 10px 30px rgba(14,165,233,.22), inset 0 1px 0 rgba(255,255,255,.26);
-}
-.modern-nav-links.is-click-sliding a.active{
-  color:var(--accent-2)!important;
-}
+/* v20.18.5：页面横向滚动切换增强 + 朋友星图圆角 */
 html.is-live-nav-swapping .site-header{
   z-index:50;
 }
@@ -487,21 +415,7 @@ main.container.is-live-enter-ready .live-nav-item{
 }
 
 
-/* v20.18.5：导航点击滑块更明显 / 页面切换同步启动 / 朋友星图真实圆角 / 文章页返回键 */
-.modern-nav-links .nav-active-indicator{
-  transition:
-    transform .68s cubic-bezier(.16,1,.3,1),
-    width .68s cubic-bezier(.16,1,.3,1),
-    opacity .22s ease,
-    box-shadow .28s ease !important;
-}
-.modern-nav-links.is-click-sliding .nav-active-indicator{
-  box-shadow:
-    0 12px 36px rgba(14,165,233,.30),
-    0 0 0 1px rgba(125,211,252,.26) inset,
-    inset 0 1px 0 rgba(255,255,255,.30);
-  filter:saturate(1.16);
-}
+/* v20.18.5：页面切换同步启动 / 朋友星图真实圆角 / 文章页返回键 */
 .modern-nav-links.is-click-sliding a.active{
   color:var(--accent-2)!important;
 }
@@ -576,71 +490,7 @@ main.container.is-live-enter-ready .live-nav-item{
 }
 
 
-/* v20.18.5：导航滑块改为实体滑动，不再淡出淡入 */
-.modern-nav-links .nav-active-indicator{
-  opacity:1!important;
-  visibility:visible!important;
-  transition:
-    box-shadow .24s ease,
-    filter .24s ease,
-    background .24s ease!important;
-  transform:translateX(var(--nav-indicator-x, 5px));
-  width:var(--nav-indicator-w, 52px);
-  will-change:transform,width;
-}
-.modern-nav-links .nav-active-indicator.is-instant{
-  transition:
-    box-shadow .24s ease,
-    filter .24s ease,
-    background .24s ease!important;
-}
-.modern-nav-links.is-click-sliding .nav-active-indicator{
-  opacity:1!important;
-  visibility:visible!important;
-  filter:saturate(1.24) brightness(1.08);
-  box-shadow:
-    0 14px 40px rgba(14,165,233,.34),
-    0 0 0 1px rgba(125,211,252,.30) inset,
-    inset 0 1px 0 rgba(255,255,255,.32);
-}
-
-
-/* v20.18.5：导航滑块改为 left/width 实体滑动，修复 hover 重影 */
-.modern-nav-links .nav-active-indicator{
-  left:var(--nav-indicator-left, 0px)!important;
-  right:auto!important;
-  transform:none!important;
-  translate:none!important;
-  opacity:1!important;
-  visibility:visible!important;
-  display:block!important;
-  transition:
-    background .24s ease,
-    box-shadow .24s ease,
-    filter .24s ease!important;
-  will-change:left,width;
-}
-.modern-nav-links.is-click-sliding .nav-active-indicator,
-.modern-nav-links.is-hover-sliding .nav-active-indicator{
-  opacity:1!important;
-  visibility:visible!important;
-  filter:saturate(1.22) brightness(1.06);
-}
-.modern-nav-links .nav-active-indicator[style]{
-  transform:none!important;
-}
-.modern-nav-links a:hover,
-.modern-nav-links a.active{
-  background:transparent!important;
-}
-
-
-/* v20.18.5：导航滑块彻底清理重写，移除旧 hover / active 重叠样式 */
-.modern-nav-links{
-  position:relative!important;
-  isolation:isolate!important;
-  overflow:hidden!important;
-}
+/* v20.18.5：导航滑块重写，移除旧 hover / active 重叠样式 */
 .modern-nav-links a,
 .modern-nav-links a:hover,
 .modern-nav-links a:focus,
@@ -659,15 +509,6 @@ body.dark .modern-nav-links a.active{
   border-color:transparent!important;
   outline:0!important;
 }
-.modern-nav-links a::before,
-.modern-nav-links a::after,
-.modern-nav-links a:hover::before,
-.modern-nav-links a:hover::after,
-.modern-nav-links a.active::before,
-.modern-nav-links a.active::after{
-  display:none!important;
-  content:none!important;
-}
 .modern-nav-links a{
   transform:none!important;
   transition:color .18s ease!important;
@@ -678,60 +519,7 @@ body.dark .modern-nav-links a.active{
   color:var(--accent-2)!important;
   transform:none!important;
 }
-.modern-nav-links .nav-active-indicator{
-  position:absolute!important;
-  top:5px!important;
-  bottom:5px!important;
-  left:0;
-  right:auto!important;
-  width:52px;
-  height:auto!important;
-  transform:none!important;
-  translate:none!important;
-  opacity:1!important;
-  visibility:visible!important;
-  display:block!important;
-  z-index:1!important;
-  pointer-events:none!important;
-  border-radius:999px!important;
-  background:
-    linear-gradient(135deg, rgba(125,211,252,.34), rgba(59,130,246,.20)),
-    rgba(14,165,233,.14)!important;
-  border:1px solid rgba(125,211,252,.30)!important;
-  box-shadow:0 12px 34px rgba(14,165,233,.20), inset 0 1px 0 rgba(255,255,255,.24)!important;
-  transition:
-    background .22s ease,
-    box-shadow .22s ease,
-    filter .22s ease!important;
-  will-change:left,width!important;
-}
-.modern-nav-links.is-hover-sliding .nav-active-indicator,
-.modern-nav-links.is-click-sliding .nav-active-indicator{
-  filter:saturate(1.18) brightness(1.06)!important;
-  box-shadow:0 15px 42px rgba(14,165,233,.30), inset 0 1px 0 rgba(255,255,255,.30)!important;
-}
-body.dark .modern-nav-links .nav-active-indicator{
-  background:
-    linear-gradient(135deg, rgba(56,189,248,.30), rgba(59,130,246,.22)),
-    rgba(14,165,233,.12)!important;
-  border-color:rgba(125,211,252,.30)!important;
-  box-shadow:0 14px 38px rgba(14,165,233,.18), inset 0 1px 0 rgba(255,255,255,.14)!important;
-}
-@media(max-width:760px){
-  .modern-nav-links .nav-active-indicator{
-    top:4px!important;
-    bottom:4px!important;
-  }
-}
-
-
-/* v20.18.5：导航滑块换成全新 songline-nav-slider，彻底绕开旧 indicator 残留 */
-.modern-nav-links .nav-active-indicator{
-  display:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
-  pointer-events:none!important;
-}
+/* v20.18.5：导航滑块换成全新 songline-nav-slider。 */
 .modern-nav-links{
   position:relative!important;
   isolation:isolate!important;
@@ -865,5 +653,3 @@ body.dark .modern-nav-links .songline-nav-slider{
     animation:none!important;
   }
 }
-
-

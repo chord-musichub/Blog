@@ -31,14 +31,5 @@
   }
 
   window.SonglineInitRecommendedViews = initRecommended;
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ initRecommended(document); });
-  }else{
-    initRecommended(document);
-  }
-  window.addEventListener('songline:page-swap', function(event){
-    initRecommended(event.detail && event.detail.root ? event.detail.root : document);
-  });
 })();
-
 

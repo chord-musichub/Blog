@@ -304,22 +304,11 @@
     renderLinks('');
   }
 
-  window.SonglineInitMobileToc = init;
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ init(document); });
-  }else{
-    init(document);
-  }
-
-  window.addEventListener('songline:page-swap', function(event){
+  function boot(root){
     removeUi();
-    window.setTimeout(function(){
-      init(event.detail && event.detail.root ? event.detail.root : document);
-    }, 40);
-  });
-
-  window.addEventListener('pageshow', function(){ init(document); });
+    init(root || document);
+  }
+  window.SonglineInitMobileToc = boot;
 
   if(mq && mq.addEventListener){
     mq.addEventListener('change', function(){ init(document); });

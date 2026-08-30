@@ -5,14 +5,6 @@
   overflow:hidden!important;
 }
 
-/* 旧 indicator 已由 songline-nav-slider 替代。 */
-.modern-nav-links .nav-active-indicator{
-  display:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
-  pointer-events:none!important;
-}
-
 .modern-nav-links .songline-nav-slider{
   position:absolute!important;
   left:0!important;

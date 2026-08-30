@@ -20,12 +20,24 @@
 
   function syncPageStyles(root){
     var path = window.location.pathname || '';
-    if(path.indexOf('/posts/') === 0 || !!query(root, '.markdown-body, [data-article-renderer="songline-markdown"]')){
-      ensureStylesheet('songline-markdown-renderer-style', '/css/markdown-renderer.css');
-    }
+    var isArticleSurface = path.indexOf('/posts/') === 0 || !!query(root, '.markdown-body, [data-article-renderer="songline-markdown"]');
     var isToolsPage = path.indexOf('/tools/') === 0 || !!query(root, '.tools-grid, .tool-card, .md-tool-layout, [data-snake-game], [data-game-2048]');
+    var isSearchSurface = isToolsPage || path === '/' || path.indexOf('/posts/') === 0 || path.indexOf('/friends/') === 0 || path.indexOf('/tags/') === 0 || !!query(root, '[data-search-submit], [data-tag-search-panel], [data-tools-search], .home-friends-section');
+    if(isArticleSurface){
+      ensureStylesheet('songline-markdown-renderer-style', '/css/markdown-renderer.css');
+      ensureStylesheet('songline-article-compat-style', '/css/site-article-compat.css');
+      ensureStylesheet('songline-markdown-compat-style', '/css/site-markdown-compat.css');
+      ensureStylesheet('songline-article-overrides-style', '/css/site-article-overrides.css');
+    }
     if(isToolsPage){
       ensureStylesheet('songline-tool-shared-style', '/css/tool-shared.css');
+      ensureStylesheet('songline-tools-compat-style', '/css/site-tools-compat.css');
+    }
+    if(isSearchSurface){
+      ensureStylesheet('songline-search-overrides-style', '/css/site-search-overrides.css');
+    }
+    if(path === '/' || !!query(root, '[data-waapi-orbit], .home-orbit-stage, .home-waapi-orbit')){
+      ensureStylesheet('songline-home-compat-style', '/css/site-home-compat.css');
     }
     if(path.indexOf('/tools/random-number/') === 0 || !!query(root, '[data-random-tool], .random-tool-panel')){
       ensureStylesheet('songline-random-number-style', '/css/tools/random-number.css');
@@ -60,6 +72,54 @@
   }
 
   var modules = [
+    {
+      key:'views',
+      src:'/js/views.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '.real-views[data-view-path]');
+      },
+      init:function(root){
+        if(window.SonglineInitViews) window.SonglineInitViews(root || document);
+      }
+    },
+    {
+      key:'recommended-posts',
+      src:'/js/recommended-posts.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-recommended-posts]');
+      },
+      init:function(root){
+        if(window.SonglineInitRecommendedViews) window.SonglineInitRecommendedViews(root || document);
+      }
+    },
+    {
+      key:'markdown-code-tools',
+      src:'/js/markdown-code-tools.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '.markdown-body pre, .preview pre, .md-live-preview pre');
+      },
+      init:function(root){
+        if(window.SonglineEnhanceMarkdown) window.SonglineEnhanceMarkdown(root || document);
+      }
+    },
+    {
+      key:'search-utils',
+      src:'/js/search-utils.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, 'input[type="search"]');
+      },
+      init:function(){}
+    },
+    {
+      key:'search',
+      src:'/js/search.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-search-submit], [data-tag-search-panel], [data-tools-search]');
+      },
+      init:function(root){
+        if(window.SonglineInitSearch) window.SonglineInitSearch(root || document);
+      }
+    },
     {
       key:'home-orbit',
       src:'/js/home-orbit-waapi.js?v=' + VERSION,
@@ -270,22 +330,11 @@
     }
     if(loading[mod.key]) return;
 
-    // 若服务端局部模板已输出脚本标签，先标记为即将加载，再尽快初始化。
+    // 服务端页级脚本在本调度器之前执行；直接复用它，避免额外监听和延迟兜底。
     var existing = document.querySelector('script[data-page-script="' + mod.key + '"], script[src*="' + mod.src.split('?')[0] + '"]');
     if(existing){
-      loading[mod.key] = true;
-      existing.addEventListener('load', function(){
-        loaded[mod.key] = true;
-        loading[mod.key] = false;
-        mod.init(root || document);
-      }, {once:true});
-      // 它可能已经加载完成。
-      window.setTimeout(function(){
-        if(loaded[mod.key]) return;
-        loaded[mod.key] = true;
-        loading[mod.key] = false;
-        mod.init(root || document);
-      }, existing.dataset.pageScript === mod.key ? 140 : 80);
+      loaded[mod.key] = true;
+      mod.init(root || document);
       return;
     }
 
@@ -357,9 +406,10 @@
   };
 
   if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ scan(document); });
+    // 首次直开页面与旧的 defer 自启动保持同一时机；站内换页仍走空闲调度。
+    document.addEventListener('DOMContentLoaded', function(){ scanNow(document); });
   }else{
-    scan(document);
+    scanNow(document);
   }
 
   window.addEventListener('pageshow', function(){ scan(document); });

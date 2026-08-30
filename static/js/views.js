@@ -37,14 +37,5 @@
   }
 
   window.SonglineInitViews = initViews;
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ initViews(document); });
-  }else{
-    initViews(document);
-  }
-  window.addEventListener('songline:page-swap', function(event){
-    initViews(event.detail && event.detail.root ? event.detail.root : document);
-  });
 })();
-
 

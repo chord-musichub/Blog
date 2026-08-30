@@ -417,14 +417,6 @@ body.dark .floating-toc-button{
   border-color:#2b4360 !important;
   color:#cfe6ff !important;
 }
-@media (min-width: 1180px){
-  .article-shell{
-    grid-template-columns:minmax(0,1fr) 72px !important;
-  }
-  .article-shell[data-toc-state="expanded"]{
-    grid-template-columns:minmax(0,1fr) 240px !important;
-  }
-}
 @media (max-width: 980px){
   .article-shell{
     grid-template-columns:1fr !important;

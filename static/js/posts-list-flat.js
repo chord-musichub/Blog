@@ -93,12 +93,9 @@
   window.SonglineInitPostsListFlat = init;
   if(!window.SonglinePostsListFlatGlobalBound){
     window.SonglinePostsListFlatGlobalBound = true;
-    window.addEventListener('load', refresh);
     window.addEventListener('resize', function(){
       window.clearTimeout(window.__postsMobileTimer);
       window.__postsMobileTimer = window.setTimeout(refresh, 120);
     });
-    document.addEventListener('DOMContentLoaded', refresh);
   }
-  refresh();
 })();

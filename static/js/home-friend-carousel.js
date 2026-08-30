@@ -1,10 +1,5 @@
 // 首页朋友卡片轮播：仅在朋友超过一屏时显示切换按钮。
 (function(){
-  function ready(fn){
-    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, {once:true});
-    else fn();
-  }
-
   function init(root){
     root = root || document;
     const carousel = root.querySelector ? root.querySelector('[data-home-friend-carousel]') : document.querySelector('[data-home-friend-carousel]');
@@ -57,5 +52,4 @@
   }
 
   window.SonglineInitHomeFriendCarousel = init;
-  ready(function(){ init(document); });
 })();

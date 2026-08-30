@@ -372,17 +372,4 @@
   }
 
   window.SonglineInit2048 = boot;
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ boot(document); });
-  }else{
-    boot(document);
-  }
-
-  window.addEventListener('pageshow', function(){ boot(document); });
-  window.addEventListener('songline:page-swap', function(event){
-    var root = event.detail && event.detail.root ? event.detail.root : document;
-    window.setTimeout(function(){ boot(root); }, 30);
-    window.setTimeout(function(){ boot(document); }, 120);
-  });
 })();

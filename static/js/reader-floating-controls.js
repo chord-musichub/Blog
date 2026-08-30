@@ -123,10 +123,12 @@
     updateVisibility(topButton, bottomButton);
   }
 
-  window.SonglineNormalizeFloatReadingButtons = normalizeFloatReadingButtons;
-
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', normalizeFloatReadingButtons);
-  else normalizeFloatReadingButtons();
+  function scheduleNormalizeFloatReadingButtons(){
+    normalizeFloatReadingButtons();
+    window.setTimeout(normalizeFloatReadingButtons, 80);
+    window.setTimeout(normalizeFloatReadingButtons, 260);
+  }
+  window.SonglineNormalizeFloatReadingButtons = scheduleNormalizeFloatReadingButtons;
 
   window.addEventListener('scroll', function(){
     updateVisibility(
@@ -136,10 +138,4 @@
   }, {passive:true});
   window.addEventListener('resize', normalizeFloatReadingButtons);
   window.addEventListener('orientationchange', normalizeFloatReadingButtons);
-  window.addEventListener('pageshow', normalizeFloatReadingButtons);
-  window.addEventListener('songline:page-swap', function(){
-    window.setTimeout(normalizeFloatReadingButtons, 0);
-    window.setTimeout(normalizeFloatReadingButtons, 80);
-    window.setTimeout(normalizeFloatReadingButtons, 260);
-  });
 })();

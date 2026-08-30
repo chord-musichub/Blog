@@ -228,8 +228,6 @@
       if(window.SonglinePageModules && typeof window.SonglinePageModules.scan === 'function'){
         window.SonglinePageModules.scan(document);
       }
-      if(window.SonglineInitHomeOrbit) window.SonglineInitHomeOrbit(document);
-      if(window.SonglineInitTagFlow) window.SonglineInitTagFlow(document);
     }catch(e){}
     try{ void document.body.offsetHeight; }catch(e){}
   }

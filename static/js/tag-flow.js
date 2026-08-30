@@ -18,11 +18,6 @@
     document.head.appendChild(style);
   }
 
-  function ready(fn){
-    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, {once:true});
-    else fn();
-  }
-
   function clean(value){
     return String(value == null ? '' : value).replace(/\s+/g, ' ').trim();
   }
@@ -402,16 +397,4 @@
   }
 
   window.SonglineInitTagFlow = init;
-
-  ready(function(){ init(document); });
-
-  window.addEventListener('pageshow', function(){
-    init(document);
-  });
-
-  window.addEventListener('songline:page-swap', function(event){
-    var root = event.detail && event.detail.root ? event.detail.root : document;
-    window.setTimeout(function(){ init(root); }, 40);
-    window.setTimeout(function(){ init(document); }, 160);
-  });
 })();

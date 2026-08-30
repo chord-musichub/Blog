@@ -12,10 +12,6 @@
     if(!nav) return null;
 
     // 若旧版本遗留了指示器，先从 DOM 中移除。
-    nav.querySelectorAll('.nav-active-indicator').forEach(function(oldIndicator){
-      oldIndicator.remove();
-    });
-
     let slider = nav.querySelector('.songline-nav-slider');
     if(!slider){
       slider = document.createElement('span');

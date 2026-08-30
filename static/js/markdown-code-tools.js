@@ -75,12 +75,6 @@
   }
 
   window.SonglineEnhanceMarkdown = enhanceMarkdownCodeBlocks;
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ enhanceMarkdownCodeBlocks(document); });
-  }else{
-    enhanceMarkdownCodeBlocks(document);
-  }
 })();
-
 
 

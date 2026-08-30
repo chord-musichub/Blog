@@ -4,11 +4,6 @@
   const VERSION = '20.20.6';
   let activeController = null;
 
-  function ready(fn){
-    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
-    else fn();
-  }
-
   function findGame(root){
     root = root && root.querySelector ? root : document;
     if(root.matches && root.matches('[data-snake-game]')) return root;
@@ -41,18 +36,6 @@
   }
 
   window.SonglineInitSnake = init;
-
-  ready(function(){ init(document); });
-
-  window.addEventListener('pageshow', function(){
-    init(document);
-  });
-
-  window.addEventListener('songline:page-swap', function(event){
-    const root = event.detail && event.detail.root ? event.detail.root : document;
-    window.setTimeout(function(){ init(root); }, 40);
-    window.setTimeout(function(){ init(document); }, 180);
-  });
 
   function createGame(game){
     const canvas = game.querySelector('[data-snake-canvas]');

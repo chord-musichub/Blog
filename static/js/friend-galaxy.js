@@ -21,11 +21,6 @@
     document.head.appendChild(style);
   }
 
-  function ready(fn){
-    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, {once:true});
-    else fn();
-  }
-
   function clean(value){
     var s = String(value == null ? '' : value).trim();
     for(var i = 0; i < 2; i++){
@@ -708,15 +703,4 @@
   }
 
   window.SonglineInitFriendGalaxy = init;
-  ready(init);
-  window.setTimeout(init, 160);
-
-  window.addEventListener('pageshow', function(){
-    init();
-  });
-
-  window.addEventListener('songline:page-swap', function(){
-    window.setTimeout(init, 40);
-    window.setTimeout(init, 180);
-  });
 })();

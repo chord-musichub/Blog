@@ -2,7 +2,7 @@
 (function(){
   var utils=window.SonglineSearchUtils;
   if(!utils) return;
-  var ready=utils.ready, normalize=utils.normalize, termsOf=utils.termsOf, includesAll=utils.includesAll, countTerm=utils.countTerm, showSearchRefresh=utils.showSearchRefresh, setVisible=utils.setVisible, setEmpty=utils.setEmpty, flashEmpty=utils.flashEmpty, installClearButtons=utils.installClearButtons;
+  var normalize=utils.normalize, termsOf=utils.termsOf, includesAll=utils.includesAll, countTerm=utils.countTerm, showSearchRefresh=utils.showSearchRefresh, setVisible=utils.setVisible, setEmpty=utils.setEmpty, flashEmpty=utils.flashEmpty, installClearButtons=utils.installClearButtons;
   function bindManualSearch(config){
     var input = document.querySelector(config.input);
     var list = document.querySelector(config.list);
@@ -278,12 +278,4 @@
   }
 
   window.SonglineInitSearch = initAllSearch;
-
-  ready(function(){
-    initAllSearch(document);
-  });
-
-  window.addEventListener('songline:page-swap', function(event){
-    initAllSearch(event.detail && event.detail.root ? event.detail.root : document);
-  });
 })();
