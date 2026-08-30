@@ -101,6 +101,20 @@
       }
     },
     {
+      key:'snake-leaderboard',
+      src:'/js/tools/snake-leaderboard.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-snake-game], .snake-game, .snake-tool-panel, #snake-canvas'); },
+      init:function(){}
+    },
+    {
+      key:'snake-renderer',
+      src:'/js/tools/snake-renderer.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-snake-game], .snake-game, .snake-tool-panel, #snake-canvas');
+      },
+      init:function(){}
+    },
+    {
       key:'snake',
       src:'/js/tools/snake.js?v=' + VERSION,
       test:function(root){
@@ -109,6 +123,34 @@
       init:function(root){
         if(window.SonglineInitSnake) window.SonglineInitSnake(root || document);
       }
+    },
+    {
+      key:'2048-engine',
+      src:'/js/tools/game-2048-engine.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-game-2048], .tool-2048-page, .game-2048-board');
+      },
+      init:function(){}
+    },
+    {
+      key:'2048-renderer',
+      src:'/js/tools/game-2048-renderer.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-game-2048], .tool-2048-page, .game-2048-board');
+      },
+      init:function(){}
+    },
+    {
+      key:'2048-leaderboard',
+      src:'/js/tools/game-2048-leaderboard.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-game-2048], .tool-2048-page, .game-2048-board'); },
+      init:function(){}
+    },
+    {
+      key:'2048-audio',
+      src:'/js/tools/game-2048-audio.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-game-2048], .tool-2048-page, .game-2048-board'); },
+      init:function(){}
     },
     {
       key:'2048',
@@ -153,6 +195,14 @@
     {
       key:'audio-metadata',
       src:'/js/tools/audio-metadata.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-audio-visualizer], .audio-visualizer-page, .av-canvas');
+      },
+      init:function(){}
+    },
+    {
+      key:'audio-visualizer-renderer',
+      src:'/js/tools/audio-visualizer-renderer.js?v=' + VERSION,
       test:function(root){
         return !!query(root, '[data-audio-visualizer], .audio-visualizer-page, .av-canvas');
       },

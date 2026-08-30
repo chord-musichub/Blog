@@ -1,0 +1,250 @@
+/* 页面加载与开机动画；由 site.css 后续加载以保持历史层叠顺序。 */
+/* v20.18.5：页面切换顶部加载环 + 首页开机动画 */
+.page-loading-orb{
+  position:fixed;
+  left:50%;
+  top:0;
+  z-index:9999;
+  pointer-events:none;
+  transform:translate(-50%,-118%);
+  opacity:0;
+  transition:transform .42s cubic-bezier(.22,1,.36,1), opacity .28s ease;
+}
+html.is-page-loading .page-loading-orb{
+  transform:translate(-50%,14px);
+  opacity:1;
+}
+html.is-page-loaded .page-loading-orb{
+  transform:translate(-50%,-118%);
+  opacity:0;
+}
+.page-loading-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  min-width:100px;
+  justify-content:center;
+  padding:10px 15px;
+  border:1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+  border-radius:999px;
+  background:color-mix(in srgb, var(--panel) 82%, transparent);
+  color:var(--accent-2);
+  box-shadow:0 18px 42px rgba(55,84,120,.16);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+}
+body.dark .page-loading-pill{
+  background:rgba(17,28,46,.82);
+  box-shadow:0 18px 42px rgba(0,0,0,.24);
+}
+.page-loading-ring{
+  width:22px;
+  height:22px;
+  border-radius:999px;
+  position:relative;
+  display:inline-block;
+  background:
+    conic-gradient(from 0deg, transparent 0 34%, var(--accent) 46%, var(--accent-2) 70%, transparent 88%),
+    radial-gradient(circle, transparent 52%, color-mix(in srgb, var(--accent) 20%, transparent) 53% 58%, transparent 60%);
+  animation:page-loading-spin .78s linear infinite;
+}
+.page-loading-ring::after{
+  content:"";
+  position:absolute;
+  width:6px;
+  height:6px;
+  border-radius:999px;
+  right:2px;
+  top:2px;
+  background:var(--accent-2);
+  box-shadow:0 0 14px var(--accent);
+}
+.page-loading-text{
+  font-size:12.5px;
+  font-weight:850;
+  letter-spacing:.08em;
+}
+@keyframes page-loading-spin{
+  to{transform:rotate(360deg)}
+}
+@media(prefers-reduced-motion: reduce){
+  .page-loading-orb{
+    display:none !important;
+  }
+}
+@media(max-width:520px){
+  html.is-page-loading .page-loading-orb{
+    transform:translate(-50%,10px);
+  }
+  .page-loading-pill{
+    min-width:96px;
+    padding:8px 12px;
+  }
+  .page-loading-text{
+    font-size:12px;
+  }
+}
+.is-boot-preparing,
+.is-boot-preparing body{
+  background:#000!important;
+}
+.is-boot-preparing body > :not(.site-boot-overlay){
+  opacity:0!important;
+  visibility:hidden!important;
+}
+.site-boot-overlay{
+  --boot-progress:0;
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100vh!important;
+  height:100dvh!important;
+  z-index:2147483000!important;
+  overflow:hidden!important;
+  pointer-events:auto;
+  background:#000;
+  color:#fff;
+  isolation:isolate;
+  transition:background .72s ease, opacity .42s ease;
+}
+.site-boot-overlay::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.02), transparent 42%);
+  pointer-events:none;
+}
+.boot-panel{
+  position:absolute;
+  top:0;bottom:0;
+  width:50.1%;
+  background:#000;
+  transition:transform 1.02s cubic-bezier(.22,1,.36,1), opacity .84s ease;
+  will-change:transform,opacity;
+}
+.boot-panel.left{left:0;}
+.boot-panel.right{right:0;}
+.boot-panel::after{
+  content:"";
+  position:absolute;
+  top:16vh;
+  bottom:16vh;
+  width:2px;
+  background:linear-gradient(180deg, transparent, rgba(255,255,255,.86) 18%, rgba(125,211,252,1) 50%, rgba(255,255,255,.86) 82%, transparent);
+  box-shadow:0 0 10px rgba(125,211,252,.82), 0 0 22px rgba(125,211,252,.52);
+  opacity:0;
+  transition:opacity .22s ease;
+}
+.boot-panel.left::after{ right:0; }
+.boot-panel.right::after{ left:0; }
+.boot-progress-line{
+  position:absolute;
+  top:50%;
+  width:2px;
+  height:min(60vh, 520px);
+  transform:translateY(-50%);
+  background:linear-gradient(180deg, transparent, rgba(255,255,255,.88) 18%, rgba(125,211,252,1) 50%, rgba(255,255,255,.88) 82%, transparent);
+  box-shadow:0 0 10px rgba(125,211,252,.82), 0 0 24px rgba(125,211,252,.56);
+  transition:opacity .2s ease;
+}
+.boot-progress-line.left{
+  left:min(calc(var(--boot-progress) * 0.5vw), calc(50vw - 1px));
+}
+.boot-progress-line.right{
+  right:min(calc(var(--boot-progress) * 0.5vw), calc(50vw - 1px));
+}
+.boot-readout{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  display:grid;
+  gap:10px;
+  justify-items:center;
+  pointer-events:none;
+}
+.boot-progress-number{
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:.24em;
+  color:rgba(255,255,255,.9);
+  transition:opacity .28s ease, transform .28s ease;
+}
+.boot-welcome{
+  font-size:30px;
+  font-weight:800;
+  letter-spacing:.16em;
+  color:#fff;
+  opacity:0;
+  transform:translateY(8px) scale(.94);
+  text-shadow:0 0 0 rgba(125,211,252,0);
+  will-change:opacity,transform,text-shadow;
+}
+.site-boot-overlay.is-complete .boot-progress-number{
+  opacity:0;
+  transform:translateY(-6px);
+}
+.site-boot-overlay.is-complete .boot-welcome{
+  animation:bootWelcomeReveal 1.22s cubic-bezier(.22,1,.36,1) forwards;
+}
+html.is-booting,
+html.is-booting body{
+  overflow:hidden!important;
+}
+.site-boot-overlay.is-opening{
+  background:transparent;
+}
+.site-boot-overlay.is-opening .boot-progress-line{
+  opacity:0;
+}
+.site-boot-overlay.is-opening .boot-panel::after{
+  opacity:1;
+}
+.site-boot-overlay.is-opening .boot-panel.left{
+  transform:translateX(-102%);
+  opacity:.96;
+}
+.site-boot-overlay.is-opening .boot-panel.right{
+  transform:translateX(102%);
+  opacity:.96;
+}
+@keyframes bootWelcomeReveal{
+  0%{
+    opacity:0;
+    transform:translateY(10px) scale(.90);
+    letter-spacing:.24em;
+    text-shadow:0 0 0 rgba(125,211,252,0);
+  }
+  24%{
+    opacity:1;
+    transform:translateY(0) scale(1.06);
+    letter-spacing:.18em;
+    text-shadow:0 0 20px rgba(125,211,252,.50);
+  }
+  58%{
+    opacity:1;
+    transform:translateY(0) scale(1.22);
+    letter-spacing:.22em;
+    text-shadow:0 0 34px rgba(125,211,252,.72), 0 0 58px rgba(255,255,255,.24);
+  }
+  100%{
+    opacity:0;
+    transform:translateY(-6px) scale(1.30);
+    letter-spacing:.28em;
+    text-shadow:0 0 46px rgba(125,211,252,0);
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .site-boot-overlay{display:none!important}
+}
+@media (max-width:760px){
+  .boot-progress-line, .boot-panel::after{ top:18vh; bottom:18vh; height:auto; }
+  .boot-welcome{ font-size:24px; }
+}
+@media (max-width:520px){
+  .boot-progress-number{ font-size:16px; }
+  .boot-welcome{ font-size:20px; }
+  .boot-progress-line{ height:min(52vh, 360px); }
+}
+
+

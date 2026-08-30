@@ -1,0 +1,52 @@
+/* 工具页浮动阅读控制兼容规则；保持在 site-modern.css 之后加载。 */
+/* v19.6：工具页置顶/置底按钮由 JS 贴着预览区外侧定位 */
+.tool-page-top-button,
+.tool-page-bottom-button{
+  right:auto;
+}
+
+
+/* v19.6：彻底修复工具页置顶/置底按钮重叠
+   旧版 CSS 里 .tool-page-top-button 有 right:... !important，会压过普通 JS 行内样式。
+   这里先取消静态 right，最终位置由 JS 用 inline !important 按预览区右边缘计算。
+*/
+.tool-page-top-button,
+.tool-page-bottom-button{
+  right:auto !important;
+}
+@media(max-width:760px){
+  .tool-page-top-button{
+    right:82px !important;
+  }
+  .tool-page-bottom-button{
+    right:14px !important;
+  }
+}
+
+
+/* v19.6：工具页置顶/置底按钮严格避开预览阅读区边框
+   桌面端优先放预览区右侧；右侧空间不足时放左侧；两侧都不足时隐藏，避免压到阅读卡片边框。
+*/
+.tool-page-top-button.tool-edge-hidden,
+.tool-page-bottom-button.tool-edge-hidden{
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+@media(min-width:761px){
+  .tool-page-top-button,
+  .tool-page-bottom-button{
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+}
+
+
+/* v19.6：工具页置顶/置底按钮再向阅读区外侧拉开
+   桌面端 JS 会用更大的 sideGap 计算位置，避免视觉上贴着预览卡片边框。
+*/
+.tool-page-top-button,
+.tool-page-bottom-button{
+  will-change:left,right,opacity;
+}
+
+

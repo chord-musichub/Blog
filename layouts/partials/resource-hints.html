@@ -22,10 +22,15 @@ v20.20.6：首屏资源提示。
 {{- end }}
 
 {{- if hasPrefix $rel "/tools/snake/" }}
+<link rel="preload" href="/js/tools/snake-leaderboard.js?v={{ $v }}" as="script">
+<link rel="preload" href="/js/tools/snake-renderer.js?v={{ $v }}" as="script">
 <link rel="preload" href="/js/tools/snake.js?v={{ $v }}" as="script">
 {{- end }}
 
 {{- if hasPrefix $rel "/tools/2048/" }}
+<link rel="preload" href="/js/tools/game-2048-engine.js?v={{ $v }}" as="script">
+<link rel="preload" href="/js/tools/game-2048-renderer.js?v={{ $v }}" as="script">
+<link rel="preload" href="/js/tools/game-2048-leaderboard.js?v={{ $v }}" as="script">
 <link rel="preload" href="/js/tools/game-2048.js?v={{ $v }}" as="script">
 {{- end }}
 
@@ -49,6 +54,7 @@ v20.20.6：首屏资源提示。
 
 {{- if hasPrefix $rel "/tools/audio-visualizer/" }}
 <link rel="preload" href="/js/tools/audio-metadata.js?v={{ $v }}" as="script">
+<link rel="preload" href="/js/tools/audio-visualizer-renderer.js?v={{ $v }}" as="script">
 <link rel="preload" href="/js/tools/audio-visualizer.js?v={{ $v }}" as="script">
 {{- end }}
 

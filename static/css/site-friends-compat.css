@@ -1,0 +1,202 @@
+/* 朋友星图、资料展示与相关交互兼容规则；保持在 site-modern.css 之后加载。 */
+/* v19.8：朋友星图与子页面视觉迭代
+   - 星图背景增加柔和星尘与星云层，不再是一整块单调底色
+   - 子页面顶部/工具栏/搜索区域弱化边框，做成透明玻璃感
+   - 快速寻找增加空结果反馈，按钮 hover 补齐
+*/
+body .page-hero.minimal-page-hero{
+  border:none !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  min-height:auto !important;
+  padding:18px 4px 16px !important;
+  margin-bottom:18px !important;
+}
+body .page-hero.minimal-page-hero h1{
+  letter-spacing:.04em;
+  text-shadow:0 10px 28px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+body.dark .page-hero.minimal-page-hero h1{
+  text-shadow:0 12px 32px rgba(125,211,252,.14);
+}
+
+body .toolbar-panel,
+body .tag-search-panel,
+body .tag-cloud,
+body .tools-command-center,
+body .friend-galaxy-control{
+  border-color:transparent !important;
+  background:color-mix(in srgb, var(--panel) 64%, transparent) !important;
+  box-shadow:0 16px 42px rgba(39,74,112,.08) !important;
+  backdrop-filter:blur(18px);
+}
+body.dark .toolbar-panel,
+body.dark .tag-search-panel,
+body.dark .tag-cloud,
+body.dark .tools-command-center,
+body.dark .friend-galaxy-control{
+  background:rgba(17,28,46,.48) !important;
+  border-color:rgba(125,211,252,.08) !important;
+  box-shadow:0 18px 50px rgba(0,0,0,.18) !important;
+}
+
+body .friend-galaxy-stage{
+  isolation:isolate;
+  border-color:transparent !important;
+  background:
+    radial-gradient(circle at 35% 46%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(216,180,254,.18), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(125,211,252,.12), transparent 26%),
+    color-mix(in srgb, var(--panel) 56%, transparent) !important;
+  box-shadow:0 22px 70px rgba(39,74,112,.10) !important;
+  backdrop-filter:blur(20px);
+}
+body.dark .friend-galaxy-stage{
+  background:
+    radial-gradient(circle at 35% 46%, rgba(56,189,248,.16), transparent 28%),
+    radial-gradient(circle at 68% 20%, rgba(168,85,247,.16), transparent 24%),
+    radial-gradient(circle at 18% 80%, rgba(96,165,250,.12), transparent 26%),
+    rgba(11,22,38,.54) !important;
+  box-shadow:0 28px 80px rgba(0,0,0,.28) !important;
+}
+body .friend-galaxy-stage::before,
+body .friend-galaxy-stage::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+body .friend-galaxy-stage::before{
+  background-image:
+    radial-gradient(circle, color-mix(in srgb, var(--accent) 54%, transparent) 0 1px, transparent 1.7px),
+    radial-gradient(circle, rgba(255,255,255,.70) 0 1px, transparent 1.6px),
+    radial-gradient(circle, rgba(216,180,254,.38) 0 1.2px, transparent 1.8px);
+  background-size:76px 76px, 118px 118px, 164px 164px;
+  background-position:10px 18px, 36px 42px, 8px 80px;
+  opacity:.46;
+  mask-image:radial-gradient(circle at 38% 48%, black 0 52%, transparent 82%);
+}
+body.dark .friend-galaxy-stage::before{
+  opacity:.52;
+}
+body .friend-galaxy-stage::after{
+  inset:10px;
+  border-radius:inherit;
+  background:
+    conic-gradient(from 160deg at 40% 48%, transparent 0deg, color-mix(in srgb, var(--accent) 11%, transparent) 45deg, transparent 96deg, rgba(216,180,254,.10) 160deg, transparent 240deg, rgba(125,211,252,.08) 310deg, transparent 360deg);
+  filter:blur(18px);
+  opacity:.72;
+}
+body .friend-galaxy-lines{z-index:1;}
+body .friend-galaxy-nodes{z-index:3;}
+body .friend-galaxy-profile{
+  border-color:color-mix(in srgb, var(--accent) 12%, transparent) !important;
+  background:color-mix(in srgb, var(--panel) 68%, transparent) !important;
+}
+body.dark .friend-galaxy-profile{
+  background:rgba(15,23,42,.58) !important;
+  border-color:rgba(125,211,252,.16) !important;
+}
+body .friend-node:hover .friend-node-name,
+body .friend-node:focus-visible .friend-node-name,
+body .friend-node.is-preview .friend-node-name{
+  color:var(--accent-2) !important;
+  border-color:color-mix(in srgb, var(--accent) 40%, var(--border)) !important;
+  transform:translateY(-1px) !important;
+}
+body .friend-node:focus-visible,
+body .friend-galaxy-core:focus-visible,
+body .friend-result:focus-visible,
+body .friend-search-submit:focus-visible,
+body .friend-center-link:focus-visible{
+  outline:2px solid color-mix(in srgb, var(--accent) 58%, transparent) !important;
+  outline-offset:4px;
+}
+
+body .friend-search-box{
+  transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease, background-color .18s ease;
+}
+body .friend-search-box:focus-within{
+  border-color:color-mix(in srgb, var(--accent) 44%, var(--border)) !important;
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 10%, transparent) !important;
+}
+body .friend-search-box.is-empty{
+  animation:friendSearchNudge .36s ease;
+  border-color:rgba(248,113,113,.58) !important;
+  box-shadow:0 0 0 4px rgba(248,113,113,.11) !important;
+}
+body .friend-search-icon{
+  font-size:17px !important;
+  filter:saturate(.92);
+}
+body .friend-search-submit,
+body .sort-pill,
+body .btn,
+body .pill,
+body .content-area-link,
+body .tool-card a,
+body .friend-center-link{
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease, color .18s ease;
+}
+body .friend-search-submit:hover,
+body .friend-search-submit:focus-visible,
+body .sort-pill:hover,
+body .sort-pill:focus-visible,
+body .btn:hover,
+body .btn:focus-visible,
+body .friend-center-link:hover,
+body .friend-center-link:focus-visible{
+  transform:translateY(-2px) !important;
+  border-color:var(--accent) !important;
+  box-shadow:0 12px 28px color-mix(in srgb, var(--accent) 14%, transparent) !important;
+}
+body .tag-cloud .pill:hover,
+body .tag-cloud .pill:focus-visible,
+body .hot-card:hover,
+body .hot-card:focus-visible,
+body .modern-tools-grid .tool-card:hover,
+body .modern-tools-grid .tool-card:focus-visible{
+  transform:translateY(-2px) !important;
+  border-color:color-mix(in srgb, var(--accent) 34%, var(--border)) !important;
+  box-shadow:0 18px 44px rgba(39,74,112,.12) !important;
+}
+body.dark .tag-cloud .pill:hover,
+body.dark .tag-cloud .pill:focus-visible,
+body.dark .hot-card:hover,
+body.dark .hot-card:focus-visible,
+body.dark .modern-tools-grid .tool-card:hover,
+body.dark .modern-tools-grid .tool-card:focus-visible{
+  box-shadow:0 20px 48px rgba(0,0,0,.28) !important;
+}
+body .friend-result:hover,
+body .friend-result:focus-visible{
+  border-color:var(--accent) !important;
+  transform:translateY(-2px) !important;
+  box-shadow:0 12px 30px color-mix(in srgb, var(--accent) 10%, transparent) !important;
+}
+body .friend-result.is-current{
+  box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent) inset !important;
+}
+
+@keyframes friendSearchNudge{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-4px)}
+  65%{transform:translateX(4px)}
+}
+@media(max-width:900px){
+  body .friend-galaxy-stage::before{
+    mask-image:radial-gradient(circle at 50% 32%, black 0 54%, transparent 84%);
+  }
+}
+@media(max-width:640px){
+  body .toolbar-panel,
+  body .tag-search-panel,
+  body .tag-cloud,
+  body .tools-command-center,
+  body .friend-galaxy-control{
+    backdrop-filter:none;
+  }
+}
+
+

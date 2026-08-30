@@ -1,0 +1,75 @@
+/* Markdown 代码高亮、注释字体与目录锚点兼容规则；保持在 site-modern.css 之后加载。 */
+/* v20.0.8：轻量代码高亮 token。用于阅读页与后台 Markdown 预览，不依赖外部 CDN。 */
+.markdown-body pre .tok-keyword,
+.md-live-preview pre .tok-keyword,
+.preview pre .tok-keyword{color:#7c3aed;font-weight:760}
+.markdown-body pre .tok-string,
+.md-live-preview pre .tok-string,
+.preview pre .tok-string{color:#047857}
+.markdown-body pre .tok-comment,
+.md-live-preview pre .tok-comment,
+.preview pre .tok-comment{color:#64748b;font-style:italic}
+.markdown-body pre .tok-number,
+.md-live-preview pre .tok-number,
+.preview pre .tok-number{color:#c2410c}
+.markdown-body pre .tok-operator,
+.md-live-preview pre .tok-operator,
+.preview pre .tok-operator{color:#0369a1}
+.markdown-body pre .tok-punct,
+.md-live-preview pre .tok-punct,
+.preview pre .tok-punct{color:#94a3b8}
+body.dark .markdown-body pre .tok-keyword,
+body.dark .md-live-preview pre .tok-keyword,
+body.dark .preview pre .tok-keyword{color:#93c5fd;font-weight:760}
+body.dark .markdown-body pre .tok-string,
+body.dark .md-live-preview pre .tok-string,
+body.dark .preview pre .tok-string{color:#a7f3d0}
+body.dark .markdown-body pre .tok-comment,
+body.dark .md-live-preview pre .tok-comment,
+body.dark .preview pre .tok-comment{color:#7e91aa;font-style:italic}
+body.dark .markdown-body pre .tok-number,
+body.dark .md-live-preview pre .tok-number,
+body.dark .preview pre .tok-number{color:#fbbf24}
+body.dark .markdown-body pre .tok-operator,
+body.dark .md-live-preview pre .tok-operator,
+body.dark .preview pre .tok-operator{color:#67e8f9}
+body.dark .markdown-body pre .tok-punct,
+body.dark .md-live-preview pre .tok-punct,
+body.dark .preview pre .tok-punct{color:#94a3b8}
+
+/* v20.0.8：文内目录锚点跳转修复。避免标题被顶部导航压住，并给锚点链接一点反馈。 */
+.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6,
+.article-reader h1, .article-reader h2, .article-reader h3, .article-reader h4, .article-reader h5, .article-reader h6 {
+  scroll-margin-top: 92px;
+}
+.markdown-body a.md-anchor-link, .article-reader a.md-anchor-link {
+  cursor: pointer;
+}
+
+/* v20.0.8：代码块中文注释显示兜底，避免字体回退看起来像乱码。 */
+.markdown-body pre,
+.md-live-preview pre,
+.preview pre,
+.markdown-body code,
+.md-live-preview code,
+.preview code{
+  font-family:"Cascadia Code","JetBrains Mono","Fira Code","Consolas","Microsoft YaHei UI","Microsoft YaHei",monospace;
+  unicode-bidi:plaintext;
+}
+
+/* v20.0.8：注释内部如果包含字符串/数字，也保持注释色，不再视觉跳色。 */
+.markdown-body pre .tok-comment .tok-string,
+.markdown-body pre .tok-comment .tok-number,
+.markdown-body pre .tok-comment .tok-keyword,
+.md-live-preview pre .tok-comment .tok-string,
+.md-live-preview pre .tok-comment .tok-number,
+.md-live-preview pre .tok-comment .tok-keyword,
+.preview pre .tok-comment .tok-string,
+.preview pre .tok-comment .tok-number,
+.preview pre .tok-comment .tok-keyword{
+  color:inherit;
+  font-style:inherit;
+  font-weight:inherit;
+}
+
+

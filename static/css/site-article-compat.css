@@ -1,0 +1,43 @@
+/* 文章目录与 Markdown 表格兼容规则；保持在 site-modern.css 之后加载。 */
+/* v19.6：文章页目录由临时渲染器同步生成时的层级缩进 */
+.article-toc .toc-level-1{margin-left:0}
+.article-toc .toc-level-2{margin-left:0}
+.article-toc .toc-level-3{margin-left:14px}
+.article-toc .toc-level-4{margin-left:28px}
+
+
+/* v19.6：Markdown 表格更紧凑，避免空列/短列撑出大片空白 */
+.markdown-body .md-table-wrap{
+  width:100%;
+  max-width:100%;
+  overflow:auto;
+  margin:20px 0;
+  border-radius:14px;
+}
+.markdown-body table.md-table{
+  width:max-content;
+  min-width:min(100%, 520px);
+  max-width:100%;
+  table-layout:auto;
+  border-collapse:collapse;
+  margin:0;
+  display:table;
+}
+.markdown-body table.md-table th,
+.markdown-body table.md-table td{
+  white-space:normal;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  max-width:38ch;
+}
+.markdown-body table.md-table td:empty::after,
+.markdown-body table.md-table th:empty::after{
+  content:"—";
+  color:var(--muted);
+  opacity:.45;
+}
+
+.article-toc .toc-level-1{margin-left:0}
+.article-toc .toc-level-2{margin-left:0}
+.article-toc .toc-level-3{margin-left:14px}
+.article-toc .toc-level-4{margin-left:28px}

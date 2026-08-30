@@ -1,0 +1,25 @@
+/* 阅读页目录定位反馈；由 site.css 后续加载以保持历史层叠顺序。 */
+/* v20.18.5：文章阅读页目录点击定位修正 */
+.article-reader h1,
+.article-reader h2,
+.article-reader h3,
+.article-reader h4,
+.article-reader h5,
+.article-reader h6,
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6{
+  scroll-margin-top:118px;
+}
+.article-reader .toc-target-flash,
+.markdown-body .toc-target-flash{
+  animation:songlineTocTargetFlash 1.05s ease;
+}
+@keyframes songlineTocTargetFlash{
+  0%{background:color-mix(in srgb, var(--accent) 18%, transparent);box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 22%, transparent)}
+  45%{background:color-mix(in srgb, var(--accent) 10%, transparent);box-shadow:0 0 0 8px color-mix(in srgb, var(--accent) 8%, transparent)}
+  100%{background:transparent;box-shadow:0 0 0 0 transparent}
+}

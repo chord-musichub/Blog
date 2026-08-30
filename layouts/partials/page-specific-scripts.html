@@ -20,10 +20,16 @@ v20.20.6：页面级 JS 按需加载。
 {{- end }}
 
 {{- if and (hasPrefix $rel "/tools/snake/") }}
+<script defer data-page-script="snake-leaderboard" src="/js/tools/snake-leaderboard.js?v={{ $v }}"></script>
+<script defer data-page-script="snake-renderer" src="/js/tools/snake-renderer.js?v={{ $v }}"></script>
 <script defer data-page-script="snake" src="/js/tools/snake.js?v={{ $v }}"></script>
 {{- end }}
 
 {{- if hasPrefix $rel "/tools/2048/" }}
+<script defer data-page-script="2048-engine" src="/js/tools/game-2048-engine.js?v={{ $v }}"></script>
+<script defer data-page-script="2048-renderer" src="/js/tools/game-2048-renderer.js?v={{ $v }}"></script>
+<script defer data-page-script="2048-leaderboard" src="/js/tools/game-2048-leaderboard.js?v={{ $v }}"></script>
+<script defer data-page-script="2048-audio" src="/js/tools/game-2048-audio.js?v={{ $v }}"></script>
 <script defer data-page-script="2048" src="/js/tools/game-2048.js?v={{ $v }}"></script>
 {{- end }}
 
@@ -47,6 +53,7 @@ v20.20.6：页面级 JS 按需加载。
 
 {{- if hasPrefix $rel "/tools/audio-visualizer/" }}
 <script defer data-page-script="audio-metadata" src="/js/tools/audio-metadata.js?v={{ $v }}"></script>
+<script defer data-page-script="audio-visualizer-renderer" src="/js/tools/audio-visualizer-renderer.js?v={{ $v }}"></script>
 <script defer data-page-script="audio-visualizer" src="/js/tools/audio-visualizer.js?v={{ $v }}"></script>
 {{- end }}
 {{- if hasPrefix $rel "/tools/focus-timer/" }}

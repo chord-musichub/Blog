@@ -58,9 +58,19 @@
   {{ with $favicon }}<link rel="icon" href="{{ . }}">{{ end }}
   {{ with $favicon }}<link rel="apple-touch-icon" href="{{ . }}">{{ end }}
   <link rel="alternate" type="application/rss+xml" title="{{ $siteTitle }} RSS" href="{{ "index.xml" | relURL }}">
-{{ partial "resource-hints.html" . }}
+  {{ partial "resource-hints.html" . }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-runtime.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-modern.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-search-overrides.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-article-compat.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-home-compat.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-tools-compat.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-friends-compat.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-markdown-compat.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-navigation-overrides.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/site-article-overrides.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/mobile-foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/responsive.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site-effects.css?v={{ $assetVersion }}">
@@ -128,6 +138,7 @@
 {{ end }}
 <link rel="stylesheet" href="/css/theme-vars.css?v={{ $assetVersion }}">
   <script defer src="/js/performance-guard.js?v={{ $assetVersion }}"></script>
+  <script defer src="/js/page-transition-nav.js?v={{ $assetVersion }}"></script>
   <script defer src="/js/page-transition.js?v={{ $assetVersion }}"></script>
   <script defer src="/js/mobile-adapt.js?v={{ $assetVersion }}"></script>
   <script defer src="/js/mobile-fixed-nav.js?v={{ $assetVersion }}"></script>

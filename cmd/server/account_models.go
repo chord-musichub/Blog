@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 // User 是后台账号及其公开个人资料。
 type User struct {
@@ -28,4 +31,31 @@ type PasswordResetRequest struct {
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 	ResolvedBy string    `json:"resolved_by,omitempty"`
+}
+
+func normalizeAccountType(role, accountType string) string {
+	accountType = strings.TrimSpace(accountType)
+	switch accountType {
+	case accountSystem, accountOwner, accountFriend:
+		return accountType
+	}
+	if role == roleAdmin {
+		return accountSystem
+	}
+	return accountFriend
+}
+
+func accountTypeText(t string) string {
+	switch normalizeAccountType("", t) {
+	case accountSystem:
+		return "系统账号 / 公告"
+	case accountOwner:
+		return "站长 / 主账号"
+	default:
+		return "朋友作者"
+	}
+}
+
+func isSystemAccount(t string) bool {
+	return normalizeAccountType("", t) == accountSystem
 }
