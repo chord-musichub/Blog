@@ -109,6 +109,13 @@ func (app *App) syncPublicFriends() error {
 // 推导成员，避免一次普通站点重建意外改写朋友名单。
 func (app *App) syncFriendContentPages() error {
 	dataPath := filepath.Join(app.cfg.DataDir, "friends.json")
+	// 部署时 data 目录通常是持久化卷。早期版本曾把该文件缩减成只含
+	// 站长的一项；若直接以它构建 Hugo，朋友星图就只会渲染中心节点。
+	// 仅在这类明显不完整的迁移状态下，使用随站点发布的历史完整名单补回，
+	// 正常的多成员服务器数据绝不会被这里覆盖。
+	if err := app.recoverIncompleteFriendData(dataPath); err != nil {
+		return err
+	}
 	data, err := os.ReadFile(dataPath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -138,6 +145,48 @@ func (app *App) syncFriendContentPages() error {
 		}
 	}
 	return app.writeFriendContentPages(friends)
+}
+
+func (app *App) recoverIncompleteFriendData(dataPath string) error {
+	var current []PublicFriend
+	if data, err := os.ReadFile(dataPath); err == nil && len(data) > 0 {
+		if err := json.Unmarshal(data, &current); err != nil {
+			return err
+		}
+	} else if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	// 一名成员正是旧版错误写入的特征；两名及以上视为管理员维护的数据。
+	if len(current) > 1 {
+		return nil
+	}
+
+	seedPath := filepath.Join("static", "friends-data.json")
+	seedData, err := os.ReadFile(seedPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	var seed []PublicFriend
+	if err := json.Unmarshal(seedData, &seed); err != nil {
+		return err
+	}
+	if len(seed) <= len(current) {
+		return nil
+	}
+
+	// current 放在 generated 位置，使现有站长资料优先于随镜像附带的旧快照。
+	restored := mergePublicFriends(seed, current)
+	b, err := json.MarshalIndent(restored, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(dataPath), 0755); err != nil {
+		return err
+	}
+	return os.WriteFile(dataPath, b, 0644)
 }
 
 // writeFriendContentPages 只处理本程序生成的资料页，避免删除用户自行维护的内容。
