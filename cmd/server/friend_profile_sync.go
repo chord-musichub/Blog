@@ -62,7 +62,7 @@ func (app *App) syncUserProfileToFriendsJSON(oldUser, newUser User) error {
 		Username:    strings.TrimSpace(newUser.Username),
 		DisplayName: name,
 		Slug:        slug,
-		URL:         "/friends/" + slug + "/",
+		URL:         friendProfileURL(slug),
 		Bio:         strings.TrimSpace(newUser.Bio),
 		Homepage:    strings.TrimSpace(newUser.Homepage),
 		Avatar:      firstNonEmpty(strings.TrimSpace(newUser.Avatar), "/uploads/admin/main_logo.png"),
@@ -84,7 +84,7 @@ func (app *App) syncUserProfileToFriendsJSON(oldUser, newUser User) error {
 			found = i
 			break
 		}
-		if strings.TrimSpace(f.URL) != "" && (strings.TrimSpace(f.URL) == "/friends/"+oldSlug+"/" || strings.TrimSpace(f.URL) == "/friends/"+slug+"/") {
+		if strings.TrimSpace(f.URL) != "" && (strings.TrimSpace(f.URL) == friendProfileURL(oldSlug) || strings.TrimSpace(f.URL) == friendProfileURL(slug) || strings.TrimSpace(f.URL) == "/friends/"+oldSlug+"/" || strings.TrimSpace(f.URL) == "/friends/"+slug+"/") {
 			found = i
 			break
 		}

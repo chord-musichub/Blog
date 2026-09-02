@@ -1,11 +1,7 @@
 {{ define "main" }}
-{{ partial "back-icon.html" (dict "fallback" "/") }}
 {{ $cfg := .Site.Data.site }}
 {{ $tags := index .Site.Taxonomies "tags" }}
 {{ $tagCount := 0 }}{{ with $tags }}{{ $tagCount = len . }}{{ end }}
-<section class="page-hero minimal-page-hero">
-<h1>{{ default "文章" $cfg.pages.posts_hero_title }}</h1>
-</section>
 <section class="card toolbar-panel posts-search-toolbar">
   <input id="postSearch" class="searchbox" type="search" autocomplete="off" placeholder="搜索文章标题或作者...">
   <button class="pill search-submit" id="postSearchSubmit" type="button" data-search-submit="post" data-no-page-loading>搜索</button>

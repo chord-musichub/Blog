@@ -1010,26 +1010,56 @@ body[data-page-kind="home"] .songline-home-system{
 
 /* 本地音乐控件：更清晰的覆盖频谱，以及与首页终端一致的悬浮面板。 */
 .songline-home-music-spectrum{ inset:2px 0 -2px; gap:3px; opacity:.58; }
-.songline-home-music-volume{ position:relative; display:grid; place-items:center; }
+.songline-home-music-volume-control{ position:relative; display:grid; place-items:center; }
+.songline-home-music-volume{ display:grid; place-items:center; }
 [data-home-music-volume-input]{
   position:absolute;
   z-index:15;
-  bottom:calc(100% + 10px);
-  right:49px;
-  width:68px;
-  height:16px;
+  right:50%;
+  bottom:calc(100% + 38px);
+  width:0;
+  height:26px;
   margin:0;
-  accent-color:rgba(255,221,184,.9);
+  padding:0 0;
+  appearance:none;
+  -webkit-appearance:none;
   opacity:0;
   pointer-events:none;
-  transform:translate(50%, 4px) rotate(-90deg);
+  border:1px solid rgba(245,226,199,.16);
+  border-radius:14px;
+  background:rgba(15,27,42,.78);
+  box-shadow:0 8px 22px rgba(3,10,18,.22), inset 0 1px rgba(255,244,225,.08);
+  transform:translate(50%, 50%) rotate(-90deg) scaleX(.72);
   transform-origin:center;
-  transition:opacity .16s ease, transform .16s ease;
+  transition:width .22s cubic-bezier(.2,.78,.25,1), padding .22s ease, opacity .16s ease, transform .22s cubic-bezier(.2,.78,.25,1);
 }
-[data-home-music-volume]:hover + [data-home-music-volume-input],
-[data-home-music-volume]:focus + [data-home-music-volume-input],
-[data-home-music-volume-input]:hover,
-[data-home-music-volume-input]:focus{ opacity:1; pointer-events:auto; transform:translate(50%, 0) rotate(-90deg); }
+.songline-home-music-volume-control:hover [data-home-music-volume-input],
+.songline-home-music-volume-control:focus-within [data-home-music-volume-input]{
+  width:86px;
+  padding:0 9px;
+  opacity:1;
+  pointer-events:auto;
+  transform:translate(50%, 50%) rotate(-90deg) scaleX(1);
+}
+[data-home-music-volume-input]::-webkit-slider-runnable-track{
+  height:3px;
+  border-radius:999px;
+  background:linear-gradient(90deg, rgba(255,225,183,.92), rgba(255,225,183,.38));
+}
+[data-home-music-volume-input]::-webkit-slider-thumb{
+  width:10px;
+  height:10px;
+  margin-top:-3.5px;
+  appearance:none;
+  -webkit-appearance:none;
+  border:2px solid rgba(27,39,53,.88);
+  border-radius:50%;
+  background:#fff0d7;
+  box-shadow:0 1px 7px rgba(255,221,181,.24);
+}
+[data-home-music-volume-input]::-moz-range-track{ height:3px; border:0; border-radius:999px; background:rgba(255,225,183,.48); }
+[data-home-music-volume-input]::-moz-range-progress{ height:3px; border-radius:999px; background:rgba(255,225,183,.92); }
+[data-home-music-volume-input]::-moz-range-thumb{ width:8px; height:8px; border:2px solid rgba(27,39,53,.88); border-radius:50%; background:#fff0d7; }
 .songline-home-music.is-muted [data-home-music-volume]{ color:rgba(203,218,231,.38); }
 .songline-home-music-playlist{
   border-color:rgba(255,224,190,.26);
@@ -1045,38 +1075,46 @@ body[data-page-kind="home"] .songline-home-system{
 @media(min-width:981px){
   .songline-home-music-spectrum{ inset:1px 0 -2px; gap:2px; opacity:.62; }
 }
-@media(prefers-reduced-motion:reduce){ .songline-home-music-volume input{ transition:none!important; } }
+@media(prefers-reduced-motion:reduce){ .songline-home-music-volume-control input{ transition:none!important; } }
 
-/* WaveSurfer 真实波形：暂停也保留同一首歌的轮廓，避免空闲与播放两套视觉。 */
-.songline-home-music-spectrum{ display:block; overflow:hidden; }
-.songline-home-music-spectrum::before{
-  position:absolute;
-  z-index:0;
-  top:50%;
-  right:0;
-  left:0;
-  height:1px;
-  content:"";
-  background:linear-gradient(90deg, transparent, rgba(248,228,208,.56) 10%, rgba(248,228,208,.56) 90%, transparent);
-  opacity:.74;
-  transition:opacity .24s ease;
+/* 实时柱形频谱：通过 Web Audio analyser 写入每一根柱子的高度。 */
+.songline-home-music-spectrum{
+  display:flex;
+  align-items:center;
+  overflow:hidden;
 }
-.songline-home-music.has-waveform .songline-home-music-spectrum::before{ opacity:0; }
-[data-home-music-waveform]{
-  position:relative;
-  z-index:1;
+[data-home-music-bars]{
+  display:flex;
+  align-items:center;
   width:100%;
   height:100%;
-  min-height:28px;
-  opacity:0;
-  transition:opacity .28s ease;
+  gap:2px;
 }
-.songline-home-music.has-waveform [data-home-music-waveform]{ opacity:1; }
-[data-home-music-waveform]::part(wave){ opacity:.86; }
-[data-home-music-waveform]::part(progress){ opacity:1; }
-@media(prefers-reduced-motion:reduce){ [data-home-music-waveform]{ transition:none; } }
+.songline-home-music-bar{
+  display:flex;
+  flex:1 1 0;
+  align-items:flex-end;
+  justify-content:center;
+  height:100%;
+  min-width:2px;
+  max-width:5px;
+}
+.songline-home-music-bar::before{
+  width:100%;
+  height:100%;
+  content:"";
+  border-radius:4px;
+  background:linear-gradient(180deg, rgba(255,242,221,.98), rgba(249,202,154,.66));
+  box-shadow:0 0 8px rgba(255,221,192,.10);
+  transform:scaleY(var(--bar-scale, .24));
+  transform-origin:bottom;
+  transition:transform 72ms linear, opacity .2s ease;
+}
+.songline-home-music:not(.is-playing) .songline-home-music-bar::before{ opacity:.46; }
+.songline-home-music.is-playing .songline-home-music-bar::before{ opacity:.92; }
+@media(prefers-reduced-motion:reduce){ .songline-home-music-bar::before{ transition:none!important; } }
 
-/* 控制键下移，给折线留出完整的展示带。 */
+/* 控制键下移，给柱形频谱留出完整的展示带。 */
 @media(min-width:981px){
   .songline-home-music-spectrum{ inset:-2px 0 -8px; opacity:.7; }
   .songline-home-music-actions{ transform:translateY(20px); }
@@ -1084,3 +1122,163 @@ body[data-page-kind="home"] .songline-home-system{
 
 .songline-home-music.is-drop-target .songline-home-music-spectrum{ opacity:1; }
 .songline-home-music.is-drop-target [data-home-music-source-toggle]{ color:rgba(255,231,205,.98); }
+
+/* 播放列表并入首页信息终端：薄线、深蓝玻璃与低调的当前曲目定位。 */
+.songline-home-music-playlist{
+  right:-10px;
+  bottom:calc(100% + 12px);
+  width:min(350px, calc(100vw - 34px));
+  max-height:282px;
+  border:1px solid rgba(185,209,241,.16);
+  border-radius:10px;
+  background:
+    linear-gradient(135deg, rgba(16,31,54,.66), rgba(10,22,42,.48));
+  box-shadow:0 18px 42px rgba(2,9,20,.25), inset 0 1px rgba(230,241,255,.10);
+  backdrop-filter:blur(16px) saturate(110%);
+  -webkit-backdrop-filter:blur(16px) saturate(110%);
+}
+.songline-home-music-playlist-head{
+  position:relative;
+  min-height:39px;
+  padding:0 10px 0 13px;
+  border:0;
+  color:rgba(230,240,255,.82);
+  font:650 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing:.18em;
+}
+.songline-home-music-playlist-head::after{
+  position:absolute;
+  right:10px;
+  bottom:0;
+  left:13px;
+  height:1px;
+  content:"";
+  background:linear-gradient(90deg, rgba(180,207,241,.34), rgba(180,207,241,.08), transparent);
+}
+.songline-home-music-playlist-head button{
+  width:25px;
+  height:25px;
+  color:rgba(209,226,246,.62);
+}
+.songline-home-music-playlist-list{
+  max-height:238px;
+  padding:7px 8px 9px;
+  counter-reset:home-playlist;
+}
+.songline-home-music-playlist-list button{
+  position:relative;
+  grid-template-columns:27px minmax(0,1fr) auto;
+  min-height:39px;
+  gap:8px;
+  margin:1px 0;
+  padding:8px 8px 8px 5px;
+  border-left:1px solid transparent;
+  color:rgba(211,225,244,.66);
+  counter-increment:home-playlist;
+  transition:background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+.songline-home-music-playlist-list button::before{
+  align-self:center;
+  color:rgba(160,185,218,.46);
+  content:counter(home-playlist, decimal-leading-zero);
+  font:600 8px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+  letter-spacing:.06em;
+  text-align:center;
+}
+.songline-home-music-playlist-list button span{ color:inherit; }
+.songline-home-music-playlist-list button small{ color:rgba(166,188,217,.48); }
+.songline-home-music-playlist-list button:hover,
+.songline-home-music-playlist-list button:focus-visible{
+  color:rgba(240,247,255,.96);
+  border-left-color:rgba(190,216,250,.70);
+  background:linear-gradient(90deg, rgba(143,180,229,.13), rgba(143,180,229,.025));
+  outline:0;
+  transform:translateX(2px);
+}
+.songline-home-music-playlist-list button.is-current{
+  color:#eef5ff;
+  border-left-color:#c7dbfb;
+  background:linear-gradient(90deg, rgba(154,188,234,.20), rgba(154,188,234,.045));
+}
+.songline-home-music-playlist-list button.is-current::before{ color:#d8e8ff; }
+.songline-home-music-playlist-list:empty::before{
+  padding:18px 9px;
+  color:rgba(175,195,222,.52);
+  font:500 9px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+
+/* 日间首页使用暖色玻璃；夜间继续保留冷蓝 HUD。 */
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist{
+  border-color:rgba(130,100,84,.22);
+  background:linear-gradient(135deg, rgba(255,246,231,.64), rgba(238,216,199,.48));
+  box-shadow:0 18px 42px rgba(82,48,31,.16), inset 0 1px rgba(255,255,255,.56);
+}
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-head{ color:rgba(80,52,42,.76); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-head::after{ background:linear-gradient(90deg, rgba(128,93,75,.32), rgba(128,93,75,.08), transparent); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-head button{ color:rgba(91,57,43,.60); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button{ color:rgba(77,51,42,.66); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button::before,
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button small{ color:rgba(112,79,63,.48); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button:hover,
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button:focus-visible{
+  color:rgba(55,34,27,.94);
+  border-left-color:rgba(163,105,78,.64);
+  background:linear-gradient(90deg, rgba(202,139,110,.16), rgba(202,139,110,.025));
+}
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button.is-current{
+  color:rgba(57,34,27,.98);
+  border-left-color:rgba(170,106,78,.82);
+  background:linear-gradient(90deg, rgba(209,145,114,.22), rgba(209,145,114,.05));
+}
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button.is-current::before{ color:rgba(126,70,48,.88); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list:empty::before{ color:rgba(112,79,63,.58); }
+
+/* 播放列表收束为中性灰，避免与场景本身的色彩竞争。 */
+.songline-home-music-playlist{
+  border-color:rgba(222,228,238,.16);
+  background:linear-gradient(135deg, rgba(30,34,41,.66), rgba(18,21,27,.48));
+  box-shadow:0 18px 42px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.09);
+}
+.songline-home-music-playlist-head{ color:rgba(232,236,242,.80); }
+.songline-home-music-playlist-head::after{ background:linear-gradient(90deg, rgba(215,223,235,.30), rgba(215,223,235,.07), transparent); }
+.songline-home-music-playlist-head button{ color:rgba(220,226,235,.60); }
+.songline-home-music-playlist-list button{ color:rgba(221,226,235,.66); }
+.songline-home-music-playlist-list button::before,
+.songline-home-music-playlist-list button small{ color:rgba(190,198,211,.48); }
+.songline-home-music-playlist-list button:hover,
+.songline-home-music-playlist-list button:focus-visible{
+  color:rgba(248,250,253,.96);
+  border-left-color:rgba(224,230,239,.68);
+  background:linear-gradient(90deg, rgba(215,222,234,.13), rgba(215,222,234,.025));
+}
+.songline-home-music-playlist-list button.is-current{
+  color:#f3f5f8;
+  border-left-color:#e1e6ee;
+  background:linear-gradient(90deg, rgba(220,226,235,.19), rgba(220,226,235,.045));
+}
+.songline-home-music-playlist-list button.is-current::before{ color:#e2e7ef; }
+.songline-home-music-playlist-list:empty::before{ color:rgba(194,201,212,.54); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist{
+  border-color:rgba(105,112,122,.20);
+  background:linear-gradient(135deg, rgba(244,245,246,.64), rgba(216,219,222,.48));
+  box-shadow:0 18px 42px rgba(58,62,68,.14), inset 0 1px rgba(255,255,255,.60);
+}
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-head{ color:rgba(63,68,76,.76); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-head::after{ background:linear-gradient(90deg, rgba(90,98,110,.29), rgba(90,98,110,.07), transparent); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-head button{ color:rgba(69,75,84,.58); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button{ color:rgba(59,64,72,.68); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button::before,
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button small{ color:rgba(92,99,109,.48); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button:hover,
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button:focus-visible{
+  color:rgba(40,44,51,.94);
+  border-left-color:rgba(91,99,110,.62);
+  background:linear-gradient(90deg, rgba(125,133,145,.15), rgba(125,133,145,.025));
+}
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button.is-current{
+  color:rgba(37,41,47,.98);
+  border-left-color:rgba(75,82,92,.76);
+  background:linear-gradient(90deg, rgba(128,136,148,.20), rgba(128,136,148,.05));
+}
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list button.is-current::before{ color:rgba(61,68,78,.86); }
+body:not(.dark)[data-page-kind="home"] .songline-home-music-playlist-list:empty::before{ color:rgba(92,99,109,.56); }

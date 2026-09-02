@@ -33,10 +33,8 @@ func normalizePublicFriend(f PublicFriend) PublicFriend {
 	if f.Slug == "" {
 		f.Slug = "friend"
 	}
-	f.URL = strings.TrimSpace(f.URL)
-	if f.URL == "" {
-		f.URL = "/friends/" + f.Slug + "/"
-	}
+	// 不信任历史 JSON 中的裸中文 URL；统一由 slug 重建为 UTF-8 编码路径。
+	f.URL = friendProfileURL(f.Slug)
 	f.Bio = strings.TrimSpace(f.Bio)
 	f.Homepage = strings.TrimSpace(f.Homepage)
 	f.Avatar = firstNonEmpty(strings.TrimSpace(f.Avatar), "/uploads/admin/main_logo.png")
@@ -136,7 +134,7 @@ func mergePublicFriends(existing []PublicFriend, generated []PublicFriend) []Pub
 			usedSlugs[base] = 1
 			f.Slug = base
 		}
-		f.URL = "/friends/" + f.Slug + "/"
+		f.URL = friendProfileURL(f.Slug)
 		out = append(out, f)
 	}
 	sort.SliceStable(out, func(i, j int) bool {

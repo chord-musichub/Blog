@@ -8,7 +8,12 @@
   {{ $firstAvatar = default "/uploads/admin/main_logo.png" .avatar }}
 {{ end }}
 
-<section class="friends-constellation" data-friend-galaxy data-friends-src="/friends-data.json?v={{ partial "asset-version.html" . }}">
+{{/*
+  星图数据只使用 Hugo 在本次构建中从 data/friends.json 注入的内容。
+  不再读取 static/friends-data.json：该文件属于历史运行产物，部署后可能比
+  data/friends.json 更旧，导致浏览器把完整星图覆盖成只有站长的一份旧数据。
+*/}}
+<section class="friends-constellation" data-friend-galaxy>
   <div class="friends-constellation__sky" data-galaxy-stage>
     <div class="friends-constellation__nebula" aria-hidden="true"></div>
     <div class="friends-constellation__meteor friends-constellation__meteor--one" aria-hidden="true"></div>
@@ -31,27 +36,6 @@
   </div>
 
   <script id="friend-galaxy-data" type="application/json">
-  [
-    {{- range $i, $f := $friends -}}
-      {{- if $i -}},{{- end -}}
-      {{- $name := default (default $f.username $f.name) (default $f.display_name $f.name) -}}
-      {{- $slug := default (urlize $name) $f.slug -}}
-      {
-        "id": {{ default (default $f.username $slug) $f.id | jsonify }},
-        "slug": {{ $slug | jsonify }},
-        "username": {{ $f.username | jsonify }},
-        "name": {{ $name | jsonify }},
-        "display_name": {{ $name | jsonify }},
-        "bio": {{ default "这个朋友还没有写简介。" $f.bio | jsonify }},
-        "url": {{ default (printf "/friends/%s/" $slug) $f.url | jsonify }},
-        "avatar": {{ default "/uploads/admin/main_logo.png" $f.avatar | jsonify }},
-        "cover": {{ $f.cover | jsonify }},
-        "post_count": {{ default 0 $f.post_count | jsonify }},
-        "post_titles": {{ default slice $f.post_titles | jsonify }},
-        "updated_at": {{ $f.updated_at | jsonify }},
-        "links": {{ default (default slice $f.relations) $f.links | jsonify }}
-      }
-    {{- end -}}
-  ]
+  {{- $friends | jsonify | safeJS -}}
   </script>
 </section>

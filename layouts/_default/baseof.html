@@ -5,6 +5,7 @@
   {{ $cfg := .Site.Data.site }}
   {{ $siteTitle := default .Site.Title $cfg.site.title }}
   {{ $favicon := default $cfg.site.logo_icon $cfg.site.favicon }}
+  {{ $isFriendsSurface := hasPrefix .RelPermalink "/friends/" }}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{{ if .IsHome }}{{ $siteTitle }}{{ else }}{{ .Title }} - {{ $siteTitle }}{{ end }}</title>
@@ -12,7 +13,8 @@
   <script>
     (function(){
       try{
-        var theme = localStorage.getItem('songline-theme') || 'dark';
+        // 朋友列表和朋友资料页共用独立夜空场景，不能继承首页的浅色偏好。
+        var theme = {{ if $isFriendsSurface }}'dark'{{ else }}localStorage.getItem('songline-theme') || 'dark'{{ end }};
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#fbfaf7';
       }catch(e){
@@ -122,7 +124,7 @@
 <link id="songline-posts-list-style" rel="stylesheet" href="/css/posts-list.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if eq .Section "posts" }}
-<link id="songline-posts-campus-scene-style" rel="stylesheet" href="/css/posts-campus-scene.css?v={{ $assetVersion }}">
+<link id="songline-posts-campus-scene-style" rel="stylesheet" href="/css/posts-campus-scene.css?v={{ $assetVersion }}&tone=22.2">
 {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/reaction-test/" }}
 <link id="songline-reaction-style" rel="stylesheet" href="/css/tools/reaction-test.css?v={{ $assetVersion }}">
@@ -179,7 +181,7 @@
   <script>
     (function(){
       try{
-        if((localStorage.getItem('songline-theme') || 'dark') === 'dark') document.body.classList.add('dark');
+        if({{ if $isFriendsSurface }}true{{ else }}(localStorage.getItem('songline-theme') || 'dark') === 'dark'{{ end }}) document.body.classList.add('dark');
       }catch(e){
         document.body.classList.add('dark');
       }

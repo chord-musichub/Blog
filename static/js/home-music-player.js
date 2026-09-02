@@ -96,8 +96,14 @@
     var sourceToggle = host.querySelector('[data-home-music-source-toggle]');
     var volumeButton = host.querySelector('[data-home-music-volume]');
     var volumeInput = host.querySelector('[data-home-music-volume-input]');
-    var waveform = host.querySelector('[data-home-music-waveform]');
-    var wavesurfer = null;
+    var volumeControl = host.querySelector('.songline-home-music-volume-control');
+    var spectrumBars = host.querySelector('[data-home-music-bars]');
+    var audioContext = null;
+    var analyser = null;
+    var sourceNode = null;
+    var spectrumData = null;
+    var spectrumFrame = 0;
+    var bars = [];
     var tracks = [];
     var current = -1;
     var activeUrl = '';
@@ -199,43 +205,99 @@
       });
     }
 
-    function destroyWaveform(){
-      if(wavesurfer && typeof wavesurfer.destroy === 'function') wavesurfer.destroy();
-      wavesurfer = null;
-      host.classList.remove('has-waveform', 'is-waveform-loading');
-      if(waveform) waveform.innerHTML = '';
+    function resetSpectrum(){
+      bars.forEach(function(bar, index){
+        var idle = .20 + ((index * 17 + 11) % 31) / 100;
+        bar.style.setProperty('--bar-scale', idle.toFixed(2));
+      });
     }
 
-    function loadWaveform(url){
-      destroyWaveform();
-      if(!waveform || !window.WaveSurfer || !url) return;
-      host.classList.add('is-waveform-loading');
-      try{
-        wavesurfer = window.WaveSurfer.create({
-          container: waveform,
-          media: audio,
-          url: url,
-          height: 28,
-          waveColor: 'rgba(239, 226, 211, .48)',
-          progressColor: 'rgba(255, 235, 216, .96)',
-          cursorColor: 'transparent',
-          cursorWidth: 0,
-          normalize: true,
-          interact: false,
-          hideScrollbar: true
-        });
-        wavesurfer.once('ready', function(){
-          if(!disposed && wavesurfer){
-            host.classList.remove('is-waveform-loading');
-            host.classList.add('has-waveform');
-          }
-        });
-        wavesurfer.once('error', function(){
-          if(!disposed) destroyWaveform();
-        });
-      }catch(e){
-        destroyWaveform();
+    function createBars(){
+      if(!spectrumBars || bars.length) return;
+      var count = window.matchMedia && window.matchMedia('(max-width:760px)').matches ? 22 : 34;
+      var fragment = document.createDocumentFragment();
+      for(var index = 0; index < count; index++){
+        var bar = document.createElement('i');
+        bar.className = 'songline-home-music-bar';
+        bar.style.setProperty('--bar-index', String(index));
+        fragment.appendChild(bar);
+        bars.push(bar);
       }
+      spectrumBars.appendChild(fragment);
+      resetSpectrum();
+    }
+
+    function ensureAnalyser(){
+      if(analyser || !audio) return !!analyser;
+      var Context = window.AudioContext || window.webkitAudioContext;
+      if(!Context) return false;
+      try{
+        audioContext = new Context();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = .78;
+        sourceNode = audioContext.createMediaElementSource(audio);
+        sourceNode.connect(analyser);
+        analyser.connect(audioContext.destination);
+        spectrumData = new Uint8Array(analyser.frequencyBinCount);
+        return true;
+      }catch(e){
+        analyser = null;
+        sourceNode = null;
+        return false;
+      }
+    }
+
+    function stopSpectrum(){
+      if(spectrumFrame) window.cancelAnimationFrame(spectrumFrame);
+      spectrumFrame = 0;
+      resetSpectrum();
+    }
+
+    function renderSpectrum(){
+      spectrumFrame = 0;
+      if(disposed || audio.paused || !analyser || !spectrumData){ stopSpectrum(); return; }
+      analyser.getByteFrequencyData(spectrumData);
+      var usable = Math.max(12, Math.floor(spectrumData.length * .72));
+      bars.forEach(function(bar, index){
+        var from = Math.floor(index * usable / bars.length);
+        var to = Math.max(from + 1, Math.floor((index + 1) * usable / bars.length));
+        var total = 0;
+        var peak = 0;
+        for(var bin = from; bin < to; bin++){
+          var value = spectrumData[bin];
+          total += value;
+          peak = Math.max(peak, value);
+        }
+        // 均值保证稳定，局部峰值和固定频段权重保留每根柱的个性与节奏差。
+        var average = total / Math.max(1, to - from) / 255;
+        var localPeak = peak / 255;
+        var amplitude = average * .42 + localPeak * .58;
+        var bandWeight = .66 + ((index * 29 + 17) % 47) / 100;
+        var scale = Math.max(.08, Math.min(1, .08 + Math.pow(amplitude, .56) * bandWeight));
+        bar.style.setProperty('--bar-scale', scale.toFixed(3));
+      });
+      spectrumFrame = window.requestAnimationFrame(renderSpectrum);
+    }
+
+    function startSpectrum(){
+      createBars();
+      if(!ensureAnalyser() || spectrumFrame) return;
+      if(audioContext && audioContext.state === 'suspended') audioContext.resume().catch(function(){});
+      spectrumFrame = window.requestAnimationFrame(renderSpectrum);
+    }
+
+    function destroySpectrum(){
+      stopSpectrum();
+      bars = [];
+      if(spectrumBars) spectrumBars.innerHTML = '';
+      try{ if(sourceNode) sourceNode.disconnect(); }catch(e){}
+      try{ if(analyser) analyser.disconnect(); }catch(e){}
+      try{ if(audioContext && audioContext.state !== 'closed') audioContext.close(); }catch(e){}
+      sourceNode = null;
+      analyser = null;
+      audioContext = null;
+      spectrumData = null;
     }
 
     async function playCurrent(){
@@ -243,6 +305,8 @@
       try{
         var fadeIn = !isMuted && !document.hidden;
         audio.volume = isMuted ? 0 : fadeIn ? .02 : preferredVolume;
+        createBars();
+        if(ensureAnalyser() && audioContext && audioContext.state === 'suspended') await audioContext.resume();
         await audio.play();
         if(fadeIn && !audio.paused) await fadeAudioVolume(preferredVolume, 230);
         setStatus((tracks[current].source || '本地音乐') + ' · 正在播放');
@@ -284,13 +348,11 @@
       if(!tracks.length) return;
       current = (index + tracks.length) % tracks.length;
       saveLastIndex(current);
-      destroyWaveform();
       revokeActiveUrl();
       activeUrl = URL.createObjectURL(tracks[current].file);
       audio.src = activeUrl;
       audio.volume = preferredVolume;
       audio.load();
-      loadWaveform(activeUrl);
       var track = tracks[current];
       setText(title, track.title || displayName(track.file));
       setText(artist, track.artist || '读取音频信息…');
@@ -303,7 +365,6 @@
 
     function setTracks(files, source, preferredIndex){
       stopPlaybackImmediately();
-      destroyWaveform();
       revokeActiveUrl();
       tracks = Array.prototype.slice.call(files || []).filter(isAudio).sort(function(a, b){
         var an = a.webkitRelativePath || a.name || '';
@@ -381,6 +442,11 @@
       }catch(e){}
     }
 
+    function closeVolumeControl(){
+      // 鼠标离开后释放 range 焦点，让 HUD 滑杆自然收起；键盘焦点不受影响。
+      if(volumeInput && document.activeElement === volumeInput && !volumeInput.matches(':focus-visible')) volumeInput.blur();
+    }
+
     async function chooseDirectory(){
       if(typeof window.showDirectoryPicker === 'function'){
         try{
@@ -428,8 +494,9 @@
     folderInput.addEventListener('change', function(){ setTracks(folderInput.files, '已选择文件夹', 0); setStatus('已加载文件夹（此浏览器不会保留目录授权）'); folderInput.value = ''; });
     volumeButton.addEventListener('click', toggleMute);
     volumeInput.addEventListener('input', function(){ setPreferredVolume(Number(volumeInput.value) / 100); });
-    audio.addEventListener('play', updateControls);
-    audio.addEventListener('pause', updateControls);
+    if(volumeControl) volumeControl.addEventListener('pointerleave', closeVolumeControl);
+    audio.addEventListener('play', function(){ updateControls(); startSpectrum(); });
+    audio.addEventListener('pause', function(){ updateControls(); stopSpectrum(); });
     audio.addEventListener('ended', function(){ if(tracks.length) loadTrack(current + 1, true); });
     audio.addEventListener('error', function(){ if(current >= 0) setStatus('该音频暂时无法播放'); });
     document.addEventListener('visibilitychange', function(){
@@ -453,14 +520,16 @@
       }).catch(function(){ setStatus('无法读取拖入的文件夹'); });
     });
 
+    createBars();
     updateControls();
     restoreDirectory();
     window.__songlineHomeMusicPlayer = {
       destroy:function(){
         disposed = true;
-        destroyWaveform();
+        destroySpectrum();
         cancelVolumeFade();
         document.removeEventListener('pointerdown', closePlaylistOnOutside);
+        if(volumeControl) volumeControl.removeEventListener('pointerleave', closeVolumeControl);
         try{ audio.pause(); }catch(e){}
         revokeActiveUrl();
         if(window.__songlineHomeMusicPlayer === this) window.__songlineHomeMusicPlayer = null;

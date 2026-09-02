@@ -78,9 +78,11 @@ func (app *App) runHugo(ctx context.Context) error {
 	if err := app.syncPublishedArticles(); err != nil {
 		return err
 	}
-	// 朋友页改为以 data/friends.json 为唯一长期数据源。
-	// 这里不再由后台根据 users.json 自动重写 friends.json，避免发布文章或重建时把星图朋友数据缩成 1 人。
-	// 公开朋友数据会在构建前同步到静态资源目录。
+	// 朋友页以 data/friends.json 为唯一名单来源。每次构建只规范 URL 并重建
+	// 自动生成的资料页，不再由 users.json 自动重写名单，避免朋友数量被缩减。
+	if err := app.syncFriendContentPages(); err != nil {
+		return err
+	}
 	if err := app.ensureBuiltinContentPages(); err != nil {
 		return err
 	}

@@ -66,14 +66,16 @@
             </div>
           </div>
           <div class="songline-home-music-spectrum" data-home-music-spectrum aria-hidden="true">
-            <div data-home-music-waveform></div>
+            <div data-home-music-bars></div>
           </div>
           <div class="songline-home-music-actions" aria-label="音乐操作">
             <button class="songline-home-music-play-toggle" type="button" data-home-music-toggle aria-label="播放" title="播放" aria-pressed="false"><span data-home-music-play-glyph aria-hidden="true">▶</span></button>
             <button type="button" data-home-music-previous aria-label="上一曲" title="上一曲">{{ partial "ui-icon.html" "arrow-left" }}</button>
             <button type="button" data-home-music-next aria-label="下一曲" title="下一曲">{{ partial "ui-icon.html" "arrow-right" }}</button>
-            <button class="songline-home-music-volume" type="button" data-home-music-volume aria-label="静音" title="静音" aria-pressed="false">{{ partial "ui-icon.html" "volume" }}</button>
-            <input type="range" data-home-music-volume-input aria-label="音量" min="0" max="100" value="88">
+            <span class="songline-home-music-volume-control">
+              <button class="songline-home-music-volume" type="button" data-home-music-volume aria-label="静音" title="静音" aria-pressed="false">{{ partial "ui-icon.html" "volume" }}</button>
+              <input type="range" data-home-music-volume-input aria-label="音量" min="0" max="100" value="88">
+            </span>
             <button type="button" data-home-music-source-toggle aria-label="添加音乐，音乐文件夹可直接拖入" title="添加音乐 · 文件夹可直接拖入">{{ partial "ui-icon.html" "upload" }}</button>
             <button type="button" data-home-music-list-toggle aria-label="打开播放列表" title="播放列表" aria-expanded="false">{{ partial "ui-icon.html" "menu" }}</button>
           </div>

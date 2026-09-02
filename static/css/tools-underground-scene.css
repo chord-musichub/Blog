@@ -1,17 +1,43 @@
 /* 工具入口页：PVZ 式从地表向下进入土层的滚动背景。 */
 body[data-page-layout="tools"]{
-  background:#1d0f09;
+  min-height:100svh;
+  background-color:#1d0f09;
+  background-image:
+    linear-gradient(180deg, rgba(44,22,8,.03), rgba(18,8,3,.20)),
+    url('/uploads/admin/under-background.png');
+  background-repeat:no-repeat;
+  background-position:center top;
+  background-size:100% 100%, max(100vw, 940px) auto;
+}
+/* 深色主题不替换场景图，工具页始终沿用同一张土层背景。 */
+body.dark[data-page-layout="tools"]{
+  background-color:#1d0f09!important;
+  background-image:
+    linear-gradient(180deg, rgba(44,22,8,.03), rgba(18,8,3,.20)),
+    url('/uploads/admin/under-background.png')!important;
+  background-repeat:no-repeat!important;
+  background-position:center top!important;
+  background-size:100% 100%, max(100vw, 940px) auto!important;
+}
+/* body 滚动结束后浏览器会露出 html 底色；根层也锁到土壤色，消除页脚下白边。 */
+html:has(body[data-page-layout="tools"]){ background:#1d0f09!important; }
+html:has(body.dark[data-page-layout="tools"]){ background:#1d0f09!important; }
+/* 工具场景顶栏是前景 HUD，品牌与操作图标始终保持白色。 */
+body[data-page-layout="tools"] .modern-site-header .logo,
+body[data-page-layout="tools"] .modern-site-header .logo-text,
+body[data-page-layout="tools"] .modern-site-header .header-icons .icon-btn,
+body[data-page-layout="tools"] .modern-site-header .header-icons .ui-icon{
+  color:#fff1d2!important;
+}
+body[data-page-layout="tools"] .modern-site-header .header-icons .icon-btn:hover,
+body[data-page-layout="tools"] .modern-site-header .header-icons .icon-btn:focus-visible{
+  color:#fff!important;
 }
 body[data-page-layout="tools"]::before{
   background:transparent;
 }
 body[data-page-layout="tools"] .site-bg-layer{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:auto!important;
-  min-height:100%;
-  overflow:visible;
+  display:none!important;
 }
 body[data-page-layout="tools"] .site-bg-layer::before{
   inset:0;
@@ -33,43 +59,84 @@ body[data-page-layout="tools"] .songline-ribbon-layer{
   display:none!important;
 }
 
-/* 保持现有工具结构，只提高在土层上的阅读稳定性。 */
-body[data-page-layout="tools"] .tools-hero,
+/* 工具页改成嵌在土层中的“种植格”：不再沿用通用白色 Dashboard 卡片。 */
 body[data-page-layout="tools"] .tools-command-center,
 body[data-page-layout="tools"] .modern-tools-grid .tool-card{
-  backdrop-filter:blur(5px);
-  -webkit-backdrop-filter:blur(5px);
+  background:linear-gradient(145deg, rgba(85,45,17,.86), rgba(47,23,9,.82))!important;
+  border:1px solid rgba(244,193,101,.22)!important;
+  box-shadow:0 16px 30px rgba(36,16,4,.28), inset 0 1px rgba(255,224,159,.10)!important;
+  color:#fff0ce!important;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
 }
-body[data-page-layout="tools"] .page-hero.minimal-page-hero h1{
-  color:#fff0c8;
-  text-shadow:0 3px 18px rgba(30,13,4,.72);
+body[data-page-layout="tools"] .tools-command-center{
+  display:flex!important;
+  justify-content:flex-end;
+  align-items:center;
+  min-height:72px;
+  margin-top:28px;
+  padding:14px 16px!important;
 }
-body[data-page-layout="tools"] .tools-hero{
-  background-image:linear-gradient(135deg, rgba(255,236,188,.84), rgba(117,57,18,.72));
-  border-color:rgba(255,232,174,.32);
+body[data-page-layout="tools"] .tools-command-center > div:first-child{ display:none!important; }
+body[data-page-layout="tools"] .tools-search-row{ width:min(100%, 620px); margin-left:auto; }
+body[data-page-layout="tools"] .tools-searchbox{
+  background:rgba(32,15,6,.42)!important;
+  border-color:rgba(250,211,139,.22)!important;
+  color:#fff4d8!important;
 }
-body.dark[data-page-layout="tools"] .tools-hero{
-  background-image:linear-gradient(135deg, rgba(68,35,14,.82), rgba(25,13,7,.78));
-  border-color:rgba(239,179,91,.24);
+body[data-page-layout="tools"] .tools-searchbox::placeholder{ color:rgba(255,229,181,.58); }
+body[data-page-layout="tools"] .tools-search-row .pill{
+  color:#ffedc5!important;
+  border-color:rgba(246,202,126,.24)!important;
+  background:rgba(115,63,23,.54)!important;
 }
-body.dark[data-page-layout="tools"] .tools-command-center,
-body.dark[data-page-layout="tools"] .modern-tools-grid .tool-card{
-  background:rgba(31,18,10,.74);
-  border-color:rgba(226,167,84,.18);
+body[data-page-layout="tools"] .modern-tools-grid{
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr))!important;
+  gap:18px!important;
+  padding-bottom:58px;
 }
-body[data-page-layout="tools"] .tools-command-center,
 body[data-page-layout="tools"] .modern-tools-grid .tool-card{
-  background:rgba(255,241,211,.58)!important;
-  border-color:rgba(255,232,174,.34)!important;
-  box-shadow:0 18px 42px rgba(39,18,5,.20)!important;
+  min-height:188px;
+  grid-template-columns:1fr!important;
+  grid-template-rows:auto 1fr;
+  gap:13px!important;
+  padding:20px!important;
+  border-radius:18px!important;
+  transform:translateZ(0);
 }
-body.dark[data-page-layout="tools"] .tools-command-center,
-body.dark[data-page-layout="tools"] .modern-tools-grid .tool-card{
-  background:rgba(31,18,10,.66)!important;
-  border-color:rgba(226,167,84,.18)!important;
+body[data-page-layout="tools"] .modern-tools-grid .tool-card::before{
+  background:radial-gradient(circle, rgba(251,203,111,.15), transparent 68%)!important;
+}
+body[data-page-layout="tools"] .tool-card-icon{
+  width:52px;
+  height:52px;
+  border-radius:14px;
+  color:#fff3d6!important;
+  border-color:rgba(255,218,150,.22)!important;
+  background:linear-gradient(135deg, rgba(148,82,28,.84), rgba(73,34,12,.92))!important;
+  box-shadow:inset 0 1px rgba(255,235,186,.14), 0 8px 18px rgba(25,10,2,.24)!important;
+}
+body[data-page-layout="tools"] .tool-card h2{ color:#fff0ce!important; font-size:21px!important; }
+body[data-page-layout="tools"] .tool-card p{ color:rgba(255,229,190,.70)!important; }
+body[data-page-layout="tools"] .tool-tags span{
+  color:rgba(255,232,193,.82)!important;
+  background:rgba(35,16,6,.34)!important;
+  border-color:rgba(245,198,118,.16)!important;
+}
+body[data-page-layout="tools"] .tool-card-arrow{
+  color:#ffe2aa!important;
+  background:rgba(43,19,7,.62)!important;
+  border-color:rgba(247,204,126,.22)!important;
+}
+body[data-page-layout="tools"] .modern-tools-grid .tool-card:hover{
+  transform:translateY(-5px)!important;
+  border-color:rgba(255,214,139,.48)!important;
+  box-shadow:0 24px 42px rgba(29,11,2,.34), inset 0 1px rgba(255,232,184,.18)!important;
 }
 @media(max-width:760px){
   body[data-page-layout="tools"] .site-bg-layer::before{
     background-size:940px auto;
   }
+  body[data-page-layout="tools"]{ background-size:100% 100%, 940px auto; }
+  body[data-page-layout="tools"] .tools-command-center{ margin-top:14px; }
 }

@@ -9,12 +9,12 @@ v20.20.6：页面级 JS 按需加载。
 
 {{- if .IsHome }}
 <script defer data-page-script="audio-metadata" src="/js/tools/audio-metadata.js?v={{ $v }}"></script>
-<script defer data-page-script="wavesurfer" src="/js/vendor/wavesurfer.min.js?v={{ $v }}"></script>
 <script defer data-page-script="home-music" src="/js/home-music-player.js?v={{ $v }}"></script>
 {{- end }}
 
 {{- if or (eq $section "friends") (hasPrefix $rel "/friends/") }}
-<script defer data-page-script="friend-galaxy" src="/js/friend-galaxy.js?v={{ $v }}"></script>
+{{/* 独立版本号：朋友 URL 编码修复必须绕过旧浏览器缓存。 */}}
+<script defer data-page-script="friend-galaxy" src="/js/friend-galaxy.js?v={{ $v }}&friends=21.2"></script>
 {{- end }}
 
 {{- if or (eq $section "tags") (hasPrefix $rel "/tags/") }}

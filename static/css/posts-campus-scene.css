@@ -1,9 +1,20 @@
 /* 文章区：校园背景留在两侧，中央始终是一张稳定的阅读底。 */
 body[data-page-section="posts"]{
-  background:#eaf2f8;
+  background:#d8ebf4;
 }
 body.dark[data-page-section="posts"]{
   background:#071126;
+}
+/* 文章场景中的顶部品牌固定使用白色，浅色阅读层不参与这一处主题换色。 */
+body[data-page-section="posts"] .modern-site-header .logo,
+body[data-page-section="posts"] .modern-site-header .logo-text,
+body[data-page-section="posts"] .modern-site-header .header-icons .icon-btn,
+body[data-page-section="posts"] .modern-site-header .header-icons .ui-icon{
+  color:#edf3ff!important;
+}
+body[data-page-section="posts"] .modern-site-header .header-icons .icon-btn:hover,
+body[data-page-section="posts"] .modern-site-header .header-icons .icon-btn:focus-visible{
+  color:#fff!important;
 }
 
 body[data-page-section="posts"] .site-bg-layer{
@@ -46,17 +57,30 @@ body[data-page-section="posts"] main.container{
   min-height:calc(100svh - 86px);
   margin-top:18px;
   margin-bottom:24px;
-  background:rgba(251,253,255,.88);
-  border:1px solid rgba(255,255,255,.68);
+  background:linear-gradient(135deg, rgba(220,239,247,.64), rgba(236,246,244,.54));
+  border:1px solid rgba(236,249,250,.48);
   border-radius:26px;
-  box-shadow:0 20px 56px rgba(36,67,95,.22), inset 0 1px rgba(255,255,255,.52);
-  backdrop-filter:blur(22px) saturate(112%);
-  -webkit-backdrop-filter:blur(22px) saturate(112%);
+  box-shadow:0 20px 56px rgba(67,109,130,.20), inset 0 1px rgba(255,255,255,.42);
+  backdrop-filter:blur(18px) saturate(108%);
+  -webkit-backdrop-filter:blur(18px) saturate(108%);
 }
 body.dark[data-page-section="posts"] main.container{
   background:rgba(8,20,42,.87);
   border-color:rgba(183,211,255,.18);
   box-shadow:0 22px 62px rgba(0,0,0,.48), inset 0 1px rgba(218,232,255,.08);
+}
+
+/* 浅色阅读层沿用校园的蓝绿日光，而非独立的一整块纯白。 */
+body:not(.dark)[data-page-section="posts"] .toolbar-panel,
+body:not(.dark)[data-page-section="posts"] .posts-tag-explorer,
+body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card,
+body:not(.dark)[data-page-section="posts"] .article-reader,
+body:not(.dark)[data-page-section="posts"] .article-toc,
+body:not(.dark)[data-page-section="posts"] .article-bottom-actions,
+body:not(.dark)[data-page-section="posts"] .nav-card{
+  background:rgba(235,247,247,.58)!important;
+  border-color:rgba(164,201,209,.34)!important;
+  box-shadow:0 14px 34px rgba(62,104,124,.12)!important;
 }
 
 @media(min-width:821px){
@@ -80,4 +104,168 @@ body[data-page-section="posts"] main.container{
 body.dark[data-page-section="posts"] main.container{
   box-shadow:0 16px 40px rgba(0,0,0,.42), inset 0 1px rgba(218,232,255,.07);
 }
+}
+
+/* 文章区色调统一：日景为纸感灰白与校园绿影，夜景为低饱和墨蓝与月光灰。
+   这一层只覆盖文章列表和阅读页，避免旧的羊皮纸/亮青蓝规则彼此打架。 */
+body[data-page-section="posts"]{
+  --article-surface:rgba(226,236,229,.66);
+  --article-surface-strong:rgba(237,244,238,.76);
+  --article-ink:#2d3936;
+  --article-muted:#62716a;
+  --article-line:rgba(86,115,102,.27);
+  --article-line-strong:rgba(90,124,108,.38);
+  --article-accent:#547d6d;
+  --article-accent-soft:rgba(84,125,109,.10);
+  --article-code:#26332f;
+  --article-code-ink:#edf3ee;
+}
+body.dark[data-page-section="posts"]{
+  --article-surface:rgba(13,25,43,.70);
+  --article-surface-strong:rgba(15,29,49,.86);
+  --article-ink:#e5edf1;
+  --article-muted:#a4b2bb;
+  --article-line:rgba(167,191,211,.16);
+  --article-line-strong:rgba(186,211,233,.27);
+  --article-accent:#a9c8bc;
+  --article-accent-soft:rgba(169,200,188,.10);
+  --article-code:#091421;
+  --article-code-ink:#dce9ef;
+}
+
+body[data-page-section="posts"] main.container{
+  background:linear-gradient(138deg, rgba(218,232,223,.63), rgba(200,220,211,.53))!important;
+  border-color:rgba(235,244,237,.42)!important;
+  box-shadow:0 24px 64px rgba(52,78,66,.20), inset 0 1px rgba(255,255,255,.32)!important;
+}
+body.dark[data-page-section="posts"] main.container{
+  background:linear-gradient(138deg, rgba(10,22,40,.82), rgba(12,27,47,.72))!important;
+  border-color:rgba(187,211,232,.15)!important;
+  box-shadow:0 26px 70px rgba(0,0,0,.42), inset 0 1px rgba(229,240,255,.07)!important;
+}
+
+body[data-page-section="posts"] :is(.toolbar-panel,.posts-tag-explorer,.posts-list > .post-search-item > article.post-card,.article-reader,.article-toc,.article-bottom-actions,.nav-card,.related-card,.article-cover-hero + section.card){
+  background:var(--article-surface)!important;
+  border-color:var(--article-line)!important;
+  box-shadow:0 12px 30px rgba(48,74,65,.09)!important;
+  color:var(--article-ink)!important;
+}
+body.dark[data-page-section="posts"] :is(.toolbar-panel,.posts-tag-explorer,.posts-list > .post-search-item > article.post-card,.article-reader,.article-toc,.article-bottom-actions,.nav-card,.related-card,.article-cover-hero + section.card){
+  background:var(--article-surface)!important;
+  border-color:var(--article-line)!important;
+  box-shadow:0 16px 38px rgba(0,0,0,.20)!important;
+  color:var(--article-ink)!important;
+}
+
+/* 列表：让封面之外的文字区像同一张安静的阅读板，而不是独立 Dashboard 卡。 */
+body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card > .post-info{
+  background:linear-gradient(104deg, rgba(239,246,240,.19), rgba(200,220,210,.12))!important;
+}
+body.dark[data-page-section="posts"] .posts-list > .post-search-item > article.post-card > .post-info{
+  background:linear-gradient(104deg, rgba(17,34,56,.48), rgba(10,23,42,.18))!important;
+}
+body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card :is(h2,h2 a,h3,h3 a),
+body[data-page-section="posts"] .article-cover-hero + section.card h1,
+body[data-page-section="posts"] .section-head h2{
+  color:var(--article-ink)!important;
+}
+body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card :is(p,.meta-row,.meta-row span,.views),
+body[data-page-section="posts"] .article-cover-hero + section.card > p,
+body[data-page-section="posts"] .article-bottom-actions p{
+  color:var(--article-muted)!important;
+}
+body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:hover,
+body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:focus-visible{
+  transform:translateY(-3px)!important;
+  border-color:var(--article-line-strong)!important;
+  box-shadow:0 20px 44px rgba(49,80,69,.16)!important;
+}
+body.dark[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:hover,
+body.dark[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:focus-visible{
+  background:rgba(19,37,61,.84)!important;
+  border-color:rgba(184,211,228,.34)!important;
+  box-shadow:0 22px 48px rgba(0,0,0,.32)!important;
+}
+
+/* 阅读正文：移除旧的棕褐羊皮纸色，文字、引用、表格和代码共享同一套冷静层级。 */
+body[data-page-section="posts"] :is(.prose,.article-content,.article-body,.markdown-body,.post-content),
+body[data-page-section="posts"] :is(.prose p,.article-content p,.article-body p,.markdown-body p,.post-content p,.prose li,.article-content li,.article-body li,.markdown-body li,.post-content li){
+  color:var(--article-ink)!important;
+}
+body[data-page-section="posts"] :is(.prose h1,.prose h2,.prose h3,.prose h4,.article-content h1,.article-content h2,.article-content h3,.article-content h4,.article-body h1,.article-body h2,.article-body h3,.article-body h4,.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.post-content h1,.post-content h2,.post-content h3,.post-content h4){
+  color:var(--article-ink)!important;
+  border-color:var(--article-line)!important;
+}
+body[data-page-section="posts"] :is(.prose a,.article-content a,.article-body a,.markdown-body a,.post-content a){
+  color:var(--article-accent)!important;
+  border-bottom-color:color-mix(in srgb, var(--article-accent) 40%, transparent)!important;
+}
+body[data-page-section="posts"] :is(.prose blockquote,.article-content blockquote,.article-body blockquote,.markdown-body blockquote,.post-content blockquote){
+  background:var(--article-accent-soft)!important;
+  border-left-color:var(--article-accent)!important;
+  color:var(--article-ink)!important;
+}
+body[data-page-section="posts"] :is(.prose code,.article-content code,.article-body code,.markdown-body code,.post-content code){
+  background:color-mix(in srgb, var(--article-accent) 11%, var(--article-surface-strong))!important;
+  border-color:color-mix(in srgb, var(--article-accent) 25%, var(--article-line))!important;
+  color:color-mix(in srgb, var(--article-ink) 88%, var(--article-accent))!important;
+}
+body[data-page-section="posts"] :is(.prose pre,.article-content pre,.article-body pre,.markdown-body pre,.post-content pre),
+body[data-page-section="posts"] :is(.prose pre code,.article-content pre code,.article-body pre code,.markdown-body pre code,.post-content pre code){
+  background:var(--article-code)!important;
+  border-color:color-mix(in srgb, var(--article-line) 72%, transparent)!important;
+  color:var(--article-code-ink)!important;
+}
+body[data-page-section="posts"] :is(.prose table,.article-content table,.article-body table,.markdown-body table,.post-content table){
+  background:rgba(255,255,255,.25)!important;
+  border-color:var(--article-line)!important;
+}
+body[data-page-section="posts"] :is(.prose th,.article-content th,.article-body th,.markdown-body th,.post-content th){
+  background:var(--article-accent-soft)!important;
+  color:var(--article-ink)!important;
+}
+body[data-page-section="posts"] :is(.prose td,.prose th,.article-content td,.article-content th,.article-body td,.article-body th,.markdown-body td,.markdown-body th,.post-content td,.post-content th,.prose hr,.article-content hr,.article-body hr,.markdown-body hr,.post-content hr){
+  border-color:var(--article-line)!important;
+}
+
+body[data-page-section="posts"] :is(.tag,.pill,.btn,.toc-toggle,.floating-toc-button){
+  background:rgba(230,240,232,.38)!important;
+  border-color:var(--article-line)!important;
+  color:var(--article-muted)!important;
+}
+body[data-page-section="posts"] :is(.tag,.pill,.btn,.toc-toggle,.floating-toc-button):hover,
+body[data-page-section="posts"] :is(.tag,.pill,.btn,.toc-toggle,.floating-toc-button):focus-visible{
+  color:var(--article-ink)!important;
+  border-color:var(--article-line-strong)!important;
+  background:var(--article-accent-soft)!important;
+}
+body[data-page-section="posts"] .post-tag-toggle.active,
+body[data-page-section="posts"] .posts-tag-chips .pill.active{
+  color:#f8fcf8!important;
+  background:var(--article-accent)!important;
+  border-color:var(--article-accent)!important;
+}
+
+@media(max-width:820px){
+  body[data-page-section="posts"] main.container{
+    background:linear-gradient(145deg, rgba(222,235,226,.74), rgba(202,220,211,.66))!important;
+  }
+  body.dark[data-page-section="posts"] main.container{
+    background:linear-gradient(145deg, rgba(10,23,42,.88), rgba(13,29,49,.80))!important;
+  }
+}
+
+/* 浅色列表卡片比外层阅读面再压一档，避免每篇文章像独立白色贴片。 */
+body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card{
+  background:linear-gradient(112deg, rgba(184,204,191,.80), rgba(204,219,208,.70))!important;
+  border-color:rgba(73,105,89,.31)!important;
+  box-shadow:0 13px 29px rgba(44,69,59,.15)!important;
+}
+body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card > .post-info{
+  background:linear-gradient(104deg, rgba(205,220,209,.82), rgba(183,203,190,.72))!important;
+}
+body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:hover,
+body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:focus-visible{
+  background:linear-gradient(112deg, rgba(194,213,201,.88), rgba(210,224,214,.80))!important;
+  border-color:rgba(70,111,91,.44)!important;
 }

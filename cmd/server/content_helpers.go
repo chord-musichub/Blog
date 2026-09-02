@@ -83,6 +83,16 @@ func firstNonEmpty(xs ...string) string {
 
 func urlMsg(s string) string { return url.QueryEscape(s) }
 
+// friendProfileURL 保留资料页的中文 slug，但将其转换为浏览器和反向代理都能
+// 稳定处理的 UTF-8 百分号路径。展示名、内容目录名仍可保持原始中文。
+func friendProfileURL(slug string) string {
+	slug = strings.TrimSpace(slug)
+	if slug == "" {
+		slug = "friend"
+	}
+	return "/friends/" + url.PathEscape(slug) + "/"
+}
+
 func newID() string { b := make([]byte, 8); _, _ = rand.Read(b); return hex.EncodeToString(b) }
 func cleanUsername(s string) string {
 	return usernameInvalidCharRE.ReplaceAllString(strings.ToLower(strings.TrimSpace(s)), "")

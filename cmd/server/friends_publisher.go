@@ -71,7 +71,7 @@ func (app *App) publicFriends() []PublicFriend {
 			Username:    u.Username,
 			DisplayName: name,
 			Slug:        slug,
-			URL:         "/friends/" + slug + "/",
+			URL:         friendProfileURL(slug),
 			Bio:         strings.TrimSpace(u.Bio),
 			Homepage:    strings.TrimSpace(u.Homepage),
 			Avatar:      firstNonEmpty(u.Avatar, "/uploads/admin/main_logo.png"),
@@ -102,6 +102,46 @@ func (app *App) syncPublicFriends() error {
 		return err
 	}
 
+	return app.writeFriendContentPages(friends)
+}
+
+// syncFriendContentPages 从 data/friends.json 重建资料页；不从 users.json
+// 推导成员，避免一次普通站点重建意外改写朋友名单。
+func (app *App) syncFriendContentPages() error {
+	dataPath := filepath.Join(app.cfg.DataDir, "friends.json")
+	data, err := os.ReadFile(dataPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	var friends []PublicFriend
+	if err := json.Unmarshal(data, &friends); err != nil {
+		return err
+	}
+	changed := false
+	for i := range friends {
+		normalized := normalizePublicFriend(friends[i])
+		if normalized.URL != friends[i].URL {
+			changed = true
+		}
+		friends[i] = normalized
+	}
+	if changed {
+		b, err := json.MarshalIndent(friends, "", "  ")
+		if err != nil {
+			return err
+		}
+		if err := os.WriteFile(dataPath, b, 0644); err != nil {
+			return err
+		}
+	}
+	return app.writeFriendContentPages(friends)
+}
+
+// writeFriendContentPages 只处理本程序生成的资料页，避免删除用户自行维护的内容。
+func (app *App) writeFriendContentPages(friends []PublicFriend) error {
 	base := filepath.Clean(app.cfg.HugoContentDir)
 	contentRoot := filepath.Dir(base)
 	friendsRoot := filepath.Join(contentRoot, "friends")

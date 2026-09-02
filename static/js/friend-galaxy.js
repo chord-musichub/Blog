@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  var VERSION = '21.0.0';
+  var VERSION = '21.1.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   var DESKTOP_POSITIONS = [[15,28],[31,17],[58,24],[75,43],[68,71],[29,72],[12,57],[47,82]];
   var MOBILE_POSITIONS = [[16,29],[67,21],[82,45],[60,60],[20,66],[43,82],[82,83],[12,48]];
@@ -18,6 +18,17 @@
     value = clean(value);
     if(!value) return fallback || '';
     return /^(https?:\/\/|\/)/.test(value) ? value : '/' + value.replace(/^\/+/, '');
+  }
+  function profileURL(value, fallback){
+    value = url(value, fallback);
+    if(/^https?:\/\//.test(value)) return value;
+    // 旧数据可能是中文裸路径，也可能已经是 %E5... 形式。
+    // 逐段先解码再编码，避免 encodeURI 将已有的 % 变成 %25（双重编码）。
+    return value.split('/').map(function(segment){
+      if(!segment) return segment;
+      try{ return encodeURIComponent(decodeURIComponent(segment)); }
+      catch(e){ return encodeURIComponent(segment).replace(/%25/g, '%'); }
+    }).join('/');
   }
   function toArray(value){
     if(Array.isArray(value)) return value.map(clean).filter(Boolean);
@@ -41,7 +52,7 @@
         name:name,
         bio:clean(item.bio) || '这个朋友还没有写简介。',
         avatar:url(item.avatar, '/uploads/admin/main_logo.png'),
-        href:url(item.url || item.href, '/friends/' + encodeURIComponent(clean(item.slug || name)) + '/'),
+        href:profileURL(item.url || item.href, '/friends/' + encodeURIComponent(clean(item.slug || name)) + '/'),
         count:Number(item.post_count || item.postCount || 0),
         updated:date(item.updated_at || item.updatedAt),
         links:toArray(item.links || item.relations)
@@ -53,13 +64,6 @@
     if(!node) return [];
     try{ return JSON.parse(node.textContent || '[]'); }catch(e){ return []; }
   }
-  function loadData(source, fallback){
-    if(!window.fetch || !source) return Promise.resolve(fallback);
-    return fetch(source, { credentials:'same-origin', cache:'no-store' })
-      .then(function(response){ return response.ok ? response.json() : fallback; })
-      .then(function(data){ return Array.isArray(data) && data.length ? data : fallback; })
-      .catch(function(){ return fallback; });
-  }
   function escapeHtml(value){ return clean(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   function init(root){
@@ -68,8 +72,10 @@
     if(!shell || shell.dataset.friendGalaxyReady === VERSION) return;
     shell.dataset.friendGalaxyReady = VERSION;
 
-    var fallback = inlineData();
-    loadData(shell.getAttribute('data-friends-src'), fallback).then(function(raw){ build(shell, normalize(raw)); });
+    // 页面内 JSON 与 Hugo 本次构建使用同一份 data/friends.json。
+    // 不能再用旧的静态 friends-data.json 覆盖它，否则服务器更新朋友资料后
+    // 会因浏览器命中陈旧文件而只显示部分成员。
+    build(shell, normalize(inlineData()));
   }
 
   function build(shell, friends){
