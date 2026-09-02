@@ -127,8 +127,17 @@ body:has(.friends-constellation){overflow-x:hidden;}
   color:var(--text);
   cursor:pointer;
   text-align:center;
+  text-decoration:none;
   transition:transform .28s cubic-bezier(.2,.7,.2,1), filter .28s ease;
 }
+.friends-constellation__node--server:nth-child(1){left:15%;top:28%;}
+.friends-constellation__node--server:nth-child(2){left:31%;top:17%;}
+.friends-constellation__node--server:nth-child(3){left:58%;top:24%;}
+.friends-constellation__node--server:nth-child(4){left:75%;top:43%;}
+.friends-constellation__node--server:nth-child(5){left:68%;top:71%;}
+.friends-constellation__node--server:nth-child(6){left:29%;top:72%;}
+.friends-constellation__node--server:nth-child(7){left:12%;top:57%;}
+.friends-constellation__node--server:nth-child(8){left:47%;top:82%;}
 .friends-constellation__node img{
   position:relative;
   z-index:2;

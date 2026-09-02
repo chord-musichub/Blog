@@ -19,7 +19,20 @@
     <div class="friends-constellation__meteor friends-constellation__meteor--one" aria-hidden="true"></div>
     <div class="friends-constellation__meteor friends-constellation__meteor--two" aria-hidden="true"></div>
     <svg class="friends-constellation__lines" data-galaxy-lines aria-hidden="true"></svg>
-    <div class="friends-constellation__nodes" data-galaxy-nodes></div>
+    {{/*
+      服务端先输出一层可用的节点：即使 JS 被旧缓存、扩展或网络策略拦截，
+      朋友仍然可见且能直接进入资料页。friend-galaxy.js 成功加载后会清空
+      此层并以同一组坐标接管悬浮卡片、连线和布局校准。
+    */}}
+    <div class="friends-constellation__nodes" data-galaxy-nodes>
+      {{ range after 1 $friends }}
+        <a class="friends-constellation__node friends-constellation__node--server" href="{{ .url }}" aria-label="查看 {{ default .username .display_name }} 的资料页">
+          <span class="friends-constellation__node-halo" aria-hidden="true"></span>
+          <img src="{{ default "/uploads/admin/main_logo.png" .avatar }}" alt="{{ default .username .display_name }}" loading="lazy" decoding="async">
+          <span class="friends-constellation__node-name">{{ default .username .display_name }}</span>
+        </a>
+      {{ end }}
+    </div>
     <aside class="friends-constellation__hover-card" data-galaxy-hover-card hidden aria-live="polite">
       <img data-hover-avatar alt="">
       <div>
@@ -27,11 +40,11 @@
         <p data-hover-bio></p>
       </div>
     </aside>
-    <button class="friends-constellation__core" type="button" data-center-open aria-label="访问 Songline 主页">
+    <a class="friends-constellation__core" href="{{ default "/friends/songline/" $first.url }}" data-center-open aria-label="访问 {{ $firstName }} 主页">
       <span class="friends-constellation__core-orbit" aria-hidden="true"></span>
       <img data-center-avatar src="{{ $firstAvatar }}" alt="{{ $firstName }}" decoding="async">
       <span class="friends-constellation__core-name" data-center-name>{{ $firstName }}</span>
-    </button>
+    </a>
     <div class="friends-constellation__empty" data-galaxy-empty hidden></div>
   </div>
 
