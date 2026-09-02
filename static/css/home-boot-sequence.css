@@ -1,0 +1,150 @@
+/* 首页独立开机场景：资源汇聚、退场与首页镜头入场。 */
+.site-boot-overlay.home-boot-sequence{
+  /* 以短边计算，16:9 与超宽屏都能完整看见 12 片叶子。 */
+  --home-boot-leaf-radius:min(42vmin, 520px);
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483000!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:hidden!important;
+  pointer-events:auto!important;
+  isolation:isolate;
+  background:#000!important;
+  color:#fff;
+  transition:background 1.08s cubic-bezier(.36,0,.16,1), opacity .72s ease;
+}
+.site-boot-overlay.home-boot-sequence::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,222,220,.07), transparent 15%),
+    radial-gradient(ellipse at 50% 50%, rgba(91,104,174,.05), transparent 42%);
+  opacity:1;
+  transition:opacity .72s ease;
+}
+.home-boot-petal-field{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+}
+.home-boot-petal{
+  --petal-angle:0deg;
+  --petal-index:0;
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:clamp(25px, 2.45vw, 42px);
+  height:clamp(46px, 5.15vw, 78px);
+  opacity:.9;
+  /* top/left 指向的是元素左上角；先移回自身中心，12 片叶子才会围绕 Logo 的真中心公转。 */
+  transform:translate(-50%,-50%) rotate(var(--petal-angle)) translateY(calc(-1 * var(--home-boot-leaf-radius))) rotate(27deg) scale(.86);
+  transform-origin:50% 50%;
+  filter:drop-shadow(0 0 8px rgba(232,217,255,.16));
+  transition:transform .62s cubic-bezier(.22,.72,.24,1), opacity .46s ease, filter .46s ease;
+  transition-delay:calc(var(--petal-index) * 14ms);
+  will-change:transform, opacity;
+}
+.home-boot-petal::before,
+.home-boot-petal::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:82% 18% 78% 22% / 74% 22% 78% 26%;
+  transform:rotate(-16deg) skewY(-8deg);
+}
+.home-boot-petal::before{
+  background:linear-gradient(150deg, var(--petal-light), var(--petal-color) 49%, rgba(255,255,255,.10));
+  box-shadow:inset 1px 1px rgba(255,255,255,.34), inset -5px -8px 14px rgba(30,37,91,.12);
+}
+.home-boot-petal::after{
+  inset:12% 17% 12% 31%;
+  opacity:.48;
+  background:linear-gradient(180deg, rgba(255,255,255,.72), transparent 70%);
+  filter:blur(2px);
+}
+.home-boot-petal:nth-child(4n + 1){ --petal-color:#f0a2a9; --petal-light:#ffd1b8; }
+.home-boot-petal:nth-child(4n + 2){ --petal-color:#b9a8ea; --petal-light:#ead6fa; }
+.home-boot-petal:nth-child(4n + 3){ --petal-color:#526aaf; --petal-light:#a6b8ef; }
+.home-boot-petal:nth-child(4n){ --petal-color:#e7e9fb; --petal-light:#fff8f4; }
+.home-boot-petal.is-gathered{
+  /* 收束到同一个中心点，Logo 覆盖在最上层作为最终视觉焦点。 */
+  opacity:.64;
+  transform:translate(-50%,-50%) rotate(var(--petal-angle)) translateY(0) rotate(27deg) scale(.28);
+  filter:drop-shadow(0 0 11px rgba(255,225,234,.28));
+}
+.home-boot-petal.is-gathered::before{ box-shadow:0 0 16px rgba(255,227,239,.24); }
+.home-boot-sequence.is-complete:not(.is-receding) .home-boot-petal.is-gathered{ opacity:.78; }
+.home-boot-sequence.is-receding .home-boot-petal{
+  opacity:0;
+  transform:translate(-50%,-50%) rotate(var(--petal-angle)) translateY(calc(-1 * var(--home-boot-leaf-radius))) rotate(27deg) scale(.82);
+  filter:blur(2px) drop-shadow(0 0 12px rgba(226,212,255,.12));
+  transition-duration:.68s,.5s,.5s;
+  transition-delay:calc((11 - var(--petal-index)) * 26ms);
+}
+/* 完成态曾因更高选择器优先级压过退场态，造成花瓣残留在首页上。 */
+.home-boot-sequence.is-receding .home-boot-petal.is-gathered{ opacity:0; }
+.home-boot-core{
+  position:relative;
+  z-index:3;
+  display:grid;
+  place-items:center;
+  width:clamp(72px, 7.2vw, 112px);
+  aspect-ratio:1;
+  border-radius:50%;
+  background:rgba(9,10,18,.52);
+  box-shadow:0 0 0 1px rgba(255,255,255,.16), 0 0 24px rgba(218,196,245,.11), inset 0 0 20px rgba(255,255,255,.04);
+  transition:transform .42s cubic-bezier(.2,.8,.2,1), opacity .34s ease, filter .34s ease;
+}
+.home-boot-logo{
+  width:76%;
+  height:76%;
+  border-radius:50%;
+  object-fit:cover;
+  box-shadow:0 0 18px rgba(255,230,239,.20);
+}
+.home-boot-flare{
+  position:absolute;
+  z-index:2;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#fff9f3;
+  opacity:0;
+  transform:scale(.2);
+  box-shadow:0 0 18px 8px rgba(255,222,233,.58), 0 0 70px 18px rgba(173,190,255,.18);
+}
+.home-boot-sequence.is-complete .home-boot-flare{
+  opacity:1;
+  transform:scale(1);
+  animation:homeBootFlare .46s cubic-bezier(.2,.8,.2,1) both;
+}
+.home-boot-sequence.is-logo-dissolving .home-boot-core{
+  opacity:0;
+  transform:scale(1.08);
+  filter:blur(8px);
+}
+.home-boot-sequence.is-logo-dissolving .home-boot-flare{ opacity:0; transform:scale(2.4); transition:opacity .28s ease, transform .5s ease; }
+.home-boot-sequence.is-revealing-home{
+  background:rgba(1,4,10,0)!important;
+  pointer-events:none!important;
+}
+.home-boot-sequence.is-revealing-home::before{ opacity:0; }
+/* 首页画面开始露出后，中心光点必须彻底退出，不能成为最终画面残留。 */
+.home-boot-sequence.is-revealing-home .home-boot-flare{ opacity:0!important; visibility:hidden!important; }
+@keyframes homeBootFlare{
+  0%{ transform:scale(.25); opacity:.15; }
+  60%{ transform:scale(1.65); opacity:1; }
+  100%{ transform:scale(1); opacity:.9; }
+}
+
+@media(max-width:760px){
+  .site-boot-overlay.home-boot-sequence{ --home-boot-leaf-radius:min(40vmin, 270px); }
+  .home-boot-petal{ width:26px; height:47px; }
+  .home-boot-petal.is-gathered{ transform:translate(-50%,-50%) rotate(var(--petal-angle)) translateY(0) rotate(27deg) scale(.25); }
+}
+@media(prefers-reduced-motion:reduce){
+  .site-boot-overlay.home-boot-sequence{ display:none!important; }
+}

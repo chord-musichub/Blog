@@ -88,6 +88,69 @@ body.dark .posts-list > .post-search-item > article.post-card .tag{
   color:#e7f1ff !important;
   border-color:#3a5878 !important;
 }
+.post-tag-toggle{
+  width:42px;
+  min-width:42px!important;
+  height:42px;
+  padding:0!important;
+  display:inline-grid!important;
+  place-items:center;
+}
+.post-tag-toggle .ui-icon{
+  display:grid;
+  place-items:center;
+  font-size:18px;
+}
+.post-tag-toggle.active{
+  color:white!important;
+  background:var(--accent)!important;
+  border-color:var(--accent)!important;
+}
+.posts-tag-explorer{
+  margin:0 0 22px;
+  padding:20px 22px;
+  background:color-mix(in srgb, var(--panel) 76%, transparent);
+  border:1px solid color-mix(in srgb, var(--accent) 15%, var(--border));
+}
+.posts-tag-explorer[hidden]{display:none!important;}
+.posts-tag-explorer-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+}
+.posts-tag-explorer h2{
+  margin:0;
+  font-size:20px;
+}
+.posts-tag-explorer > .searchbox{
+  width:100%;
+  margin-bottom:14px;
+}
+.posts-tag-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+.posts-tag-chips .pill{
+  border:1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
+  cursor:pointer;
+}
+.posts-tag-chips .pill.active{
+  color:white;
+  background:var(--accent);
+  border-color:var(--accent);
+}
+.posts-tag-chips .pill b{
+  margin-left:3px;
+  opacity:.7;
+  font-size:.9em;
+}
+body.dark .posts-tag-explorer{
+  background:rgba(17,28,46,.64);
+  border-color:rgba(125,211,252,.16);
+}
 @media(max-width:760px){
   body .posts-list{
     grid-template-columns:minmax(0,1fr) !important;
@@ -140,4 +203,5 @@ body.dark .posts-list > .post-search-item > article.post-card .tag{
     max-height:3.6em !important;
     overflow:hidden !important;
   }
+  .posts-tag-explorer{padding:16px;}
 }

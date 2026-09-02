@@ -1,0 +1,77 @@
+/* 全站主题切换：以单独黑幕覆盖主题变量替换，避免和页面过场共用状态。 */
+.songline-theme-transition{
+  position:fixed;
+  inset:0;
+  z-index:2147483000;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  pointer-events:auto;
+  opacity:0;
+  background:#050608;
+  transition:opacity .42s cubic-bezier(.22,.8,.2,1);
+  will-change:opacity;
+}
+.songline-theme-transition.is-covering{opacity:1}
+.songline-theme-transition.is-leaving{
+  opacity:0;
+  transition:opacity .4s cubic-bezier(.45,0,.8,.3);
+}
+.songline-theme-transition-symbol{
+  position:relative;
+  width:70px;
+  height:70px;
+  color:rgba(248,250,252,.95);
+  opacity:0;
+  transform:scale(.78);
+  transition:opacity .2s ease .18s,transform .38s cubic-bezier(.18,.88,.24,1) .18s;
+}
+.songline-theme-transition.is-covering .songline-theme-transition-symbol{
+  opacity:1;
+  transform:scale(1);
+}
+.songline-theme-transition-icon{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  transition:transform .34s cubic-bezier(.22,.8,.2,1),opacity .24s ease;
+}
+.songline-theme-transition-icon svg{
+  display:block;
+  width:100%;
+  height:100%;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:2.2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.songline-theme-transition-icon.is-next{
+  opacity:0;
+  transform:rotate(-34deg) scale(.42);
+}
+.songline-theme-transition.is-swapping .songline-theme-transition-icon.is-current{
+  opacity:0;
+  transform:rotate(34deg) scale(.42);
+}
+.songline-theme-transition.is-swapping .songline-theme-transition-icon.is-next{
+  opacity:1;
+  transform:rotate(0) scale(1);
+}
+.songline-theme-transition.is-leaving .songline-theme-transition-symbol{
+  opacity:0;
+  transform:scale(.78);
+  transition-duration:.18s;
+  transition-delay:0s;
+}
+@media (prefers-reduced-motion: reduce){
+  .songline-theme-transition{transition-duration:.11s}
+  .songline-theme-transition-symbol{display:none}
+  .songline-theme-transition.is-leaving{transition-duration:.11s}
+}
+
+/* 固定在背景图上的全站操作图标必须跟随主题提供足够对比。 */
+html[data-theme="light"] .modern-site-header .header-icons .icon-btn{ color:rgba(8,17,28,.9)!important; }
+html[data-theme="dark"] .modern-site-header .header-icons .icon-btn{ color:rgba(248,251,255,.92)!important; }
+.modern-site-header .header-icons .icon-btn.is-theme-placeholder{ cursor:pointer; }

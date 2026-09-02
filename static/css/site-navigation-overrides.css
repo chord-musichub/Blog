@@ -117,6 +117,376 @@ html.nav-enter-from-left.is-nav-enter-ready body > :not(.site-boot-overlay):not(
   }
 }
 
+/* v22：最右侧楼层刻度。默认只保留编号/轨道，当前层或 hover 才展开名称。 */
+@media(min-width:981px){
+  html body .modern-site-header .songline-elevator-nav{
+    top:50vh!important;
+    right:clamp(18px, 2.1vw, 46px)!important;
+    left:auto!important;
+    width:154px!important;
+    min-height:0!important;
+    padding:8px 0!important;
+    gap:5px!important;
+    background:transparent!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  html body .modern-site-header .songline-elevator-rail{
+    top:10px!important;
+    bottom:10px!important;
+    left:18px!important;
+    background:linear-gradient(180deg, transparent, rgba(235,244,252,.46) 13%, rgba(235,244,252,.46) 87%, transparent)!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a,
+  html body .modern-site-header .songline-elevator-nav a:hover,
+  html body .modern-site-header .songline-elevator-nav a:focus-visible,
+  html body .modern-site-header .songline-elevator-nav a.active{
+    grid-template-columns:38px minmax(0, 1fr)!important;
+    min-height:33px!important;
+    padding:7px 0!important;
+    color:rgba(232,241,250,.66)!important;
+    background:transparent!important;
+  }
+  html body .songline-elevator-floor{
+    font-size:11px!important;
+    letter-spacing:.06em!important;
+  }
+  html body .songline-elevator-floor::after{
+    right:8px!important;
+    width:5px!important;
+    height:5px!important;
+  }
+  html body .songline-elevator-name{
+    max-width:0;
+    overflow:hidden;
+    opacity:0;
+    font-size:11px!important;
+    letter-spacing:.13em!important;
+    white-space:nowrap;
+    transform:translateX(-5px)!important;
+    transition:max-width .22s ease, opacity .18s ease, transform .22s cubic-bezier(.2,.75,.25,1)!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a.active,
+  html body .modern-site-header .songline-elevator-nav a:hover,
+  html body .modern-site-header .songline-elevator-nav a:focus-visible{
+    color:rgba(250,253,255,.98)!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
+  html body .modern-site-header .songline-elevator-nav a:hover .songline-elevator-name,
+  html body .modern-site-header .songline-elevator-nav a:focus-visible .songline-elevator-name{
+    max-width:92px;
+    opacity:1;
+    transform:translateX(0)!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-floor::after{
+    background:#ffd3aa!important;
+    border-color:#fff0e2!important;
+    box-shadow:0 0 0 3px rgba(255,204,159,.15)!important;
+  }
+}
+
+/* v25：悬停楼层向轨道靠拢，暗侧从轨道右侧开始展开。 */
+@media(min-width:981px){
+  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering{
+    background:transparent!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a .songline-elevator-floor{
+    transition:transform .24s cubic-bezier(.2,.75,.25,1), color .2s ease;
+  }
+  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered .songline-elevator-floor{
+    transform:translateX(clamp(4px, .42vw, 7px));
+  }
+  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered .songline-elevator-floor::after{
+    transition:width .2s ease, height .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+}
+
+/* v24：电梯栏悬停时以指针位置接管高亮，离开后回到当前页面。 */
+@media(min-width:981px){
+  html body .modern-site-header .songline-elevator-nav{
+    isolation:isolate;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body .modern-site-header .songline-elevator-nav::before{
+    content:"";
+    position:absolute;
+    z-index:-2;
+    top:-30px;
+    right:-34px;
+    bottom:-30px;
+    left:calc(clamp(25px, 2.15vw, 38px) + 6px);
+    border-radius:36px;
+    background:radial-gradient(ellipse 150% 136% at 76% 50%, rgba(11,21,35,.48) 0%, rgba(9,18,31,.34) 56%, rgba(9,18,31,0) 100%);
+    opacity:0;
+    transform:translateX(-8px);
+    transition:opacity .3s ease, transform .3s cubic-bezier(.2,.75,.25,1);
+    pointer-events:none;
+  }
+  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering{
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering::before{
+    opacity:1;
+    transform:translateX(0);
+  }
+  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering a.active:not(.is-elevator-hovered){
+    color:rgba(232,241,250,.66)!important;
+  }
+  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering a.active:not(.is-elevator-hovered) .songline-elevator-name{
+    max-width:0!important;
+    opacity:0!important;
+    transform:translateX(-5px)!important;
+  }
+  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering a.active:not(.is-elevator-hovered) .songline-elevator-floor::after{
+    width:clamp(6px, .5vw, 8px)!important;
+    height:clamp(6px, .5vw, 8px)!important;
+    background:transparent!important;
+    border-color:currentColor!important;
+    box-shadow:none!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered{
+    color:rgba(250,253,255,.99)!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered .songline-elevator-name{
+    max-width:clamp(112px, 10vw, 160px)!important;
+    opacity:1!important;
+    transform:translateX(0)!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered .songline-elevator-floor::after{
+    width:clamp(9px, .72vw, 11px)!important;
+    height:clamp(9px, .72vw, 11px)!important;
+    background:#ffd3aa!important;
+    border-color:#fff0e2!important;
+    box-shadow:0 0 0 4px rgba(255,204,159,.15)!important;
+  }
+}
+
+
+/* 页脚备案信息：提高深色背景下的可见性，并以一条细线收束页面。 */
+.footer.site-footer-clean{
+  color:rgba(225,234,244,.76)!important;
+}
+.footer.site-footer-clean .footer-icp{
+  color:inherit!important;
+  font-weight:inherit;
+}
+.footer.site-footer-clean .footer-inner{
+  flex-direction:row;
+  gap:10px;
+  text-align:center;
+}
+.footer.site-footer-clean .footer-meta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.footer.site-footer-clean .footer-inner::after{
+  content:"";
+  /* 独占下一行，不能参与上方版权与备案文字的横向分配。 */
+  flex:0 0 100%;
+  width:100%;
+  height:1px;
+  margin-top:6px;
+  background:linear-gradient(90deg, transparent calc(50% - 260px), rgba(191,204,219,.25) calc(50% - 260px), rgba(191,204,219,.25) calc(50% + 260px), transparent calc(50% + 260px));
+}
+@media(max-width:560px){
+  .footer.site-footer-clean .footer-inner::after{
+    background:rgba(191,204,219,.25);
+  }
+}
+@media(max-width:980px){
+  html body .modern-site-header .songline-elevator-nav a:not(.active) .songline-elevator-name{ display:none!important; }
+  html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name{ display:block!important; }
+}
+
+/* v21：首页系统导航：右侧电梯楼层，不再复用旧横向标签。 */
+.modern-site-header{
+  pointer-events:none!important;
+  background:transparent!important;
+}
+.modern-site-header .modern-navbar{
+  pointer-events:auto;
+  width:auto!important;
+  min-height:0!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+.modern-site-header .logo{
+  position:fixed;
+  z-index:10060;
+  top:22px;
+  left:clamp(20px, 3vw, 52px);
+  pointer-events:auto;
+}
+.modern-site-header .header-icons{
+  position:fixed;
+  z-index:10060;
+  top:20px;
+  right:clamp(22px, 3vw, 58px);
+  pointer-events:auto;
+}
+.modern-site-header .header-icons .icon-btn,
+.modern-site-header .header-icons .icon-btn:hover,
+.modern-site-header .header-icons .icon-btn:focus-visible{
+  background:transparent!important;
+  border-color:transparent!important;
+  box-shadow:none!important;
+}
+.modern-site-header .header-icons .icon-btn{
+  color:color-mix(in srgb, var(--text) 78%, transparent)!important;
+  transition:color .18s ease, transform .18s cubic-bezier(.2,.75,.25,1)!important;
+}
+.modern-site-header .header-icons .icon-btn:hover,
+.modern-site-header .header-icons .icon-btn:focus-visible{
+  color:var(--text)!important;
+  transform:translateY(-1px)!important;
+}
+.modern-site-header .songline-elevator-nav{
+  position:fixed!important;
+  z-index:10055;
+  /* 页眉自身可能建立 fixed containing block，使用视口单位避免被吸到顶部。 */
+  top:50vh!important;
+  right:auto!important;
+  left:clamp(18px, 2.4vw, 46px)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:4px!important;
+  width:192px!important;
+  height:auto!important;
+  min-height:310px!important;
+  margin:0!important;
+  padding:18px 0!important;
+  overflow:visible!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  transform:translateY(-50%)!important;
+  isolation:isolate!important;
+}
+.songline-elevator-rail{
+  position:absolute;
+  top:16px;
+  bottom:16px;
+  left:27px;
+  z-index:-1;
+  width:1px;
+  background:linear-gradient(180deg, transparent, color-mix(in srgb, var(--muted) 46%, transparent) 12%, color-mix(in srgb, var(--muted) 46%, transparent) 88%, transparent);
+}
+.modern-site-header .songline-elevator-nav a,
+.modern-site-header .songline-elevator-nav a:hover,
+.modern-site-header .songline-elevator-nav a:focus-visible,
+.modern-site-header .songline-elevator-nav a.active{
+  display:grid!important;
+  grid-template-columns:56px minmax(0, 1fr)!important;
+  align-items:center!important;
+  min-width:0!important;
+  min-height:48px!important;
+  padding:14px 10px!important;
+  color:color-mix(in srgb, var(--muted) 78%, transparent)!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  text-decoration:none!important;
+  transform:none!important;
+}
+.songline-elevator-floor{
+  position:relative;
+  font:650 13px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.08em;
+  color:inherit;
+}
+.songline-elevator-floor::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  right:13px;
+  width:6px;
+  height:6px;
+  border:1px solid currentColor;
+  border-radius:50%;
+  transform:translateY(-50%);
+}
+.songline-elevator-name{
+  font:650 15px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.12em;
+  opacity:.82;
+  transition:opacity .2s ease, transform .28s cubic-bezier(.2,.75,.25,1), color .2s ease;
+}
+.modern-site-header .songline-elevator-nav a:hover,
+.modern-site-header .songline-elevator-nav a:focus-visible,
+.modern-site-header .songline-elevator-nav a.active{
+  color:var(--text)!important;
+}
+.modern-site-header .songline-elevator-nav a.active .songline-elevator-floor::after{
+  width:9px;
+  height:9px;
+  border-color:var(--accent-2);
+  background:var(--accent-2);
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--accent-2) 15%, transparent);
+}
+.modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
+.modern-site-header .songline-elevator-nav a:hover .songline-elevator-name,
+.modern-site-header .songline-elevator-nav a:focus-visible .songline-elevator-name{
+  opacity:1;
+  transform:translateX(3px);
+}
+.modern-site-header .songline-elevator-nav .songline-nav-slider{ display:none!important; }
+@media(max-width:980px){
+  html.has-fixed-mobile-nav body{ padding-top:0!important; }
+  .modern-site-header .logo{ top:15px; left:16px; }
+  .modern-site-header .header-icons{ top:13px; right:14px; }
+  .modern-site-header .songline-elevator-nav{
+    top:auto!important;
+    left:auto!important;
+    right:50%!important;
+    bottom:max(12px, env(safe-area-inset-bottom))!important;
+    flex-direction:row!important;
+    justify-content:center!important;
+    gap:0!important;
+    width:min(390px, calc(100vw - 24px))!important;
+    min-height:0!important;
+    padding:7px 9px!important;
+    border:1px solid color-mix(in srgb, var(--border) 90%, transparent)!important;
+    border-radius:18px!important;
+    background:color-mix(in srgb, var(--panel) 88%, transparent)!important;
+    box-shadow:0 12px 34px rgba(0,0,0,.18)!important;
+    backdrop-filter:blur(16px)!important;
+    -webkit-backdrop-filter:blur(16px)!important;
+    transform:translateX(50%)!important;
+  }
+  .songline-elevator-rail{ display:none; }
+  .modern-site-header .songline-elevator-nav a,
+  .modern-site-header .songline-elevator-nav a:hover,
+  .modern-site-header .songline-elevator-nav a:focus-visible,
+  .modern-site-header .songline-elevator-nav a.active{
+    display:block!important;
+    min-height:0!important;
+    padding:6px 5px!important;
+    text-align:center;
+  }
+  .songline-elevator-floor{ display:block; font-size:9px; }
+  .songline-elevator-floor::after{ display:none; }
+  .songline-elevator-name{ display:block; margin-top:3px; font-size:8px; letter-spacing:.08em; }
+  .modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
+  .modern-site-header .songline-elevator-nav a:hover .songline-elevator-name{ transform:none; }
+}
+
 
 /* v20.18.5：主导航横向切换去加载遮罩，只保留自然滑动 */
 html.is-nav-sliding .page-loading-orb,
@@ -651,5 +1021,50 @@ body.dark .modern-nav-links .songline-nav-slider{
   #site-notice.is-orbit-scroll-target,
   #site-about.is-orbit-scroll-target{
     animation:none!important;
+  }
+}
+
+/* v23：桌面电梯回到左侧；尺寸随有效视口宽度缩放，保持楼层刻度可读。 */
+@media(min-width:981px){
+  html body .modern-site-header .songline-elevator-nav{
+    top:50vh!important;
+    right:auto!important;
+    left:clamp(22px, 3.4vw, 64px)!important;
+    width:clamp(202px, 17vw, 276px)!important;
+    /* 四层导航按实际内容高度收束，轨道与悬浮暗底保持上下对称。 */
+    min-height:0!important;
+    justify-content:center!important;
+    padding:clamp(12px, 1.35vh, 20px) 0!important;
+    gap:clamp(5px, .45vh, 9px)!important;
+  }
+  html body .modern-site-header .songline-elevator-rail{
+    top:clamp(14px, 1.55vh, 22px)!important;
+    bottom:clamp(14px, 1.55vh, 22px)!important;
+    left:clamp(25px, 2.15vw, 38px)!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a,
+  html body .modern-site-header .songline-elevator-nav a:hover,
+  html body .modern-site-header .songline-elevator-nav a:focus-visible,
+  html body .modern-site-header .songline-elevator-nav a.active{
+    grid-template-columns:clamp(54px, 4.8vw, 76px) minmax(0, 1fr)!important;
+    min-height:clamp(47px, 5.2vh, 66px)!important;
+    padding:clamp(9px, 1vh, 13px) 0!important;
+  }
+  html body .songline-elevator-floor{
+    font-size:clamp(13px, 1.08vw, 17px)!important;
+  }
+  html body .songline-elevator-floor::after{
+    right:clamp(9px, .95vw, 15px)!important;
+    width:clamp(6px, .5vw, 8px)!important;
+    height:clamp(6px, .5vw, 8px)!important;
+  }
+  html body .songline-elevator-name{
+    font-size:clamp(12px, 1vw, 16px)!important;
+    letter-spacing:.15em!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
+  html body .modern-site-header .songline-elevator-nav a:hover .songline-elevator-name,
+  html body .modern-site-header .songline-elevator-nav a:focus-visible .songline-elevator-name{
+    max-width:clamp(112px, 10vw, 160px)!important;
   }
 }

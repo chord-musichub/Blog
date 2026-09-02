@@ -26,7 +26,7 @@
       {{ with $p.Params.tags }}{{ range . }}
         {{ if or (ne . "site-notice") (not $flat) }}
           {{ $tagLabel := . }}{{ if eq . "site-notice" }}{{ $tagLabel = "站点公告" }}{{ end }}
-          {{ $tagHref := printf "/tags/%s/" (. | urlize) }}{{ if eq . "site-notice" }}{{ $tagHref = "/tags/site-notice/" }}{{ end }}
+          {{ $tagHref := printf "/posts/?tag=%s" (. | urlquery) }}
           <a class="tag" href="{{ $tagHref }}">{{ $tagLabel }}</a>
         {{ end }}
       {{ end }}{{ end }}

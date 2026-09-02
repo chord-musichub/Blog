@@ -16,6 +16,10 @@
       window.open(href, '_blank', 'noopener');
       return;
     }
+    if(window.SonglinePageTransition && typeof window.SonglinePageTransition.navigateLink === 'function'){
+      window.SonglinePageTransition.navigateLink(href);
+      return;
+    }
     window.location.href = href;
   }
 
@@ -56,6 +60,5 @@
 
 
 /* v16.9：返回按钮改为固定返回对应上级页面，不再 history.back，避免像撤回上一动作 */
-
 
 

@@ -1,12 +1,13 @@
 {{ $cfg := .Site.Data.site }}
 <footer class="footer site-footer-clean">
   <div class="footer-inner">
-    <span>© {{ now.Format "2006" }} {{ default "Blog" $cfg.site.display_name }}</span>
-    <span class="footer-dot">·</span>
-    <span>{{ default "由热爱驱动，持续记录" $cfg.site.footer_text }}</span>
+    <div class="footer-meta">
+      <span>© {{ now.Format "2006" }} {{ default "Blog" $cfg.site.display_name }}</span>
+      <span class="footer-dot">·</span>
+      <span>{{ default "由热爱驱动，持续记录" $cfg.site.footer_text }}</span>
+    </div>
     {{ with $cfg.site.icp }}
       {{ if and . (ne . "暂无") }}
-        <span class="footer-dot">·</span>
         <a class="footer-icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">ICP备案号：{{ . }}</a>
       {{ end }}
     {{ end }}

@@ -102,6 +102,11 @@
     var empty = document.querySelector('#postEmpty');
     var sortBtn = document.querySelector('#postSort');
     var filterButtons = Array.from(document.querySelectorAll('#postFilters [data-filter]'));
+    var tagToggle = document.querySelector('#postTagToggle');
+    var tagPanel = document.querySelector('#postTagExplorer');
+    var tagInput = document.querySelector('#postTagSearch');
+    var tagStatus = document.querySelector('#postTagStatus');
+    var tagButtons = Array.from(document.querySelectorAll('[data-post-tag-filter]'));
     var sortOrder = sortBtn ? (sortBtn.dataset.order || 'desc') : 'desc';
     var activeFilter = 'all';
     if(button) button.setAttribute('data-no-page-loading', '');
@@ -111,6 +116,17 @@
       var f = normalize(activeFilter);
       var hay = normalize([item.dataset.title, item.dataset.author, item.dataset.tags].filter(Boolean).join(' '));
       return !!f && hay.indexOf(f) >= 0;
+    }
+
+    function syncFilterControls(){
+      filterButtons.forEach(function(button){ button.classList.toggle('active', (button.dataset.filter || 'all') === activeFilter); });
+      tagButtons.forEach(function(button){ button.classList.toggle('active', (button.dataset.postTagFilter || 'all') === activeFilter); });
+    }
+
+    function setActiveFilter(value, feedback){
+      activeFilter = value || 'all';
+      syncFilterControls();
+      runSearch({feedback:feedback !== false});
     }
 
     function updateCount(active, visible){
@@ -189,13 +205,68 @@
       btn.setAttribute('data-no-page-loading', '');
       btn.addEventListener('click', function(e){
         e.preventDefault(); e.stopPropagation();
-        filterButtons.forEach(function(x){ x.classList.remove('active'); });
-        btn.classList.add('active');
-        activeFilter = btn.dataset.filter || 'all';
-        runSearch({feedback:true});
+        setActiveFilter(btn.dataset.filter || 'all', true);
       }, true);
     });
+    if(tagToggle && tagPanel && tagToggle.dataset.songlineTagToggleBound !== '1'){
+      tagToggle.dataset.songlineTagToggleBound = '1';
+      tagToggle.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        var willOpen = tagPanel.hidden;
+        tagPanel.hidden = !willOpen;
+        tagToggle.classList.toggle('active', willOpen);
+        tagToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        if(willOpen && tagInput) tagInput.focus();
+      }, true);
+    }
+    tagButtons.forEach(function(btn){
+      if(btn.dataset.songlinePostTagBound === '1') return;
+      btn.dataset.songlinePostTagBound = '1';
+      btn.setAttribute('data-no-page-loading', '');
+      btn.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        setActiveFilter(btn.dataset.postTagFilter || 'all', true);
+      }, true);
+    });
+    if(tagInput && tagInput.dataset.songlinePostTagSearchBound !== '1'){
+      tagInput.dataset.songlinePostTagSearchBound = '1';
+      function filterTags(){
+        var query = normalize(tagInput.value || '');
+        var visibleTags = 0;
+        tagButtons.forEach(function(button){
+          var isAll = (button.dataset.postTagFilter || 'all') === 'all';
+          var show = isAll || !query || normalize(button.textContent || '').indexOf(query) >= 0;
+          button.hidden = !show;
+          if(show && !isAll) visibleTags++;
+        });
+        if(tagStatus) tagStatus.textContent = query ? ('找到 ' + visibleTags + ' 个标签') : (Math.max(tagButtons.length - 1, 0) + ' 个标签');
+      }
+      tagInput.addEventListener('input', filterTags);
+      tagInput.addEventListener('keydown', function(e){
+        if(e.key === 'Escape'){
+          e.preventDefault();
+          tagInput.value = '';
+          filterTags();
+        }else if(e.key === 'Enter'){
+          e.preventDefault();
+          var first = tagButtons.filter(function(button){ return !button.hidden && (button.dataset.postTagFilter || 'all') !== 'all'; })[0];
+          if(first) first.click();
+        }
+      });
+      filterTags();
+    }
+    var queryParams = new URLSearchParams(window.location.search);
+    var requestedTag = queryParams.get('tag') || '';
+    if(requestedTag && tagButtons.some(function(button){ return (button.dataset.postTagFilter || '') === requestedTag; })){
+      activeFilter = requestedTag;
+      if(tagPanel && tagToggle){
+        tagPanel.hidden = false;
+        tagToggle.classList.add('active');
+        tagToggle.setAttribute('aria-expanded', 'true');
+      }
+    }
     sortItems();
+    syncFilterControls();
     runSearch({feedback:false});
   }
 

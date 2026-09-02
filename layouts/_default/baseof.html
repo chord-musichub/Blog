@@ -21,6 +21,10 @@
       }
     })();
   </script>
+  <script>
+    // 唯一页面配置源：楼层导航与过场 priority 都从同一 Hugo partial 读取。
+    window.SonglinePageConfig = {{ partial "page-navigation-data.html" . | jsonify | safeJS }};
+  </script>
   {{ if .IsHome }}
   <style>
     html.is-boot-preparing,
@@ -36,7 +40,7 @@
     (function(){
       try{
         var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var played = sessionStorage.getItem('songline-home-boot-v20.20.6') === '1';
+        var played = sessionStorage.getItem('songline-home-boot-v21.4') === '1';
         if(!reduced && !played){
           document.documentElement.classList.add('is-boot-preparing');
           document.documentElement.style.backgroundColor = '#000';
@@ -72,9 +76,6 @@
   {{ if $isArticleSurface }}
   <link rel="stylesheet" href="/css/site-article-compat.css?v={{ $assetVersion }}">
   {{ end }}
-  {{ if .IsHome }}
-  <link rel="stylesheet" href="/css/site-home-compat.css?v={{ $assetVersion }}">
-  {{ end }}
   {{ if $isToolsSurface }}
   <link rel="stylesheet" href="/css/site-tools-compat.css?v={{ $assetVersion }}">
   {{ end }}
@@ -83,6 +84,8 @@
   <link rel="stylesheet" href="/css/site-markdown-compat.css?v={{ $assetVersion }}">
   {{ end }}
   <link rel="stylesheet" href="/css/site-navigation-overrides.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/theme-transition.css?v={{ $assetVersion }}">
+  <link rel="stylesheet" href="/css/page-transition-scene.css?v={{ $assetVersion }}">
   {{ if $isArticleSurface }}
   <link rel="stylesheet" href="/css/site-article-overrides.css?v={{ $assetVersion }}">
   {{ end }}
@@ -98,7 +101,9 @@
 <link id="songline-markdown-renderer-style" rel="stylesheet" href="/css/markdown-renderer.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if .IsHome }}
-<link id="songline-home-style" rel="stylesheet" href="/css/home.css?v={{ $assetVersion }}">
+<link id="songline-home-style" rel="stylesheet" href="/css/home-scene-clean.css?v={{ $assetVersion }}">
+<link id="songline-home-night-style" rel="stylesheet" href="/css/home-night-mode.css?v={{ $assetVersion }}">
+<link id="songline-home-boot-style" rel="stylesheet" href="/css/home-boot-sequence.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if or (eq .Section "friends") (hasPrefix .RelPermalink "/friends/") }}
 <link id="songline-friends-galaxy-style" rel="stylesheet" href="/css/friends-galaxy.css?v={{ $assetVersion }}">
@@ -116,6 +121,9 @@
 {{ if and .IsSection (eq .Section "posts") }}
 <link id="songline-posts-list-style" rel="stylesheet" href="/css/posts-list.css?v={{ $assetVersion }}">
 {{ end }}
+{{ if eq .Section "posts" }}
+<link id="songline-posts-campus-scene-style" rel="stylesheet" href="/css/posts-campus-scene.css?v={{ $assetVersion }}">
+{{ end }}
 {{ if hasPrefix .RelPermalink "/tools/reaction-test/" }}
 <link id="songline-reaction-style" rel="stylesheet" href="/css/tools/reaction-test.css?v={{ $assetVersion }}">
 {{ end }}
@@ -130,6 +138,9 @@
 {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/" }}
 <link id="songline-tool-shared-style" rel="stylesheet" href="/css/tool-shared.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if eq .RelPermalink "/tools/" }}
+<link id="songline-tools-underground-scene-style" rel="stylesheet" href="/css/tools-underground-scene.css?v={{ $assetVersion }}">
 {{ end }}
 <link rel="stylesheet" href="/css/runtime-animation.css?v={{ $assetVersion }}">
   {{ if hasPrefix .RelPermalink "/tools/focus-timer/" }}
@@ -152,11 +163,16 @@
 <link id="songline-gacha-style" rel="stylesheet" href="/css/tools/gacha.css?v={{ $assetVersion }}">
 {{ end }}
 <link rel="stylesheet" href="/css/theme-vars.css?v={{ $assetVersion }}">
+  <script>window.__songlineUnifiedPageTransition = true;</script>
   <script defer src="/js/performance-guard.js?v={{ $assetVersion }}"></script>
-  <script defer src="/js/page-transition-nav.js?v={{ $assetVersion }}"></script>
+  <script src="/js/page-transition-priority.js?v={{ $assetVersion }}"></script>
+  <script src="/js/page-transition-nav.js?v={{ $assetVersion }}"></script>
+  {{ if .IsHome }}<script defer src="/js/home-boot-sequence.js?v={{ $assetVersion }}"></script>{{ end }}
   <script defer src="/js/page-transition.js?v={{ $assetVersion }}"></script>
+  <script src="/js/page-transition-system.js?v={{ $assetVersion }}"></script>
   <script defer src="/js/mobile-adapt.js?v={{ $assetVersion }}"></script>
   <script defer src="/js/mobile-fixed-nav.js?v={{ $assetVersion }}"></script>
+  <script defer src="/js/home-scene-parallax.js?v={{ $assetVersion }}"></script>
 <script defer src="/js/space-ribbons.js?v={{ $assetVersion }}"></script>
 </head>
 <body data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-page-section="{{ if .IsHome }}home{{ else }}{{ default "general" .Section }}{{ end }}" data-page-layout="{{ .Layout }}" data-boot-welcome="{{ default "欢迎回来" $cfg.boot.welcome_text }}"{{ with $cfg.background.image }} class="has-site-bg"{{ end }}>

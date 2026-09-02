@@ -36,9 +36,6 @@
     if(isSearchSurface){
       ensureStylesheet('songline-search-overrides-style', '/css/site-search-overrides.css');
     }
-    if(path === '/' || !!query(root, '[data-waapi-orbit], .home-orbit-stage, .home-waapi-orbit')){
-      ensureStylesheet('songline-home-compat-style', '/css/site-home-compat.css');
-    }
     if(path.indexOf('/tools/random-number/') === 0 || !!query(root, '[data-random-tool], .random-tool-panel')){
       ensureStylesheet('songline-random-number-style', '/css/tools/random-number.css');
     }
@@ -93,6 +90,16 @@
       }
     },
     {
+      key:'home-recommendations',
+      src:'/js/home-recommendations.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-home-recommendations]');
+      },
+      init:function(root){
+        if(window.SonglineInitHomeRecommendations) window.SonglineInitHomeRecommendations(root || document);
+      }
+    },
+    {
       key:'markdown-code-tools',
       src:'/js/markdown-code-tools.js?v=' + VERSION,
       test:function(root){
@@ -121,16 +128,6 @@
       }
     },
     {
-      key:'home-orbit',
-      src:'/js/home-orbit-waapi.js?v=' + VERSION,
-      test:function(root){
-        return !!query(root, '[data-waapi-orbit], .waapi-orbit-stage, .home-orbit-stage, .home-waapi-orbit');
-      },
-      init:function(root){
-        if(window.SonglineInitHomeOrbit) window.SonglineInitHomeOrbit(root || document);
-      }
-    },
-    {
       key:'home-friend-carousel',
       src:'/js/home-friend-carousel.js?v=' + VERSION,
       test:function(root){
@@ -142,6 +139,8 @@
     },
     {
       key:'friend-galaxy',
+      // 与服务端直开页面共用当前资源版本；固定版本号会让 AJAX 进入朋友页时
+      // 命中旧缓存，导致新坐标逻辑没有真正执行。
       src:'/js/friend-galaxy.js?v=' + VERSION,
       test:function(root){
         return !!query(root, '[data-friend-galaxy], .friend-galaxy, .friend-galaxy-stage, .friends-galaxy, .galaxy-map');
@@ -256,9 +255,19 @@
       key:'audio-metadata',
       src:'/js/tools/audio-metadata.js?v=' + VERSION,
       test:function(root){
-        return !!query(root, '[data-audio-visualizer], .audio-visualizer-page, .av-canvas');
+        return !!query(root, '[data-audio-visualizer], .audio-visualizer-page, .av-canvas, [data-home-music]');
       },
       init:function(){}
+    },
+    {
+      key:'home-music',
+      src:'/js/home-music-player.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-home-music]');
+      },
+      init:function(root){
+        if(window.SonglineInitHomeMusic) window.SonglineInitHomeMusic(root || document);
+      }
     },
     {
       key:'audio-visualizer-renderer',

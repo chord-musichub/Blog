@@ -19,7 +19,7 @@
     {{ if $authorHref }}<a class="author-link meta-icon-item" href="{{ $authorHref }}">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</a>{{ else }}<span class="meta-icon-item">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</span>{{ end }}
     <span>◷ 阅读约 {{ .ReadingTime }} 分钟</span>
     {{ with .Params.tags }}{{ range . }}
-      {{ $tagRaw := . }}{{ $tagHref := printf "/tags/%s/" ($tagRaw | urlize) }}
+      {{ $tagRaw := . }}{{ $tagHref := printf "/posts/?tag=%s" ($tagRaw | urlquery) }}
       <a class="tag" href="{{ $tagHref }}">{{ . }}</a>
     {{ end }}{{ end }}
     <span class="views real-views article-view-counter meta-icon-item" data-view-mode="post" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span>

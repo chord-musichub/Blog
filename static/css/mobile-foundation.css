@@ -713,9 +713,6 @@
   .logo-text{
     max-width:44vw!important;
   }
-  .header-icons .icon-btn:first-child{
-    display:none!important; /* 搜索入口和文章入口重复，极窄屏收起 */
-  }
   .modern-nav-links a{
     min-width:54px!important;
     font-size:13px!important;

@@ -1,49 +1,104 @@
 {{- $cfg := .Site.Data.site -}}
 {{- $posts := where .Site.RegularPages "Section" "posts" -}}
-<aside class="sidebar">
-  <section class="card sidebar-card about-mini" id="site-about">
-    <h3>{{ default "关于本站" $cfg.about_card.title }}</h3>
-    {{ with $cfg.about_card.avatar_image }}
-      <img class="b-avatar b-avatar-img" src="{{ . }}" alt="{{ default "Blog" $cfg.about_card.name }}" loading="lazy" decoding="async">
-    {{ else }}
-      <div class="b-avatar">{{ default "B" $cfg.about_card.avatar_text }}</div>
-    {{ end }}
-    <div class="name">{{ default "Blog" $cfg.about_card.name }}</div>
-    <p>{{ default "这是一个记录学习、创作与生活的个人博客。" $cfg.about_card.body }}</p>
-  </section>
-  <section class="card sidebar-card">
-    <h3>站点统计</h3>
-    <ul class="stat-list">
-      <li><span>{{ partial "ui-icon.html" "article" }} 文章数</span><b>{{ len $posts }}</b></li>
-      {{ $tagTax := index .Site.Taxonomies "tags" }}
-      <li><span>◇ 标签数</span><b>{{ if $tagTax }}{{ len $tagTax }}{{ else }}0{{ end }}</b></li>
-      {{ $publicFriends := .Site.Data.friends | default slice }}
-      <li><span>♧ 朋友数</span><b>{{ len $publicFriends }}</b></li>
-      <li><span>{{ partial "ui-icon.html" "calendar" }} 创站时间</span><b>{{ default "2026/5/8" $cfg.home.founded_at }}</b></li>
-      <li><span>{{ partial "ui-icon.html" "eye" }} 已发布</span><b>{{ len $posts }}</b></li>
-      <li><span>◷ 最近更新</span><b>{{ with index $posts 0 }}{{ .Date.Format "01-02" }}{{ else }}暂无{{ end }}</b></li>
-    </ul>
-  </section>
-  <section class="sidebar-card recent-updates-card">
-    <h3>最近更新</h3>
-    <ul class="recent-list">
-      {{ range first 5 $posts }}
-      <li><a class="recent-link" href="{{ .RelPermalink }}"><span class="recent-title">{{ .Title }}</span><span class="recent-date">{{ .Date.Format "01-02" }}</span></a></li>
-      {{ else }}<li>还没有文章<span></span></li>{{ end }}
-    </ul>
-  </section>
-  <section class="card sidebar-card">
-    <h3>联系我</h3>
-    <p style="color:var(--muted);margin:0">如果你有想交流的想法，欢迎通过以下方式联系我。</p>
-    <div class="social-row">
-      {{ if $cfg.social.show_github }}<a href="{{ $cfg.social.github }}" target="_blank" rel="noopener" aria-label="GitHub">{{ partial "ui-icon.html" "github" }}</a>{{ end }}
+{{- $tagTax := index .Site.Taxonomies "tags" -}}
+{{- $publicFriends := .Site.Data.friends | default slice -}}
+{{- $lastPost := first 1 $posts -}}
+{{- $recommendable := where $posts ".Params.is_notice" "ne" true -}}
+{{- $featuredPosts := first 5 $recommendable -}}
+<aside class="sidebar songline-home-system" aria-label="站点信息终端" data-home-parallax="system">
+  <div class="songline-terminal-frame">
+    <header class="songline-terminal-status" aria-label="系统在线">
+      <span class="songline-terminal-online"><i></i> 在线</span>
+      <h1 class="songline-terminal-brand" id="songline-home-title">Songline</h1>
+      {{ with $cfg.about_card.avatar_image }}
+        <img src="{{ . }}" alt="" loading="lazy" decoding="async">
+      {{ else }}
+        <span class="songline-terminal-avatar" aria-hidden="true">{{ default "S" $cfg.about_card.avatar_text }}</span>
+      {{ end }}
+    </header>
+
+    <div class="songline-terminal-main">
+      <section class="songline-terminal-feature" aria-label="精选文章" data-home-recommendations>
+        <div class="songline-terminal-heading"><span>推荐文章</span><i></i></div>
+        <div class="songline-terminal-feature-stage">
+          {{ range $index, $post := $featuredPosts }}
+            {{ $cover := $post.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}
+            <a class="songline-terminal-feature-card{{ if eq $index 0 }} is-active{{ end }}" href="{{ $post.RelPermalink }}" data-home-recommendation-card aria-hidden="{{ if eq $index 0 }}false{{ else }}true{{ end }}"{{ if ne $index 0 }} tabindex="-1"{{ end }}>
+              <img src="{{ $cover }}" alt="" loading="eager" fetchpriority="{{ if eq $index 0 }}high{{ else }}auto{{ end }}" decoding="async" onerror="this.onerror=null;this.src='/uploads/admin/article_default.png';">
+              <span class="songline-terminal-feature-wash" aria-hidden="true"></span>
+              <span class="songline-terminal-feature-copy">
+                <time datetime="{{ $post.Date.Format "2006-01-02" }}">{{ $post.Date.Format "2006.01.02" }}</time>
+                <strong>{{ $post.Title }}</strong>
+              </span>
+            </a>
+          {{ else }}
+            <div class="songline-terminal-feature-empty"><span>暂无文章</span><strong>还没有可展示的文章</strong></div>
+          {{ end }}
+          {{ if gt (len $featuredPosts) 1 }}
+            <button class="songline-terminal-feature-switch songline-terminal-feature-switch--previous" type="button" data-home-recommend-previous aria-label="上一章" title="上一章">{{ partial "ui-icon.html" "arrow-left" }}</button>
+            <button class="songline-terminal-feature-switch songline-terminal-feature-switch--next" type="button" data-home-recommend-next aria-label="下一章" title="下一章">{{ partial "ui-icon.html" "arrow-right" }}</button>
+          {{ end }}
+        </div>
+        {{ if gt (len $featuredPosts) 1 }}
+          <div class="songline-terminal-indicators" aria-label="切换推荐文章">
+            {{ range $index, $post := $featuredPosts }}
+              <button type="button" data-home-recommend-indicator data-home-recommend-index="{{ $index }}" aria-label="查看第 {{ add $index 1 }} 篇推荐文章"{{ if eq $index 0 }} aria-current="true"{{ end }}><b>0{{ add $index 1 }}</b><i></i></button>
+            {{ end }}
+          </div>
+        {{ end }}
+      </section>
+
+      <section class="songline-terminal-stats" aria-label="站点统计">
+        <div class="songline-terminal-heading"><span>站点数据</span><i></i></div>
+        <dl class="songline-terminal-stat-grid">
+          <div style="--stat-delay:80ms"><dt>文章</dt><dd>{{ len $posts }}</dd></div>
+          <div style="--stat-delay:150ms"><dt>标签</dt><dd>{{ if $tagTax }}{{ len $tagTax }}{{ else }}0{{ end }}</dd></div>
+          <div style="--stat-delay:220ms"><dt>朋友</dt><dd>{{ len $publicFriends }}</dd></div>
+          <div style="--stat-delay:290ms"><dt>更新</dt><dd>{{ with $lastPost }}{{ (index . 0).Date.Format "01.02" }}{{ else }}--.--{{ end }}</dd></div>
+        </dl>
+
+        <section class="songline-home-music" aria-label="本地音乐" data-home-music>
+          <div class="songline-home-music-main">
+            <div class="songline-home-music-track">
+              <span class="songline-home-music-label">本地音乐</span>
+              <strong data-home-music-title>选择一首歌</strong>
+              <small data-home-music-artist>单曲或音乐文件夹</small>
+            </div>
+          </div>
+          <div class="songline-home-music-spectrum" data-home-music-spectrum aria-hidden="true">
+            <div data-home-music-waveform></div>
+          </div>
+          <div class="songline-home-music-actions" aria-label="音乐操作">
+            <button class="songline-home-music-play-toggle" type="button" data-home-music-toggle aria-label="播放" title="播放" aria-pressed="false"><span data-home-music-play-glyph aria-hidden="true">▶</span></button>
+            <button type="button" data-home-music-previous aria-label="上一曲" title="上一曲">{{ partial "ui-icon.html" "arrow-left" }}</button>
+            <button type="button" data-home-music-next aria-label="下一曲" title="下一曲">{{ partial "ui-icon.html" "arrow-right" }}</button>
+            <button class="songline-home-music-volume" type="button" data-home-music-volume aria-label="静音" title="静音" aria-pressed="false">{{ partial "ui-icon.html" "volume" }}</button>
+            <input type="range" data-home-music-volume-input aria-label="音量" min="0" max="100" value="88">
+            <button type="button" data-home-music-source-toggle aria-label="添加音乐，音乐文件夹可直接拖入" title="添加音乐 · 文件夹可直接拖入">{{ partial "ui-icon.html" "upload" }}</button>
+            <button type="button" data-home-music-list-toggle aria-label="打开播放列表" title="播放列表" aria-expanded="false">{{ partial "ui-icon.html" "menu" }}</button>
+          </div>
+          <div class="songline-home-music-playlist" data-home-music-playlist hidden>
+            <div class="songline-home-music-playlist-head"><span>播放列表</span><button type="button" data-home-music-list-close aria-label="关闭播放列表">{{ partial "ui-icon.html" "close" }}</button></div>
+            <div class="songline-home-music-playlist-list" data-home-music-playlist-list></div>
+          </div>
+          <p class="songline-home-music-status" data-home-music-status aria-live="polite">未选择音乐来源</p>
+          <input type="file" accept="audio/*,.mp3,.flac,.wav,.m4a,.aac,.ogg,.opus" data-home-music-file hidden>
+          <input type="file" accept="audio/*,.mp3,.flac,.wav,.m4a,.aac,.ogg,.opus" data-home-music-folder webkitdirectory directory multiple hidden>
+          <audio data-home-music-audio preload="auto"></audio>
+        </section>
+      </section>
+    </div>
+
+    <footer class="songline-terminal-links" aria-label="站点链接">
+      {{ if $cfg.social.show_github }}<a href="{{ $cfg.social.github }}" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">{{ partial "ui-icon.html" "github" }}</a>{{ end }}
       {{ if $cfg.social.show_email }}
         {{ $emailHref := $cfg.social.email }}
         {{ if and $emailHref (not (hasPrefix $emailHref "mailto:")) }}{{ $emailHref = printf "mailto:%s" $emailHref }}{{ end }}
-        {{ $emailText := replace $emailHref "mailto:" "" }}
-        <a class="email-contact" href="{{ $emailHref | safeURL }}" data-email="{{ $emailText }}" aria-label="Email" title="点击打开邮件；若没有邮件客户端，会复制邮箱">{{ partial "ui-icon.html" "mail" }}<span class="contact-tip">已复制邮箱</span></a>
+        {{ $emailText := replaceRE "^mailto:" "" $emailHref }}
+        <button class="songline-terminal-copy-email" type="button" data-home-copy-email="{{ $emailText }}" aria-label="复制邮箱" title="复制邮箱">{{ partial "ui-icon.html" "mail" }}</button>
       {{ end }}
-      {{ if $cfg.social.show_bilibili }}<a href="{{ $cfg.social.bilibili }}" target="_blank" rel="noopener" aria-label="Bilibili"><img src="{{ default "/uploads/admin/bilibili.png" $cfg.social.bilibili_icon }}" alt="B站"></a>{{ end }}
-    </div>
-  </section>
+      {{ if $cfg.social.show_bilibili }}<a href="{{ $cfg.social.bilibili }}" target="_blank" rel="noopener" aria-label="哔哩哔哩" title="哔哩哔哩">{{ partial "ui-icon.html" "bilibili" }}</a>{{ end }}
+      <span class="songline-terminal-copy-tip" data-home-copy-tip role="status" aria-live="polite"></span>
+    </footer>
+  </div>
 </aside>

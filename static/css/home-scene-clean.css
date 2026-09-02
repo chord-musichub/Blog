@@ -1,0 +1,1086 @@
+/* v21：首页由场景与系统信息组成；下方旧内容区保持原有数据与入口。 */
+/* 首页主视觉使用完整场景图；不沿用全站背景的虚化、渐变遮罩或星轨流线。 */
+body[data-page-kind="home"]{
+  background:#f3c3ad!important;
+}
+body[data-page-kind="home"] .site-bg-layer{
+  --site-bg-image:url('/uploads/admin/qiandai_background.png')!important;
+  --site-bg-height:100svh!important;
+  --site-bg-blur:0px!important;
+  --site-bg-opacity:1!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100svh!important;
+  overflow:hidden!important;
+}
+body[data-page-kind="home"] .site-bg-layer::before{
+  /* 全覆盖优先：额外扩出 1px，消除高 DPI / 缩放下的背景接缝。 */
+  inset:-1px!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+  filter:none!important;
+  opacity:1!important;
+  transform:none!important;
+}
+body[data-page-kind="home"] .site-bg-layer::after,
+body[data-page-kind="home"] .songline-starstream-layer{
+  display:none!important;
+}
+.songline-home-scene-frame{
+  display:none!important;
+}
+.songline-home-scene{
+  min-height:clamp(440px, calc(100svh - 178px), 680px);
+}
+.songline-home-scene-copy{
+  max-width:min(54%, 500px);
+}
+.songline-home-scene-copy h1{
+  text-shadow:0 3px 18px rgba(44,24,31,.62), 0 1px 0 rgba(255,255,255,.16);
+}
+
+/* 明亮场景图上的首页 HUD 使用墨色文字，避免继承深色主题的低对比白字。 */
+body[data-page-kind="home"] .modern-site-header .header-icons .icon-btn{
+  color:rgba(65,39,48,.82)!important;
+}
+body[data-page-kind="home"] .modern-site-header .header-icons .icon-btn:hover,
+body[data-page-kind="home"] .modern-site-header .header-icons .icon-btn:focus-visible{
+  color:#2f1d27!important;
+}
+/* 首页场景上的品牌字始终使用白色，不跟随主题类切换瞬间回落为深色。 */
+body[data-page-kind="home"] .modern-site-header .logo,
+body[data-page-kind="home"] .modern-site-header .logo-text{ color:#edf3ff!important; }
+body[data-page-kind="home"] .songline-home-system{
+  color:#3b2830;
+  border-left-color:rgba(73,45,53,.42);
+  text-shadow:0 1px 8px rgba(255,250,245,.42);
+}
+
+
+
+
+
+
+.songline-home-layout{
+  grid-template-columns:minmax(0, 1fr) minmax(270px, 31%)!important;
+  align-items:start;
+  gap:clamp(28px, 4.2vw, 76px)!important;
+  /* 为右侧电梯保留独立通道，避免压到系统信息终端。 */
+  width:min(1540px, calc(100vw - 270px))!important;
+  max-width:none!important;
+  margin-left:clamp(224px, 18vw, 294px)!important;
+  margin-right:auto!important;
+  padding-top:clamp(92px, 11vh, 142px)!important;
+}
+.songline-home-main{ min-width:0; }
+.songline-home-scene{
+  position:relative;
+  min-height:clamp(440px, calc(100svh - 178px), 680px);
+  display:grid;
+  align-items:center;
+  isolation:isolate;
+}
+.songline-home-scene-copy{
+  position:absolute;
+  z-index:2;
+  top:clamp(18px, 5vh, 64px);
+  left:clamp(12px, 3vw, 56px);
+  max-width:min(46%, 430px);
+  pointer-events:none;
+  text-shadow:0 8px 30px rgba(0,0,0,.38);
+}
+
+.songline-home-scene-copy h1{
+  margin:0;
+  color:#fff;
+  font-size:clamp(32px, 4.3vw, 68px);
+  line-height:1.05;
+  letter-spacing:.02em;
+  font-weight:720;
+}
+.songline-home-scene-copy p{
+  margin:16px 0 0;
+  color:rgba(255,255,255,.78);
+  font-size:clamp(14px, 1.18vw, 18px);
+  letter-spacing:.08em;
+}
+.songline-home-scene-frame{
+  width:100%;
+  overflow:hidden;
+  border-radius:0!important;
+  background:transparent;
+}
+.songline-home-scene .hero-banner.hero-banner-image-only.hero-banner-actual-image{
+  width:100%;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.songline-home-scene .hero-banner-img{
+  width:100%!important;
+  min-height:clamp(440px, calc(100svh - 178px), 680px);
+  object-fit:cover!important;
+  object-position:center!important;
+  border-radius:0!important;
+  filter:saturate(.92) contrast(1.04) brightness(.84);
+}
+.songline-home-scene-frame::after{
+  content:"";
+  position:absolute;
+  z-index:1;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(90deg, rgba(7,12,20,.62), rgba(7,12,20,.16) 47%, rgba(7,12,20,.03) 72%), linear-gradient(0deg, color-mix(in srgb, var(--bg) 55%, transparent), transparent 28%);
+}
+.songline-home-intro{
+  max-width:760px;
+  margin:18px 0 0!important;
+  padding:12px 0 0!important;
+  background:transparent!important;
+  border:0!important;
+  border-top:1px solid color-mix(in srgb, var(--border) 75%, transparent)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.songline-home-intro .hero-intro-mark{ display:none!important; }
+.songline-home-intro h2{
+  color:var(--text);
+  font-size:14px!important;
+  font-weight:650;
+  letter-spacing:.12em;
+}
+.songline-home-intro p{ max-width:680px; font-size:14px!important; line-height:1.8!important; }
+.songline-home-system{
+  position:sticky;
+  top:clamp(100px, 13vh, 140px);
+  display:grid!important;
+  gap:0!important;
+  padding:2px 0 0 20px;
+  border-left:1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 窄笔记本与浏览器放大后的有效视口：同步收缩三列间距，而非沿用大屏尺寸。 */
+@media (min-width:981px) and (max-width:1180px){
+  .songline-home-layout{
+    width:calc(100vw - 230px)!important;
+    margin-left:214px!important;
+    gap:clamp(24px, 3vw, 38px)!important;
+    padding-top:92px!important;
+  }
+  .songline-home-layout{ grid-template-columns:minmax(0, 1fr) minmax(248px, 30%)!important; }
+  .songline-home-scene,
+  .songline-home-scene .hero-banner-img{ min-height:clamp(390px, calc(100svh - 162px), 560px); }
+  .songline-home-scene-copy{ left:clamp(16px, 2.4vw, 34px); max-width:58%; }
+  .songline-home-scene-copy h1{ font-size:clamp(31px, 4.4vw, 52px); }
+  .songline-home-system{ padding-left:15px; }
+
+
+}
+@media(max-width:980px){
+  .songline-home-layout{ display:block!important; width:100%!important; margin-inline:0!important; padding:74px 18px 92px!important; }
+  .songline-home-scene{ min-height:clamp(310px, 65svh, 560px); }
+  .songline-home-scene-copy{ top:26px; left:18px; max-width:80%; }
+  .songline-home-scene .hero-banner-img{ min-height:clamp(310px, 65svh, 560px); }
+  .songline-home-system{ position:static; margin-top:32px; padding:0; border-left:0; border-top:1px solid color-mix(in srgb, var(--border) 78%, transparent); }
+
+  .songline-home-system{ grid-template-columns:1fr; }
+}
+@media(max-width:560px){
+  .songline-home-layout{ padding-inline:14px!important; }
+  .songline-home-scene-copy h1{ font-size:34px; }
+  .songline-home-scene-copy p{ margin-top:10px; font-size:13px; }
+  .songline-home-scene-frame::after{ background:linear-gradient(90deg, rgba(7,12,20,.55), rgba(7,12,20,.08)), linear-gradient(0deg, color-mix(in srgb, var(--bg) 62%, transparent), transparent 31%); }
+
+}
+
+/* v22：首页环境 UI：背景是空间，信息与导航是轻量前景层。 */
+body[data-page-kind="home"] .site-bg-layer::before{
+  background-position:30% center!important;
+  /* 背景比视口多出余量后仅移动图像本身，固定全屏根层不动，杜绝移动时露边。 */
+  inset:-5px!important;
+  transform:translate3d(var(--home-parallax-x, 0px), var(--home-parallax-y, 0px), 0) scale(1.004)!important;
+  will-change:transform;
+}
+body[data-page-kind="home"] .site-bg-layer::after{
+  display:block!important;
+  background:
+    radial-gradient(ellipse 43% 76% at 77% 47%, rgba(27,39,57,.32), transparent 74%),
+    linear-gradient(90deg, transparent 42%, rgba(30,41,59,.06) 59%, rgba(25,35,52,.36) 100%)!important;
+}
+.songline-home-layout{
+  min-height:100svh;
+  width:min(1450px, calc(100vw - 248px))!important;
+  margin-left:clamp(24px, 3vw, 60px)!important;
+  padding-top:clamp(108px, 14vh, 158px)!important;
+  grid-template-columns:minmax(0, 1fr) minmax(286px, 27%)!important;
+  gap:clamp(34px, 5vw, 88px)!important;
+}
+.songline-home-scene{
+  min-height:clamp(470px, calc(100svh - 170px), 700px)!important;
+}
+.songline-home-scene-copy{
+  top:auto!important;
+  bottom:clamp(44px, 9vh, 94px)!important;
+  left:clamp(14px, 2.5vw, 48px)!important;
+  max-width:260px!important;
+  text-shadow:0 3px 18px rgba(19,26,37,.42)!important;
+}
+.songline-home-scene-copy h1{
+  font-size:clamp(29px, 3vw, 46px)!important;
+  font-weight:680!important;
+  letter-spacing:.045em!important;
+}
+.songline-home-scene-copy p{
+  margin-top:10px!important;
+  font-size:10px!important;
+  letter-spacing:.15em!important;
+  color:rgba(247,250,255,.90)!important;
+}
+
+body[data-page-kind="home"] .songline-home-system{
+  position:relative!important;
+  top:auto!important;
+  align-self:start!important;
+  margin-top:clamp(36px, 8vh, 112px)!important;
+  padding:0!important;
+  color:rgba(239,246,255,.96)!important;
+  border-left:0!important;
+  background:transparent!important;
+  text-shadow:0 1px 10px rgba(11,17,27,.54)!important;
+}
+
+
+
+
+
+
+
+
+.songline-ui-layer--front{
+  margin-left:0!important;
+  opacity:1;
+}
+.songline-ui-layer--middle{
+  margin-left:clamp(18px, 2vw, 42px)!important;
+  opacity:.90;
+}
+.songline-ui-layer--rear{
+  margin-left:clamp(40px, 4vw, 78px)!important;
+  opacity:.73;
+  filter:blur(.12px);
+}
+.songline-ui-layer--rear:hover{
+  opacity:.92;
+  filter:none;
+}
+
+
+
+
+
+
+[data-home-parallax]{ will-change:transform; }
+@media(max-width:980px){
+  body[data-page-kind="home"] .site-bg-layer::before{ background-position:20% center!important; }
+  body[data-page-kind="home"] .site-bg-layer::after{
+    background:linear-gradient(180deg, transparent 34%, rgba(27,38,54,.12) 62%, rgba(27,38,54,.34) 100%)!important;
+  }
+  .songline-home-layout{
+    min-height:0;
+    width:100%!important;
+    margin-inline:0!important;
+    padding:84px 18px 112px!important;
+  }
+  .songline-home-scene{ min-height:clamp(360px, 54svh, 520px)!important; }
+  .songline-home-scene-copy{ bottom:32px!important; left:10px!important; }
+  body[data-page-kind="home"] .songline-home-system{ margin-top:16px!important; }
+  .songline-ui-layer--middle,
+  .songline-ui-layer--rear{ margin-left:0!important; opacity:1; filter:none; }
+  [data-home-parallax]{ will-change:auto; }
+}
+@media(prefers-reduced-motion:reduce){
+  [data-home-parallax]{ transform:none!important; will-change:auto!important; }
+}
+
+.songline-recommendations-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:24px;
+  margin-bottom:clamp(20px, 2.2vw, 34px);
+}
+.songline-recommendations-head > div:first-child > span{
+  display:block;
+  margin-bottom:8px;
+  color:rgba(198,215,233,.64);
+  font:650 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.18em;
+}
+.songline-recommendations-head h2{
+  margin:0;
+  color:#f7fbff;
+  font-size:clamp(24px, 2vw, 34px);
+  font-weight:680;
+  letter-spacing:.04em;
+}
+.songline-recommendations-actions{ display:flex; align-items:center; gap:12px; }
+.songline-recommendations-actions button,
+.songline-recommendations-actions a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:38px;
+  padding:0 13px;
+  border:1px solid rgba(222,235,248,.26);
+  border-radius:0;
+  color:rgba(244,249,255,.90);
+  background:rgba(245,250,255,.05);
+  font:650 11px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.08em;
+  text-decoration:none;
+  cursor:pointer;
+  transition:background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+.songline-recommendations-actions button span{ font-size:16px; line-height:1; }
+.songline-recommendations-actions button:hover:not(:disabled),
+.songline-recommendations-actions a:hover{
+  color:#fff;
+  border-color:rgba(255,217,174,.72);
+  background:rgba(255,209,162,.11);
+  transform:translateY(-1px);
+}
+.songline-recommendations-actions button:disabled{ opacity:.42; cursor:default; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@keyframes songlineRecommendationRefresh{ from{ opacity:.4; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
+
+@media(max-width:1180px){
+
+
+}
+@media(max-width:980px){
+
+  .songline-recommendations-head{ align-items:flex-start; }
+
+
+}
+@media(max-width:560px){
+  .songline-recommendations-head{ display:block; }
+  .songline-recommendations-actions{ margin-top:18px; }
+  .songline-recommendations-actions button,
+  .songline-recommendations-actions a{ flex:1; }
+
+
+}
+@media(prefers-reduced-motion:reduce){
+
+
+}
+
+/* v25：精选文章回收至首屏右侧终端，强化统计可读性而不增加页面纵向模块。 */
+body[data-page-kind="home"] .songline-home-system{
+  gap:0!important;
+  padding:16px 18px 14px!important;
+  background:linear-gradient(135deg, rgba(13,23,38,.70), rgba(18,30,47,.43))!important;
+  border:1px solid rgba(233,243,253,.32)!important;
+  border-left:2px solid rgba(255,211,170,.76)!important;
+  box-shadow:0 18px 48px rgba(4,10,18,.20)!important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media(max-width:980px){
+  body[data-page-kind="home"] .songline-home-system{
+    padding:18px!important;
+    border-left:1px solid rgba(233,243,253,.32)!important;
+  }
+
+}
+
+@media(min-width:981px){
+  body[data-page-kind="home"] .songline-home-system{ padding:12px 15px 10px!important; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+/* v26：首页右侧信息终端：内容与数据并置，而不是堆叠的小型信息卡。 */
+body[data-page-kind="home"] .songline-home-system{
+  width:min(100%, 920px)!important;
+  justify-self:end!important;
+  margin-top:clamp(18px, 4.8vh, 64px)!important;
+  margin-right:clamp(56px, 4.8vw, 108px)!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
+}
+.songline-terminal-frame{
+  position:relative;
+  display:grid;
+  gap:clamp(14px, 1.6vh, 20px);
+  min-height:clamp(460px, 58vh, 620px);
+  padding:clamp(18px, 2vw, 28px) clamp(18px, 2.2vw, 32px) clamp(15px, 1.7vw, 23px);
+  overflow:visible;
+  color:rgba(247,250,255,.96);
+  background:
+    linear-gradient(118deg, rgba(12,23,39,.76), rgba(18,31,49,.45) 55%, rgba(25,38,54,.28)),
+    linear-gradient(90deg, rgba(255,218,181,.06), transparent 38%);
+  box-shadow:0 22px 54px rgba(5,13,24,.16);
+  transform:perspective(1050px) rotateY(-6deg);
+  transform-origin:left center;
+}
+.songline-terminal-frame::before,
+.songline-terminal-frame::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+}
+.songline-terminal-frame::before{
+  inset:0;
+  border-left:1px solid rgba(235,244,255,.48);
+  background:
+    linear-gradient(90deg, rgba(255,220,182,.78), rgba(255,220,182,.78)) left top / 82px 1px no-repeat,
+    linear-gradient(90deg, rgba(232,244,255,.4), rgba(232,244,255,.4)) right bottom / 72px 1px no-repeat;
+}
+.songline-terminal-frame::after{
+  right:-18px;
+  bottom:34px;
+  width:18px;
+  height:1px;
+  background:rgba(235,244,255,.48);
+  box-shadow:7px 9px 0 -0.5px rgba(255,220,182,.56);
+}
+.songline-terminal-status{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:24px;
+  padding-bottom:12px;
+  border-bottom:1px solid rgba(232,243,255,.2);
+  color:rgba(231,240,249,.9);
+  font:680 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.16em;
+  transform:translateZ(22px);
+  backface-visibility:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+.songline-terminal-status img,
+.songline-terminal-status .songline-terminal-avatar{
+  margin-left:auto;
+  transform:translateZ(32px);
+  backface-visibility:hidden;
+}
+.songline-terminal-brand{
+  margin:0 12px 0 auto;
+  color:rgba(248,251,255,.96);
+  font:650 clamp(28px, 2.35vw, 42px)/1 ui-sans-serif,system-ui,sans-serif;
+  letter-spacing:.055em;
+  text-shadow:0 2px 18px rgba(0,0,0,.28);
+  transform:translateZ(30px);
+}
+.songline-terminal-status .songline-terminal-brand ~ img,
+.songline-terminal-status .songline-terminal-brand ~ .songline-terminal-avatar{ margin-left:0; }
+.songline-terminal-online{ display:inline-flex; align-items:center; gap:7px; color:rgba(250,253,255,.98); text-shadow:0 1px 7px rgba(4,12,22,.38); }
+.songline-terminal-online i,
+.songline-terminal-uptime i{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#b6ddc5;
+  box-shadow:0 0 0 3px rgba(182,221,197,.12);
+}
+.songline-terminal-status img,
+.songline-terminal-avatar{
+  display:grid;
+  place-items:center;
+  width:38px;
+  height:38px;
+  border:1px solid rgba(244,249,255,.68);
+  border-radius:50%;
+  object-fit:cover;
+  color:#fff;
+  background:rgba(233,244,255,.18);
+  box-shadow:0 2px 12px rgba(3,10,19,.24);
+  filter:contrast(1.06) saturate(1.04);
+}
+.songline-terminal-main{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:minmax(0, 1.03fr) minmax(0, .97fr);
+  min-height:0;
+}
+.songline-terminal-feature,
+.songline-terminal-stats{ min-width:0; }
+.songline-terminal-feature{
+  position:relative;
+  padding-right:clamp(16px, 2vw, 28px);
+  transform:translateZ(8px);
+}
+.songline-terminal-feature::after{
+  content:"";
+  position:absolute;
+  top:2px;
+  right:0;
+  bottom:2px;
+  width:1px;
+  background:linear-gradient(180deg, transparent, rgba(232,243,255,.38) 10%, rgba(232,243,255,.18) 88%, transparent);
+}
+.songline-terminal-stats{
+  padding-left:clamp(16px, 2vw, 28px);
+  transform:translateZ(5px);
+}
+.songline-terminal-heading{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:clamp(10px, 1.3vh, 15px);
+  color:rgba(235,244,252,.92);
+  font:680 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.17em;
+  transform:translateZ(16px);
+  backface-visibility:hidden;
+}
+.songline-terminal-heading i{ flex:1; height:1px; background:rgba(232,243,255,.22); }
+.songline-terminal-feature-stage{
+  position:relative;
+  min-height:clamp(262px, 34vh, 370px);
+  overflow:hidden;
+  background:rgba(12,22,36,.22);
+}
+.songline-terminal-feature-stage::before{
+  content:"";
+  position:absolute;
+  z-index:4;
+  top:0;
+  left:0;
+  width:32px;
+  height:1px;
+  background:rgba(255,221,184,.78);
+  pointer-events:none;
+}
+.songline-terminal-feature-switch{
+  position:absolute;
+  z-index:6;
+  top:50%;
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:48px;
+  padding:0;
+  border:1px solid rgba(235,245,255,.42);
+  color:rgba(248,252,255,.96);
+  background:rgba(11,21,35,.54);
+  cursor:pointer;
+  opacity:0;
+  transform:translateY(-50%);
+  transition:opacity .2s ease, color .2s ease, background .2s ease, transform .2s ease;
+}
+.songline-terminal-feature-switch--previous{ left:0; border-left:0; }
+.songline-terminal-feature-switch--next{ right:0; border-right:0; }
+.songline-terminal-feature-switch .ui-icon{ --ui-icon-size:16px; }
+.songline-terminal-feature-stage:hover .songline-terminal-feature-switch,
+.songline-terminal-feature-stage:focus-within .songline-terminal-feature-switch{ opacity:.92; }
+.songline-terminal-feature-switch:hover,
+.songline-terminal-feature-switch:focus-visible{ color:rgba(255,221,185,.98); background:rgba(12,24,39,.82); outline:0; }
+.songline-terminal-feature-switch--previous:hover,
+.songline-terminal-feature-switch--previous:focus-visible{ transform:translate(-2px, -50%); }
+.songline-terminal-feature-switch--next:hover,
+.songline-terminal-feature-switch--next:focus-visible{ transform:translate(2px, -50%); }
+.songline-terminal-feature-card{
+  position:absolute;
+  inset:0;
+  display:block;
+  overflow:hidden;
+  color:#fff!important;
+  opacity:0;
+  pointer-events:none;
+  transform:translate3d(16px, 0, 0) scale(1.014);
+  transition:opacity .56s ease, transform .62s cubic-bezier(.24,.72,.24,1);
+}
+.songline-terminal-feature-card.is-active{ z-index:2; opacity:1; pointer-events:auto; transform:translate3d(0, 0, 0) scale(1); }
+.songline-terminal-feature-card.is-leaving{ z-index:1; opacity:0; transform:translate3d(-15px, 0, 0) scale(.992); }
+.songline-terminal-feature.is-direct-switch .songline-terminal-feature-card.is-active{
+  opacity:1!important;
+  transform:translate3d(0, 0, 0) scale(1)!important;
+  transition:none!important;
+}
+.songline-terminal-feature-card img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  background:#17283b url('/uploads/admin/article_default.png') center / cover no-repeat;
+  opacity:0;
+  transform:scale(1.08);
+  transition:opacity .42s ease, transform .65s cubic-bezier(.2,.7,.25,1), filter .45s ease;
+}
+.songline-terminal-feature-card.is-active img{ opacity:1; }
+.songline-terminal-feature-card.is-leaving img{ opacity:0; }
+.songline-terminal-feature-card:hover img,
+.songline-terminal-feature-card:focus-visible img{ transform:scale(1.105); filter:brightness(1.05); }
+.songline-terminal-feature-wash{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(8,16,27,.03) 26%, rgba(6,13,23,.88) 100%);
+}
+.songline-terminal-feature-copy{
+  position:absolute;
+  z-index:1;
+  right:clamp(13px, 1.5vw, 20px);
+  bottom:clamp(13px, 1.6vw, 20px);
+  left:clamp(13px, 1.5vw, 20px);
+  display:grid;
+  gap:7px;
+  opacity:0;
+  transform:translate3d(0, 8px, 10px);
+  transition:opacity .32s ease .06s, transform .42s cubic-bezier(.2,.72,.24,1) .06s;
+}
+.songline-terminal-feature-card.is-active .songline-terminal-feature-copy{ opacity:1; transform:translate3d(0, 0, 10px); }
+.songline-terminal-feature-copy time{
+  color:rgba(230,240,250,.76);
+  font:650 9px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.14em;
+}
+.songline-terminal-feature-copy strong{
+  display:-webkit-box;
+  overflow:hidden;
+  color:#fff;
+  font-size:clamp(16px, 1.25vw, 21px);
+  line-height:1.35;
+  letter-spacing:.02em;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+}
+.songline-terminal-feature-empty{
+  display:grid;
+  place-content:center;
+  gap:10px;
+  height:100%;
+  padding:20px;
+  border:1px solid rgba(234,244,255,.18);
+  color:rgba(228,239,249,.7);
+  text-align:center;
+}
+.songline-terminal-feature-empty span{ font:650 9px/1 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing:.16em; }
+.songline-terminal-feature-empty strong{ font-size:14px; font-weight:560; }
+.songline-terminal-indicators{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  margin-top:12px;
+}
+.songline-terminal-indicators button{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  padding:0;
+  border:0;
+  color:rgba(221,234,246,.47);
+  background:none;
+  cursor:pointer;
+  font:650 8px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.1em;
+}
+.songline-terminal-indicators button i{ width:8px; height:1px; background:currentColor; transition:width .3s ease, color .3s ease; }
+.songline-terminal-indicators button.is-active,
+.songline-terminal-indicators button:hover,
+.songline-terminal-indicators button:focus-visible{ color:rgba(255,224,189,.98); outline:0; }
+.songline-terminal-indicators button.is-active i{ width:25px; }
+.songline-terminal-stat-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:0;
+  margin:0;
+  border-top:1px solid rgba(232,243,255,.2);
+  border-bottom:1px solid rgba(232,243,255,.2);
+}
+.songline-terminal-stat-grid div{
+  min-width:0;
+  min-height:clamp(105px, 14vh, 142px);
+  padding:clamp(13px, 1.5vw, 21px) 0;
+  transition:transform .25s ease, color .25s ease;
+  animation:songlineTerminalStatIn .5s cubic-bezier(.22,.78,.28,1) both;
+  animation-delay:var(--stat-delay, 0ms);
+}
+.songline-terminal-stat-grid div:nth-child(odd){ border-right:1px solid rgba(232,243,255,.18); }
+.songline-terminal-stat-grid div:nth-child(-n+2){ border-bottom:1px solid rgba(232,243,255,.18); }
+.songline-terminal-stat-grid div:nth-child(even){ padding-left:clamp(14px, 1.6vw, 23px); }
+.songline-terminal-stat-grid div:nth-child(odd){ padding-right:clamp(14px, 1.6vw, 23px); }
+.songline-terminal-stat-grid div:hover{ transform:translate3d(2px, -1px, 5px); }
+.songline-terminal-stat-grid dt{
+  color:rgba(216,230,244,.68)!important;
+  font:650 9px/1 ui-monospace, SFMono-Regular, Consolas, monospace!important;
+  letter-spacing:.14em!important;
+}
+.songline-terminal-stat-grid dd{
+  margin:clamp(11px, 1.4vh, 16px) 0 0!important;
+  color:rgba(250,252,255,.98)!important;
+  font:620 clamp(28px, 2.8vw, 46px)/.82 ui-monospace, SFMono-Regular, Consolas, monospace!important;
+  letter-spacing:-.07em;
+}
+.songline-terminal-stat-grid div:last-child dd{ font-size:clamp(19px, 1.8vw, 29px)!important; letter-spacing:-.04em; white-space:nowrap; }
+.songline-terminal-uptime{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding-top:13px;
+  color:rgba(219,233,246,.66);
+  font:650 8px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.15em;
+}
+.songline-terminal-uptime b{ margin-left:auto; color:rgba(195,229,211,.9); font:inherit; }
+.songline-terminal-links{
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-wrap:wrap;
+  gap:clamp(14px, 1.8vw, 24px);
+  margin:0!important;
+  padding-top:12px;
+  border-top:1px solid rgba(232,243,255,.18);
+  border-right:0!important;
+  border-bottom:0!important;
+  border-left:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.songline-terminal-links a,
+.songline-terminal-links button{
+  display:grid;
+  place-items:center;
+  width:22px;
+  height:22px;
+  padding:0;
+  border:0;
+  color:rgba(220,233,245,.7)!important;
+  background:transparent;
+  cursor:pointer;
+  text-decoration:none;
+  transition:color .2s ease, transform .2s ease;
+}
+.songline-terminal-links .ui-icon{ --ui-icon-size:16px; }
+.songline-terminal-links a:hover,
+.songline-terminal-links a:focus-visible,
+.songline-terminal-links button:hover,
+.songline-terminal-links button:focus-visible{ color:rgba(255,222,187,.98)!important; transform:translateY(-1px); outline:0; }
+.songline-terminal-copy-tip{
+  position:absolute;
+  bottom:32px;
+  left:29px;
+  padding:6px 8px;
+  color:rgba(244,249,255,.96);
+  background:rgba(14,27,43,.88);
+  border:1px solid rgba(234,244,255,.3);
+  font:650 9px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing:.1em;
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(4px);
+  transition:opacity .18s ease, transform .18s ease;
+}
+.songline-terminal-copy-tip.is-visible{ opacity:1; transform:translateY(0); }
+.songline-terminal-copy-tip.is-error{ color:rgba(255,214,194,.98); border-color:rgba(255,191,166,.48); }
+@keyframes songlineTerminalStatIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+@media(min-width:1181px){
+  .songline-home-layout{
+    grid-template-columns:minmax(0, .65fr) minmax(clamp(620px, 49vw, 980px), 1.35fr)!important;
+    gap:clamp(20px, 2.3vw, 42px)!important;
+  }
+}
+@media(max-width:1180px) and (min-width:981px){
+  .songline-home-layout{ grid-template-columns:minmax(0, 1fr) minmax(385px, 42%)!important; gap:clamp(20px, 2.6vw, 34px)!important; }
+  .songline-terminal-frame{ min-height:368px; padding:16px; transform:perspective(1050px) rotateY(-4deg); }
+  .songline-terminal-feature{ padding-right:14px; }
+  .songline-terminal-stats{ padding-left:14px; }
+  .songline-terminal-feature-stage{ min-height:205px; }
+  .songline-terminal-stat-grid div{ min-height:87px; }
+}
+@media(max-width:980px){
+  body[data-page-kind="home"] .songline-home-system{ width:100%!important; max-width:640px; margin:24px auto 0!important; }
+  .songline-terminal-frame{ min-height:0; transform:none; }
+  .songline-terminal-main{ grid-template-columns:1fr; gap:22px; }
+  .songline-terminal-feature{ padding-right:0; }
+  .songline-terminal-feature::after{ display:none; }
+  .songline-terminal-stats{ padding:21px 0 0; border-top:1px solid rgba(232,243,255,.22); }
+  .songline-terminal-feature-stage{ min-height:clamp(230px, 50vw, 340px); }
+  .songline-terminal-feature-switch{ opacity:.78; }
+}
+@media(max-width:500px){
+  .songline-terminal-frame{ padding:16px 15px 14px; }
+  .songline-terminal-status{ gap:8px; font-size:8px; letter-spacing:.1em; }
+  .songline-terminal-brand{ margin-right:8px; font-size:clamp(22px, 7vw, 31px); }
+  .songline-terminal-status > span:nth-child(2){ display:none; }
+  .songline-terminal-stat-grid div{ min-height:89px; }
+  .songline-terminal-links{ gap:14px; }
+}
+@media(prefers-reduced-motion:reduce){
+  .songline-terminal-frame{ transform:none!important; }
+  .songline-terminal-feature-card,
+  .songline-terminal-feature-card img,
+  .songline-terminal-feature-copy,
+  .songline-terminal-indicators button i,
+  .songline-terminal-stat-grid div,
+  .songline-terminal-links a{ transition:none!important; animation:none!important; }
+  .songline-terminal-feature-card.is-leaving{ transform:none!important; }
+}
+
+/* 首页本地音乐：嵌入右侧数据区的留白，不额外形成重卡片。 */
+.songline-home-music{
+  position:relative;
+  z-index:8;
+  margin-top:clamp(15px, 2vh, 23px);
+  padding-top:clamp(12px, 1.5vh, 17px);
+  border-top:1px solid rgba(232,243,255,.18);
+  color:rgba(244,249,255,.94);
+}
+.songline-home-music-main{ display:grid; grid-template-columns:48px minmax(0,1fr); align-items:center; gap:10px; min-width:0; }
+.songline-home-music-track{ display:grid; min-width:0; gap:3px; }
+.songline-home-music-label{ color:rgba(219,233,246,.56); font:650 8px/1 ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:.14em; }
+.songline-home-music-track strong,.songline-home-music-track small{ overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.songline-home-music-track strong{ color:rgba(249,252,255,.98); font:650 12px/1.25 system-ui,sans-serif; }
+.songline-home-music-track small{ color:rgba(221,234,246,.64); font:500 9px/1.25 system-ui,sans-serif; }
+.songline-home-music-spectrum{ grid-column:2; display:flex; align-items:center; gap:2px; height:14px; margin-top:-1px; overflow:hidden; }
+.songline-home-music-actions{ display:flex; align-items:center; gap:4px; margin-top:11px; }
+.songline-home-music-actions button,.songline-home-music-playlist-head button{
+  display:grid;
+  place-items:center;
+  width:23px;
+  height:23px;
+  padding:0;
+  border:0;
+  color:rgba(220,233,245,.68);
+  background:transparent;
+  cursor:pointer;
+  transition:color .18s ease, transform .18s ease;
+}
+.songline-home-music-actions button:last-child{ margin-left:auto; }
+.songline-home-music-actions .ui-icon,.songline-home-music-playlist-head .ui-icon{ --ui-icon-size:14px; }
+.songline-home-music-actions button:hover,.songline-home-music-actions button:focus-visible,.songline-home-music-playlist-head button:hover,.songline-home-music-playlist-head button:focus-visible{ color:rgba(255,224,189,.98); transform:translateY(-1px); outline:0; }
+.songline-home-music-status{ margin:8px 0 0; color:rgba(215,229,243,.54); font:500 8px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:.06em; }
+.songline-home-music-playlist{
+  position:absolute;
+  z-index:12;
+  right:-7px;
+  bottom:calc(100% + 9px);
+  width:min(330px, calc(100vw - 36px));
+  max-height:260px;
+  overflow:hidden;
+  border:1px solid rgba(235,245,255,.24);
+  background:rgba(9,20,34,.94);
+  box-shadow:0 18px 42px rgba(3,10,18,.28);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+}
+.songline-home-music-playlist-head{ display:flex; align-items:center; min-height:34px; padding-left:11px; border-bottom:1px solid rgba(234,244,255,.16); color:rgba(245,250,255,.88); font:650 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace; letter-spacing:.14em; }
+.songline-home-music-playlist-head button{ margin-left:auto; }
+.songline-home-music-playlist-list{ max-height:224px; overflow:auto; padding:5px; }
+.songline-home-music-playlist-list button{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; width:100%; padding:8px 7px; border:0; color:rgba(221,234,246,.68); background:transparent; cursor:pointer; text-align:left; }
+.songline-home-music-playlist-list button span,.songline-home-music-playlist-list button small{ overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.songline-home-music-playlist-list button span{ font:600 11px/1.25 system-ui,sans-serif; }
+.songline-home-music-playlist-list button small{ color:rgba(214,228,242,.44); font:500 9px/1.25 system-ui,sans-serif; }
+.songline-home-music-playlist-list button:hover,.songline-home-music-playlist-list button:focus-visible,.songline-home-music-playlist-list button.is-current{ color:rgba(255,224,189,.98); background:rgba(235,245,255,.08); outline:0; }
+.songline-home-music-playlist-list:empty::before{ content:"选择单曲或文件夹后显示播放列表"; display:block; padding:13px 8px; color:rgba(215,229,243,.56); font:500 9px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace; }
+@media(max-width:1180px) and (min-width:981px){
+  .songline-home-music{ margin-top:12px; padding-top:10px; }
+  .songline-home-music-main{ grid-template-columns:42px minmax(0,1fr); gap:8px; }
+}
+@media(max-width:980px){ .songline-home-music{ margin-top:18px; } }
+@media(prefers-reduced-motion:reduce){ .songline-home-music-actions button{ transition:none!important; animation:none!important; } }
+
+/* 桌面端压缩为统计区右下的一行轻播放器。 */
+@media(min-width:981px){
+  .songline-terminal-stats{ display:flex; flex-direction:column; }
+  .songline-home-music{
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) auto;
+    align-items:center;
+    gap:7px;
+    margin-top:auto;
+    padding-top:8px;
+  }
+  .songline-home-music-main{ grid-template-columns:34px minmax(0, 1fr) 50px; gap:7px; }
+  .songline-home-music-label{ display:none; }
+  .songline-home-music-track{ gap:2px; }
+  .songline-home-music-track strong{ font-size:10px; }
+  .songline-home-music-track small{ font-size:8px; }
+  .songline-home-music-spectrum{ grid-column:3; grid-row:1; height:11px; margin:0; gap:1px; }
+  .songline-home-music-actions{ gap:1px; margin:0; }
+  .songline-home-music-actions button{ width:18px; height:18px; }
+  .songline-home-music-actions .ui-icon{ --ui-icon-size:12px; }
+  .songline-home-music-actions button:last-child{ margin-left:1px; }
+  .songline-home-music-status{ display:none; }
+  .songline-home-music-playlist{ right:-5px; bottom:calc(100% + 7px); }
+}
+
+/* 无封面版本：频谱覆盖整条音乐带，作为低对比背景而非独立小组件。 */
+.songline-home-music-main{ position:relative; display:block; min-height:31px; }
+.songline-home-music-track{ position:relative; z-index:1; padding:3px 0; }
+.songline-home-music-spectrum{ position:absolute; z-index:0; inset:8px 0 0; display:flex; grid-column:auto; height:auto; margin:0; gap:2px; opacity:.34; pointer-events:none; }
+.songline-home-music-actions{ position:relative; z-index:1; }
+.songline-home-music-play-toggle span{ font:700 11px/1 ui-sans-serif,system-ui,sans-serif; transform:translateX(1px); }
+@media(min-width:981px){
+  .songline-home-music-main{ min-height:32px; }
+  .songline-home-music-spectrum{ inset:8px 0 0; gap:1px; opacity:.38; }
+}
+
+/* 本地音乐控件：更清晰的覆盖频谱，以及与首页终端一致的悬浮面板。 */
+.songline-home-music-spectrum{ inset:2px 0 -2px; gap:3px; opacity:.58; }
+.songline-home-music-volume{ position:relative; display:grid; place-items:center; }
+[data-home-music-volume-input]{
+  position:absolute;
+  z-index:15;
+  bottom:calc(100% + 10px);
+  right:49px;
+  width:68px;
+  height:16px;
+  margin:0;
+  accent-color:rgba(255,221,184,.9);
+  opacity:0;
+  pointer-events:none;
+  transform:translate(50%, 4px) rotate(-90deg);
+  transform-origin:center;
+  transition:opacity .16s ease, transform .16s ease;
+}
+[data-home-music-volume]:hover + [data-home-music-volume-input],
+[data-home-music-volume]:focus + [data-home-music-volume-input],
+[data-home-music-volume-input]:hover,
+[data-home-music-volume-input]:focus{ opacity:1; pointer-events:auto; transform:translate(50%, 0) rotate(-90deg); }
+.songline-home-music.is-muted [data-home-music-volume]{ color:rgba(203,218,231,.38); }
+.songline-home-music-playlist{
+  border-color:rgba(255,224,190,.26);
+  background:linear-gradient(118deg, rgba(24,37,53,.91), rgba(47,54,62,.83));
+  box-shadow:0 18px 42px rgba(5,13,22,.24), inset 0 1px 0 rgba(255,240,220,.08);
+}
+.songline-home-music-playlist-head{ border-bottom-color:rgba(255,229,201,.17); color:rgba(250,244,237,.9); }
+.songline-home-music-playlist-list button{ color:rgba(234,239,243,.72); }
+.songline-home-music-playlist-list button small{ color:rgba(232,220,208,.52); }
+.songline-home-music-playlist-list button:hover,
+.songline-home-music-playlist-list button:focus-visible,
+.songline-home-music-playlist-list button.is-current{ color:rgba(255,231,206,.98); background:rgba(255,229,201,.1); }
+@media(min-width:981px){
+  .songline-home-music-spectrum{ inset:1px 0 -2px; gap:2px; opacity:.62; }
+}
+@media(prefers-reduced-motion:reduce){ .songline-home-music-volume input{ transition:none!important; } }
+
+/* WaveSurfer 真实波形：暂停也保留同一首歌的轮廓，避免空闲与播放两套视觉。 */
+.songline-home-music-spectrum{ display:block; overflow:hidden; }
+.songline-home-music-spectrum::before{
+  position:absolute;
+  z-index:0;
+  top:50%;
+  right:0;
+  left:0;
+  height:1px;
+  content:"";
+  background:linear-gradient(90deg, transparent, rgba(248,228,208,.56) 10%, rgba(248,228,208,.56) 90%, transparent);
+  opacity:.74;
+  transition:opacity .24s ease;
+}
+.songline-home-music.has-waveform .songline-home-music-spectrum::before{ opacity:0; }
+[data-home-music-waveform]{
+  position:relative;
+  z-index:1;
+  width:100%;
+  height:100%;
+  min-height:28px;
+  opacity:0;
+  transition:opacity .28s ease;
+}
+.songline-home-music.has-waveform [data-home-music-waveform]{ opacity:1; }
+[data-home-music-waveform]::part(wave){ opacity:.86; }
+[data-home-music-waveform]::part(progress){ opacity:1; }
+@media(prefers-reduced-motion:reduce){ [data-home-music-waveform]{ transition:none; } }
+
+/* 控制键下移，给折线留出完整的展示带。 */
+@media(min-width:981px){
+  .songline-home-music-spectrum{ inset:-2px 0 -8px; opacity:.7; }
+  .songline-home-music-actions{ transform:translateY(20px); }
+}
+
+.songline-home-music.is-drop-target .songline-home-music-spectrum{ opacity:1; }
+.songline-home-music.is-drop-target [data-home-music-source-toggle]{ color:rgba(255,231,205,.98); }

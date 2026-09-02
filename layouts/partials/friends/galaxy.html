@@ -1,52 +1,33 @@
-{{ $cfg := .Site.Data.site }}
 {{ $friends := .Site.Data.friends | default slice }}
 {{ $first := dict }}
 {{ if gt (len $friends) 0 }}{{ $first = index $friends 0 }}{{ end }}
 {{ $firstName := "朋友星图" }}
-{{ $firstBio := "搜索或点击头像，切换中心朋友。" }}
 {{ $firstAvatar := "/uploads/admin/main_logo.png" }}
-{{ $firstURL := "/friends/" }}
-{{ $firstCount := 0 }}
-{{ $firstUpdated := "最近更新 —" }}
 {{ with $first }}
   {{ $firstName = default (default .username .name) (default .display_name .name) }}
-  {{ $firstBio = default "这个朋友还没有写简介。" .bio }}
   {{ $firstAvatar = default "/uploads/admin/main_logo.png" .avatar }}
-  {{ $firstURL = default "/friends/" .url }}
-  {{ $firstCount = default 0 .post_count }}
-  {{ if .updated_at }}{{ $firstUpdated = printf "最近更新 %s" (substr .updated_at 0 10) }}{{ end }}
 {{ end }}
 
-<section class="page-hero minimal-page-hero page-title-plain">
-  <h1>{{ default "朋友" $cfg.pages.friends_hero_title }}</h1>
-</section>
-
-<section class="friend-galaxy-shell slv2007-shell" data-friend-galaxy data-friends-src="/friends-data.json?v={{ partial "asset-version.html" . }}" data-friend-refactor="20.0.10">
-  <div class="slv2004-stage slv2007-stage" data-galaxy-stage>
-    <svg class="slv2004-lines" data-galaxy-lines aria-hidden="true"></svg>
-    <div class="slv2004-nodes" data-galaxy-nodes></div>
-    <button class="slv2004-core" type="button" data-center-open aria-label="进入当前朋友主页">
-      <span class="slv2007-core-frame" aria-hidden="true"><img data-center-avatar src="{{ $firstAvatar }}" alt="{{ $firstName }}" decoding="async" loading="lazy"></span>
-    </button>
-    <aside class="slv2004-profile" data-galaxy-profile>
-      <h2 data-center-name>{{ $firstName }}</h2>
-      <p data-center-bio>{{ $firstBio }}</p>
-      <div class="meta-row">
-        <span data-center-count>文章 {{ $firstCount }} 篇</span>
-        <span data-center-updated>{{ $firstUpdated }}</span>
+<section class="friends-constellation" data-friend-galaxy data-friends-src="/friends-data.json?v={{ partial "asset-version.html" . }}">
+  <div class="friends-constellation__sky" data-galaxy-stage>
+    <div class="friends-constellation__nebula" aria-hidden="true"></div>
+    <div class="friends-constellation__meteor friends-constellation__meteor--one" aria-hidden="true"></div>
+    <div class="friends-constellation__meteor friends-constellation__meteor--two" aria-hidden="true"></div>
+    <svg class="friends-constellation__lines" data-galaxy-lines aria-hidden="true"></svg>
+    <div class="friends-constellation__nodes" data-galaxy-nodes></div>
+    <aside class="friends-constellation__hover-card" data-galaxy-hover-card hidden aria-live="polite">
+      <img data-hover-avatar alt="">
+      <div>
+        <h2 data-hover-name></h2>
+        <p data-hover-bio></p>
       </div>
-      <a class="btn slv2004-center-link" data-center-link href="{{ $firstURL }}">进入主页 {{ partial "ui-icon.html" "arrow-right" }}</a>
     </aside>
-  </div>
-
-  <div class="card friend-galaxy-control">
-    <div><h2>快速寻找</h2></div>
-    <div class="friend-search-box">
-      <span class="site-search-icon friend-search-icon" aria-hidden="true">{{ partial "ui-icon.html" "search" }}</span>
-      <input id="friendGalaxySearch" class="searchbox" type="search" autocomplete="off" placeholder="搜索朋友名称或用户名...">
-      <button class="friend-search-submit" type="button" data-friend-search-submit data-no-page-loading aria-label="搜索朋友">搜索</button>
-    </div>
-    <div class="friend-galaxy-results" data-galaxy-results></div>
+    <button class="friends-constellation__core" type="button" data-center-open aria-label="访问 Songline 主页">
+      <span class="friends-constellation__core-orbit" aria-hidden="true"></span>
+      <img data-center-avatar src="{{ $firstAvatar }}" alt="{{ $firstName }}" decoding="async">
+      <span class="friends-constellation__core-name" data-center-name>{{ $firstName }}</span>
+    </button>
+    <div class="friends-constellation__empty" data-galaxy-empty hidden></div>
   </div>
 
   <script id="friend-galaxy-data" type="application/json">

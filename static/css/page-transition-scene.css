@@ -1,0 +1,176 @@
+/* 全站页面过场：当前场景式黑幕的运行时锁定规则。 */
+html.songline-page-transitioning,
+html.songline-page-transitioning body{
+  overscroll-behavior:none;
+}
+html.songline-page-transitioning body{
+  cursor:progress;
+}
+html.songline-page-transitioning main.container{
+  will-change:transform, opacity;
+}
+html.songline-page-transitioning .page-loading-orb{
+  display:none!important;
+}
+
+/* v2：场景式穿屏过场。覆盖首版淡入黑幕，保持同一模块边界。 */
+.songline-page-transition-overlay{
+  position:fixed;
+  z-index:2147483000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  top:-12svh;
+  left:-2vw;
+  width:104vw;
+  height:124svh;
+  overflow:hidden;
+  visibility:hidden;
+  opacity:1;
+  background:#020304;
+  transform:translate3d(0,0,0);
+  transition:none;
+  will-change:transform;
+}
+.songline-page-transition-overlay::before{
+  background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.025), transparent 44%);
+}
+.songline-page-transition-overlay.is-visible{
+  visibility:visible;
+  opacity:1;
+  pointer-events:auto;
+}
+.songline-page-transition-overlay.is-forward:not(.is-covering):not(.is-leaving){
+  transform:translate3d(0,112svh,0);
+}
+.songline-page-transition-overlay.is-forward.is-covering{
+  transform:translate3d(0,0,0);
+  transition:transform .72s cubic-bezier(.16,.82,.22,1);
+}
+.songline-page-transition-overlay.is-forward.is-leaving{
+  transform:translate3d(0,-112svh,0);
+  transition:transform .66s cubic-bezier(.54,0,.86,.42);
+}
+.songline-page-transition-overlay.is-backward:not(.is-covering):not(.is-leaving){
+  transform:translate3d(0,-112svh,0);
+}
+.songline-page-transition-overlay.is-backward.is-covering{
+  transform:translate3d(0,0,0);
+  transition:transform .72s cubic-bezier(.16,.82,.22,1);
+}
+.songline-page-transition-overlay.is-backward.is-leaving{
+  transform:translate3d(0,112svh,0);
+  transition:transform .66s cubic-bezier(.54,0,.86,.42);
+}
+.songline-page-transition-overlay.is-same{opacity:0;transition:opacity .36s ease}
+.songline-page-transition-overlay.is-same.is-covering{opacity:1}
+.songline-page-transition-overlay.is-same.is-leaving{opacity:0;transition:opacity .44s ease}
+.songline-page-transition-loader{
+  width:86px;
+  height:86px;
+  opacity:0;
+  transform:scale(.54);
+  transition:opacity .18s ease, transform .22s cubic-bezier(.22,1,.36,1);
+}
+.songline-page-transition-loader svg{
+  display:block;
+  width:100%;
+  height:100%;
+  overflow:visible;
+}
+.songline-page-transition-overlay.is-loader-visible .songline-page-transition-loader{
+  opacity:1;
+  transform:scale(1);
+}
+.songline-page-transition-overlay.is-loader-closing .songline-page-transition-loader{
+  opacity:0;
+  transform:scale(.38);
+  transition:opacity .18s ease, transform .2s cubic-bezier(.55,0,.9,.46);
+}
+.songline-transition-orbit{
+  fill:none;
+  stroke:rgba(246,248,252,.92);
+  stroke-width:1.05;
+  stroke-linecap:round;
+  transform-box:fill-box;
+  transform-origin:center;
+  animation-play-state:paused;
+}
+.songline-page-transition-overlay.is-loader-visible .songline-transition-orbit{animation-play-state:running}
+.songline-transition-orbit--primary{
+  stroke-dasharray:7 205;
+  animation:songlineTransitionSceneOrbit 1.14s cubic-bezier(.42,0,.2,1) infinite;
+}
+.songline-transition-orbit--secondary{
+  stroke:rgba(226,232,240,.52);
+  stroke-width:.85;
+  stroke-dasharray:4 172;
+  animation:songlineTransitionSceneOrbitSoft 1.14s cubic-bezier(.42,0,.2,1) -.2s infinite;
+}
+.songline-transition-orbit--tertiary{
+  stroke:rgba(255,255,255,.28);
+  stroke-width:.7;
+  stroke-dasharray:3 154;
+  animation:songlineTransitionSceneOrbitSoft 1.14s cubic-bezier(.42,0,.2,1) -.42s infinite;
+}
+@keyframes songlineTransitionSceneOrbit{
+  0%{stroke-dasharray:5 207;stroke-dashoffset:16;transform:rotate(-48deg) scale(.4);opacity:.36}
+  38%{stroke-dasharray:72 140;stroke-dashoffset:-78;transform:rotate(86deg) scale(.86);opacity:1}
+  72%{stroke-dasharray:154 58;stroke-dashoffset:-176;transform:rotate(202deg) scale(1);opacity:.92}
+  100%{stroke-dasharray:5 207;stroke-dashoffset:-266;transform:rotate(302deg) scale(.4);opacity:.22}
+}
+@keyframes songlineTransitionSceneOrbitSoft{
+  0%{stroke-dasharray:3 177;stroke-dashoffset:4;transform:rotate(12deg) scale(.48);opacity:.1}
+  42%{stroke-dasharray:46 134;stroke-dashoffset:-78;transform:rotate(144deg) scale(.96);opacity:.54}
+  74%{stroke-dasharray:82 98;stroke-dashoffset:-158;transform:rotate(250deg) scale(1.05);opacity:.3}
+  100%{stroke-dasharray:3 177;stroke-dashoffset:-230;transform:rotate(366deg) scale(.48);opacity:.05}
+}
+main.container.songline-page-exit-forward,
+main.container.songline-page-exit-backward,
+main.container.songline-page-exit-same{
+  transition:transform .66s cubic-bezier(.2,.7,.2,1), opacity .58s ease;
+  opacity:0;
+}
+main.container.songline-page-exit-forward{transform:translate3d(0,-126px,0) scale(.97)}
+main.container.songline-page-exit-backward{transform:translate3d(0,126px,0) scale(.97)}
+main.container.songline-page-exit-same{transform:scale(.985)}
+main.container.songline-page-enter-forward{transform:translate3d(0,132px,0) scale(.97)}
+main.container.songline-page-enter-backward{transform:translate3d(0,-132px,0) scale(.97)}
+main.container.songline-page-enter-same{transform:scale(.985)}
+main.container.songline-page-enter-active{
+  transform:translate3d(0,0,0);
+  opacity:1;
+  transition:transform .62s cubic-bezier(.16,.84,.2,1), opacity .54s ease;
+}
+@media(max-width:760px){
+  .songline-page-transition-loader{width:70px;height:70px}
+  main.container.songline-page-exit-forward{transform:translate3d(0,-84px,0) scale(.978)}
+  main.container.songline-page-exit-backward{transform:translate3d(0,84px,0) scale(.978)}
+  main.container.songline-page-enter-forward{transform:translate3d(0,90px,0) scale(.978)}
+  main.container.songline-page-enter-backward{transform:translate3d(0,-90px,0) scale(.978)}
+}
+@media(prefers-reduced-motion: reduce){
+  .songline-page-transition-overlay{
+    top:0;
+    left:0;
+    width:100vw;
+    height:100svh;
+    opacity:0;
+    transform:none!important;
+    transition:opacity .14s ease!important;
+  }
+  .songline-page-transition-overlay.is-covering{opacity:1}
+  .songline-page-transition-overlay.is-leaving{opacity:0}
+  .songline-page-transition-loader{display:none}
+  main.container.songline-page-exit-forward,
+  main.container.songline-page-exit-backward,
+  main.container.songline-page-exit-same,
+  main.container.songline-page-enter-forward,
+  main.container.songline-page-enter-backward,
+  main.container.songline-page-enter-same,
+  main.container.songline-page-enter-active{
+    transform:none!important;
+    transition:opacity .14s ease!important;
+  }
+}

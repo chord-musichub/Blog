@@ -9,10 +9,6 @@ v20.20.6：首屏资源提示。
 
 <link rel="preload" href="/css/site.css?v={{ $v }}" as="style">
 
-{{- if .IsHome }}
-<link rel="preload" href="/js/home-orbit-waapi.js?v={{ $v }}" as="script">
-{{- end }}
-
 {{- if or (eq $section "friends") (hasPrefix $rel "/friends/") }}
 <link rel="preload" href="/js/friend-galaxy.js?v={{ $v }}" as="script">
 {{- end }}

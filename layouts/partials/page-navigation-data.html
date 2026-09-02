@@ -1,0 +1,14 @@
+{{- /*
+  全站页面的唯一导航配置：楼层导航与页面过场优先级共同读取这里。
+  新增主页面时只需增加一项；visible 决定是否显示在电梯中。
+*/ -}}
+{{- $pages := slice
+  (dict "key" "friends" "label" "朋友" "system_label" "朋友" "route" "/friends/" "priority" 1 "floor" "01" "visible" true)
+  (dict "key" "home" "label" "首页" "system_label" "首页" "route" "/" "priority" 2 "floor" "00" "visible" true)
+  (dict "key" "posts" "label" "文章" "system_label" "文章" "route" "/posts/" "priority" 3 "floor" "-01" "visible" true)
+  (dict "key" "tags" "label" "标签" "route" "/tags/" "priority" 3 "visible" false)
+  (dict "key" "tools" "label" "工具" "system_label" "工具" "route" "/tools/" "priority" 4 "floor" "-02" "visible" true)
+  (dict "key" "write" "label" "投稿" "system_label" "投稿" "route" "/write/" "priority" 5 "floor" "-03" "visible" false)
+  (dict "key" "general" "priority" 3 "visible" false)
+-}}
+{{- return $pages -}}

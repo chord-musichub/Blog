@@ -1,0 +1,75 @@
+/* 工具入口页：PVZ 式从地表向下进入土层的滚动背景。 */
+body[data-page-layout="tools"]{
+  background:#1d0f09;
+}
+body[data-page-layout="tools"]::before{
+  background:transparent;
+}
+body[data-page-layout="tools"] .site-bg-layer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:auto!important;
+  min-height:100%;
+  overflow:visible;
+}
+body[data-page-layout="tools"] .site-bg-layer::before{
+  inset:0;
+  background-color:#1d0f09;
+  background-image:url('/uploads/admin/under-background.png');
+  background-repeat:no-repeat;
+  background-position:center top;
+  background-size:max(100vw, 940px) auto;
+  filter:none;
+  opacity:1;
+  transform:none;
+}
+body[data-page-layout="tools"] .site-bg-layer::after{
+  inset:0;
+  background:linear-gradient(180deg, rgba(24,12,5,.03) 0%, rgba(24,12,5,0) 32%, rgba(15,8,4,.20) 100%);
+}
+body[data-page-layout="tools"] .songline-starstream-layer,
+body[data-page-layout="tools"] .songline-ribbon-layer{
+  display:none!important;
+}
+
+/* 保持现有工具结构，只提高在土层上的阅读稳定性。 */
+body[data-page-layout="tools"] .tools-hero,
+body[data-page-layout="tools"] .tools-command-center,
+body[data-page-layout="tools"] .modern-tools-grid .tool-card{
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+body[data-page-layout="tools"] .page-hero.minimal-page-hero h1{
+  color:#fff0c8;
+  text-shadow:0 3px 18px rgba(30,13,4,.72);
+}
+body[data-page-layout="tools"] .tools-hero{
+  background-image:linear-gradient(135deg, rgba(255,236,188,.84), rgba(117,57,18,.72));
+  border-color:rgba(255,232,174,.32);
+}
+body.dark[data-page-layout="tools"] .tools-hero{
+  background-image:linear-gradient(135deg, rgba(68,35,14,.82), rgba(25,13,7,.78));
+  border-color:rgba(239,179,91,.24);
+}
+body.dark[data-page-layout="tools"] .tools-command-center,
+body.dark[data-page-layout="tools"] .modern-tools-grid .tool-card{
+  background:rgba(31,18,10,.74);
+  border-color:rgba(226,167,84,.18);
+}
+body[data-page-layout="tools"] .tools-command-center,
+body[data-page-layout="tools"] .modern-tools-grid .tool-card{
+  background:rgba(255,241,211,.58)!important;
+  border-color:rgba(255,232,174,.34)!important;
+  box-shadow:0 18px 42px rgba(39,18,5,.20)!important;
+}
+body.dark[data-page-layout="tools"] .tools-command-center,
+body.dark[data-page-layout="tools"] .modern-tools-grid .tool-card{
+  background:rgba(31,18,10,.66)!important;
+  border-color:rgba(226,167,84,.18)!important;
+}
+@media(max-width:760px){
+  body[data-page-layout="tools"] .site-bg-layer::before{
+    background-size:940px auto;
+  }
+}

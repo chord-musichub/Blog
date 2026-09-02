@@ -1,0 +1,154 @@
+/* 首页夜间静态视觉层：仅覆盖深色状态，不涉及布局、交互或页面过场。 */
+body.dark[data-page-kind="home"]{
+  --night-text-main:#e8f0ff;
+  --night-text-secondary:#8e9ebc;
+  --night-text-muted:rgba(174,193,220,.45);
+  --night-panel:rgba(7,18,40,.62);
+  --night-line:rgba(170,195,230,.13);
+  --night-line-strong:rgba(190,215,245,.20);
+  --night-accent:#b7d1ff;
+  --night-active:#e4eeff;
+  --night-shadow:rgba(0,0,0,.30);
+  background:#060d1e!important;
+}
+
+/* 夜景只替换深色模式背景，保留既有全屏定位和视差行为。 */
+body.dark[data-page-kind="home"] .site-bg-layer{
+  --site-bg-image:url('/uploads/admin/qiandai-background-black.png')!important;
+  background:#060d1e!important;
+}
+body.dark[data-page-kind="home"] .site-bg-layer::before{ background-position:center center!important; }
+body.dark[data-page-kind="home"] .site-bg-layer::after{
+  display:block!important;
+  background:linear-gradient(90deg, rgba(2,8,25,.02) 0%, rgba(2,8,25,.06) 34%, rgba(2,8,25,.14) 58%, rgba(2,8,25,.20) 100%)!important;
+}
+
+/* 顶部保持悬浮，颜色服从夜空而不是白天的暖色覆写。 */
+body.dark[data-page-kind="home"] .modern-site-header,
+body.dark[data-page-kind="home"] .modern-site-header .modern-navbar{ background:transparent!important; }
+body.dark[data-page-kind="home"] .modern-site-header .logo,
+body.dark[data-page-kind="home"] .modern-site-header .logo-text{ color:#edf3ff!important; }
+body.dark[data-page-kind="home"] .modern-site-header .header-icons .icon-btn{
+  color:rgba(225,235,250,.72)!important;
+  text-shadow:0 0 20px rgba(181,210,255,.08);
+}
+body.dark[data-page-kind="home"] .modern-site-header .header-icons .icon-btn:hover,
+body.dark[data-page-kind="home"] .modern-site-header .header-icons .icon-btn:focus-visible{
+  color:rgba(255,255,255,.95)!important;
+  background:radial-gradient(circle, rgba(213,229,255,.12), transparent 66%)!important;
+}
+
+/* 左侧人物信息只做冷白文字融合，不给人物添加遮罩。 */
+body.dark[data-page-kind="home"] .songline-home-scene-copy h1{
+  position:relative;
+  color:rgba(240,245,255,.94)!important;
+  text-shadow:0 2px 20px rgba(0,0,0,.35)!important;
+}
+
+/* 楼层导航变成夜晚建筑指示系统。 */
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-rail{
+  background:linear-gradient(180deg, transparent, rgba(160,190,230,.16) 12%, rgba(160,190,230,.16) 88%, transparent)!important;
+}
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a,
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a:hover,
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a:focus-visible,
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a.active{ color:rgba(205,220,245,.42)!important; }
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a.active,
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a:hover,
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a:focus-visible{ color:rgba(240,247,255,.95)!important; }
+body.dark[data-page-kind="home"] .songline-elevator-floor::after{ border-color:rgba(180,205,240,.30)!important; }
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a.active .songline-elevator-floor::after{
+  border-color:#d9e7ff!important;
+  background:#d9e7ff!important;
+  box-shadow:0 0 10px rgba(160,195,255,.35)!important;
+}
+body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a.active .songline-elevator-name{ color:#e6eeff!important; }
+
+/* 右侧是一整块月光玻璃 HUD，不拆成附加卡片。 */
+body.dark[data-page-kind="home"] .songline-terminal-frame{
+  color:var(--night-text-main);
+  background:linear-gradient(135deg, rgba(8,18,40,.72), rgba(9,23,50,.54))!important;
+  border:1px solid rgba(180,205,255,.12);
+  box-shadow:0 24px 70px rgba(0,0,0,.28), inset 0 1px rgba(220,235,255,.12)!important;
+  backdrop-filter:blur(14px) saturate(110%);
+  -webkit-backdrop-filter:blur(14px) saturate(110%);
+}
+body.dark[data-page-kind="home"] .songline-terminal-frame::before{
+  border-left-color:var(--night-line-strong)!important;
+  background:
+    linear-gradient(90deg, var(--night-accent), var(--night-accent)) left top / 58px 1px no-repeat,
+    linear-gradient(90deg, var(--night-line-strong), var(--night-line-strong)) right bottom / 62px 1px no-repeat!important;
+  opacity:.7;
+}
+body.dark[data-page-kind="home"] .songline-terminal-frame::after{ background:var(--night-line-strong)!important; box-shadow:7px 9px 0 -.5px rgba(183,209,255,.45)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-status{ border-bottom-color:var(--night-line)!important; color:#c9d4e8!important; }
+body.dark[data-page-kind="home"] .songline-terminal-online{ color:#c9d4e8!important; text-shadow:none!important; }
+body.dark[data-page-kind="home"] .songline-terminal-online i{ background:#8dd8b4!important; box-shadow:0 0 8px rgba(141,216,180,.35)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-status img,
+body.dark[data-page-kind="home"] .songline-terminal-avatar{ border-color:rgba(190,215,245,.25)!important; background:rgba(205,222,248,.07)!important; }
+
+/* HUD 分区线按主次分层，少量左端标记保留游戏界面感。 */
+body.dark[data-page-kind="home"] .songline-terminal-feature::after{ background:linear-gradient(180deg, transparent, var(--night-line-strong) 10%, var(--night-line) 88%, transparent)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-heading{ color:var(--night-text-main)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-heading i{ position:relative; background:var(--night-line-strong)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-heading i::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:3px;
+  height:1px;
+  background:rgba(220,234,255,.72);
+}
+body.dark[data-page-kind="home"] .songline-terminal-feature-stage{ background:rgba(3,11,27,.22)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-feature-stage::before{ background:rgba(183,209,255,.66)!important; }
+
+/* 推荐文章保留原图，只压低夜间亮度与饱和度。 */
+body.dark[data-page-kind="home"] .songline-terminal-feature-card img{ filter:brightness(.82) saturate(.9); }
+body.dark[data-page-kind="home"] .songline-terminal-feature-card:hover img,
+body.dark[data-page-kind="home"] .songline-terminal-feature-card:focus-visible img{ filter:brightness(1) saturate(.96); transform:scale(1.01)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-feature-card:hover{ box-shadow:0 0 30px rgba(130,170,255,.08); }
+body.dark[data-page-kind="home"] .songline-terminal-feature-wash{ background:linear-gradient(180deg, rgba(4,10,25,.03) 26%, rgba(4,10,25,.86) 100%)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-feature-copy time{ color:#8293b4!important; }
+body.dark[data-page-kind="home"] .songline-terminal-feature-copy strong{ color:#e7eeff!important; }
+body.dark[data-page-kind="home"] .songline-terminal-feature-switch{ border-color:var(--night-line-strong)!important; color:var(--night-text-main)!important; background:rgba(5,14,32,.48)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-feature-switch:hover,
+body.dark[data-page-kind="home"] .songline-terminal-feature-switch:focus-visible{ color:#fff!important; background:rgba(12,27,56,.66)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-indicators button{ color:rgba(220,232,255,.35)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-indicators button.is-active,
+body.dark[data-page-kind="home"] .songline-terminal-indicators button:hover,
+body.dark[data-page-kind="home"] .songline-terminal-indicators button:focus-visible{ color:#dce8ff!important; }
+body.dark[data-page-kind="home"] .songline-terminal-indicators button.is-active i{ height:1px; background:#b7d1ff!important; }
+
+/* 同一块 HUD 内的 2×2 数据，不追加独立卡片边框。 */
+body.dark[data-page-kind="home"] .songline-terminal-stat-grid{ border-color:var(--night-line)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-stat-grid div:nth-child(odd),
+body.dark[data-page-kind="home"] .songline-terminal-stat-grid div:nth-child(-n+2){ border-color:var(--night-line)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-stat-grid dt{ color:#8b9ab8!important; }
+body.dark[data-page-kind="home"] .songline-terminal-stat-grid dd{ color:#edf3ff!important; text-shadow:0 0 18px rgba(170,200,255,.08)!important; }
+
+/* 右下音乐带沿用 HUD 的冷白文字和蓝灰细线。 */
+body.dark[data-page-kind="home"] .songline-home-music{ border-top-color:var(--night-line)!important; color:#dce7fa!important; }
+body.dark[data-page-kind="home"] .songline-home-music-track strong{ color:#dce7fa!important; }
+body.dark[data-page-kind="home"] .songline-home-music-track small,
+body.dark[data-page-kind="home"] .songline-home-music-label{ color:rgba(180,198,225,.55)!important; }
+body.dark[data-page-kind="home"] .songline-home-music-actions button,
+body.dark[data-page-kind="home"] .songline-terminal-links a,
+body.dark[data-page-kind="home"] .songline-terminal-links button{ color:rgba(210,225,245,.58)!important; }
+body.dark[data-page-kind="home"] .songline-home-music-actions button:hover,
+body.dark[data-page-kind="home"] .songline-home-music-actions button:focus-visible,
+body.dark[data-page-kind="home"] .songline-terminal-links a:hover,
+body.dark[data-page-kind="home"] .songline-terminal-links a:focus-visible,
+body.dark[data-page-kind="home"] .songline-terminal-links button:hover,
+body.dark[data-page-kind="home"] .songline-terminal-links button:focus-visible{ color:rgba(240,247,255,.95)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-links{ border-top-color:var(--night-line)!important; }
+body.dark[data-page-kind="home"] .songline-home-music-spectrum::before{ background:linear-gradient(90deg, transparent, rgba(183,209,255,.55) 10%, rgba(183,209,255,.55) 90%, transparent)!important; }
+body.dark[data-page-kind="home"] .songline-home-music-playlist{ border-color:var(--night-line-strong)!important; background:linear-gradient(118deg, rgba(7,18,40,.94), rgba(12,29,58,.88))!important; }
+
+@media(max-width:980px){
+  body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav{
+    border-color:var(--night-line-strong)!important;
+    background:rgba(7,18,40,.72)!important;
+    box-shadow:0 12px 34px rgba(0,0,0,.26)!important;
+  }
+}

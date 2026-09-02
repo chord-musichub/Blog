@@ -2,7 +2,7 @@
   const root = document.documentElement;
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isHome = window.location.pathname === '/' || (document.body && document.body.dataset && document.body.dataset.pageKind === 'home');
-  const bootKey = 'songline-home-boot-v20.20.6';
+  const bootKey = 'songline-home-boot-v21.4';
   const bootWelcomeText = (document.body && document.body.getAttribute('data-boot-welcome')) || '欢迎回来';
   const shouldBoot = !reduceMotion && isHome && !sessionStorage.getItem(bootKey);
 
@@ -12,6 +12,7 @@
       sessionStorage.setItem(bootKey, '1');
     }catch(e){}
     root.classList.remove('is-booting', 'boot-opening', 'is-boot-preparing', 'is-boot-interactive', 'boot-frame-settling');
+    root.style.backgroundColor = root.getAttribute('data-theme') === 'dark' ? '#0d1728' : '#fbfaf7';
     const overlay = document.querySelector('.site-boot-overlay');
     if(overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
     try{ window.dispatchEvent(new Event('resize')); }catch(e){}
@@ -233,6 +234,15 @@
   }
 
   function runBootSequence(){
+    // 首页开机视觉独立维护；此壳层只负责把现有导航与防卡死机制交给它。
+    if(window.SonglineHomeBoot && typeof window.SonglineHomeBoot.run === 'function'){
+      window.SonglineHomeBoot.run({
+        shouldBoot:shouldBoot,
+        bootKey:bootKey,
+        fallback:function(){ forceBootReveal('home-boot-fallback'); }
+      });
+      return;
+    }
     if(!shouldBoot){
       if(window.__songlineBootPrepFallback) window.clearTimeout(window.__songlineBootPrepFallback);
       root.classList.remove('is-boot-preparing');
@@ -323,6 +333,21 @@
 
   const navigation=window.SonglineCreatePageNavigation&&window.SonglineCreatePageNavigation();
   if(!navigation) return;
+
+  // 过场系统已拆为独立模块；这里保留首页开机动画与导航滑块的初始化。
+  if(window.__songlineUnifiedPageTransition){
+    function initializeLegacyShell(){
+      navigation.bindNavIndicatorHover();
+      navigation.updateNavIndicator(true);
+      if(shouldBoot) runBootSequence();
+    }
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', initializeLegacyShell, { once:true });
+    }else{
+      initializeLegacyShell();
+    }
+    return;
+  }
 
   function hydrateDynamicBits(scope){
     if(!scope) return;

@@ -1,6 +1,8 @@
 {{ define "main" }}
 {{ partial "back-icon.html" (dict "fallback" "/") }}
 {{ $cfg := .Site.Data.site }}
+{{ $tags := index .Site.Taxonomies "tags" }}
+{{ $tagCount := 0 }}{{ with $tags }}{{ $tagCount = len . }}{{ end }}
 <section class="page-hero minimal-page-hero">
 <h1>{{ default "文章" $cfg.pages.posts_hero_title }}</h1>
 </section>
@@ -9,6 +11,22 @@
   <button class="pill search-submit" id="postSearchSubmit" type="button" data-search-submit="post" data-no-page-loading>搜索</button>
   <span class="pill search-count" id="postSearchCount">正在统计文章</span>
   <button class="pill sort-pill" id="postSort" type="button" data-order="desc">排序：最新优先⌄</button>
+  <button class="pill post-tag-toggle" id="postTagToggle" type="button" aria-label="搜索与筛选标签" aria-controls="postTagExplorer" aria-expanded="false" title="搜索与筛选标签" data-no-page-loading>{{ partial "ui-icon.html" "search" }}</button>
+</section>
+
+<section class="card posts-tag-explorer" id="postTagExplorer" hidden aria-label="标签筛选">
+  <div class="posts-tag-explorer-head">
+    <h2>标签筛选</h2>
+    <span class="pill" id="postTagStatus">{{ $tagCount }} 个标签</span>
+  </div>
+  <input id="postTagSearch" class="searchbox" type="search" autocomplete="off" placeholder="搜索标签，或直接选择下方标签…">
+  <div class="pills posts-tag-chips" id="postTagChips">
+    <button class="pill active" type="button" data-post-tag-filter="all">全部</button>
+    {{ with $tags }}{{ range .ByCount }}
+      {{ $raw := .Page.Title }}{{ $name := $raw }}{{ if eq $raw "site-notice" }}{{ $name = "站点公告" }}{{ end }}
+      <button class="pill" type="button" data-post-tag-filter="{{ $raw }}">{{ $name }} <b>{{ .Count }}</b></button>
+    {{ end }}{{ end }}
+  </div>
 </section>
 
 <section class="article-list posts-list" id="postList">

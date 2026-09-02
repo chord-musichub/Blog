@@ -1,706 +1,336 @@
-/* v20.0.8：朋友星图重构兜底版
-   目标：数据已有 7 人时，无论旧 CSS/旧 DOM 怎么干扰，都稳定渲染多节点关系图。
-   只使用专属 slv2004-* 类名，避开旧 friend-node/friend-galaxy 规则污染。
-*/
+/* Friends 星座场景：数据、节点、连线与轻量交互相互独立。 */
 (function(){
   'use strict';
-  var VERSION = '20.20.6';
-  var STYLE_ID = 'songline-friends-galaxy-style';
-  var assetVersion = VERSION;
-  try{
-    var sourceURL = new URL((document.currentScript && document.currentScript.src) || '', window.location.href);
-    assetVersion = sourceURL.searchParams.get('v') || assetVersion;
-  }catch(e){}
 
-  function ensureStylesheet(){
-    if(document.getElementById(STYLE_ID)) return;
-    var style = document.createElement('link');
-    style.id = STYLE_ID;
-    style.rel = 'stylesheet';
-    style.href = '/css/friends-galaxy.css?v=' + encodeURIComponent(assetVersion);
-    document.head.appendChild(style);
+  var VERSION = '21.0.0';
+  // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
+  var DESKTOP_POSITIONS = [[15,28],[31,17],[58,24],[75,43],[68,71],[29,72],[12,57],[47,82]];
+  var MOBILE_POSITIONS = [[16,29],[67,21],[82,45],[60,60],[20,66],[43,82],[82,83],[12,48]];
+  // 以稳定 key 描述关系；数据新增后仍可在这里显式补边，不依赖 DOM 顺序。
+  var CONSTELLATION_EDGES = [
+    ['mxbt','three'], ['three','songline'], ['songline','mishi'],
+    ['mishi','scanf'], ['scanf','zxlyzq'], ['mxbt','scanf']
+  ];
+
+  function clean(value){ return String(value == null ? '' : value).trim().replace(/^['"]|['"]$/g, ''); }
+  function key(value){ return clean(value).toLowerCase().replace(/[\s\u3000]+/g, '-').replace(/[^\w\-\u4e00-\u9fff]/g, ''); }
+  function url(value, fallback){
+    value = clean(value);
+    if(!value) return fallback || '';
+    return /^(https?:\/\/|\/)/.test(value) ? value : '/' + value.replace(/^\/+/, '');
   }
-
-  function clean(value){
-    var s = String(value == null ? '' : value).trim();
-    for(var i = 0; i < 2; i++){
-      if(s.length >= 2 && ((s[0] === '"' && s[s.length - 1] === '"') || (s[0] === "'" && s[s.length - 1] === "'"))){
-        s = s.slice(1, -1).trim();
-      }
-    }
-    return s.replace(/\\n/g, '\n').replace(/\\r/g, '').replace(/\\"/g, '"').replace(/\\\\/g, '\\').trim();
-  }
-
-  function normalize(value){
-    return String(value == null ? '' : value)
-      .toLowerCase()
-      .replace(/[\u3000\t\r\n]+/g, ' ')
-      .replace(/[，。！？、；：,.!?;:|/\\()[\]{}<>《》“”‘’`~@#$%^&*_+=-]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  function slugify(value){
-    var raw = clean(value);
-    var ascii = normalize(raw).replace(/\s+/g, '-').replace(/^-+|-+$/g, '');
-    if(ascii) return ascii;
-    return raw ? encodeURIComponent(raw).replace(/%/g, '').slice(0, 42).toLowerCase() : 'friend';
-  }
-
-  function toUrl(value, fallback){
-    var s = clean(value);
-    if(!s || s === 'null' || s === 'undefined') return fallback || '';
-    if(/^https?:\/\//.test(s) || s[0] === '/') return s;
-    return '/' + s.replace(/^\/+/, '');
-  }
-
-  function arrayOf(value){
+  function toArray(value){
     if(Array.isArray(value)) return value.map(clean).filter(Boolean);
-    if(typeof value === 'string'){
-      var s = clean(value);
-      if(!s) return [];
-      try{
-        var parsed = JSON.parse(s);
-        if(Array.isArray(parsed)) return parsed.map(clean).filter(Boolean);
-      }catch(e){}
-      return s.split(/[\s,，;；|]+/).map(clean).filter(Boolean);
-    }
-    return [];
+    if(typeof value !== 'string') return [];
+    try{ var parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed.map(clean).filter(Boolean) : []; }catch(e){}
+    return value.split(/[\s,，;；|]+/).map(clean).filter(Boolean);
   }
-
-  function parseInlineFriends(){
-    var el = document.getElementById('friend-galaxy-data');
-    if(!el) return [];
-    try{
-      var parsed = JSON.parse(el.textContent || '[]');
-      if(Array.isArray(parsed)) return parsed;
-      if(parsed && typeof parsed === 'object'){
-        if(Array.isArray(parsed.friends)) return parsed.friends;
-        if(Array.isArray(parsed.items)) return parsed.items;
-        return Object.keys(parsed).map(function(k){ return parsed[k]; }).filter(function(v){ return v && typeof v === 'object'; });
-      }
-    }catch(e){
-      console.warn('[friend-galaxy:' + VERSION + '] inline 数据解析失败', e);
-    }
-    return [];
+  function date(value){
+    var found = clean(value).match(/\d{4}-\d{2}-\d{2}/);
+    return found ? found[0].replace(/-/g, '.') : '—';
   }
-
-  function fetchJson(url){
-    if(!url || !window.fetch) return Promise.resolve([]);
-    return fetch(url, {cache:'no-store', credentials:'same-origin'})
-      .then(function(res){ return res.ok ? res.json() : []; })
-      .then(function(data){
-        if(Array.isArray(data)) return data;
-        if(data && Array.isArray(data.friends)) return data.friends;
-        if(data && Array.isArray(data.items)) return data.items;
-        if(data && typeof data === 'object'){
-          return Object.keys(data).map(function(k){ return data[k]; }).filter(function(v){ return v && typeof v === 'object'; });
-        }
-        return [];
-      })
-      .catch(function(e){
-        console.warn('[friend-galaxy:' + VERSION + '] public JSON 读取失败', e);
-        return [];
-      });
-  }
-
-  function text(value, fallback){
-    var s = clean(value);
-    return s || fallback || '';
-  }
-
-  function shortText(value, max){
-    var s = clean(value).replace(/\s+/g, ' ');
-    if(!s) return '这个朋友还没有写简介。';
-    return s.length > max ? s.slice(0, max).trim() + '…' : s;
-  }
-
-  function dateText(value){
-    var s = clean(value);
-    if(!s) return '最近更新 —';
-    var m = s.match(/^(\d{4}-\d{2}-\d{2})/);
-    return '最近更新 ' + (m ? m[1] : s.slice(0, 10));
-  }
-
-  function safeImg(img, src){
-    if(!img) return;
-    img.onerror = function(){
-      if(img.getAttribute('src') !== '/uploads/admin/main_logo.png') img.src = '/uploads/admin/main_logo.png';
-    };
-    img.src = src || '/uploads/admin/main_logo.png';
-  }
-
-  function escapeHtml(s){
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-
-  function compactKey(value){
-    return normalize(value).replace(/\s+/g, '-');
-  }
-
-  function isSystemFriendRaw(f){
-    f = f || {};
-    function pick(){
-      for(var i = 0; i < arguments.length; i++){
-        if(arguments[i] in f) return f[arguments[i]];
-      }
-      var lower = {};
-      Object.keys(f).forEach(function(k){ lower[String(k).toLowerCase()] = k; });
-      for(var j = 0; j < arguments.length; j++){
-        var kk = lower[String(arguments[j]).toLowerCase()];
-        if(kk) return f[kk];
-      }
-      return '';
-    }
-    var username = compactKey(pick('username','Username'));
-    var id = compactKey(pick('id','ID'));
-    var slug = compactKey(pick('slug','Slug'));
-    var nameRaw = clean(pick('name','Name','display_name','DisplayName','displayName','title','Title'));
-    var name = compactKey(nameRaw);
-    var role = compactKey(pick('role','Role'));
-    var accountType = compactKey(pick('account_type','AccountType','type','Type'));
-
-    var exactSystem = {
-      'admin': true,
-      'root': true,
-      'system': true,
-      'notice': true,
-      'announcement': true,
-      'announcer': true,
-      'gonggao': true,
-      'bot': true,
-      'site-admin': true,
-      'site-admins': true,
-      'manager': true,
-      'test': true,
-      'tests': true,
-      'demo': true,
-      'dummy': true,
-      'sample': true,
-      'ceshi': true,
-      'test-user': true,
-      'demo-user': true
-    };
-    if(exactSystem[username] || exactSystem[id] || exactSystem[slug]) return true;
-    if(accountType === 'system' || role === 'system' || role === 'announcer' || role === 'notice' || role === 'gonggao') return true;
-    if(/^(管理员|公告员|公告|系统|系统账号|站点公告|测试|测试账号|测试用户|临时账号|测试用户)$/.test(nameRaw)) return true;
-    if(/管理员|公告员|系统账号|测试账号|临时账号/.test(nameRaw)) return true;
-    return false;
-  }
-
-  function normalizeFriends(raw){
-    var used = Object.create(null);
-    var friends = [];
-    (raw || []).forEach(function(f, index){
-      f = f || {};
-      if(isSystemFriendRaw(f)) return;
-      var username = text(f.username || f.Username);
-      var name = text(f.name || f.Name || f.display_name || f.DisplayName || f.displayName, username || ('朋友 ' + (index + 1)));
-      var id = text(f.id || f.ID || f.slug || f.Slug || username || name);
-      id = slugify(id);
-      var base = id, n = 1;
-      while(used[id]){ n++; id = base + '-' + n; }
-      used[id] = true;
-      var slug = text(f.slug || f.Slug, id);
-      var links = arrayOf(f.links || f.Links || f.relations || f.Relations || f.friends || f.Friends);
-      friends.push({
-        index: friends.length,
-        id: id,
-        slug: slugify(slug),
-        username: username,
-        name: name,
-        bio: text(f.bio || f.Bio, '这个朋友还没有写简介。'),
-        avatar: toUrl(f.avatar || f.Avatar, '/uploads/admin/main_logo.png'),
-        href: toUrl(f.url || f.URL || f.href || f.Href, '/friends/' + slugify(slug) + '/'),
-        count: Number(f.post_count || f.postCount || f.PostCount || 0),
-        updated: text(f.updated_at || f.updatedAt || f.UpdatedAt),
-        titles: arrayOf(f.post_titles || f.postTitles || f.PostTitles),
-        links: links.map(slugify)
-      });
-    });
-    return friends;
-  }
-
-  function installStage(shell){
-    var oldStage = shell.querySelector('[data-galaxy-stage]') || shell.querySelector('.friend-galaxy-stage');
-    if(!oldStage) return null;
-
-    var profile = oldStage.querySelector('[data-galaxy-profile]');
-    var centerOpen = oldStage.querySelector('[data-center-open]');
-    var centerAvatar = oldStage.querySelector('[data-center-avatar]');
-    var centerName = oldStage.querySelector('[data-center-name]');
-    var centerBio = oldStage.querySelector('[data-center-bio]');
-    var centerCount = oldStage.querySelector('[data-center-count]');
-    var centerUpdated = oldStage.querySelector('[data-center-updated]');
-    var centerLink = oldStage.querySelector('[data-center-link]');
-
-    oldStage.className = 'slv2004-stage slv2007-stage';
-    oldStage.setAttribute('data-slv2004-stage', '');
-    shell.setAttribute('data-friend-galaxy-ready', VERSION);
-    oldStage.innerHTML = '';
-
-    var lines = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    lines.setAttribute('class', 'slv2004-lines');
-    lines.setAttribute('data-slv2004-lines', '');
-    lines.setAttribute('aria-hidden', 'true');
-
-    var nodes = document.createElement('div');
-    nodes.className = 'slv2004-nodes';
-    nodes.setAttribute('data-slv2004-nodes', '');
-
-    if(!centerOpen){
-      centerOpen = document.createElement('button');
-      centerOpen.type = 'button';
-      centerOpen.setAttribute('data-center-open', '');
-      centerOpen.setAttribute('aria-label', '进入当前朋友主页');
-    }
-    // v20.0.8：清掉旧模板遗留的 friend-core-orbit / 旧头像结构，避免返回上一页时闪旧样式，也避免旧圆层造成错位。
-    var oldAvatar = centerAvatar || centerOpen.querySelector('[data-center-avatar]');
-    var avatarSrc = oldAvatar ? oldAvatar.getAttribute('src') : '';
-    var avatarAlt = oldAvatar ? oldAvatar.getAttribute('alt') : '';
-    centerOpen.className = 'slv2004-core';
-    centerOpen.setAttribute('data-slv2004-core', '');
-    centerOpen.type = 'button';
-    centerOpen.innerHTML = '<span class="slv2007-core-frame" aria-hidden="true"><img data-center-avatar alt=""></span>';
-    centerAvatar = centerOpen.querySelector('[data-center-avatar]');
-    if(avatarSrc) centerAvatar.src = avatarSrc;
-    if(avatarAlt) centerAvatar.alt = avatarAlt;
-
-    if(!profile){
-      profile = document.createElement('aside');
-      profile.setAttribute('data-galaxy-profile', '');
-      profile.innerHTML = '<h2 data-center-name></h2><p data-center-bio></p><div class="meta-row"><span data-center-count></span><span data-center-updated></span></div><a data-center-link href="/friends/">进入主页</a>';
-      centerName = profile.querySelector('[data-center-name]');
-      centerBio = profile.querySelector('[data-center-bio]');
-      centerCount = profile.querySelector('[data-center-count]');
-      centerUpdated = profile.querySelector('[data-center-updated]');
-      centerLink = profile.querySelector('[data-center-link]');
-    }
-    profile.className = 'slv2004-profile';
-    if(centerLink) centerLink.className = 'btn slv2004-center-link';
-
-    oldStage.appendChild(lines);
-    oldStage.appendChild(nodes);
-    oldStage.appendChild(centerOpen);
-    oldStage.appendChild(profile);
-
-    return {stage:oldStage, lineSvg:lines, nodeLayer:nodes, centerOpen:centerOpen, centerAvatar:centerAvatar || centerOpen.querySelector('[data-center-avatar]'), centerName:centerName || profile.querySelector('[data-center-name]'), centerBio:centerBio || profile.querySelector('[data-center-bio]'), centerCount:centerCount || profile.querySelector('[data-center-count]'), centerUpdated:centerUpdated || profile.querySelector('[data-center-updated]'), centerLink:centerLink || profile.querySelector('[data-center-link]')};
-  }
-
-  function initWithRaw(shell, raw){
-    var parts = installStage(shell);
-    if(!parts) return;
-
-    var stage = parts.stage;
-    var nodeLayer = parts.nodeLayer;
-    var lineSvg = parts.lineSvg;
-    var results = shell.querySelector('[data-galaxy-results]');
-    var input = shell.querySelector('#friendGalaxySearch');
-    var submitBtn = shell.querySelector('[data-friend-search-submit], .friend-search-submit');
-    var centerOpen = parts.centerOpen;
-    var centerAvatar = parts.centerAvatar;
-    var centerName = parts.centerName;
-    var centerBio = parts.centerBio;
-    var centerCount = parts.centerCount;
-    var centerUpdated = parts.centerUpdated;
-    var centerLink = parts.centerLink;
-
-    var friends = normalizeFriends(raw);
-    console.info('[friend-galaxy:' + VERSION + '] friends count =', friends.length);
-    shell.dataset.friendCount = String(friends.length);
-
-    var byKey = Object.create(null);
-    friends.forEach(function(f){
-      [f.id, f.slug, f.username, f.name].forEach(function(k){
-        var key = slugify(k);
-        if(key) byKey[key] = f.index;
-      });
-    });
-
-    var active = 0;
-    var nodes = [];
-    var positions = [];
-
-    function stageSize(){
-      var rect = stage.getBoundingClientRect();
-      var viewportMobile = window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
-      var w = Math.max(300, Math.round(rect.width || stage.clientWidth || 980));
-      var h = Math.max(viewportMobile ? 330 : 560, Math.round(rect.height || stage.clientHeight || (viewportMobile ? 320 : 700)));
-      var desktop = !viewportMobile && w >= 900;
+  function normalize(raw){
+    return (raw || []).map(function(item, index){
+      item = item || {};
+      var name = clean(item.name || item.display_name || item.displayName || item.username || ('朋友 ' + (index + 1)));
+      var id = key(item.id || item.slug || item.username || name);
       return {
-        w:w,
-        h:h,
-        desktop:desktop,
-        mobile:viewportMobile,
-        cx:desktop ? w * 0.36 : w * 0.50,
-        cy:desktop ? h * 0.46 : (viewportMobile ? h * 0.33 : h * 0.31),
-        reserveRight:desktop ? Math.min(430, Math.max(320, w * 0.36)) : 0
+        id:id,
+        index:index,
+        username:clean(item.username),
+        name:name,
+        bio:clean(item.bio) || '这个朋友还没有写简介。',
+        avatar:url(item.avatar, '/uploads/admin/main_logo.png'),
+        href:url(item.url || item.href, '/friends/' + encodeURIComponent(clean(item.slug || name)) + '/'),
+        count:Number(item.post_count || item.postCount || 0),
+        updated:date(item.updated_at || item.updatedAt),
+        links:toArray(item.links || item.relations)
       };
-    }
+    }).filter(function(friend){ return friend.id && !/^(admin|root|system|test|demo)$/.test(friend.id); });
+  }
+  function inlineData(){
+    var node = document.getElementById('friend-galaxy-data');
+    if(!node) return [];
+    try{ return JSON.parse(node.textContent || '[]'); }catch(e){ return []; }
+  }
+  function loadData(source, fallback){
+    if(!window.fetch || !source) return Promise.resolve(fallback);
+    return fetch(source, { credentials:'same-origin', cache:'no-store' })
+      .then(function(response){ return response.ok ? response.json() : fallback; })
+      .then(function(data){ return Array.isArray(data) && data.length ? data : fallback; })
+      .catch(function(){ return fallback; });
+  }
+  function escapeHtml(value){ return clean(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-    function setStatus(message, kind){
-      if(!results) return;
-      results.innerHTML = '';
-      var div = document.createElement('div');
-      div.className = 'friend-search-status' + (kind ? ' is-' + kind : '');
-      div.textContent = message;
-      results.appendChild(div);
-    }
+  function init(root){
+    root = root || document;
+    var shell = root.querySelector ? root.querySelector('[data-friend-galaxy]') : null;
+    if(!shell || shell.dataset.friendGalaxyReady === VERSION) return;
+    shell.dataset.friendGalaxyReady = VERSION;
 
-    function showEmpty(message){
-      nodeLayer.innerHTML = '<div class="slv2004-empty">' + escapeHtml(message) + '</div>';
-      setStatus(message, 'empty');
-    }
+    var fallback = inlineData();
+    loadData(shell.getAttribute('data-friends-src'), fallback).then(function(raw){ build(shell, normalize(raw)); });
+  }
+
+  function build(shell, friends){
+    var stage = shell.querySelector('[data-galaxy-stage]');
+    var lines = shell.querySelector('[data-galaxy-lines]');
+    var nodeLayer = shell.querySelector('[data-galaxy-nodes]');
+    var hoverCard = shell.querySelector('[data-galaxy-hover-card]');
+    var hoverAvatar = shell.querySelector('[data-hover-avatar]');
+    var hoverName = shell.querySelector('[data-hover-name]');
+    var hoverBio = shell.querySelector('[data-hover-bio]');
+    var core = shell.querySelector('[data-center-open]');
+    var coreImage = shell.querySelector('[data-center-avatar]');
+    var coreName = shell.querySelector('[data-center-name]');
+    var profile = shell.querySelector('[data-galaxy-profile]');
+    var profileName = shell.querySelector('[data-center-name-display]');
+    var profileBio = shell.querySelector('[data-center-bio]');
+    var profileCount = shell.querySelector('[data-center-count]');
+    var profileUpdated = shell.querySelector('[data-center-updated]');
+    var profileLink = shell.querySelector('[data-center-link]');
+    var empty = shell.querySelector('[data-galaxy-empty]');
+    var input = shell.querySelector('#friendGalaxySearch');
+    var submit = shell.querySelector('[data-friend-search-submit]');
+    var results = shell.querySelector('[data-galaxy-results]');
+    if(!stage || !lines || !nodeLayer || !core) return;
 
     if(!friends.length){
-      showEmpty('还没有朋友数据。请检查 data/friends.json 或 /friends-data.json。');
+      if(empty){ empty.hidden = false; empty.textContent = '还没有可显示的朋友数据。'; }
       return;
     }
 
-    function makeLine(x1, y1, x2, y2, cls){
-      var l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      l.setAttribute('x1', String(Math.round(x1)));
-      l.setAttribute('y1', String(Math.round(y1)));
-      l.setAttribute('x2', String(Math.round(x2)));
-      l.setAttribute('y2', String(Math.round(y2)));
-      l.setAttribute('class', cls || 'slv2004-line slv2004-center-line');
-      lineSvg.appendChild(l);
+    var host = friends.filter(function(friend){ return /^(songline|song-line)$/.test(friend.id) || friend.username.toLowerCase() === 'songline'; })[0] || friends[0];
+    var visibleFriends = friends.filter(function(friend){ return friend !== host; });
+    var byKey = Object.create(null);
+    friends.forEach(function(friend){ [friend.id, friend.username, friend.name].forEach(function(value){ if(key(value)) byKey[key(value)] = friend; }); });
+    var focused = host;
+    var selected = host;
+    var nodeById = Object.create(null);
+    var resizeFrame = 0;
+
+    // 星图通过百分比定位，但图片、字体和移动端可视视口会在首帧后继续稳定。
+    // 统一收敛到同一轮布局，保证 SVG 线端永远读取头像的最终圆心。
+    function scheduleLayout(){
+      window.cancelAnimationFrame(resizeFrame);
+      resizeFrame = window.requestAnimationFrame(layout);
+    }
+    function settleLayout(){
+      scheduleLayout();
+      window.requestAnimationFrame(scheduleLayout);
     }
 
-    function explicitEdges(arr){
-      var allow = Object.create(null);
-      arr.forEach(function(i){ allow[i] = true; });
+    function safeImage(image, source){
+      if(!image) return;
+      image.onerror = function(){ if(image.src.indexOf('/uploads/admin/main_logo.png') < 0) image.src = '/uploads/admin/main_logo.png'; };
+      image.onload = settleLayout;
+      image.src = source;
+    }
+    function setProfile(friend){
+      if(!friend) return;
+      focused = friend;
+      if(profileName) profileName.textContent = friend.name;
+      if(profileBio) profileBio.textContent = friend.bio;
+      if(profileCount) profileCount.textContent = friend.count + (friend.count === 1 ? ' POST' : ' POSTS');
+      if(profileUpdated) profileUpdated.textContent = 'LAST UPDATE · ' + friend.updated;
+      if(profileLink) profileLink.href = friend.href;
+      shell.dataset.focusedFriend = friend.id;
+      updateLineState(friend);
+    }
+    function showHoverCard(friend, anchor){
+      if(!hoverCard || !anchor) return;
+      safeImage(hoverAvatar, friend.avatar);
+      hoverAvatar.alt = friend.name;
+      hoverName.textContent = friend.name;
+      hoverBio.textContent = friend.bio;
+      hoverCard.hidden = false;
+      var stageRect = stage.getBoundingClientRect();
+      var anchorRect = anchor.getBoundingClientRect();
+      var cardWidth = hoverCard.offsetWidth || 280;
+      var cardHeight = hoverCard.offsetHeight || 98;
+      var onRight = anchorRect.left - stageRect.left > stageRect.width * 0.57;
+      var x = onRight ? anchorRect.left - stageRect.left - cardWidth - 18 : anchorRect.right - stageRect.left + 18;
+      var y = anchorRect.top - stageRect.top + anchorRect.height * .5 - cardHeight * .5;
+      x = Math.max(16, Math.min(stageRect.width - cardWidth - 16, x));
+      y = Math.max(16, Math.min(stageRect.height - cardHeight - 16, y));
+      hoverCard.style.left = Math.round(x) + 'px';
+      hoverCard.style.top = Math.round(y) + 'px';
+    }
+    function hideHoverCard(){ if(hoverCard) hoverCard.hidden = true; }
+    function setHost(){
+      safeImage(coreImage, host.avatar);
+      if(coreName) coreName.textContent = host.name;
+      core.onclick = function(){ window.location.href = host.href; };
+      core.addEventListener('pointerenter', function(){ showHoverCard(host, core); });
+      core.addEventListener('pointerleave', hideHoverCard);
+      core.addEventListener('focus', function(){ showHoverCard(host, core); });
+      core.addEventListener('blur', hideHoverCard);
+    }
+    function edgeFor(a, b){ return [a.id, b.id].sort().join(':'); }
+    function configuredEdges(){
       var edges = [];
       var seen = Object.create(null);
-      function add(a, b, cls){
-        if(a === b || !allow[a] || !allow[b]) return;
-        var k = a < b ? a + ':' + b : b + ':' + a;
-        if(seen[k]) return;
-        seen[k] = true;
-        edges.push([a, b, cls || 'slv2004-line slv2004-web-line is-explicit']);
+      function add(a, b){
+        if(!a || !b || a === b) return;
+        var edge = edgeFor(a,b);
+        if(seen[edge]) return;
+        seen[edge] = true;
+        edges.push([a,b]);
       }
-      friends.forEach(function(f, i){
-        if(!f.links || !f.links.length) return;
-        f.links.forEach(function(link){
-          var target = byKey[slugify(link)];
-          if(typeof target === 'number') add(i, target, 'slv2004-line slv2004-web-line is-explicit');
-        });
-      });
+      CONSTELLATION_EDGES.forEach(function(pair){ add(byKey[key(pair[0])], byKey[key(pair[1])]); });
+      friends.forEach(function(friend){ friend.links.forEach(function(target){ add(friend, byKey[key(target)]); }); });
+      // 没有关系数据时，维持一个稀疏、非放射的星座链。
+      if(!edges.length){
+        var chain = [host].concat(visibleFriends);
+        chain.forEach(function(friend, index){ if(index) add(chain[index - 1], friend); });
+        if(chain.length > 3) add(chain[0], chain[Math.min(3, chain.length - 1)]);
+      }
       return edges;
     }
+    var edges = configuredEdges();
 
     function createNodes(){
       nodeLayer.innerHTML = '';
-      nodes = friends.map(function(f){
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'slv2004-node';
-        btn.dataset.index = String(f.index);
-        btn.dataset.friendId = f.id;
-        btn.dataset.friendName = f.name;
-        btn.dataset.friendUsername = f.username;
-        btn.setAttribute('aria-label', '聚焦朋友：' + f.name);
-        btn.innerHTML = '<span class="slv2004-node-ring" aria-hidden="true"></span><img alt=""><span class="slv2004-node-name"></span>';
-        safeImg(btn.querySelector('img'), f.avatar);
-        btn.querySelector('.slv2004-node-name').textContent = f.name;
-        btn.addEventListener('click', function(e){
-          e.preventDefault();
-          e.stopPropagation();
-          if(active === f.index) window.location.href = f.href;
-          else setCenter(f.index, {result:true});
+      visibleFriends.forEach(function(friend, index){
+        var node = document.createElement('button');
+        node.type = 'button';
+        node.className = 'friends-constellation__node';
+        node.dataset.friendId = friend.id;
+        node.dataset.position = String(index);
+        node.setAttribute('aria-label', '查看 ' + friend.name + ' 的星图标注');
+        node.innerHTML = '<span class="friends-constellation__node-halo" aria-hidden="true"></span><img alt=""><span class="friends-constellation__node-name"></span>';
+        safeImage(node.querySelector('img'), friend.avatar);
+        node.querySelector('.friends-constellation__node-name').textContent = friend.name;
+        // 不以 hover media query 判断设备：二合一设备也可能连接鼠标。
+        node.addEventListener('pointerenter', function(){ setProfile(friend); showHoverCard(friend, node); });
+        node.addEventListener('pointerleave', function(){ setProfile(selected); hideHoverCard(); });
+        node.addEventListener('focus', function(){ setProfile(friend); showHoverCard(friend, node); });
+        node.addEventListener('blur', function(){ if(!isTouch()){ setProfile(selected); hideHoverCard(); } });
+        node.addEventListener('click', function(event){
+          event.preventDefault();
+          if(selected === friend){ window.location.href = friend.href; return; }
+          selected = friend;
+          setProfile(friend);
+          showHoverCard(friend, node);
+          node.classList.add('is-selected');
+          Object.keys(nodeById).forEach(function(id){ nodeById[id].classList.toggle('is-selected', id === friend.id); });
         });
-        nodeLayer.appendChild(btn);
-        return btn;
+        nodeLayer.appendChild(node);
+        nodeById[friend.id] = node;
       });
     }
-
+    function isTouch(){ return window.matchMedia && window.matchMedia('(hover: none)').matches; }
+    function presetFor(index){
+      var presets = window.matchMedia && window.matchMedia('(max-width: 760px)').matches ? MOBILE_POSITIONS : DESKTOP_POSITIONS;
+      if(index < presets.length) return presets[index];
+      var angle = (-Math.PI / 2) + (index * (Math.PI * 2 / Math.max(visibleFriends.length, 1)));
+      return [50 + Math.cos(angle) * 34, 50 + Math.sin(angle) * 32];
+    }
+    function positionNodes(){
+      visibleFriends.forEach(function(friend, index){
+        var node = nodeById[friend.id];
+        var point = presetFor(index);
+        node.style.left = point[0] + '%';
+        node.style.top = point[1] + '%';
+      });
+    }
+    function drawLines(){
+      var stageRect = stage.getBoundingClientRect();
+      // 过场期间 main 会缩放；getBoundingClientRect 会得到缩放后的视觉尺寸，
+      // 而 SVG viewBox 必须使用未缩放的布局尺寸。否则过场结束后节点已回到
+      // 正常大小，连线仍停留在缩小后的坐标系中。
+      var layoutWidth = stage.clientWidth || stageRect.width;
+      var layoutHeight = stage.clientHeight || stageRect.height;
+      if(!stageRect.width || !stageRect.height || !layoutWidth || !layoutHeight) return;
+      lines.setAttribute('viewBox', '0 0 ' + Math.round(layoutWidth) + ' ' + Math.round(layoutHeight));
+      lines.innerHTML = '';
+      var centers = Object.create(null);
+      centers[host.id] = centerOf(core, stageRect, layoutWidth, layoutHeight);
+      visibleFriends.forEach(function(friend){ centers[friend.id] = centerOf(nodeById[friend.id], stageRect, layoutWidth, layoutHeight); });
+      edges.forEach(function(edge){
+        var from = centers[edge[0].id], to = centers[edge[1].id];
+        if(!from || !to) return;
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', Math.round(from.x)); line.setAttribute('y1', Math.round(from.y));
+        line.setAttribute('x2', Math.round(to.x)); line.setAttribute('y2', Math.round(to.y));
+        line.setAttribute('data-edge', edgeFor(edge[0], edge[1]));
+        line.setAttribute('class', 'friends-constellation__line');
+        lines.appendChild(line);
+      });
+      updateLineState(focused);
+    }
+    function centerOf(element, container, layoutWidth, layoutHeight){
+      if(!element) return null;
+      // 线必须命中可见头像圆心，而不是包含文字标签的 button 外框中心。
+      var visual = element.querySelector('img') || element;
+      var rect = visual.getBoundingClientRect();
+      return {
+        x:(rect.left - container.left + rect.width / 2) * layoutWidth / container.width,
+        y:(rect.top - container.top + rect.height / 2) * layoutHeight / container.height
+      };
+    }
+    function updateLineState(friend){
+      Array.prototype.forEach.call(lines.querySelectorAll('[data-edge]'), function(line){
+        var related = line.getAttribute('data-edge').split(':').indexOf(friend.id) >= 0;
+        line.classList.toggle('is-related', related);
+      });
+      Object.keys(nodeById).forEach(function(id){ nodeById[id].classList.toggle('is-related', id === friend.id); });
+    }
     function layout(){
-      var s = stageSize();
-      lineSvg.setAttribute('viewBox', '0 0 ' + s.w + ' ' + s.h);
-      lineSvg.setAttribute('width', String(s.w));
-      lineSvg.setAttribute('height', String(s.h));
-      lineSvg.innerHTML = '';
-      positions = friends.map(function(){ return {x:s.cx, y:s.cy}; });
-      centerOpen.style.left = Math.round(s.cx) + 'px';
-      centerOpen.style.top = Math.round(s.cy) + 'px';
-
-      var arr = friends.map(function(f){ return f.index; }).filter(function(i){ return i !== active; });
-      var count = arr.length;
-      var usableW = Math.max(260, s.w - s.reserveRight);
-      var base = Math.min(usableW, s.h);
-      var rx = base * (s.desktop ? 0.34 : (s.mobile ? 0.30 : 0.30));
-      var ry = base * (s.desktop ? 0.30 : (s.mobile ? 0.22 : 0.25));
-
-      function hashSeed(str){
-        var h = 2166136261;
-        str = String(str || '');
-        for(var i = 0; i < str.length; i++){
-          h ^= str.charCodeAt(i);
-          h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
-        }
-        return (h >>> 0) / 4294967295;
-      }
-
-      var anchorsDesktop = [-2.34, -1.82, -1.28, -0.76, -0.18, 0.56, 1.18, 1.82, 2.44];
-      var anchorsMobile  = [-2.18, -1.52, -0.96, -0.42, 0.28, 0.92, 1.46, 2.08];
-      var anchors = (s.desktop ? anchorsDesktop : anchorsMobile).slice();
-      if(count > anchors.length){
-        for(var extra = anchors.length; extra < count; extra++){
-          anchors.push(-Math.PI + (Math.PI * 2 * (extra + 0.5) / count));
-        }
-      }
-      arr.sort(function(a, b){
-        var sa = hashSeed(friends[a].id + ':' + friends[a].name);
-        var sb = hashSeed(friends[b].id + ':' + friends[b].name);
-        return sa - sb;
-      });
-      arr.forEach(function(index, pos){
-        var f = friends[index];
-        var seed = hashSeed(f.id + ':' + f.name + ':' + pos);
-        var angle = anchors[pos % anchors.length];
-        angle += (seed - 0.5) * (s.desktop ? 0.30 : 0.22);
-        var radial = 0.84 + seed * 0.28 + ((pos % 3) - 1) * 0.04;
-        var localRx = rx * radial;
-        var localRy = ry * (0.88 + (1 - seed) * 0.22);
-        var driftX = (seed - 0.5) * (s.desktop ? 22 : 14);
-        var driftY = (0.5 - seed) * (s.desktop ? 18 : 12) + (pos % 2 ? 8 : -6);
-        var x = s.cx + Math.cos(angle) * localRx + driftX;
-        var y = s.cy + Math.sin(angle) * localRy + driftY;
-        var maxX = Math.max(88, s.w - 88 - s.reserveRight);
-        x = Math.max(84, Math.min(maxX, x));
-        y = Math.max(82, Math.min(s.h - 118, y));
-        positions[index] = {x:x, y:y};
-      });
-
-      nodes.forEach(function(el, index){
-        var isActive = index === active;
-        var p = positions[index] || {x:s.cx, y:s.cy};
-        el.classList.toggle('is-active', isActive);
-        el.classList.remove('is-search-hit');
-        if(isActive){
-          el.style.display = 'none';
-          el.style.visibility = 'hidden';
-          el.style.opacity = '0';
-          el.style.pointerEvents = 'none';
-        }else{
-          el.style.display = 'flex';
-          el.style.visibility = 'visible';
-          el.style.opacity = '1';
-          el.style.pointerEvents = 'auto';
-          el.style.left = Math.round(p.x) + 'px';
-          el.style.top = Math.round(p.y) + 'px';
-          el.style.transform = 'translate(-50%,-50%) scale(' + (s.mobile ? '0.46' : '1') + ')';
-        }
-      });
-
-      arr.forEach(function(index){
-        var p = positions[index];
-        if(p) makeLine(s.cx, s.cy, p.x, p.y, 'slv2004-line slv2004-center-line');
-      });
-      explicitEdges(arr.concat([active])).forEach(function(edge){
-        var a = positions[edge[0]], b = positions[edge[1]];
-        if(a && b) makeLine(a.x, a.y, b.x, b.y, edge[2]);
-      });
-      if(arr.length > 2){
-        arr.forEach(function(index, i){
-          var next = arr[(i + 1) % arr.length];
-          var a = positions[index], b = positions[next];
-          if(a && b) makeLine(a.x, a.y, b.x, b.y, 'slv2004-line slv2004-web-line is-fallback');
-        });
-      }
-      if(arr.length > 4){
-        arr.forEach(function(index, i){
-          if(i % 2) return;
-          var next = arr[(i + 2) % arr.length];
-          var a = positions[index], b = positions[next];
-          if(a && b) makeLine(a.x, a.y, b.x, b.y, 'slv2004-line slv2004-web-line is-dim is-fallback');
-        });
-      }
+      if(!stage.isConnected) return;
+      positionNodes();
+      window.requestAnimationFrame(drawLines);
     }
-
-    function setCenter(index, opts){
-      opts = opts || {};
-      index = Math.max(0, Math.min(friends.length - 1, Number(index) || 0));
-      active = index;
-      var f = friends[active];
-      safeImg(centerAvatar, f.avatar);
-      if(centerAvatar) centerAvatar.alt = f.name;
-      if(centerName) centerName.textContent = f.name;
-      if(centerBio){ centerBio.textContent = shortText(f.bio, 88); centerBio.title = f.bio; }
-      if(centerCount) centerCount.textContent = '文章 ' + (f.count || 0) + ' 篇';
-      if(centerUpdated) centerUpdated.textContent = dateText(f.updated);
-      if(centerLink) centerLink.href = f.href;
-      centerOpen.onclick = function(e){ e.preventDefault(); window.location.href = f.href; };
-      shell.classList.remove('friend-search-not-found');
-      stage.classList.remove('is-switching');
-      void stage.offsetWidth;
-      stage.classList.add('is-switching');
-      window.clearTimeout(stage.__switchTimer);
-      stage.__switchTimer = window.setTimeout(function(){ stage.classList.remove('is-switching'); }, 360);
-      layout();
-      if(opts.result !== false) renderDefaultResults();
-    }
-
-    function scoreFriend(q){
-      var phrase = normalize(q);
-      if(!phrase) return [];
-      var terms = phrase.split(' ').filter(Boolean);
-      return friends.map(function(f){
-        var name = normalize(f.name);
-        var username = normalize(f.username);
-        var id = normalize(f.id + ' ' + f.slug);
-        var hay = [name, username, id].join(' ');
-        var score = 0;
-        if(name === phrase) score += 1200;
-        if(username === phrase) score += 1100;
-        if(id === phrase) score += 1000;
-        if(name.indexOf(phrase) >= 0) score += 800;
-        if(username.indexOf(phrase) >= 0) score += 760;
-        if(id.indexOf(phrase) >= 0) score += 720;
-        if(terms.length && terms.every(function(t){ return hay.indexOf(t) >= 0; })) score += 450;
-        return {friend:f, score:score};
-      }).filter(function(x){ return x.score > 0; }).sort(function(a,b){
-        return b.score - a.score || b.friend.count - a.friend.count || a.friend.index - b.friend.index;
-      });
-    }
-
-    function renderResultList(matches, q){
+    function renderSearch(){
+      var query = clean(input && input.value).toLowerCase();
       if(!results) return;
       results.innerHTML = '';
-      var status = document.createElement('div');
-      status.className = 'friend-search-status';
-      status.textContent = q ? ('搜索“' + clean(q) + '”：找到 ' + matches.length + ' 位朋友') : ('共 ' + friends.length + ' 位朋友');
+      if(!query) return;
+      var matches = friends.filter(function(friend){ return [friend.name, friend.username, friend.id].join(' ').toLowerCase().indexOf(query) >= 0; });
+      var status = document.createElement('p');
+      status.textContent = matches.length ? ('定位到 ' + matches.length + ' 颗星') : '没有找到对应的星';
       results.appendChild(status);
-      matches.forEach(function(item){
-        var f = item.friend || item;
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'friend-result' + (f.index === active ? ' is-current' : '');
-        btn.innerHTML = '<img alt=""><span><b></b><small></small></span><em></em>';
-        safeImg(btn.querySelector('img'), f.avatar);
-        btn.querySelector('b').textContent = f.name;
-        btn.querySelector('small').textContent = shortText(f.bio, 28) + ' · ' + f.count + ' 篇文章';
-        btn.querySelector('em').textContent = f.index === active ? '当前' : '聚焦';
-        btn.addEventListener('click', function(e){ e.preventDefault(); setCenter(f.index, {result:true}); });
-        results.appendChild(btn);
+      matches.forEach(function(friend){
+        var item = document.createElement('button');
+        item.type = 'button'; item.className = 'friends-constellation__search-result';
+        item.innerHTML = '<span></span><small></small>';
+        item.querySelector('span').textContent = friend.name;
+        item.querySelector('small').textContent = friend.username || 'FRIEND';
+        item.onclick = function(){
+          selected = friend;
+          setProfile(friend);
+          if(nodeById[friend.id]) nodeById[friend.id].focus();
+        };
+        results.appendChild(item);
       });
-    }
-
-    function renderDefaultResults(){
-      renderResultList(friends.map(function(f){ return {friend:f, score:1}; }), '');
-    }
-
-    function notFound(){
-      shell.classList.add('friend-search-not-found');
-      nodes.forEach(function(n){ n.classList.remove('is-search-hit'); });
-      if(results) results.innerHTML = '<div class="friend-search-status is-not-found">不存在该用户</div>';
-      layout();
-    }
-
-    function doSearch(e){
-      if(e){ e.preventDefault(); e.stopPropagation(); }
-      var q = input ? input.value : '';
-      if(window.SonglineSearchRefresh) window.SonglineSearchRefresh('搜索朋友中');
-      shell.classList.remove('friend-search-not-found');
-      nodes.forEach(function(n){ n.classList.remove('is-search-hit'); });
-      if(!normalize(q)){
-        setCenter(active, {result:false});
-        renderDefaultResults();
-        return;
-      }
-      var found = scoreFriend(q);
-      if(!found.length){ notFound(); return; }
-      var f = found[0].friend;
-      if(nodes[f.index]) nodes[f.index].classList.add('is-search-hit');
-      setCenter(f.index, {result:false});
-      renderResultList(found, q);
-      if(results) results.scrollIntoView({behavior:'smooth', block:'nearest'});
-    }
-
-    function reset(e){
-      if(e){ e.preventDefault(); e.stopPropagation(); }
-      if(input) input.value = '';
-      shell.classList.remove('friend-search-not-found');
-      nodes.forEach(function(n){ n.classList.remove('is-search-hit'); });
-      setCenter(active, {result:false});
-      renderDefaultResults();
-      if(window.SonglineSearchRefresh) window.SonglineSearchRefresh('已重置');
-    }
-
-    if(submitBtn){
-      submitBtn.setAttribute('data-no-page-loading', '');
-      submitBtn.onclick = doSearch;
-    }
-    if(input){
-      input.onkeydown = function(e){
-        if(e.key === 'Enter') doSearch(e);
-        else if(e.key === 'Escape') reset(e);
-      };
-      input.onsearch = function(e){ if(!input.value) reset(e); };
     }
 
     createNodes();
-    setCenter(0, {result:false});
-    renderDefaultResults();
-
-    function revealAfterStableLayout(){
-      layout();
-      if(window.requestAnimationFrame){
+    setHost();
+    setProfile(host);
+    settleLayout();
+    if(window.ResizeObserver) new ResizeObserver(scheduleLayout).observe(stage);
+    else window.addEventListener('resize', scheduleLayout, {passive:true});
+    if(window.visualViewport) window.visualViewport.addEventListener('resize', scheduleLayout, {passive:true});
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(settleLayout);
+    if(document.readyState === 'complete') settleLayout();
+    else window.addEventListener('load', settleLayout, {once:true});
+    // main 的入场只影响合成层，ResizeObserver 不会感知它结束；在最终帧再对齐一次。
+    window.addEventListener('songline:page-transition-end', function(){
+      if(!stage.isConnected) return;
+      window.requestAnimationFrame(function(){
         window.requestAnimationFrame(function(){
           layout();
-          window.requestAnimationFrame(function(){
-            layout();
-            shell.classList.remove('slv2010-booting');
-            shell.classList.add('slv2010-ready');
-          });
+          window.setTimeout(layout, 48);
         });
-      }else{
-        window.setTimeout(function(){
-          layout();
-          shell.classList.remove('slv2010-booting');
-          shell.classList.add('slv2010-ready');
-        }, 80);
-      }
-    }
-
-    revealAfterStableLayout();
-    window.addEventListener('resize', layout);
-    window.addEventListener('pageshow', function(evt){
-      if(evt && evt.persisted){
-        shell.classList.add('slv2010-booting');
-        shell.classList.remove('slv2010-ready');
-        revealAfterStableLayout();
-      }
+      });
     });
-    window.setTimeout(layout, 240);
-
-    window.SonglineFriendGalaxySearch = doSearch;
-    window.SonglineFriendGalaxyReset = reset;
-  }
-
-  function init(){
-    var shell = document.querySelector('[data-friend-galaxy]');
-    if(!shell) return;
-    ensureStylesheet();
-    if(shell.dataset.friendGalaxyReady === VERSION) return;
-    shell.dataset.friendGalaxyReady = VERSION;
-    shell.classList.add('slv2010-booting');
-    shell.classList.remove('slv2010-ready');
-
-    var inline = parseInlineFriends();
-    var src = shell.getAttribute('data-friends-src') || '/friends-data.json?v=20.3.5';
-    fetchJson(src).then(function(publicData){
-      var raw = publicData.length >= inline.length ? publicData : inline;
-      console.info('[friend-galaxy:' + VERSION + '] 数据选择 public=', publicData.length, 'inline=', inline.length, 'using=', raw.length);
-      initWithRaw(shell, raw);
-    });
+    if(submit) submit.addEventListener('click', renderSearch);
+    if(input){ input.addEventListener('input', renderSearch); input.addEventListener('keydown', function(event){ if(event.key === 'Enter') renderSearch(); }); }
   }
 
   window.SonglineInitFriendGalaxy = init;
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ init(document); }, {once:true});
+  else init(document);
+  window.addEventListener('songline:page-swap', function(event){ init((event.detail && event.detail.root) || document); });
 })();

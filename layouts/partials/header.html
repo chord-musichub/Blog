@@ -5,17 +5,17 @@
       {{ with $cfg.site.logo_icon }}<img class="logo-icon" src="{{ . }}" alt="" loading="lazy">{{ else }}<span class="logo-mark line-logo-mark">{{ partial "ui-icon.html" "logo" }}</span>{{ end }}
       <span class="logo-text">{{ default "Songline Blog" $cfg.site.logo }}</span>
     </a>
-    <nav class="nav-links modern-nav-links" aria-label="主导航">
-      <span class="songline-nav-slider" aria-hidden="true"></span>
-      <a href="/" class="{{ if .IsHome }}active{{ end }}">首页</a>
-      <a href="/posts/" class="{{ if or (eq .Section "posts") (and (eq .Kind "page") (eq .Section "posts")) }}active{{ end }}">文章</a>
-      <a href="/tags/" class="{{ if eq .Data.Plural "tags" }}active{{ end }}">标签</a>
-      <a href="/friends/" class="{{ if or (eq .Section "friends") (eq .RelPermalink "/friends/") (hasPrefix .RelPermalink "/friends/") }}active{{ end }}">朋友</a>
-      <a href="/tools/" class="{{ if eq .Section "tools" }}active{{ end }}">工具</a>
+    <nav class="nav-links modern-nav-links songline-elevator-nav" aria-label="站点楼层导航" data-elevator-nav>
+      <span class="songline-elevator-rail" aria-hidden="true"></span>
+      {{ range where (partial "page-navigation-data.html" .) "visible" true }}
+      <a href="{{ .route }}" data-page-key="{{ .key }}" data-floor="{{ .floor }}" aria-label="{{ .label }}，{{ .floor }}层">
+        <span class="songline-elevator-floor">{{ .floor }}</span>
+        <span class="songline-elevator-name">{{ .system_label }}</span>
+      </a>
+      {{ end }}
     </nav>
     <div class="header-icons">
-      <a class="icon-btn header-submit-link" href="/write/" aria-label="投稿" title="投稿">投稿</a>
-      <a class="icon-btn" href="/posts/" aria-label="搜索">{{ partial "ui-icon.html" "search" }}</a>
+      <a class="icon-btn header-submit-link" href="/write/" aria-label="投稿" title="投稿">{{ partial "ui-icon.html" "upload" }}</a>
       <button class="icon-btn" data-theme-toggle type="button" aria-label="切换深色模式">{{ partial "ui-icon.html" "moon" }}</button>
     </div>
   </div>
