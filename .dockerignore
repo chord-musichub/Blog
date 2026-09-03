@@ -4,9 +4,6 @@
 .env.*
 data/*
 !data/
-!data/tools-local.json
-!data/tools-external.json
-!data/friends-external.json
 content/posts/
 content/friends/
 content/tags/

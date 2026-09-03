@@ -2,7 +2,8 @@
 {{- $posts := where .Site.RegularPages "Section" "posts" -}}
 {{- $tagTax := index .Site.Taxonomies "tags" -}}
 {{- $localFriends := .Site.Data.friends | default slice -}}
-{{- $externalFriends := (index .Site.Data "friends-external") | default slice -}}
+{{- $externalFriends := slice -}}
+{{- with resources.Get "data/friends-external.json" }}{{ $externalFriends = . | transform.Unmarshal }}{{ end -}}
 {{- $publicFriends := $localFriends | append $externalFriends -}}
 {{- $lastPost := first 1 $posts -}}
 {{- $recommendable := where $posts ".Params.is_notice" "ne" true -}}

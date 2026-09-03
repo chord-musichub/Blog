@@ -1,8 +1,5 @@
 # 私有运行数据：文章、用户、站点设置、成绩等
 /data/*
-!/data/tools-local.json
-!/data/tools-external.json
-!/data/friends-external.json
 
 # 本地文章和自动生成的内容页面
 /content/posts/
