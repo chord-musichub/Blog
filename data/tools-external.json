@@ -1,0 +1,20 @@
+[
+    {
+        "icon_url": "https://www.google.com/s2/favicons?domain=www.edclub.com&sz=64",
+        "title": "edclub",
+        "desc": "一个非常高效的打字练习网站",
+        "href": "https://www.edclub.com/"
+    },
+    {
+        "icon_url": "https://www.google.com/s2/favicons?domain=www.runoob.com/cmake/cmake-tutorial.html&sz=64",
+        "title": "cmake-tutorial",
+        "desc": "CMake学习网站",
+        "href": "https://www.runoob.com/cmake/cmake-tutorial.html"
+    },
+    {
+        "icon_url": "https://www.google.com/s2/favicons?domain=app.diagrams.net/&sz=64",
+        "title": "draw.io",
+        "desc": "流程图绘图网站",
+        "href": "https://app.diagrams.net/"
+    }
+]

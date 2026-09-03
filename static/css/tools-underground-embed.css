@@ -1,0 +1,64 @@
+/* 工具条目直接嵌入地下场景，不额外铺设卡片或列表底板。 */
+body[data-page-layout=tools] .tools-grid {
+  background: none !important;
+}
+
+body[data-page-layout=tools] .tools-grid .tool-card,
+body[data-page-layout=tools] .tools-grid .tool-card[data-tool-side=left],
+body[data-page-layout=tools] .tools-grid .tool-card[data-tool-side=right] {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-bottom-color: rgba(255, 225, 174, .2) !important;
+}
+
+body[data-page-layout=tools] .tools-grid .tool-card h2 {
+  text-shadow: 0 1px 7px rgba(24, 8, 1, .82) !important;
+}
+
+body[data-page-layout=tools] .tools-grid .tool-card p {
+  color: rgba(255, 238, 209, .88) !important;
+  text-shadow: 0 1px 5px rgba(35, 12, 2, .72);
+}
+
+body[data-page-layout=tools] .tools-grid .tool-card:hover,
+body[data-page-layout=tools] .tools-grid .tool-card:focus-visible,
+body[data-page-layout=tools] .tools-grid .tool-card[data-tool-side=right]:hover,
+body[data-page-layout=tools] .tools-grid .tool-card[data-tool-side=right]:focus-visible {
+  background: rgba(68, 28, 6, .18) !important;
+}
+
+body[data-page-layout=tools] .tools-grid .tool-card:hover,
+body[data-page-layout=tools] .tools-grid .tool-card:focus-visible {
+  box-shadow: inset 3px 0 rgba(126, 220, 89, .78) !important;
+}
+
+body[data-page-layout=tools] .tools-grid .tool-card[data-tool-side=right]:hover,
+body[data-page-layout=tools] .tools-grid .tool-card[data-tool-side=right]:focus-visible {
+  box-shadow: inset -3px 0 rgba(126, 220, 89, .78) !important;
+}
+
+body[data-page-layout=tools] .tools-search-station {
+  border-color: rgba(255, 226, 173, .14) !important;
+  background: rgba(45, 16, 3, .24) !important;
+  box-shadow: none !important;
+}
+
+/* 去除仍会制造前后层次的地下容器与检索外框。 */
+html:root body[data-page-layout=tools] .tools-underground {
+  margin-inline: 0 !important;
+  border: 0 !important;
+  background: none !important;
+}
+
+body[data-page-layout=tools] .tools-underground::before,
+body[data-page-layout=tools] .tools-underground::after,
+body[data-page-layout=tools] .tools-grid::before {
+  display: none !important;
+}
+
+body[data-page-layout=tools] .tools-search-station {
+  border: 0 !important;
+  background: transparent !important;
+}

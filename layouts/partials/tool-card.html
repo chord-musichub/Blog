@@ -1,7 +1,8 @@
 {{ $class := default "" .class }}
-<a class="card tool-card tool-link-card{{ with $class }} {{ . }}{{ end }}" href="{{ .href }}"{{ with .attrs }} {{ . | safeHTMLAttr }}{{ end }}>
-  <div class="tool-card-icon">{{ .icon }}</div>
-  <div>
+<a class="tool-card tool-link-card{{ with $class }} {{ . }}{{ end }}" href="{{ .href }}" data-tool-node data-tool-side="{{ default "left" .side }}" data-tool-index="{{ default 0 .index }}"{{ with .id }} data-tool-id="{{ . }}"{{ end }}{{ with .keywords }} data-tool-keywords="{{ delimit . " " }}"{{ end }}>
+  <span class="tool-node-connector" aria-hidden="true"><i></i></span>
+  <div class="tool-card-icon">{{ with .icon_url }}<img src="{{ . }}" alt="" loading="lazy" referrerpolicy="no-referrer">{{ else }}{{ .icon }}{{ end }}</div>
+  <div class="tool-card-copy">
     <h2>{{ .title }}</h2>
     <p>{{ .desc }}</p>
     <div class="tool-tags">

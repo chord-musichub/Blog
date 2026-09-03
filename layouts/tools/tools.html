@@ -1,107 +1,38 @@
 {{ define "main" }}
-<section class="card tools-command-center">
-  <div>
-    <h2>工具搜索</h2>
-  </div>
-  <div class="tools-search-row"><input class="tools-searchbox" type="search" autocomplete="off" data-tools-search placeholder="搜索工具，例如 Markdown / 贪吃蛇 / 抽卡..."><button class="pill search-submit" type="button" data-tools-search-submit data-no-page-loading>搜索</button><span class="pill search-count" data-tools-search-count>正在统计工具</span></div>
+{{ $localTools := (index .Site.Data "tools-local") | default slice }}
+{{ $externalTools := (index .Site.Data "tools-external") | default slice }}
+{{ $rowCount := len $localTools }}
+{{ if gt (len $externalTools) $rowCount }}{{ $rowCount = len $externalTools }}{{ end }}
+<section class="tools-excavation" data-tools-archive>
+  <section class="tools-underground" aria-label="工具节点列表">
+    <span class="tools-soil-root tools-soil-root--one" aria-hidden="true"></span><span class="tools-soil-root tools-soil-root--two" aria-hidden="true"></span><span class="tools-soil-root tools-soil-root--three" aria-hidden="true"></span>
+    <div class="tools-search-station">
+      <div class="tools-search-row"><input id="toolsArchiveSearch" class="tools-searchbox" type="search" autocomplete="off" data-tools-search aria-label="搜索工具" placeholder="搜索工具"><button class="search-submit" type="button" data-tools-search-submit data-no-page-loading aria-label="搜索工具">{{ partial "ui-icon.html" "search" }}<span>搜索</span></button><span class="search-count" data-tools-search-count>正在统计工具</span></div>
+    </div>
+    <div class="tools-grid modern-tools-grid" data-tools-list>
+      {{ if gt $rowCount 0 }}
+      {{ range $index := seq 0 (sub $rowCount 1) }}
+        {{ $variant := mod $index 2 }}
+        <section class="tools-strata tools-strata--{{ $variant }}" data-tools-layer="{{ $index }}">
+          <span class="tools-strata-ridge" aria-hidden="true"></span>
+          <span class="tools-strata-root" aria-hidden="true"></span>
+          <span class="tools-strata-axis" aria-hidden="true"></span>
+          <div class="tools-strata-nodes">
+            {{ if lt $index (len $localTools) }}
+              {{ $tool := index $localTools $index }}
+              {{ partial "tool-card.html" (dict "href" $tool.href "icon" $tool.icon "icon_url" $tool.icon_url "title" $tool.title "desc" $tool.desc "tags" $tool.tags "keywords" $tool.keywords "id" $tool.id "side" "left" "index" $index "class" $tool.class) }}
+            {{ end }}
+            {{ if lt $index (len $externalTools) }}
+              {{ $tool := index $externalTools $index }}
+              {{ partial "tool-card.html" (dict "href" $tool.href "icon" $tool.icon "icon_url" $tool.icon_url "title" $tool.title "desc" $tool.desc "tags" $tool.tags "keywords" $tool.keywords "id" $tool.id "side" "right" "index" $index "class" $tool.class) }}
+            {{ end }}
+          </div>
+        </section>
+        {{ end }}
+      {{ end }}
+      <div class="tools-empty-state" data-tools-empty>这层土里还没有挖到这个工具。</div>
+    </div>
+  </section>
 </section>
-
-<section class="tools-grid modern-tools-grid">
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/markdown-previewer/"
-    "icon" "MD"
-    "title" "Markdown 预览器"
-    "desc" "临时查看本地 Markdown 文件的渲染效果。"
-    "tags" (slice "本地预览" "临时查看")
-    "attrs" "data-tool-keywords=\"markdown md 预览 写作 文档\""
-    "class" "tool-card-featured tool-app-card tool-writing"
-  ) }}
-
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/random-number/"
-    "icon" "R"
-    "title" "随机数生成器"
-    "attrs" "data-tool-keywords=\"随机 数字 区间 random number\""
-    "desc" "输入区间，生成一个随机整数。"
-    "tags" (slice "随机整数" "区间生成")
-  ) }}
-
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/snake/"
-    "icon" "S"
-    "title" "贪吃蛇"
-    "attrs" "data-tool-keywords=\"游戏 贪吃蛇 snake space shift\""
-    "desc" "一个轻量的小游戏，支持暂停、加速和音效。"
-    "tags" (slice "小游戏" "Space 暂停" "Shift 加速")
-  ) }}
-
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/2048/"
-    "icon" "2048"
-    "title" "2048"
-    "attrs" "data-tool-id=\"2048\" data-tool-keywords=\"游戏 2048 数字 合并 上下左右 wasd\""
-    "desc" "一个简单的数字合并小游戏，桌面方向键操作，手机端提供按键。"
-    "tags" (slice "小游戏" "方向键" "手机按键")
-  ) }}
-
-
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/reaction-test/"
-    "icon" "RT"
-    "title" "反应测试"
-    "attrs" "data-tool-id=\"reaction-test\" data-tool-keywords=\"游戏 反应 测试 reaction time 点击 排行榜\""
-    "desc" "点击开始等待变色，记录你的反应时间，并同步前三名排行榜。"
-    "tags" (slice "小游戏" "反应速度" "排行榜")
-  ) }}
-
-
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/flappy-bird/"
-    "icon" "🐦"
-    "title" "管道鸟"
-    "attrs" "data-tool-id=\"flappy-bird\" data-tool-keywords=\"游戏 管道鸟 flappy bird 小鸟 点击 排行榜\""
-    "desc" "点击让小鸟上飞，穿过管道得分，挑战前三名排行榜。"
-    "tags" (slice "小游戏" "点击操作" "排行榜")
-  ) }}
-
-
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/typing-practice/"
-    "icon" "打"
-    "title" "打字练习"
-    "attrs" "data-tool-id=\"typing-practice\" data-tool-keywords=\"打字 练习 typing practice 英文 中文 中英混打 排行榜\""
-    "desc" "英文与中英混打两种模式，随机短文练习，并按完成时间记录排行榜。"
-    "tags" (slice "输入练习" "随机短文" "排行榜")
-  ) }}
-
-
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/audio-visualizer/"
-    "icon" "AV"
-    "title" "音频可视化"
-    "attrs" "data-tool-id=\"audio-visualizer\" data-tool-keywords=\"音频 可视化 music visualizer qq音乐 网易云 歌曲 封面 频谱\""
-    "desc" "全屏音乐频谱与氛围可视化，可连接本地助手读取桌面播放器信息。"
-    "tags" (slice "音乐氛围" "全屏可视化" "本地助手")
-  ) }}
-
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/focus-timer/"
-    "icon" "钟"
-    "title" "星轨专注钟"
-    "attrs" "data-tool-id=\"focus-timer\" data-tool-keywords=\"专注 倒计时 番茄钟 学习 计时 focus timer pomodoro\""
-    "desc" "学习倒计时，结束提示音，本地偏好记忆。"
-    "tags" (slice "学习倒计时" "提示音" "本地记忆")
-  ) }}
-
-
-  {{ partial "tool-card.html" (dict
-    "href" "/tools/gacha/"
-    "icon" "抽"
-    "title" "抽卡模拟器"
-    "attrs" "data-tool-keywords=\"抽卡 模拟 保底 up gacha 二游\""
-    "desc" "按游戏名切换 UP / 常驻卡池，只显示稀有度与 UP 状态。"
-    "tags" (slice "抽卡机制" "保底模拟" "多卡池")
-  ) }}
-</section>
-<script defer src="/js/tools/index.js?v={{ partial "asset-version.html" . }}"></script>
+<script defer src="/js/tools/index.js?v={{ partial "asset-version.html" . }}&archive=1"></script>
 {{ end }}

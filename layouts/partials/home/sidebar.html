@@ -1,7 +1,9 @@
 {{- $cfg := .Site.Data.site -}}
 {{- $posts := where .Site.RegularPages "Section" "posts" -}}
 {{- $tagTax := index .Site.Taxonomies "tags" -}}
-{{- $publicFriends := .Site.Data.friends | default slice -}}
+{{- $localFriends := .Site.Data.friends | default slice -}}
+{{- $externalFriends := (index .Site.Data "friends-external") | default slice -}}
+{{- $publicFriends := $localFriends | append $externalFriends -}}
 {{- $lastPost := first 1 $posts -}}
 {{- $recommendable := where $posts ".Params.is_notice" "ne" true -}}
 {{- $featuredPosts := first 5 $recommendable -}}

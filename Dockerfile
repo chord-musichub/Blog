@@ -13,5 +13,8 @@ COPY hugo.toml /app/hugo.toml
 COPY layouts /app/layouts
 COPY static /app/static
 COPY content /app/content
+COPY data/tools-local.json /app/data/tools-local.json
+COPY data/tools-external.json /app/data/tools-external.json
+COPY data/friends-external.json /app/data/friends-external.json
 EXPOSE 8080
 CMD ["/app/blog-admin"]

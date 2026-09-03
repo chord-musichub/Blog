@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.1.0';
+  var VERSION = '22.2.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   var DESKTOP_POSITIONS = [[15,28],[31,17],[58,24],[75,43],[68,71],[29,72],[12,57],[47,82]];
   var MOBILE_POSITIONS = [[16,29],[67,21],[82,45],[60,60],[20,66],[43,82],[82,83],[12,48]];
@@ -64,15 +64,9 @@
     if(!node) return [];
     try{ return JSON.parse(node.textContent || '[]'); }catch(e){ return []; }
   }
-  // 已发布页面若来自一次旧的、只包含站长资料的 Hugo 构建，仍可从随站点
-  // 一同发布的完整快照恢复节点。正常情况下以内嵌数据为准，不会额外请求。
+  // 内嵌数据是构建期合并后的唯一来源：不能再让旧静态快照覆盖第三方节点。
   function friendData(){
-    var inline = inlineData();
-    if(inline.length > 1 || !window.fetch) return Promise.resolve(inline);
-    return window.fetch('/friends-data.json?friends=22.1', {cache:'no-store'})
-      .then(function(response){ return response.ok ? response.json() : inline; })
-      .then(function(snapshot){ return Array.isArray(snapshot) && snapshot.length > inline.length ? snapshot : inline; })
-      .catch(function(){ return inline; });
+    return Promise.resolve(inlineData());
   }
   function escapeHtml(value){ return clean(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -82,9 +76,7 @@
     if(!shell || shell.dataset.friendGalaxyReady === VERSION) return;
     shell.dataset.friendGalaxyReady = VERSION;
 
-    // 页面内 JSON 与 Hugo 本次构建使用同一份 data/friends.json。
-    // 不能再用旧的静态 friends-data.json 覆盖它，否则服务器更新朋友资料后
-    // 会因浏览器命中陈旧文件而只显示部分成员。
+    // 页面内 JSON 与 Hugo 本次构建使用同一份合并结果。
     friendData().then(function(data){
       if(!shell.isConnected || shell.dataset.friendGalaxyReady !== VERSION) return;
       build(shell, normalize(data));

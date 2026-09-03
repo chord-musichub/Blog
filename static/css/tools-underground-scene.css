@@ -1,142 +1,152 @@
-/* 工具入口页：PVZ 式从地表向下进入土层的滚动背景。 */
-body[data-page-layout="tools"]{
-  min-height:100svh;
-  background-color:#1d0f09;
-  background-image:
-    linear-gradient(180deg, rgba(44,22,8,.03), rgba(18,8,3,.20)),
-    url('/uploads/admin/under-background.png');
-  background-repeat:no-repeat;
-  background-position:center top;
-  background-size:100% 100%, max(100vw, 940px) auto;
+/* Tools / 地下工具库：每两项工具构成一段可无限延伸的土层。 */
+:root { --tools-ink:#fff0d4; --tools-muted:rgba(255,231,193,.72); --tools-green:#b7dc76; }
+html:has(body[data-page-layout="tools"]) { background:#211008!important; }
+body[data-page-layout="tools"] { min-height:100svh; color:var(--tools-ink); background-color:#251208!important; background-image:linear-gradient(180deg,rgba(52,21,4,.06),rgba(25,9,2,.46) 100%),url('/uploads/admin/under-ground.png'),url('/uploads/admin/tools-underground-soil-light-v1.png')!important; background-repeat:no-repeat,no-repeat,repeat-y!important; background-position:center top,center top,center 190px!important; background-size:100% auto,100% auto,100% auto!important; }
+body.dark[data-page-layout="tools"] { background-color:#130906!important; background-image:linear-gradient(180deg,rgba(4,7,16,.14),rgba(8,3,2,.60) 100%),url('/uploads/admin/under-ground-black.png'),url('/uploads/admin/tools-underground-soil-dark-v1.png')!important; }
+body[data-page-layout="tools"]::before,body[data-page-layout="tools"] .site-bg-layer,body[data-page-layout="tools"] .songline-starstream-layer,body[data-page-layout="tools"] .songline-ribbon-layer { display:none!important; }
+body[data-page-layout="tools"] .modern-site-header { background:linear-gradient(180deg,rgba(34,15,4,.48),transparent)!important; border-bottom-color:rgba(255,228,176,.10)!important; box-shadow:none!important; }
+body[data-page-layout="tools"] .modern-site-header .logo,body[data-page-layout="tools"] .modern-site-header .logo-text,body[data-page-layout="tools"] .modern-site-header .header-icons .icon-btn,body[data-page-layout="tools"] .modern-site-header .header-icons .ui-icon { color:#fff1d2!important; }
+body[data-page-layout="tools"] main.container { width:min(1320px,calc(100vw - 34px)); max-width:none; margin:0 auto; padding:0!important; border:0!important; background:transparent!important; box-shadow:none!important; }
+
+.tools-excavation { position:relative; padding:clamp(188px,17vw,258px) 0 126px; overflow:hidden; }
+.tools-underground { position:relative; min-height:900px; padding:0 0 82px; }.tools-underground > .tools-soil-root { display:none; }
+
+/* 地表检索入口：上方只保留一组轻量的入口控件。 */
+.tools-search-station { position:relative; z-index:3; width:min(740px,calc(100% - 34px)); margin:0 auto 35px; padding:13px 15px 12px; border:1px solid rgba(255,229,178,.14); border-radius:13px; background:linear-gradient(135deg,rgba(72,34,10,.22),rgba(28,11,3,.08)); box-shadow:inset 0 1px rgba(255,240,206,.08),0 10px 24px rgba(25,8,1,.13); }
+.tools-search-station::before { content:""; position:absolute; z-index:-1; inset:-17px 7% auto; height:15px; border-radius:50%; background:radial-gradient(ellipse,rgba(74,133,49,.62),rgba(39,86,31,.15) 52%,transparent 70%); filter:blur(1px); }
+.tools-search-label { display:block; margin:0 0 7px; color:rgba(255,234,198,.74); font-size:10px; font-weight:800; letter-spacing:.18em; }.tools-search-row { display:grid!important; grid-template-columns:minmax(0,1fr) auto; gap:8px!important; align-items:center!important; }
+.tools-searchbox { width:100%; min-height:41px!important; padding:0 13px!important; border:1px solid rgba(255,226,173,.18)!important; border-radius:9px!important; background:rgba(28,10,2,.31)!important; color:#fff0d2!important; box-shadow:inset 0 1px rgba(255,243,215,.06)!important; }.tools-searchbox::placeholder { color:rgba(255,226,178,.48)!important; }.tools-searchbox:focus { border-color:rgba(218,231,139,.56)!important; box-shadow:0 0 0 3px rgba(164,204,96,.13)!important; }
+.tools-search-row .search-submit { display:inline-flex; align-items:center; gap:7px; min-height:41px; padding:0 13px; border:1px solid rgba(218,229,135,.25); border-radius:9px; background:linear-gradient(135deg,rgba(88,126,42,.72),rgba(51,77,26,.84)); color:#f4f5c5; font:inherit; font-size:12px; font-weight:800; cursor:pointer; }.tools-search-row .search-submit:hover,.tools-search-row .search-submit:focus-visible { background:linear-gradient(135deg,rgba(111,159,51,.84),rgba(62,97,28,.94)); outline:0; }.tools-search-row .search-count { grid-column:1/-1; justify-self:end; color:rgba(255,230,189,.57)!important; background:transparent!important; border:0!important; font-size:10px; }
+
+/* 一条 strata 就是一段地下剖面；新增工具后按层继续向下生长。 */
+.tools-grid { position:relative; z-index:2; display:grid!important; gap:20px!important; width:min(1140px,calc(100% - 32px)); margin:0 auto!important; padding:0!important; background:none!important; }
+.tools-strata { --layer-base:rgba(90,42,13,.32); --layer-shade:rgba(31,12,3,.32); --layer-ridge:rgba(255,190,99,.20); position:relative; min-height:166px; padding:29px clamp(26px,5vw,72px) 25px; overflow:hidden; isolation:isolate; background:radial-gradient(ellipse 15% 42% at 8% 50%,rgba(255,184,80,.08),transparent 70%),radial-gradient(ellipse 18% 54% at 91% 48%,rgba(18,7,2,.26),transparent 73%),linear-gradient(99deg,var(--layer-shade),var(--layer-base) 18%,transparent 48%,var(--layer-base) 82%,var(--layer-shade)),repeating-linear-gradient(176deg,transparent 0 24px,rgba(255,222,163,.028) 25px 26px,transparent 27px 53px); box-shadow:inset 0 18px 22px rgba(19,7,2,.10),inset 0 -18px 23px rgba(15,5,1,.11); }
+.tools-strata::before { content:""; position:absolute; z-index:-1; inset:0; background-image:radial-gradient(circle at 8% 36%,rgba(28,10,3,.52) 0 3px,transparent 4px),radial-gradient(circle at 83% 70%,rgba(255,209,140,.13) 0 2px,transparent 3px),radial-gradient(circle at 62% 25%,rgba(34,13,3,.48) 0 4px,transparent 5px); background-size:191px 117px,149px 137px,229px 153px; opacity:.72; }
+.tools-strata-ridge { position:absolute; z-index:1; top:0; right:0; left:0; height:3px; background:linear-gradient(90deg,transparent,var(--layer-ridge) 14%,rgba(55,23,7,.40) 50%,var(--layer-ridge) 86%,transparent); opacity:.82; }.tools-strata-root { position:absolute; z-index:1; top:0; left:clamp(14%,22vw,29%); width:2px; height:76px; background:linear-gradient(180deg,rgba(84,43,18,.82),rgba(62,28,10,.35),transparent); transform:rotate(8deg); opacity:.72; }.tools-strata-root::before,.tools-strata-root::after { content:""; position:absolute; width:1px; height:34px; background:linear-gradient(rgba(79,36,13,.70),transparent); transform-origin:top; }.tools-strata-root::before { top:25px; transform:rotate(-46deg); }.tools-strata-root::after { top:43px; transform:rotate(41deg); }
+.tools-strata-axis { position:absolute; z-index:1; top:23px; bottom:22px; left:50%; width:1px; background:linear-gradient(transparent,rgba(226,184,112,.23) 16%,rgba(86,48,21,.55) 50%,rgba(226,184,112,.18) 84%,transparent); }.tools-strata-axis::before,.tools-strata-axis::after { content:""; position:absolute; left:50%; width:6px; height:6px; border:1px solid rgba(244,214,158,.35); border-radius:50%; background:rgba(76,40,15,.62); transform:translateX(-50%); }.tools-strata-axis::before { top:20%; }.tools-strata-axis::after { bottom:19%; }.tools-strata-nodes { position:relative; z-index:2; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:clamp(68px,13vw,184px); min-height:110px; }
+.tools-strata--0 { --layer-base:rgba(107,55,19,.38); --layer-shade:rgba(44,20,5,.30); --layer-ridge:rgba(234,171,88,.30); }.tools-strata--1 { --layer-base:rgba(72,53,29,.38); --layer-shade:rgba(36,25,13,.36); --layer-ridge:rgba(188,160,112,.27); min-height:184px; }.tools-strata--2 { --layer-base:rgba(119,50,21,.37); --layer-shade:rgba(53,19,6,.35); --layer-ridge:rgba(225,137,72,.30); }.tools-strata--3 { --layer-base:rgba(82,58,27,.40); --layer-shade:rgba(30,21,10,.38); --layer-ridge:rgba(201,177,117,.25); min-height:190px; }.tools-strata--4 { --layer-base:rgba(132,71,24,.35); --layer-shade:rgba(50,24,7,.38); --layer-ridge:rgba(243,186,91,.29); }.tools-strata--5 { --layer-base:rgba(61,39,26,.45); --layer-shade:rgba(21,12,8,.43); --layer-ridge:rgba(166,138,102,.26); min-height:198px; }.tools-strata--1 .tools-strata-root { right:15%; left:auto; transform:rotate(-11deg); }.tools-strata--2 .tools-strata-root { left:72%; }.tools-strata--3 .tools-strata-root { left:11%; }.tools-strata--4 .tools-strata-root { left:83%; }.tools-strata--5 .tools-strata-root { left:35%; }
+
+/* 节点不再是卡片：没有完整边框、没有底板，只保留土层内的微弱压痕。 */
+html:root body[data-page-layout="tools"] .tools-grid .tool-card,html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="left"],html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"] { position:relative; display:grid!important; grid-template-columns:47px minmax(0,1fr)!important; gap:13px!important; align-content:start; width:100%; min-height:105px; margin:0!important; padding:14px 43px 13px 13px!important; border:0!important; border-radius:0!important; background:linear-gradient(90deg,rgba(22,8,2,.16),rgba(121,67,25,.08) 72%,transparent)!important; box-shadow:inset 0 10px 14px rgba(28,10,2,.08),inset 0 -8px 12px rgba(255,202,122,.025)!important; backdrop-filter:none!important; -webkit-backdrop-filter:none!important; color:var(--tools-ink)!important; text-decoration:none; transition:transform .22s cubic-bezier(.2,.7,.2,1),filter .22s ease,background .22s ease!important; }
+html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="left"] { grid-column:1; justify-self:end; transform:translateX(-7px); }html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"] { grid-column:2; justify-self:start; transform:translateX(7px); background:linear-gradient(270deg,rgba(22,8,2,.16),rgba(121,67,25,.08) 72%,transparent)!important; }html:root body[data-page-layout="tools"] .tools-grid .tool-card::before,html:root body[data-page-layout="tools"] .tools-grid .tool-card::after { content:none!important; display:none!important; }
+.tool-card-icon { width:47px!important; height:47px!important; border:1px solid rgba(255,229,175,.22)!important; border-radius:8px 12px 10px 7px!important; background:linear-gradient(135deg,rgba(124,81,35,.92),rgba(65,37,16,.94))!important; box-shadow:inset 0 1px rgba(255,241,210,.16),0 4px 9px rgba(24,8,1,.22)!important; color:#fff0cb!important; font-size:13px!important; }.tool-card-copy { min-width:0; }.tools-grid .tool-card h2 { margin:0 0 4px!important; color:var(--tools-green)!important; font-size:16px!important; font-weight:800; line-height:1.2; text-shadow:0 1px 6px rgba(12,4,1,.72)!important; }.tools-grid .tool-card p { display:-webkit-box; overflow:hidden; margin:0!important; color:var(--tools-muted)!important; font-size:12px; line-height:1.52; text-shadow:0 1px 4px rgba(28,9,1,.76); -webkit-box-orient:vertical; -webkit-line-clamp:2; }.tool-tags { display:none!important; }.tool-card-arrow { right:10px!important; top:50%!important; width:27px!important; height:27px!important; border:0!important; background:transparent!important; color:rgba(255,228,176,.58)!important; }
+.tool-node-connector { position:absolute; top:50%; width:clamp(33px,5vw,77px); height:1px; background:linear-gradient(90deg,rgba(201,177,110,.34),rgba(87,49,20,.15)); pointer-events:none; }.tool-node-connector::after { content:""; position:absolute; top:50%; width:6px; height:6px; border:1px solid rgba(238,209,152,.36); border-radius:50%; background:rgba(83,44,17,.85); box-shadow:0 0 0 3px rgba(53,27,10,.30); transform:translateY(-50%); }.tool-node-connector i { display:none; }.tool-card[data-tool-side="left"] .tool-node-connector { left:100%; }.tool-card[data-tool-side="left"] .tool-node-connector::after { right:-5px; }.tool-card[data-tool-side="right"] .tool-node-connector { right:100%; background:linear-gradient(90deg,rgba(87,49,20,.15),rgba(201,177,110,.34)); }.tool-card[data-tool-side="right"] .tool-node-connector::after { left:-5px; }
+html:root body[data-page-layout="tools"] .tools-grid .tool-card:hover,html:root body[data-page-layout="tools"] .tools-grid .tool-card:focus-visible { filter:brightness(1.10); outline:0; background:linear-gradient(90deg,rgba(103,71,26,.27),rgba(137,91,34,.12) 70%,transparent)!important; box-shadow:inset 3px 0 0 rgba(183,220,118,.74),inset 0 10px 14px rgba(28,10,2,.08)!important; }html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"]:hover,html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"]:focus-visible { background:linear-gradient(270deg,rgba(103,71,26,.27),rgba(137,91,34,.12) 70%,transparent)!important; box-shadow:inset -3px 0 0 rgba(183,220,118,.74),inset 0 10px 14px rgba(28,10,2,.08)!important; }.tools-grid .tool-card:hover .tool-card-arrow,.tools-grid .tool-card:focus-visible .tool-card-arrow { transform:translateY(-50%) translateX(4px)!important; color:#f7f2c4!important; }.tools-grid .tool-card:hover .tool-node-connector,.tools-grid .tool-card:focus-visible .tool-node-connector { filter:brightness(1.45); }.tools-empty-state { display:none; width:min(420px,100%); justify-self:center; padding:24px; color:rgba(255,230,189,.76); text-align:center; background:rgba(39,16,4,.20); }
+
+body.dark[data-page-layout="tools"] .tools-strata { --layer-base:rgba(52,36,28,.44); --layer-shade:rgba(13,8,9,.54); --layer-ridge:rgba(158,150,126,.25); }.tools-strata--1,.tools-strata--3,.tools-strata--5 { --layer-base:rgba(41,31,28,.52)!important; --layer-shade:rgba(8,6,9,.57)!important; }.tools-strata--2,.tools-strata--4 { --layer-base:rgba(69,41,27,.43)!important; }.tools-grid .tool-card h2 { color:#c7e692!important; }body.dark[data-page-layout="tools"] .tools-grid .tool-card p { color:rgba(239,224,202,.74)!important; }.tools-grid .tool-card-icon { background:linear-gradient(135deg,rgba(82,69,54,.93),rgba(39,29,25,.95))!important; }
+
+@media(max-width:780px) { body[data-page-layout="tools"] main.container { width:100%; }.tools-excavation { padding-top:clamp(155px,35vw,205px); padding-bottom:78px; }.tools-search-station { width:calc(100% - 28px); margin-bottom:25px; }.tools-search-row .search-submit span { display:none; }.tools-search-row .search-submit { min-width:41px; justify-content:center; padding:0!important; }.tools-search-row .search-count { justify-self:start; }.tools-grid { width:100%; gap:13px!important; }.tools-strata { min-height:0; padding:21px 19px 20px 47px; }.tools-strata--1,.tools-strata--3,.tools-strata--5 { min-height:0; }.tools-strata-axis { left:25px; top:15px; bottom:15px; }.tools-strata-root { left:78%!important; height:55px; }.tools-strata-nodes { display:grid; grid-template-columns:1fr; gap:8px; min-height:0; }.tools-strata-nodes .tool-card,.tools-strata-nodes .tool-card[data-tool-side="left"],.tools-strata-nodes .tool-card[data-tool-side="right"] { grid-column:1; justify-self:stretch; transform:none!important; min-height:88px; padding:12px 36px 12px 10px!important; }.tool-card[data-tool-side] .tool-node-connector { left:-23px; right:auto; width:23px; background:linear-gradient(90deg,rgba(201,177,110,.35),rgba(87,49,20,.15)); }.tool-card[data-tool-side] .tool-node-connector::after { left:-5px; right:auto; }.tools-grid .tool-card h2 { font-size:15px!important; }.tools-grid .tool-card p { font-size:11px; } }
+@media(prefers-reduced-motion:reduce) { .tools-grid .tool-card { transition:none!important; } }
+
+/* v2：一层只承托一个工具节点。深、浅土带交替，节点左右错位嵌进剖面。 */
+.tools-grid { gap:9px!important; }
+.tools-strata { min-height:142px; padding-block:22px 20px; }
+.tools-strata--0 { --layer-base:rgba(76,34,10,.48); --layer-shade:rgba(27,10,2,.44); --layer-ridge:rgba(180,116,54,.30); }
+.tools-strata--1 { --layer-base:rgba(145,78,27,.34); --layer-shade:rgba(72,35,11,.28); --layer-ridge:rgba(255,198,112,.34); min-height:154px; }
+.tools-strata-nodes { min-height:98px; }
+html:root body[data-page-layout="tools"] .tools-grid .tool-card,
+html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="left"],
+html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"] { width:min(100%,470px); min-height:98px; align-self:center; }
+html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="left"] { grid-column:1; justify-self:end; }
+html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"] { grid-column:2; justify-self:start; }
+body.dark[data-page-layout="tools"] .tools-strata--0 { --layer-base:rgba(38,24,18,.60); --layer-shade:rgba(10,6,7,.64); --layer-ridge:rgba(123,111,94,.26); }
+body.dark[data-page-layout="tools"] .tools-strata--1 { --layer-base:rgba(74,46,29,.46); --layer-shade:rgba(24,13,10,.54); --layer-ridge:rgba(172,147,107,.28); }
+@media(max-width:780px) { .tools-grid { gap:8px!important; }.tools-strata { min-height:0; }.tools-strata--1 { min-height:0; }.tools-strata-nodes { min-height:0; }.tools-strata-nodes .tool-card,.tools-strata-nodes .tool-card[data-tool-side="left"],.tools-strata-nodes .tool-card[data-tool-side="right"] { width:100%; } }
+
+/* v3：节点只作为土层中的文字与铭牌，不再保留任何卡片底板。 */
+@media(min-width:781px) {
+  .tools-grid { gap:0!important; width:min(1180px,calc(100% - 44px)); }
+  .tools-strata { min-height:136px; padding-block:19px 18px; }
+  .tools-strata--1 { min-height:146px; }
+  .tools-strata-nodes { min-height:94px; }
+  html:root body[data-page-layout="tools"] .tools-grid .tool-card,
+  html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="left"],
+  html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"] {
+    width:min(100%,408px); min-height:88px; padding:11px 37px 11px 8px!important;
+    background:transparent!important; box-shadow:none!important;
+  }
+  .tool-card-icon { width:43px!important; height:43px!important; }
+  .tools-grid .tool-card h2 { font-size:15px!important; }
+  .tools-grid .tool-card p { font-size:11px!important; }
 }
-/* 深色主题不替换场景图，工具页始终沿用同一张土层背景。 */
-body.dark[data-page-layout="tools"]{
-  background-color:#1d0f09!important;
-  background-image:
-    linear-gradient(180deg, rgba(44,22,8,.03), rgba(18,8,3,.20)),
-    url('/uploads/admin/under-background.png')!important;
-  background-repeat:no-repeat!important;
-  background-position:center top!important;
-  background-size:100% 100%, max(100vw, 940px) auto!important;
+.tools-strata--0 { --layer-base:rgba(81,39,13,.39); --layer-shade:rgba(32,13,3,.34); --layer-ridge:rgba(187,125,61,.15); }
+.tools-strata--1 { --layer-base:rgba(112,59,21,.33); --layer-shade:rgba(53,25,7,.27); --layer-ridge:rgba(225,172,92,.16); }
+.tools-strata-ridge { height:18px; opacity:.36; background:linear-gradient(90deg,transparent,rgba(255,210,139,.07) 15%,var(--layer-ridge) 50%,rgba(81,39,13,.10) 76%,transparent); }
+.tools-strata::after { content:""; position:absolute; z-index:1; right:0; bottom:-1px; left:0; height:28px; background:linear-gradient(180deg,transparent,rgba(25,9,2,.15)); pointer-events:none; }
+html:root body[data-page-layout="tools"] .tools-grid .tool-card:hover,
+html:root body[data-page-layout="tools"] .tools-grid .tool-card:focus-visible,
+html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"]:hover,
+html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"]:focus-visible { background:transparent!important; box-shadow:none!important; filter:brightness(1.13); }
+html:root body[data-page-layout="tools"] .tools-grid .tool-card:hover .tool-card-icon,
+html:root body[data-page-layout="tools"] .tools-grid .tool-card:focus-visible .tool-card-icon { box-shadow:inset 0 1px rgba(255,241,210,.22),0 0 0 3px rgba(183,220,118,.16),0 5px 10px rgba(24,8,1,.20)!important; }
+@media(max-width:780px) { .tools-grid { gap:0!important; }.tools-strata { padding-top:18px; padding-bottom:17px; }.tools-strata-ridge { height:14px; }.tools-strata::after { height:19px; }.tools-strata-nodes .tool-card,.tools-strata-nodes .tool-card[data-tool-side="left"],.tools-strata-nodes .tool-card[data-tool-side="right"] { background:transparent!important; box-shadow:none!important; } }
+
+/* v4：土层横带延展到全视口，彻底消除中间背景板与两侧原图的硬竖切。 */
+@media(min-width:781px) {
+  .tools-grid { width:100%; }
+  .tools-strata {
+    width:100vw; margin-left:calc(50% - 50vw); padding:19px 0 18px;
+    overflow:hidden; background:linear-gradient(180deg,rgba(47,19,5,.11),transparent 44%,rgba(30,11,3,.08))!important;
+    box-shadow:none!important;
+  }
+  .tools-strata--1 { background:linear-gradient(180deg,rgba(135,72,25,.075),transparent 50%,rgba(48,20,5,.07))!important; }
+  .tools-strata::before { opacity:.18; }
+  .tools-strata::after { height:36px; background:linear-gradient(180deg,transparent,rgba(31,11,3,.10)); }
+  .tools-strata-ridge { opacity:.16; }
+  .tools-strata-axis { left:50%; }
+  .tools-strata-root { left:max(8%,calc(50% - 420px)); }
+  .tools-strata--1 .tools-strata-root { right:max(8%,calc(50% - 420px)); left:auto; }
+  .tools-strata-nodes { width:min(1180px,calc(100vw - 44px)); margin:0 auto; }
 }
-/* body 滚动结束后浏览器会露出 html 底色；根层也锁到土壤色，消除页脚下白边。 */
-html:has(body[data-page-layout="tools"]){ background:#1d0f09!important; }
-html:has(body.dark[data-page-layout="tools"]){ background:#1d0f09!important; }
-/* 工具场景顶栏是前景 HUD，品牌与操作图标始终保持白色。 */
-body[data-page-layout="tools"] .modern-site-header .logo,
-body[data-page-layout="tools"] .modern-site-header .logo-text,
-body[data-page-layout="tools"] .modern-site-header .header-icons .icon-btn,
-body[data-page-layout="tools"] .modern-site-header .header-icons .ui-icon{
-  color:#fff1d2!important;
+body[data-page-layout="tools"] .site-footer-clean {
+  width:100%; max-width:none; margin:0!important; padding:42px 34px 30px;
+  background:linear-gradient(180deg,transparent,rgba(31,11,3,.48))!important;
 }
-body[data-page-layout="tools"] .modern-site-header .header-icons .icon-btn:hover,
-body[data-page-layout="tools"] .modern-site-header .header-icons .icon-btn:focus-visible{
-  color:#fff!important;
+body.dark[data-page-layout="tools"] .site-footer-clean { background:linear-gradient(180deg,transparent,rgba(6,4,6,.62))!important; }
+
+/* v5：不再给土层或工具节点另铺背景，只把相邻土纹的接缝柔化。 */
+.tools-strata,
+.tools-strata--0,
+.tools-strata--1 { background:none!important; box-shadow:none!important; }
+.tools-strata::before,
+.tools-strata-ridge { display:none!important; }
+.tools-strata::after {
+  z-index:1; right:-2px; bottom:-13px; left:-2px; height:27px;
+  background:linear-gradient(180deg,transparent 8%,rgba(52,20,4,.025) 45%,transparent 92%)!important;
+  backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
 }
-body[data-page-layout="tools"]::before{
-  background:transparent;
-}
-body[data-page-layout="tools"] .site-bg-layer{
-  display:none!important;
-}
-body[data-page-layout="tools"] .site-bg-layer::before{
-  inset:0;
-  background-color:#1d0f09;
-  background-image:url('/uploads/admin/under-background.png');
-  background-repeat:no-repeat;
-  background-position:center top;
-  background-size:max(100vw, 940px) auto;
-  filter:none;
-  opacity:1;
-  transform:none;
-}
-body[data-page-layout="tools"] .site-bg-layer::after{
-  inset:0;
-  background:linear-gradient(180deg, rgba(24,12,5,.03) 0%, rgba(24,12,5,0) 32%, rgba(15,8,4,.20) 100%);
-}
-body[data-page-layout="tools"] .songline-starstream-layer,
-body[data-page-layout="tools"] .songline-ribbon-layer{
-  display:none!important;
+html:root body[data-page-layout="tools"] .tools-grid .tool-card,
+html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="left"],
+html:root body[data-page-layout="tools"] .tools-grid .tool-card[data-tool-side="right"],
+html:root body[data-page-layout="tools"] .tools-grid .tool-card::before,
+html:root body[data-page-layout="tools"] .tools-grid .tool-card::after {
+  background:none!important; background-image:none!important; box-shadow:none!important;
 }
 
-/* 工具页改成嵌在土层中的“种植格”：不再沿用通用白色 Dashboard 卡片。 */
-body[data-page-layout="tools"] .tools-command-center,
-body[data-page-layout="tools"] .modern-tools-grid .tool-card{
-  background:linear-gradient(145deg, rgba(85,45,17,.86), rgba(47,23,9,.82))!important;
-  border:1px solid rgba(244,193,101,.22)!important;
-  box-shadow:0 16px 30px rgba(36,16,4,.28), inset 0 1px rgba(255,224,159,.10)!important;
-  color:#fff0ce!important;
-  backdrop-filter:blur(4px);
-  -webkit-backdrop-filter:blur(4px);
-}
-body[data-page-layout="tools"] .tools-command-center{
-  display:flex!important;
-  justify-content:flex-end;
-  align-items:center;
-  min-height:72px;
-  margin-top:28px;
-  padding:14px 16px!important;
-}
-body[data-page-layout="tools"] .tools-command-center > div:first-child{ display:none!important; }
-body[data-page-layout="tools"] .tools-search-row{ width:min(100%, 620px); margin-left:auto; }
-body[data-page-layout="tools"] .tools-searchbox{
-  background:rgba(32,15,6,.42)!important;
-  border-color:rgba(250,211,139,.22)!important;
-  color:#fff4d8!important;
-}
-body[data-page-layout="tools"] .tools-searchbox::placeholder{ color:rgba(255,229,181,.58); }
-body[data-page-layout="tools"] .tools-search-row .pill{
-  color:#ffedc5!important;
-  border-color:rgba(246,202,126,.24)!important;
-  background:rgba(115,63,23,.54)!important;
-}
-body[data-page-layout="tools"] .modern-tools-grid{
-  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr))!important;
-  gap:18px!important;
-  padding-bottom:58px;
-}
-body[data-page-layout="tools"] .modern-tools-grid .tool-card{
-  min-height:188px;
-  grid-template-columns:1fr!important;
-  grid-template-rows:auto 1fr;
-  gap:13px!important;
-  padding:20px!important;
-  border-radius:18px!important;
-  transform:translateZ(0);
-}
-body[data-page-layout="tools"] .modern-tools-grid .tool-card::before{
-  background:radial-gradient(circle, rgba(251,203,111,.15), transparent 68%)!important;
-}
-body[data-page-layout="tools"] .tool-card-icon{
-  width:52px;
-  height:52px;
-  border-radius:14px;
-  color:#fff3d6!important;
-  border-color:rgba(255,218,150,.22)!important;
-  background:linear-gradient(135deg, rgba(148,82,28,.84), rgba(73,34,12,.92))!important;
-  box-shadow:inset 0 1px rgba(255,235,186,.14), 0 8px 18px rgba(25,10,2,.24)!important;
-}
-body[data-page-layout="tools"] .tool-card h2{ color:#fff0ce!important; font-size:21px!important; }
-body[data-page-layout="tools"] .tool-card p{ color:rgba(255,229,190,.70)!important; }
-body[data-page-layout="tools"] .tool-tags span{
-  color:rgba(255,232,193,.82)!important;
-  background:rgba(35,16,6,.34)!important;
-  border-color:rgba(245,198,118,.16)!important;
-}
-body[data-page-layout="tools"] .tool-card-arrow{
-  color:#ffe2aa!important;
-  background:rgba(43,19,7,.62)!important;
-  border-color:rgba(247,204,126,.22)!important;
-}
-body[data-page-layout="tools"] .modern-tools-grid .tool-card:hover{
-  transform:translateY(-5px)!important;
-  border-color:rgba(255,214,139,.48)!important;
-  box-shadow:0 24px 42px rgba(29,11,2,.34), inset 0 1px rgba(255,232,184,.18)!important;
-}
-@media(max-width:760px){
-  body[data-page-layout="tools"] .site-bg-layer::before{
-    background-size:940px auto;
-  }
-  body[data-page-layout="tools"]{ background-size:100% 100%, 940px auto; }
-  body[data-page-layout="tools"] .tools-command-center{ margin-top:14px; }
-}
+/* v6：去除接缝伪元素本身产生的横带；检索入口收束为一条简约搜索线。 */
+.tools-strata::after { display:none!important; }
+.tools-search-station { width:min(620px,calc(100% - 42px)); margin-bottom:42px; padding:0!important; border:0!important; border-radius:0!important; background:none!important; box-shadow:none!important; }
+.tools-search-station::before { display:none!important; }
+.tools-search-label { display:none!important; }
+.tools-search-row { gap:6px!important; border-bottom:1px solid rgba(255,225,174,.22); }
+.tools-searchbox { min-height:36px!important; padding:0 5px!important; border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; font-size:13px!important; }
+.tools-searchbox:focus { box-shadow:none!important; }
+.tools-search-row .search-submit { min-width:36px; min-height:36px; padding:0 8px!important; border:0!important; border-radius:0!important; background:transparent!important; color:rgba(241,239,197,.82); }
+.tools-search-row .search-submit span { display:none; }
+.tools-search-row .search-submit:hover,.tools-search-row .search-submit:focus-visible { background:transparent!important; color:#fff8ce; }
+.tools-search-row .search-count { grid-column:auto; justify-self:end; padding-right:4px; font-size:10px; }
+@media(max-width:780px) { .tools-search-station { width:calc(100% - 34px); margin-bottom:30px; }.tools-search-row .search-count { grid-column:1/-1; padding:0 0 5px 5px; } }
+
+/* v7：搜索入口保持轻量，但用细白边确认可交互范围。 */
+.tools-search-station { padding:8px 12px 7px!important; border:1px solid rgba(255,245,222,.30)!important; border-radius:8px!important; background:rgba(62,25,6,.055)!important; box-shadow:inset 0 1px rgba(255,250,232,.11),0 5px 15px rgba(35,11,2,.05)!important; }
+.tools-search-row { border-bottom-color:rgba(255,243,216,.18)!important; }
+.tools-search-station:focus-within { border-color:rgba(255,249,229,.52)!important; box-shadow:inset 0 1px rgba(255,250,232,.16),0 0 0 3px rgba(255,230,177,.07)!important; }
+
+/* v8：搜索图标不再继承页面图标色，固定保留足够对比度。 */
+.tools-search-row .search-submit { color:rgba(255,249,231,.94)!important; }
+.tools-search-row .search-submit .ui-icon,
+.tools-search-row .search-submit .ui-line-icon { display:block!important; width:18px!important; height:18px!important; color:currentColor!important; stroke:currentColor!important; opacity:1!important; }
+.tools-search-row .search-submit:hover .ui-icon,.tools-search-row .search-submit:focus-visible .ui-icon { color:#fff!important; }
+
+/* 第三方图标：与本地文字铭牌使用同一尺寸与嵌入式容器。 */
+.tool-card-icon img { display:block; width:28px; height:28px; object-fit:contain; border-radius:6px; }

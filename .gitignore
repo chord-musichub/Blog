@@ -1,5 +1,8 @@
 # 私有运行数据：文章、用户、站点设置、成绩等
 /data/*
+!/data/tools-local.json
+!/data/tools-external.json
+!/data/friends-external.json
 
 # 本地文章和自动生成的内容页面
 /content/posts/
@@ -7,7 +10,18 @@
 /content/tags/
 
 # 文章图片、后台上传的媒体
-/static/uploads/
+/static/uploads/*
+!/static/uploads/admin/
+/static/uploads/admin/*
+!/static/uploads/admin/tools-archive-day-v1.png
+!/static/uploads/admin/tools-archive-night-v1.png
+!/static/uploads/admin/tools-archive-sunset-v2.png
+!/static/uploads/admin/tools-archive-sunset-v3.png
+!/static/uploads/admin/tools-archive-night-v3.png
+!/static/uploads/admin/under-ground.png
+!/static/uploads/admin/under-ground-black.png
+!/static/uploads/admin/tools-underground-soil-light-v1.png
+!/static/uploads/admin/tools-underground-soil-dark-v1.png
 /static/md-source/
 /static/runtime-config.js
 /static/friends-data.json
