@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.0.0';
+  var VERSION = '22.1.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   var DESKTOP_POSITIONS = [[15,28],[31,17],[58,24],[75,43],[68,71],[29,72],[12,57],[47,82]];
   var MOBILE_POSITIONS = [[16,29],[67,21],[82,45],[60,60],[20,66],[43,82],[82,83],[12,48]];
@@ -69,7 +69,7 @@
   function friendData(){
     var inline = inlineData();
     if(inline.length > 1 || !window.fetch) return Promise.resolve(inline);
-    return window.fetch('/friends-data.json?friends=22.0', {cache:'no-store'})
+    return window.fetch('/friends-data.json?friends=22.1', {cache:'no-store'})
       .then(function(response){ return response.ok ? response.json() : inline; })
       .then(function(snapshot){ return Array.isArray(snapshot) && snapshot.length > inline.length ? snapshot : inline; })
       .catch(function(){ return inline; });

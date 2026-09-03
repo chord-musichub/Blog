@@ -14,7 +14,7 @@ v20.20.6：页面级 JS 按需加载。
 
 {{- if or (eq $section "friends") (hasPrefix $rel "/friends/") }}
 {{/* 独立版本号：朋友 URL 编码修复必须绕过旧浏览器缓存。 */}}
-<script defer data-page-script="friend-galaxy" src="/js/friend-galaxy.js?v={{ $v }}&friends=22.0"></script>
+<script defer data-page-script="friend-galaxy" src="/js/friend-galaxy.js?v={{ $v }}&friends=22.1"></script>
 {{- end }}
 
 {{- if or (eq $section "tags") (hasPrefix $rel "/tags/") }}
