@@ -1,3 +1,10 @@
 [
-  {"id":"shoper","display_name":"shoper","bio":"shoper的文档站","url":"https://docs.scandidreams.top/","avatar":"https://docs.scandidreams.top/favicon.ico","links":["songline"]}
+  {
+    "id":"shoper",
+    "display_name":"shoper",
+    "bio":"shoper的文档站",
+    "url":"https://docs.scandidreams.top/",
+    "avatar":"https://image.wustacm.com/i/2026/02/17/si2wc7.png",
+    "links":["songline","mishi_a"]
+  }
 ]

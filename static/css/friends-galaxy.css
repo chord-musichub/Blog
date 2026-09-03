@@ -109,7 +109,7 @@ body:has(.friends-constellation){overflow-x:hidden;}
 .friends-constellation__nebula{position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg, rgba(3,10,21,.09), transparent 28%, transparent 70%, rgba(3,10,21,.15));}
 .friends-constellation__lines{position:absolute;inset:0;z-index:1;width:100%;height:100%;overflow:visible;pointer-events:none;}
 .friends-constellation__line{
-  stroke:rgba(188,215,244,.28);
+  stroke:rgba(188,215,244,.42);
   stroke-width:1;
   vector-effect:non-scaling-stroke;
   transition:stroke .3s ease, stroke-opacity .3s ease, stroke-width .3s ease;
@@ -402,6 +402,9 @@ body:has(.friends-constellation) .modern-site-header .header-icons .icon-btn{ co
   top:calc(50% + 58px);
   width:100%;
   margin:0;
+  opacity:1;
+  pointer-events:none;
+  text-align:center;
 }
 @keyframes friendsCoreBreath{
   0%,100%{filter:brightness(.96);transform:translate(-50%,-50%) scale(.985)}

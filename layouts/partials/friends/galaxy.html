@@ -53,26 +53,4 @@
   <script id="friend-galaxy-data" type="application/json">
   {{- $friends | jsonify | safeJS -}}
   </script>
-  <script>
-  (function(){
-    // 朋友页会被全站过场替换进 main；不要依赖 page-modules 的通用版本号，
-    // 否则线上长期 immutable 缓存可能继续返回旧星图脚本，造成只有静态头像。
-    var revision = '22.2';
-    var root = document.currentScript && document.currentScript.closest('[data-friend-galaxy]');
-    function start(){
-      if(window.SonglineInitFriendGalaxy) window.SonglineInitFriendGalaxy(root || document);
-    }
-    var runtime = document.querySelector('script[data-friend-galaxy-runtime="' + revision + '"]');
-    if(runtime){
-      start();
-      return;
-    }
-    runtime = document.createElement('script');
-    runtime.src = '/js/friend-galaxy.js?friends=' + revision;
-    runtime.async = false;
-    runtime.dataset.friendGalaxyRuntime = revision;
-    runtime.onload = start;
-    document.head.appendChild(runtime);
-  })();
-  </script>
 </section>

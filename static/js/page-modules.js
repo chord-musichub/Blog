@@ -141,7 +141,7 @@
       key:'friend-galaxy',
       // 与服务端直开页面共用当前资源版本；固定版本号会让 AJAX 进入朋友页时
       // 命中旧缓存，导致新坐标逻辑没有真正执行。
-      src:'/js/friend-galaxy.js?v=' + VERSION + '&friends=22.1',
+      src:'/js/friend-galaxy.js?v=' + VERSION + '&friends=22.3',
       test:function(root){
         return !!query(root, '[data-friend-galaxy], .friend-galaxy, .friend-galaxy-stage, .friends-galaxy, .galaxy-map');
       },
@@ -341,7 +341,10 @@
 
     // 服务端页级脚本在本调度器之前执行；直接复用它，避免额外监听和延迟兜底。
     var existing = document.querySelector('script[data-page-script="' + mod.key + '"], script[src*="' + mod.src.split('?')[0] + '"]');
-    if(existing){
+    // 站内过场会把新页面的 main 直接写入 DOM，其中的 script 标签不会执行。
+    // Friends 过去因此误把这类“未执行脚本”当作已加载，星图只剩服务端兜底头像。
+    var friendGalaxyReady = mod.key !== 'friend-galaxy' || typeof window.SonglineInitFriendGalaxy === 'function';
+    if(existing && friendGalaxyReady){
       loaded[mod.key] = true;
       mod.init(root || document);
       return;
