@@ -1,0 +1,109 @@
+/* 信息面板雪人摆件：木杆下端是固定在面板上的支点，容器与图片均保持透明。 */
+.songline-desktop-pet{
+  position:absolute;
+  z-index:12;
+  right:-4px;
+  top:auto;
+  bottom:0;
+  width:136px;
+  height:178px;
+  background:transparent;
+  cursor:grab;
+  touch-action:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.songline-terminal-status .songline-terminal-brand{
+  margin:0 90px 0 auto;
+}
+.songline-desktop-pet:hover .songline-desktop-pet__rig{filter:brightness(1.04);}
+.songline-desktop-pet.is-dragging{cursor:grabbing;}
+.songline-desktop-pet__rig{
+  position:absolute;
+  inset:0;
+  display:block;
+  background:transparent;
+  transform-origin:50% 100%;
+  transform:rotate(var(--desktop-pet-angle, 0deg));
+}
+.songline-desktop-pet__figure{
+  position:absolute;
+  inset:0;
+  display:block;
+  background:transparent;
+  transform-origin:50% 100%;
+  animation:songlineDesktopPetBreathe 3.1s ease-in-out infinite;
+}
+.songline-desktop-pet.is-dragging .songline-desktop-pet__figure,
+.songline-desktop-pet.is-returning .songline-desktop-pet__figure{
+  animation-play-state:paused;
+}
+.songline-desktop-pet__image{
+  position:absolute;
+  z-index:1;
+  left:12px;
+  top:0;
+  display:block;
+  width:112px;
+  height:140px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  object-fit:contain;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+/* 排除信息面板的通用头像样式：它原本会把任意后代 img 强制成 38px 圆形。 */
+.songline-terminal-status .songline-desktop-pet__image,
+body.dark[data-page-kind="home"] .songline-terminal-status .songline-desktop-pet__image{
+  position:absolute!important;
+  display:block!important;
+  left:12px!important;
+  top:0!important;
+  width:112px!important;
+  height:140px!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  object-fit:contain!important;
+  transform:none!important;
+  filter:none!important;
+}
+/* 木杆底端位于 rig 的 transform-origin，因此会固定在信息面板上。 */
+.songline-desktop-pet__stake{
+  position:absolute;
+  z-index:0;
+  left:64px;
+  bottom:0;
+  width:9px;
+  height:54px;
+  border-radius:5px 5px 1px 1px;
+  background:linear-gradient(90deg,#70421e 0 20%,#c98a4d 26% 55%,#75451f 62% 100%);
+  transform:rotate(2deg);
+}
+.songline-desktop-pet.is-returning .songline-desktop-pet__rig{
+  animation:songlineDesktopPetSpringReturn .92s cubic-bezier(.16,.78,.18,1) both;
+}
+@keyframes songlineDesktopPetBreathe{
+  0%,100%{transform:translate3d(0,0,0) scale(1,1)}
+  50%{transform:translate3d(0,-1px,0) scale(1.018,.988)}
+}
+@keyframes songlineDesktopPetSpringReturn{
+  0%{transform:rotate(var(--desktop-pet-spring-start, 0deg))}
+  38%{transform:rotate(var(--desktop-pet-spring-reverse-large, 0deg))}
+  61%{transform:rotate(var(--desktop-pet-spring-forward-small, 0deg))}
+  79%{transform:rotate(var(--desktop-pet-spring-reverse-small, 0deg))}
+  100%{transform:rotate(0deg)}
+}
+@media (max-width:760px){
+  .songline-desktop-pet{right:-2px;top:auto;bottom:0;width:110px;height:142px;}
+  .songline-terminal-status .songline-terminal-brand{margin:0 72px 0 auto;}
+  .songline-terminal-status .songline-desktop-pet__image{left:9px!important;width:92px!important;height:114px!important;}
+  .songline-desktop-pet__stake{left:51px;width:8px;height:43px;}
+}
+@media (prefers-reduced-motion:reduce){
+  .songline-desktop-pet__figure{animation:none;}
+  .songline-desktop-pet.is-returning .songline-desktop-pet__rig{animation:none;}
+}

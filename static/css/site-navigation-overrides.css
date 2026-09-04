@@ -1030,12 +1030,20 @@ body.dark .modern-nav-links .songline-nav-slider{
     top:50vh!important;
     right:auto!important;
     left:clamp(22px, 3.4vw, 64px)!important;
-    width:clamp(202px, 17vw, 276px)!important;
+    width:clamp(156px, 12.5vw, 204px)!important;
     /* 四层导航按实际内容高度收束，轨道与悬浮暗底保持上下对称。 */
     min-height:0!important;
     justify-content:center!important;
     padding:clamp(12px, 1.35vh, 20px) 0!important;
     gap:clamp(5px, .45vh, 9px)!important;
+    /* 空白暗幕不拦截星图节点，只有每个实际楼层链接可点击。 */
+    pointer-events:none!important;
+  }
+  html body .modern-site-header .songline-elevator-nav::before{
+    top:-30px!important;
+    right:-12px!important;
+    bottom:-30px!important;
+    border-radius:36px!important;
   }
   html body .modern-site-header .songline-elevator-rail{
     top:clamp(14px, 1.55vh, 22px)!important;
@@ -1046,9 +1054,15 @@ body.dark .modern-nav-links .songline-nav-slider{
   html body .modern-site-header .songline-elevator-nav a:hover,
   html body .modern-site-header .songline-elevator-nav a:focus-visible,
   html body .modern-site-header .songline-elevator-nav a.active{
-    grid-template-columns:clamp(54px, 4.8vw, 76px) minmax(0, 1fr)!important;
+    grid-template-columns:clamp(46px, 4.1vw, 60px) max-content!important;
+    align-self:flex-start!important;
+    width:max-content!important;
     min-height:clamp(47px, 5.2vh, 66px)!important;
     padding:clamp(9px, 1vh, 13px) 0!important;
+    pointer-events:auto!important;
+  }
+  html body .modern-site-header .songline-elevator-nav a.is-elevator-yielding{
+    pointer-events:none!important;
   }
   html body .songline-elevator-floor{
     font-size:clamp(13px, 1.08vw, 17px)!important;
@@ -1065,6 +1079,6 @@ body.dark .modern-nav-links .songline-nav-slider{
   html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
   html body .modern-site-header .songline-elevator-nav a:hover .songline-elevator-name,
   html body .modern-site-header .songline-elevator-nav a:focus-visible .songline-elevator-name{
-    max-width:clamp(112px, 10vw, 160px)!important;
+    max-width:clamp(76px, 7vw, 110px)!important;
   }
 }

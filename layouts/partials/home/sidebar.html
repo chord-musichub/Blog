@@ -13,11 +13,7 @@
     <header class="songline-terminal-status" aria-label="系统在线">
       <span class="songline-terminal-online"><i></i> 在线</span>
       <h1 class="songline-terminal-brand" id="songline-home-title">Songline</h1>
-      {{ with $cfg.about_card.avatar_image }}
-        <img src="{{ . }}" alt="" loading="lazy" decoding="async">
-      {{ else }}
-        <span class="songline-terminal-avatar" aria-hidden="true">{{ default "S" $cfg.about_card.avatar_text }}</span>
-      {{ end }}
+      {{ partial "desktop-pet.html" . }}
     </header>
 
     <div class="songline-terminal-main">

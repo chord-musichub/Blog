@@ -145,6 +145,9 @@
 <link id="songline-tools-underground-scene-style" rel="stylesheet" href="/css/tools-underground-scene.css?v={{ $assetVersion }}&scene=18">
 {{ end }}
 <link rel="stylesheet" href="/css/runtime-animation.css?v={{ $assetVersion }}">
+{{ if .IsHome }}
+<link id="songline-desktop-pet-style" rel="stylesheet" href="/css/desktop-pet.css?v={{ $assetVersion }}">
+{{ end }}
   {{ if hasPrefix .RelPermalink "/tools/focus-timer/" }}
   <link id="songline-focus-style" rel="stylesheet" href="/css/tools/focus-timer.css?v={{ $assetVersion }}">
   {{ end }}
@@ -176,6 +179,9 @@
   <script defer src="/js/mobile-fixed-nav.js?v={{ $assetVersion }}"></script>
   <script defer src="/js/home-scene-parallax.js?v={{ $assetVersion }}"></script>
 <script defer src="/js/space-ribbons.js?v={{ $assetVersion }}"></script>
+{{ if .IsHome }}
+<script defer src="/js/desktop-pet.js?v={{ $assetVersion }}"></script>
+{{ end }}
 </head>
 <body data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-page-section="{{ if .IsHome }}home{{ else }}{{ default "general" .Section }}{{ end }}" data-page-layout="{{ .Layout }}" data-boot-welcome="{{ default "欢迎回来" $cfg.boot.welcome_text }}"{{ with $cfg.background.image }} class="has-site-bg"{{ end }}>
   <script>

@@ -1,0 +1,10 @@
+{{- $image := "/uploads/admin/snowMan.png" -}}
+{{- with .Site.Data.site.desktop_pet.image }}{{ $image = . }}{{ end -}}
+<div class="songline-desktop-pet" data-desktop-pet role="img" aria-label="可拖动的雪人摆件" title="拖动雪人摆动">
+  <span class="songline-desktop-pet__rig">
+    <span class="songline-desktop-pet__figure">
+      <span class="songline-desktop-pet__stake" aria-hidden="true"></span>
+      <img class="songline-desktop-pet__image" src="{{ $image }}" alt="" decoding="async">
+    </span>
+  </span>
+</div>
