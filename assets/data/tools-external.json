@@ -24,10 +24,10 @@
     "href":"https://chatgpt.com/"
   },
   {
-    "icon_url":"https://www.google.com/s2/favicons?domain=accounts.woozooo.com/accounts.php?action=login&ref=pc.woozooo.com&sz=64",
+    "icon_url":"https://www.google.com/s2/favicons?domain=www.lanzou.com/&sz=64",
     "title":"蓝奏云",
     "desc":"比较好用的轻量级网盘",
-    "href":"https://accounts.woozooo.com/accounts.php?action=login&ref=pc.woozooo.com"
+    "href":"https://www.lanzou.com/"
   },
   {
     "icon_url":"https://www.google.com/s2/favicons?domain=photokit.com/tools/cutout/?lang=zh&sz=64",
@@ -58,5 +58,71 @@
     "title":"动漫共和国",
     "desc":"看番，对",
     "href":"https://www.dmghg.app/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=bdwlmc.xiao-blog.top/&sz=64",
+    "title":"BDWL基岩荒地",
+    "desc":"请支持BDWL~",
+    "href":"https://bdwlmc.xiao-blog.top/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=github.com/&sz=64",
+    "title":"github",
+    "desc":"非常好的git远程托管",
+    "href":"https://github.com/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=oi.wiki/&sz=64",
+    "title":"OI-Wiki",
+    "desc":"oi竞赛自学可用",
+    "href":"https://oi.wiki/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=www.w3school.com.cn/&sz=64",
+    "title":"W3school",
+    "desc":"自学语言的高效网站",
+    "href":"https://www.w3school.com.cn/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=www.toolhelper.cn/&sz=64",
+    "title":"锤子在线工具网",
+    "desc":"小工具集合!",
+    "href":"https://www.toolhelper.cn/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=www.ear0.com/&sz=64",
+    "title":"Ear聆",
+    "desc":"素材获取网站",
+    "href":"https://www.ear0.com/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=www.pexels.com/zh-cn/&sz=64",
+    "title":"pexels",
+    "desc":"免费4k视频素材下载网站",
+    "href":"https://www.pexels.com/zh-cn/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=www.geogebra.org/calculator&sz=64",
+    "title":"GroGebra",
+    "desc":"经典几何画板",
+    "href":"https://www.geogebra.org/calculator"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=tools.athbe.cn/ncm/&sz=64",
+    "title":"NCM 解密工具",
+    "desc":"网易云 .ncm文件->.flac文件 工具",
+    "href":"https://tools.athbe.cn/ncm/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=fanyi.youdao.com/#/TextTranslate&sz=64",
+    "title":"有道翻译官",
+    "desc":"虽然说ai时代...但是有道还是好用，对吧?",
+    "href":"https://fanyi.youdao.com/#/TextTranslate"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=cn.thdog.moe/&sz=64",
+    "title":"东方狗下载站",
+    "desc":"东方，不得不品的一环",
+    "href":"https://cn.thdog.moe/"
   }
 ]
