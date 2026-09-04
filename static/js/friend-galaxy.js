@@ -88,9 +88,11 @@
   }
 
   function build(shell, friends){
-    var stage = shell.querySelector('[data-galaxy-stage]');
-    var lines = shell.querySelector('[data-galaxy-lines]');
-    var nodeLayer = shell.querySelector('[data-galaxy-nodes]');
+    var stage = shell.querySelector('[data-galaxy-stage], .friends-constellation__sky');
+    // 线上旧版 Hugo 的 HTML 压缩器会移除 SVG 上的空 data-* 属性，
+    // 但 class 会完整保留；这里以 class 作为兼容回退，不能再只依赖 data 属性。
+    var lines = shell.querySelector('[data-galaxy-lines], .friends-constellation__lines');
+    var nodeLayer = shell.querySelector('[data-galaxy-nodes], .friends-constellation__nodes');
     var hoverCard = shell.querySelector('[data-galaxy-hover-card]');
     var hoverAvatar = shell.querySelector('[data-hover-avatar]');
     var hoverName = shell.querySelector('[data-hover-name]');
