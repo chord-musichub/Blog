@@ -81,7 +81,9 @@
 
     // 页面内 JSON 与 Hugo 本次构建使用同一份合并结果。
     var data = friendData();
-    if(!shell.isConnected || shell.dataset.friendGalaxyReady !== VERSION) return;
+    // 初始直开和站内换页会处于不同的文档/过场时机；线上环境中此处的
+    // isConnected/version 二次判断曾错误地把刚标记为 ready 的星图跳过。
+    // 首层去重已经完成，拿到内嵌数据后直接构建即可。
     build(shell, normalize(data));
   }
 
