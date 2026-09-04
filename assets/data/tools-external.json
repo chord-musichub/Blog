@@ -16,5 +16,47 @@
     "title":"draw.io",
     "desc":"流程图绘图网站",
     "href":"https://app.diagrams.net/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=chatgpt.com/&sz=64",
+    "title":"ChatGPT",
+    "desc":"一切的开始",
+    "href":"https://chatgpt.com/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=accounts.woozooo.com/accounts.php?action=login&ref=pc.woozooo.com&sz=64",
+    "title":"蓝奏云",
+    "desc":"比较好用的轻量级网盘",
+    "href":"https://accounts.woozooo.com/accounts.php?action=login&ref=pc.woozooo.com"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=photokit.com/tools/cutout/?lang=zh&sz=64",
+    "title":"PHOTOKIT",
+    "desc":"你知道的ai抠图，香",
+    "href":"https://photokit.com/tools/cutout/?lang=zh"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=web.chatboxai.app/guide&sz=64",
+    "title":"ChatBox",
+    "desc":"用来管理你的ai们",
+    "href":"https://web.chatboxai.app/guide"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=shimo.im/recent&sz=64",
+    "title":"石墨",
+    "desc":"非常好用的文档存储网盘",
+    "href":"https://shimo.im/recent"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=csdiy.wustacm.com/&sz=64",
+    "title":"wust-csdiy",
+    "desc":"?!夹带私货!?",
+    "href":"http://csdiy.wustacm.com/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=www.dmghg.app/&sz=64",
+    "title":"动漫共和国",
+    "desc":"看番，对",
+    "href":"https://www.dmghg.app/"
   }
 ]
