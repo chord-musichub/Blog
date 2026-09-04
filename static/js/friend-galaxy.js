@@ -66,7 +66,10 @@
   }
   // 内嵌数据是构建期合并后的唯一来源：不能再让旧静态快照覆盖第三方节点。
   function friendData(){
-    return Promise.resolve(inlineData());
+    // 数据已经由 Hugo 内嵌到当前页面，不需要再经过 Promise 微任务。
+    // 公开站某些导航/过场时序下，异步回调会在页面完成前被跳过，导致只保留
+    // 服务端的头像保底节点，而星链和悬浮卡片从未开始构建。
+    return inlineData();
   }
   function escapeHtml(value){ return clean(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -77,10 +80,9 @@
     shell.dataset.friendGalaxyReady = VERSION;
 
     // 页面内 JSON 与 Hugo 本次构建使用同一份合并结果。
-    friendData().then(function(data){
-      if(!shell.isConnected || shell.dataset.friendGalaxyReady !== VERSION) return;
-      build(shell, normalize(data));
-    });
+    var data = friendData();
+    if(!shell.isConnected || shell.dataset.friendGalaxyReady !== VERSION) return;
+    build(shell, normalize(data));
   }
 
   function build(shell, friends){
