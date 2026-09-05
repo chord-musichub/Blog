@@ -1,0 +1,102 @@
+{{define "admin-head"}}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{.Title}}</title>
+  {{template "admin-favicon" .Data}}
+  <script>
+  (function(){
+    try{
+      var theme = localStorage.getItem('gexian-admin-theme') || 'dark';
+      document.documentElement.setAttribute('data-admin-theme', theme);
+      document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#fbfaf7';
+    }catch(e){
+      document.documentElement.setAttribute('data-admin-theme', 'dark');
+      document.documentElement.style.backgroundColor = '#0d1728';
+    }
+  })();
+  </script>
+  <link rel="stylesheet" href="/static/style.css?v=20.18.5">
+  <script defer src="/static/admin-theme.js"></script>
+  {{if .Navigation}}<script defer src="/static/admin-nav.js?v=20.18.5"></script>
+  <script defer src="/static/admin-mobile.js?v=20.18.5"></script>{{end}}
+  <script defer src="/static/page-transition.js?v=20.18.5"></script>
+  {{with .ExtraScript}}<script defer src="{{.}}"></script>{{end}}
+  <style>
+  :root{
+    --admin-bg:{{default "#fbfaf7" .Data.Theme.Background}};
+    --admin-panel:color-mix(in srgb, {{default "#fffdfa" .Data.Theme.Panel}} 86%, transparent);
+    --admin-panel-strong:{{default "#fffdfa" .Data.Theme.Panel}};
+    --admin-text:{{default "#15345b" .Data.Theme.Text}};
+    --admin-muted:{{default "#64748b" .Data.Theme.Muted}};
+    --admin-accent:{{default "#0ea5e9" .Data.Theme.Accent}};
+    --admin-accent-2:{{default "#2563eb" .Data.Theme.Accent2}};
+    --admin-soft:color-mix(in srgb, {{default "#0ea5e9" .Data.Theme.Accent}} 11%, {{default "#fbfaf7" .Data.Theme.Background}});
+    --admin-warm:color-mix(in srgb, #ffe7bd 36%, {{default "#fbfaf7" .Data.Theme.Background}});
+  }
+  </style>
+  <style id="admin-dark-top-hardfix">
+  html[data-admin-theme="dark"],
+  html[data-admin-theme="dark"] body,
+  html[data-admin-theme="dark"] body::before,
+  html[data-admin-theme="dark"] body::after{
+    background:#0d1728!important;
+    background-image:none!important;
+  }
+  html[data-admin-theme="dark"] body{
+    margin-top:0!important;
+    border-top:0!important;
+    box-shadow:none!important;
+  }
+  html[data-admin-theme="dark"] .admin-site-bg-layer{
+    display:block!important;
+    visibility:visible!important;
+    opacity:var(--admin-site-bg-opacity, .38)!important;
+    background-image:var(--admin-site-bg-image)!important;
+    background-size:cover!important;
+    background-position:center top!important;
+  }
+  html[data-admin-theme="dark"] .admin-client-nav{
+    background:#101c30!important;
+    background-image:none!important;
+    border-color:rgba(125,211,252,.18)!important;
+  }
+  html[data-admin-theme="dark"] .admin-main-nav,
+  html[data-admin-theme="dark"] .admin-glass-nav,
+  html[data-admin-theme="dark"] main.wrap > nav.nav:first-child,
+  html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
+    display:none!important;
+    height:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    overflow:hidden!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  </style>
+  <script defer src="/static/space-ribbons.js?v=20.18.5"></script>
+</head>
+{{end}}
+
+{{define "admin-client-nav"}}
+<nav class="admin-client-nav" data-admin-client-nav>
+  <a class="admin-client-brand admin-client-brand-simple" href="{{adminURL "/"}}">后台</a>
+  <div class="admin-client-links">
+    <a href="{{adminURL "/"}}" data-admin-route="dashboard">工作台</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin"}}" data-admin-route="review">审核</a>{{end}}
+    <a href="{{adminURL "/articles/new"}}" data-admin-route="new">新建</a>
+    <a href="{{adminURL "/articles/upload"}}" data-admin-route="upload">上传</a>
+    <a href="{{adminURL "/admin/media"}}" data-admin-route="media">媒体库</a>
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin/site"}}" data-admin-route="site">站点</a>{{end}}
+    {{if eq .User.Role "admin"}}<a href="{{adminURL "/users/new"}}" data-admin-route="users">作者</a>{{end}}
+    <a href="{{adminURL "/account"}}" data-admin-route="account">账号</a>
+  </div>
+  <div class="admin-client-actions">
+    <a class="admin-client-home" href="{{publicURL}}" target="_blank" rel="noopener">回主页 ↗</a>
+    <button class="admin-theme-icon-button admin-client-theme" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <a class="admin-client-logout" href="{{adminURL "/logout"}}">退出</a>
+  </div>
+</nav>
+{{end}}

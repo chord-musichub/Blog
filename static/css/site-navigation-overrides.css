@@ -1,77 +1,7 @@
-/* 导航、轨道入口与页面切换覆盖规则；由 site.css 后续加载以保持历史层叠顺序。 */
-/* v20.18.5：星际入口去掉右上文章跳转，文字标注彻底无背景 */
-.waapi-gateway-head{
-  align-items:center;
-}
-.waapi-gateway-more{
-  display:none!important;
-}
-.waapi-satellite{
-  gap:6px;
-}
-.waapi-satellite-label,
-.waapi-satellite:hover .waapi-satellite-label,
-.waapi-satellite:focus-visible .waapi-satellite-label,
-.waapi-satellite.is-active .waapi-satellite-label,
-body.dark .waapi-satellite-label,
-body.dark .waapi-satellite:hover .waapi-satellite-label,
-body.dark .waapi-satellite:focus-visible .waapi-satellite-label,
-body.dark .waapi-satellite.is-active .waapi-satellite-label{
-  display:block!important;
-  min-width:0!important;
-  padding:0!important;
-  margin:0!important;
-  border:0!important;
-  outline:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  background-image:none!important;
-  box-shadow:none!important;
-  backdrop-filter:none!important;
-  -webkit-backdrop-filter:none!important;
-}
-.waapi-satellite-label{
-  font-size:12px;
-  line-height:1.15;
-  transform:translateY(0);
-  transition:color .22s ease, text-shadow .22s ease, transform .22s ease;
-}
-.waapi-satellite:hover .waapi-satellite-label,
-.waapi-satellite:focus-visible .waapi-satellite-label,
-.waapi-satellite.is-active .waapi-satellite-label{
-  transform:translateY(1px);
-}
-
-
-/* v20.18.5：星际入口标题外置、关于本站轨道修正、导航页横向切换 */
-.waapi-orbital-section{
-  margin-top:34px;
-}
-.waapi-orbital-section .waapi-orbital-title{
-  margin-bottom:18px;
-}
-.waapi-orbital-section .waapi-orbital-title h2{
-  margin:0;
-}
-.waapi-orbital-gateway{
-  margin-top:0;
-}
+/* 导航与页面切换的唯一覆盖层。 */
 #site-about,
 #site-notice{
   scroll-margin-top:96px;
-}
-.waapi-orbit-guide.guide-about{
-  --orbit-w:500px;
-  --orbit-h:190px;
-  --orbit-x:-34px;
-  --orbit-y:18px;
-  --orbit-rot:-16deg;
-  --orbit-opacity:.26;
-}
-.satellite-about .waapi-satellite-label{
-  white-space:nowrap;
-  font-size:11.5px;
-  letter-spacing:.08em;
 }
 html.nav-leave-to-left body > :not(.site-boot-overlay):not(.page-loading-orb),
 html.nav-leave-to-right body > :not(.site-boot-overlay):not(.page-loading-orb),
@@ -301,7 +231,8 @@ html.nav-enter-from-left.is-nav-enter-ready body > :not(.site-boot-overlay):not(
     background:rgba(191,204,219,.25);
   }
 }
-@media(max-width:980px){
+/* 窄桌面窗口仍使用电梯导航；仅触屏设备（或真正小屏）切换成底部导航。 */
+@media (max-width:760px), (max-width:980px) and (hover:none){
   html body .modern-site-header .songline-elevator-nav a:not(.active) .songline-elevator-name{ display:none!important; }
   html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name{ display:block!important; }
 }
@@ -447,7 +378,8 @@ html.nav-enter-from-left.is-nav-enter-ready body > :not(.site-boot-overlay):not(
   transform:translateX(3px);
 }
 .modern-site-header .songline-elevator-nav .songline-nav-slider{ display:none!important; }
-@media(max-width:980px){
+/* 不能只按窗口宽度切换：桌面浏览器半屏时也需要保留完整电梯交互。 */
+@media (max-width:760px), (max-width:980px) and (hover:none){
   html.has-fixed-mobile-nav body{ padding-top:0!important; }
   .modern-site-header .logo{ top:15px; left:16px; }
   .modern-site-header .header-icons{ top:13px; right:14px; }

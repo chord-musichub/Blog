@@ -14,7 +14,7 @@
     var style = document.createElement('link');
     style.id = STYLE_ID;
     style.rel = 'stylesheet';
-    style.href = '/css/tags.css?v=' + encodeURIComponent(assetVersion);
+    style.href = '/css/pages/tags/index.css?v=' + encodeURIComponent(assetVersion);
     document.head.appendChild(style);
   }
 

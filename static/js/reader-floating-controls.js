@@ -29,8 +29,8 @@
   }
 
   function ensureReaderStylesheets(){
-    ensureStylesheet(ARTICLE_STYLE_ID, '/css/article-reader.css');
-    ensureStylesheet(STYLE_ID, '/css/reader-floating-controls.css');
+    ensureStylesheet(ARTICLE_STYLE_ID, '/css/pages/content/article-reader.css');
+    ensureStylesheet(STYLE_ID, '/css/pages/content/reader-floating-controls.css');
   }
 
   function hasReaderPage(){

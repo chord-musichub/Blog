@@ -202,7 +202,8 @@ body[data-page-kind="home"] .songline-home-system{
 
 
 }
-@media(max-width:980px){
+/* 仅在真实小屏或触屏窄屏时折叠首页；桌面浏览器缩放不应切回旧的单列版。 */
+@media (max-width:760px), (max-width:980px) and (hover:none){
   .songline-home-layout{ display:block!important; width:100%!important; margin-inline:0!important; padding:74px 18px 92px!important; }
   .songline-home-scene{ min-height:clamp(310px, 65svh, 560px); }
   .songline-home-scene-copy{ top:26px; left:18px; max-width:80%; }
@@ -306,7 +307,7 @@ body[data-page-kind="home"] .songline-home-system{
 
 
 [data-home-parallax]{ will-change:transform; }
-@media(max-width:980px){
+@media (max-width:760px), (max-width:980px) and (hover:none){
   body[data-page-kind="home"] .site-bg-layer::before{ background-position:20% center!important; }
   body[data-page-kind="home"] .site-bg-layer::after{
     background:linear-gradient(180deg, transparent 34%, rgba(27,38,54,.12) 62%, rgba(27,38,54,.34) 100%)!important;
@@ -402,7 +403,7 @@ body[data-page-kind="home"] .songline-home-system{
 
 
 }
-@media(max-width:980px){
+@media (max-width:760px), (max-width:980px) and (hover:none){
 
   .songline-recommendations-head{ align-items:flex-start; }
 
@@ -456,7 +457,7 @@ body[data-page-kind="home"] .songline-home-system{
 
 
 
-@media(max-width:980px){
+@media (max-width:760px), (max-width:980px) and (hover:none){
   body[data-page-kind="home"] .songline-home-system{
     padding:18px!important;
     border-left:1px solid rgba(233,243,253,.32)!important;
@@ -880,7 +881,31 @@ body[data-page-kind="home"] .songline-home-system{
   .songline-terminal-feature-stage{ min-height:205px; }
   .songline-terminal-stat-grid div{ min-height:87px; }
 }
-@media(max-width:980px){
+/* 浏览器缩放或非全屏桌面窗口：保留首页的左右终端构图，只压缩间距和面板尺寸。 */
+@media (min-width:761px) and (max-width:1180px) and (hover:hover){
+  .songline-home-layout{
+    width:calc(100vw - clamp(118px, 15vw, 150px))!important;
+    margin-left:clamp(92px, 11vw, 118px)!important;
+    padding-top:clamp(82px, 11vh, 106px)!important;
+    grid-template-columns:minmax(0, 1fr) minmax(350px, 1.2fr)!important;
+    gap:clamp(16px, 2.4vw, 24px)!important;
+  }
+  body[data-page-kind="home"] .songline-home-system{
+    margin-top:clamp(12px, 2.4vh, 22px)!important;
+    margin-right:0!important;
+  }
+  .songline-terminal-frame{
+    min-height:clamp(372px, 53vh, 480px);
+    padding:clamp(13px, 1.7vw, 16px);
+    transform:perspective(1050px) rotateY(-3deg);
+  }
+  .songline-terminal-main{ gap:clamp(12px, 1.8vw, 18px); }
+  .songline-terminal-feature{ padding-right:12px; }
+  .songline-terminal-stats{ padding-left:12px; }
+  .songline-terminal-feature-stage{ min-height:clamp(178px, 28vw, 230px); }
+  .songline-terminal-stat-grid div{ min-height:72px; }
+}
+@media (max-width:760px), (max-width:980px) and (hover:none){
   body[data-page-kind="home"] .songline-home-system{ width:100%!important; max-width:640px; margin:24px auto 0!important; }
   .songline-terminal-frame{ min-height:0; transform:none; }
   .songline-terminal-main{ grid-template-columns:1fr; gap:22px; }
@@ -969,7 +994,7 @@ body[data-page-kind="home"] .songline-home-system{
   .songline-home-music{ margin-top:12px; padding-top:10px; }
   .songline-home-music-main{ grid-template-columns:42px minmax(0,1fr); gap:8px; }
 }
-@media(max-width:980px){ .songline-home-music{ margin-top:18px; } }
+@media (max-width:760px), (max-width:980px) and (hover:none){ .songline-home-music{ margin-top:18px; } }
 @media(prefers-reduced-motion:reduce){ .songline-home-music-actions button{ transition:none!important; animation:none!important; } }
 
 /* 桌面端压缩为统计区右下的一行轻播放器。 */

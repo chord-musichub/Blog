@@ -11,7 +11,7 @@
     const link = document.createElement('link');
     link.id = STYLE_ID;
     link.rel = 'stylesheet';
-    link.href = '/css/posts-list.css' + (assetVersion ? '?v=' + encodeURIComponent(assetVersion) : '');
+    link.href = '/css/pages/posts/list.css' + (assetVersion ? '?v=' + encodeURIComponent(assetVersion) : '');
     link.dataset.songlinePageStyle = 'posts-list';
     document.head.appendChild(link);
   }

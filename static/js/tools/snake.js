@@ -900,7 +900,6 @@
 
     bestEl.textContent = String(best);
     bind();
-    renderTopScores();
     leaderboard.fetchTopScores().then(function(){ window.setTimeout(function(){ leaderboard.syncLocalBest(false); }, 320); });
     initialDraw();
     raf = requestAnimationFrame(loop);

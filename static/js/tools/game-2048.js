@@ -362,7 +362,7 @@
 
     newGame();
     leaderboard.fetchTopScores().then(function(){
-      window.setTimeout(syncLocalBest, 300);
+      window.setTimeout(function(){ leaderboard.syncLocalBest(); }, 300);
     });
   }
 

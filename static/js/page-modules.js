@@ -24,7 +24,7 @@
     var isToolsPage = path.indexOf('/tools/') === 0 || !!query(root, '.tools-grid, .tool-card, .md-tool-layout, [data-snake-game], [data-game-2048]');
     var isSearchSurface = isToolsPage || path === '/' || path.indexOf('/posts/') === 0 || path.indexOf('/friends/') === 0 || path.indexOf('/tags/') === 0 || !!query(root, '[data-search-submit], [data-tag-search-panel], [data-tools-search], .home-friends-section');
     if(isArticleSurface){
-      ensureStylesheet('songline-markdown-renderer-style', '/css/markdown-renderer.css');
+      ensureStylesheet('songline-markdown-renderer-style', '/css/pages/content/markdown-renderer.css');
       ensureStylesheet('songline-article-compat-style', '/css/site-article-compat.css');
       ensureStylesheet('songline-markdown-compat-style', '/css/site-markdown-compat.css');
       ensureStylesheet('songline-article-overrides-style', '/css/site-article-overrides.css');
@@ -42,8 +42,8 @@
     if(path.indexOf('/tools/markdown-previewer/') === 0 || !!query(root, '[data-md-tool], .md-tool-layout')){
       // 动态换页时明确维持与服务端直开一致的层级顺序。
       ensureStylesheet('songline-markdown-previewer-base-style', '/css/tools/markdown-previewer-base.css');
-      ensureStylesheet('songline-article-reader-style', '/css/article-reader.css');
-      ensureStylesheet('songline-reader-floating-controls-style', '/css/reader-floating-controls.css');
+      ensureStylesheet('songline-article-reader-style', '/css/pages/content/article-reader.css');
+      ensureStylesheet('songline-reader-floating-controls-style', '/css/pages/content/reader-floating-controls.css');
       ensureStylesheet('songline-markdown-previewer-style', '/css/tools/markdown-previewer.css');
     }
     if(path.indexOf('/tools/audio-visualizer/') === 0 || !!query(root, '[data-audio-visualizer], .audio-visualizer-page')){
@@ -91,7 +91,7 @@
     },
     {
       key:'home-recommendations',
-      src:'/js/home-recommendations.js?v=' + VERSION,
+      src:'/js/pages/home/recommendations.js?v=' + VERSION,
       test:function(root){
         return !!query(root, '[data-home-recommendations]');
       },
@@ -129,7 +129,7 @@
     },
     {
       key:'home-friend-carousel',
-      src:'/js/home-friend-carousel.js?v=' + VERSION,
+      src:'/js/pages/home/friend-carousel.js?v=' + VERSION,
       test:function(root){
         return !!query(root, '[data-home-friend-carousel], [data-home-friend-track]');
       },
@@ -141,7 +141,7 @@
       key:'friend-galaxy',
       // 与服务端直开页面共用当前资源版本；固定版本号会让 AJAX 进入朋友页时
       // 命中旧缓存，导致新坐标逻辑没有真正执行。
-      src:'/js/friend-galaxy.js?v=' + VERSION + '&friends=22.3',
+      src:'/js/pages/friends/galaxy.js?v=' + VERSION + '&friends=22.3',
       test:function(root){
         return !!query(root, '[data-friend-galaxy], .friend-galaxy, .friend-galaxy-stage, .friends-galaxy, .galaxy-map');
       },
@@ -151,7 +151,7 @@
     },
     {
       key:'tag-flow',
-      src:'/js/tag-flow.js?v=' + VERSION,
+      src:'/js/pages/tags/flow.js?v=' + VERSION,
       test:function(root){
         return !!query(root, '[data-tag-flow], .tag-flow, .tag-river, .tag-river-stage, .tag-river-canvas, .tag-river-search');
       },
@@ -261,7 +261,7 @@
     },
     {
       key:'home-music',
-      src:'/js/home-music-player.js?v=' + VERSION,
+      src:'/js/pages/home/music-player.js?v=' + VERSION,
       test:function(root){
         return !!query(root, '[data-home-music]');
       },
@@ -309,7 +309,7 @@
     },
     {
       key:'posts-list-flat',
-      src:'/js/posts-list-flat.js?v=' + VERSION,
+      src:'/js/pages/posts/list.js?v=' + VERSION,
       test:function(root){
         return !!query(root, '.posts-list, #postList');
       },

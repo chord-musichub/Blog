@@ -1,8 +1,8 @@
 {{ define "main" }}
 {{ $localTools := slice }}
-{{ with resources.Get "data/tools-local.json" }}{{ $localTools = . | transform.Unmarshal }}{{ end }}
+{{ with resources.Get "data/tools/local.json" }}{{ $localTools = . | transform.Unmarshal }}{{ end }}
 {{ $externalTools := slice }}
-{{ with resources.Get "data/tools-external.json" }}{{ $externalTools = . | transform.Unmarshal }}{{ end }}
+{{ with resources.Get "data/tools/external.json" }}{{ $externalTools = . | transform.Unmarshal }}{{ end }}
 {{ $rowCount := len $localTools }}
 {{ if gt (len $externalTools) $rowCount }}{{ $rowCount = len $externalTools }}{{ end }}
 <section class="tools-excavation" data-tools-archive>

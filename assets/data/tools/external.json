@@ -124,5 +124,41 @@
     "title":"东方狗下载站",
     "desc":"东方，不得不品的一环",
     "href":"https://cn.thdog.moe/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=font.subf.dev/zh-cn/&sz=64",
+    "title":"Maple Mono",
+    "desc":"极力推荐的等宽字体",
+    "href":"https://font.subf.dev/zh-cn/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=maboloshi.github.io/github-chinese/&sz=64",
+    "title":"github-chinese",
+    "desc":"GitHub 中文化插件",
+    "href":"https://maboloshi.github.io/github-chinese/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=rufus.ie/zh/&sz=64",
+    "title":"Rufus",
+    "desc":"轻量级usb启动盘制作工具,镜像、刷机、换系统,都可以用它",
+    "href":"https://rufus.ie/zh/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=3b1b.github.io/manim/&sz=64",
+    "title":"Manim",
+    "desc":"解释性数学视频的动画引擎,用来制作数学模型动画",
+    "href":"https://3b1b.github.io/manim/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=sqlitebrowser.org/&sz=64",
+    "title":"DB Browser",
+    "desc":"轻量级可视化 SQLite 编辑软件",
+    "href":"https://sqlitebrowser.org/"
+  },
+  {
+    "icon_url":"https://www.google.com/s2/favicons?domain=www.vmware.com/products/desktop-hypervisor/workstation-and-fusion&sz=64",
+    "title":"VMware",
+    "desc":"桌面虚拟机软件",
+    "href":"https://www.vmware.com/products/desktop-hypervisor/workstation-and-fusion"
   }
 ]

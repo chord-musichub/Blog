@@ -10,16 +10,17 @@
 | `site-modern.css` | 现代页面布局、卡片、搜索与视觉兼容规则。 |
 | `site-search-overrides.css` | 搜索反馈、筛选状态与搜索相关覆盖规则。 |
 | `site-article-compat.css` | 文章目录和 Markdown 表格的兼容规则。 |
-| `site-home-compat.css` | 首页欢迎区与统计项的兼容规则。 |
 | `site-tools-compat.css` | 工具页浮动阅读控制的兼容规则。 |
-| `site-friends-compat.css` | 朋友星图、资料展示与相关交互兼容规则。 |
+| `site-friends-compat.css` | 仅朋友页加载的星图、资料展示与交互兼容规则。 |
 | `site-markdown-compat.css` | Markdown 代码高亮、注释字体与目录锚点兼容规则。 |
-| `site-navigation-overrides.css` | 导航滑块、轨道入口、页面切换与锚点反馈。 |
+| `site-navigation-overrides.css` | 导航滑块、页面切换与锚点反馈。 |
 | `page-transition-scene.css` | 全站纵向页面过场、黑幕和 SVG 生长圆加载器；仅作用于 `main.container`。 |
 | `site-article-overrides.css` | 阅读页目录定位反馈。 |
-| `mobile-foundation.css`、`responsive.css` | 断点与移动端覆盖规则。 |
+| `mobile-foundation.css` | 公共断点与移动端可用性规则。 |
 
-页面专用样式（首页、朋友、标签、文章和工具）在公共层之后按页面条件加载。新增规则应优先落到对应页面文件；只有需要作用于多个页面时才放入公共层。
+页面专用样式（首页、朋友、标签、文章和工具）在公共层之后按页面条件加载。新增规则应优先落到对应页面文件；只有需要作用于多个页面时才放入公共层。历史组件被删除后，应同时删除其 CSS 与模板加载入口，不能保留“未引用但可能有用”的响应式补丁。
+
+样式入口统一维护在 `layouts/partials/assets/page-styles.html`，其顺序就是实际层叠顺序；全站核心脚本入口在同目录的 `core-scripts.html`。`baseof.html` 只负责调用这两个入口，页面专用脚本则继续由 `page-specific-scripts.html` 和 `page-modules.js` 管理。
 
 `page-modules.js` 负责站内换页后的样式补载与页面级初始化。阅读量、首页推荐、Markdown 代码工具和搜索不应再由页脚全站加载；它们必须通过该调度器按实际 DOM 特征载入。服务端页级脚本必须排在该调度器之前，并且只暴露初始化函数：直开与站内换页都由调度器调用同一个入口。
 

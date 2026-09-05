@@ -1,0 +1,16 @@
+{{/* 全站核心脚本；页面专用脚本由 page-specific-scripts 与 page-modules 负责。 */}}
+{{ $assetVersion := partial "asset-version.html" . }}
+  <script>window.__songlineUnifiedPageTransition = true;</script>
+  <script defer src="/js/performance-guard.js?v={{ $assetVersion }}"></script>
+  <script src="/js/page-transition-priority.js?v={{ $assetVersion }}"></script>
+  <script src="/js/page-transition-nav.js?v={{ $assetVersion }}"></script>
+  {{ if .IsHome }}<script defer src="/js/pages/home/boot-sequence.js?v={{ $assetVersion }}"></script>{{ end }}
+  <script defer src="/js/page-transition.js?v={{ $assetVersion }}"></script>
+  <script src="/js/page-transition-system.js?v={{ $assetVersion }}"></script>
+  <script defer src="/js/mobile-adapt.js?v={{ $assetVersion }}"></script>
+  <script defer src="/js/mobile-fixed-nav.js?v={{ $assetVersion }}"></script>
+  {{ if .IsHome }}<script defer src="/js/pages/home/scene-parallax.js?v={{ $assetVersion }}"></script>{{ end }}
+<script defer src="/js/space-ribbons.js?v={{ $assetVersion }}"></script>
+{{ if .IsHome }}
+<script defer src="/js/desktop-pet.js?v={{ $assetVersion }}"></script>
+{{ end }}

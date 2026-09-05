@@ -10,11 +10,11 @@ v20.20.6：首屏资源提示。
 <link rel="preload" href="/css/site.css?v={{ $v }}" as="style">
 
 {{- if or (eq $section "friends") (hasPrefix $rel "/friends/") }}
-<link rel="preload" href="/js/friend-galaxy.js?v={{ $v }}&friends=22.3" as="script">
+<link rel="preload" href="/js/pages/friends/galaxy.js?v={{ $v }}&friends=22.3" as="script">
 {{- end }}
 
 {{- if or (eq $section "tags") (hasPrefix $rel "/tags/") }}
-<link rel="preload" href="/js/tag-flow.js?v={{ $v }}" as="script">
+<link rel="preload" href="/js/pages/tags/flow.js?v={{ $v }}" as="script">
 {{- end }}
 
 {{- if hasPrefix $rel "/tools/snake/" }}

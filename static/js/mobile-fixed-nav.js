@@ -1,7 +1,10 @@
 (function(){
   'use strict';
 
-  var mq = window.matchMedia ? window.matchMedia('(max-width: 980px)') : null;
+  // 980px 以下的桌面分屏仍应保留桌面电梯；无 hover 的触屏设备才使用
+  // 底部固定导航。760px 以下则无条件进入移动布局。
+  var mobileQuery = '(max-width: 760px), (max-width: 980px) and (hover: none)';
+  var mq = window.matchMedia ? window.matchMedia(mobileQuery) : null;
   var resizeObserver = null;
   var raf = 0;
 
