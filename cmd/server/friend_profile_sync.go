@@ -65,7 +65,7 @@ func (app *App) syncUserProfileToFriendsJSON(oldUser, newUser User) error {
 		URL:         friendProfileURL(slug),
 		Bio:         strings.TrimSpace(newUser.Bio),
 		Homepage:    strings.TrimSpace(newUser.Homepage),
-		Avatar:      firstNonEmpty(strings.TrimSpace(newUser.Avatar), "/uploads/admin/main_logo.png"),
+		Avatar:      normalizeUserAvatar(newUser.Avatar),
 		Cover:       strings.TrimSpace(newUser.Cover),
 		PostCount:   postCount,
 		PostTitles:  postTitles,

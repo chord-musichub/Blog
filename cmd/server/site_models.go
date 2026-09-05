@@ -8,6 +8,7 @@ type PublicFriend struct {
 	URL         string   `json:"url"`
 	Bio         string   `json:"bio,omitempty"`
 	Homepage    string   `json:"homepage,omitempty"`
+	Links       []string `json:"links,omitempty"`
 	Avatar      string   `json:"avatar,omitempty"`
 	Cover       string   `json:"cover,omitempty"`
 	PostCount   int      `json:"post_count"`

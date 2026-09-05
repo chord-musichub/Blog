@@ -7,19 +7,6 @@
   max-width:920px;
   margin:0 auto;
 }
-.reaction-hero{
-  margin-bottom:22px;
-}
-.reaction-hero h1{
-  margin:.15em 0 .2em;
-  font-size:clamp(2.3rem, 8vw, 5.2rem);
-  line-height:.9;
-  letter-spacing:-.08em;
-}
-.reaction-hero p{
-  max-width:42rem;
-  color:rgba(71,85,105,.88);
-}
 .reaction-panel{
   position:relative;
   border:1px solid rgba(148,163,184,.24);
@@ -225,18 +212,6 @@
   width:min(100%, 620px);
   margin:18px auto 0!important;
 }
-.reaction-tip{
-  margin:16px 0 0;
-  text-align:center;
-  color:rgba(71,85,105,.82);
-  font-size:.94rem;
-}
-body.dark .reaction-hero p,
-html.dark .reaction-hero p,
-body.dark .reaction-tip,
-html.dark .reaction-tip{
-  color:rgba(203,213,225,.76);
-}
 body.dark .reaction-panel,
 html.dark .reaction-panel,
 body.dark .reaction-stat-card,
@@ -291,6 +266,5 @@ html.dark .reaction-leaderboard li span small{
   background:rgba(14,165,233,.2);
   color:rgba(186,230,253,.92);
 }
-
 
 

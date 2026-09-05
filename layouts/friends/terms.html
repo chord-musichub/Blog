@@ -14,7 +14,7 @@
   <div class="featured-friends friend-search-list">
     {{ with $friends }}{{ range first 2 .ByCount }}
       {{ $first := index .Pages 0 }}
-      {{ $avatar := "/uploads/admin/main_logo.png" }}
+      {{ $avatar := "/media/users/user-null.png" }}
       {{ $bio := "记录想法，分享文章。" }}
       {{ with $first }}{{ with .Params.author_avatar }}{{ $avatar = . }}{{ end }}{{ with .Params.author_bio }}{{ $bio = . }}{{ end }}{{ end }}
       <a class="card featured-card friend-search-item" data-name="{{ .Page.Title | plainify }}" data-bio="{{ $bio | plainify }}" data-posts="{{ range .Pages }}{{ .Title | plainify }} {{ end }}" href="{{ .Page.RelPermalink }}"><img class="avatar" src="{{ $avatar }}" alt="{{ .Page.Title }}"><div><h2>{{ .Page.Title }}</h2><p style="color:var(--muted)">{{ $bio | plainify | truncate 54 }}</p><div class="meta-row"><span class="meta-icon-item">{{ partial "ui-icon.html" "article" }} 文章 {{ .Count }} 篇</span><span class="btn">访问主页 {{ partial "ui-icon.html" "arrow-right" }}</span></div></div></a>
@@ -26,7 +26,7 @@
   <div class="all-friends friend-search-list">
     {{ with $friends }}{{ range .ByCount }}
       {{ $first := index .Pages 0 }}
-      {{ $avatar := "/uploads/admin/main_logo.png" }}
+      {{ $avatar := "/media/users/user-null.png" }}
       {{ $bio := "" }}
       {{ with $first }}{{ with .Params.author_avatar }}{{ $avatar = . }}{{ end }}{{ with .Params.author_bio }}{{ $bio = . }}{{ end }}{{ end }}
       <a class="card small-friend friend-search-item" data-name="{{ .Page.Title | plainify }}" data-bio="{{ $bio | plainify }}" data-posts="{{ range .Pages }}{{ .Title | plainify }} {{ end }}" href="{{ .Page.RelPermalink }}"><img class="avatar" src="{{ $avatar }}" alt="{{ .Page.Title }}"><div><h3>{{ .Page.Title }}</h3><p style="color:var(--muted);margin:0">文章 {{ .Count }} 篇</p></div></a>

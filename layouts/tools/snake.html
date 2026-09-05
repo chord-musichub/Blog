@@ -1,15 +1,7 @@
 {{ define "main" }}
 {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-<section class="page-hero tools-hero snake-hero">
-<h1>贪吃蛇</h1>
-</section>
-
 <section class="card snake-tool-panel" data-snake-game>
   <div class="snake-head">
-    <div>
-      <h2>星际贪吃蛇</h2>
-      <p>玩法：18格棋盘更清楚；粉豆限时连锁更难；棕豆造墙，黑豆清墙；金盾抵伤。</p>
-    </div>
     <div class="snake-stats" aria-live="polite">
       <span>分数 <b data-snake-score>0</b></span>
       <span>最高 <b data-snake-best>0</b></span>
@@ -23,7 +15,6 @@
     <span class="snake-chip snake-shield" data-snake-shield>护盾 0</span>
     <span class="snake-chip snake-slow" data-snake-slow>缓速 0s</span>
     <span class="snake-chip snake-rush" data-snake-rush>临时豆 待机</span>
-    <span class="snake-chip snake-tip" data-snake-tip>18格棋盘 · 粉豆限时连锁 · 棕豆造墙 · 黑豆清墙</span>
   </div>
 
   <div class="snake-stage-wrap">

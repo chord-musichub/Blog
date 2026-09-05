@@ -6,8 +6,9 @@
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   var DESKTOP_POSITIONS = [[15,28],[31,17],[58,24],[75,43],[68,71],[29,72],[12,57],[47,82]];
   var MOBILE_POSITIONS = [[16,29],[67,21],[82,45],[60,60],[20,66],[43,82],[82,83],[12,48]];
-  // 以稳定 key 描述关系；数据新增后仍可在这里显式补边，不依赖 DOM 顺序。
-  var CONSTELLATION_EDGES = [
+  // 历史默认关系只用于尚未在 data/friends.json 配置本地 links 的旧数据；
+  // 一旦配置了关系图，连线完全由 JSON 驱动，避免前端写死的线无法修改。
+  var DEFAULT_CONSTELLATION_EDGES = [
     ['mxbt','three'], ['three','songline'], ['songline','mishi'],
     ['mishi','scanf'], ['scanf','zxlyzq'], ['mxbt','scanf']
   ];
@@ -51,7 +52,7 @@
         username:clean(item.username),
         name:name,
         bio:clean(item.bio) || '这个朋友还没有写简介。',
-        avatar:url(item.avatar, '/uploads/admin/main_logo.png'),
+        avatar:url(item.avatar, '/media/users/user-null.png'),
         href:profileURL(item.url || item.href, '/friends/' + encodeURIComponent(clean(item.slug || name)) + '/'),
         count:Number(item.post_count || item.postCount || 0),
         updated:date(item.updated_at || item.updatedAt),
@@ -139,7 +140,7 @@
 
     function safeImage(image, source){
       if(!image) return;
-      image.onerror = function(){ if(image.src.indexOf('/uploads/admin/main_logo.png') < 0) image.src = '/uploads/admin/main_logo.png'; };
+      image.onerror = function(){ if(image.src.indexOf('/media/users/user-null.png') < 0) image.src = '/media/users/user-null.png'; };
       image.onload = settleLayout;
       image.src = source;
     }
@@ -187,6 +188,7 @@
     function configuredEdges(){
       var edges = [];
       var seen = Object.create(null);
+      var hasConfiguredLocalLinks = false;
       function add(a, b){
         if(!a || !b || a === b) return;
         var edge = edgeFor(a,b);
@@ -194,8 +196,13 @@
         seen[edge] = true;
         edges.push([a,b]);
       }
-      CONSTELLATION_EDGES.forEach(function(pair){ add(byKey[key(pair[0])], byKey[key(pair[1])]); });
-      friends.forEach(function(friend){ friend.links.forEach(function(target){ add(friend, byKey[key(target)]); }); });
+      friends.forEach(function(friend){
+        if(friend.username && friend.links.length) hasConfiguredLocalLinks = true;
+        friend.links.forEach(function(target){ add(friend, byKey[key(target)]); });
+      });
+      if(!hasConfiguredLocalLinks){
+        DEFAULT_CONSTELLATION_EDGES.forEach(function(pair){ add(byKey[key(pair[0])], byKey[key(pair[1])]); });
+      }
       // 没有关系数据时，维持一个稀疏、非放射的星座链。
       if(!edges.length){
         var chain = [host].concat(visibleFriends);

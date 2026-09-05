@@ -107,3 +107,6 @@
 <link id="songline-gacha-style" rel="stylesheet" href="/css/tools/gacha.css?v={{ $assetVersion }}">
 {{ end }}
 <link rel="stylesheet" href="/css/theme-vars.css?v={{ $assetVersion }}">
+{{ if and $isToolsSurface (ne .RelPermalink "/tools/") }}
+<link id="songline-tool-detail-shell-style" rel="stylesheet" href="/css/tools/detail-shell.css?v={{ $assetVersion }}">
+{{ end }}

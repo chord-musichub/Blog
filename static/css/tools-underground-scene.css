@@ -148,5 +148,6 @@ html:root body[data-page-layout="tools"] .tools-grid .tool-card::after {
 .tools-search-row .search-submit .ui-line-icon { display:block!important; width:18px!important; height:18px!important; color:currentColor!important; stroke:currentColor!important; opacity:1!important; }
 .tools-search-row .search-submit:hover .ui-icon,.tools-search-row .search-submit:focus-visible .ui-icon { color:#fff!important; }
 
-/* 第三方图标：与本地文字铭牌使用同一尺寸与嵌入式容器。 */
-.tool-card-icon img { display:block; width:28px; height:28px; object-fit:contain; border-radius:6px; }
+/* 图标统一放大：本地工具和第三方站点共用同一视觉尺度。 */
+.tool-card-icon { font-size:15px!important; }
+.tool-card-icon img { display:block; width:36px; height:36px; object-fit:contain; border-radius:8px; }

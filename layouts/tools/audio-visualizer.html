@@ -10,16 +10,10 @@
       <div class="av-drop-card">
         <span>Drop Audio</span>
         <strong>松开添加到播放列表</strong>
-        <p>支持 MP3 / FLAC / WAV / M4A / AAC / OGG，可一次拖入多首。</p>
       </div>
     </div>
 
     <header class="av-topbar">
-      <div>
-        <p class="eyebrow">Songline Visual Lab</p>
-        <h1>音频可视化</h1>
-        <p class="av-subtitle">网页端音频可视化：可以临时捕获系统/标签页声音，也可以加入本地音乐列表播放，并显示封面、进度和音量。</p>
-      </div>
       <div class="av-status-stack">
         <div class="av-status-pill is-soft" data-av-audio-state>等待音频来源</div>
       </div>
@@ -43,16 +37,12 @@
 
     <section class="av-source-panel" data-av-source-panel aria-label="音频来源选择">
       <article class="av-source-card is-primary">
-        <span>Source 01</span>
-        <strong>网页授权 · 系统声音</strong>
-        <p>临时捕获系统/标签页音频并生成频谱。浏览器通常会弹出系统授权窗口；这个模式只负责频谱，不读取歌曲名和封面。</p>
+        <strong>系统声音</strong>
         <button class="av-button" type="button" data-av-browser-audio>授权系统声音</button>
       </article>
 
       <article class="av-source-card">
-        <span>Source 02</span>
         <strong>本地音频</strong>
-        <p>一次可以选择或拖拽多个音频文件加入本地播放列表，支持点击列表切歌、自动顺播、继续追加音乐。</p>
         <button class="av-button" type="button" data-av-upload>添加音乐</button>
       </article>
     </section>
@@ -86,9 +76,7 @@
       <audio data-av-audio preload="metadata" hidden></audio>
     </section>
 
-    <p class="av-hint" data-av-hint>
-      选择一个音频来源开始。网页系统声音适合临时频谱；本地音频支持多文件列表、顺播、切歌和音量控制。
-    </p>
+    <p class="av-hint" data-av-hint aria-live="polite"></p>
   </section>
 </main>
 {{ end }}

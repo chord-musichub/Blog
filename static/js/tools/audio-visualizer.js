@@ -1052,7 +1052,7 @@
     setHasTrack(false);
     setVisualLive(false);
     showPlaylist();
-    setHint('选择一个音频来源开始。网页系统声音适合临时频谱；本地音频支持多文件列表、顺播、切歌和音量控制。');
+    setHint('选择音频来源。');
 
     bindBackButton();
     bindSourceCards();

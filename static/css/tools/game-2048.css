@@ -121,9 +121,6 @@ html.dark .game-2048-controls button:focus-visible{
 
 
 /* v20.18.5：2048 真滑动 / 合成动画重做 */
-.tool-2048-hero{
-  justify-content:flex-start!important;
-}
 .game-2048-board{
   position:relative!important;
   display:block!important;
@@ -439,23 +436,6 @@ html.dark .game-2048-sound-toggle:focus-visible{
   max-width:920px;
   margin:0 auto;
 }
-.tool-2048-hero{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:18px;
-  margin-bottom:22px;
-}
-.tool-2048-hero h1{
-  margin:.15em 0 .2em;
-  font-size:clamp(2.3rem, 8vw, 5.2rem);
-  line-height:.9;
-  letter-spacing:-.08em;
-}
-.tool-2048-hero p{
-  max-width:38rem;
-  color:rgba(71,85,105,.88);
-}
 .tool-back-link{
   display:inline-flex;
   align-items:center;
@@ -640,19 +620,9 @@ html.dark .game-2048-sound-toggle:focus-visible{
 .game-2048-controls button:active{
   transform:translateY(1px) scale(.98);
 }
-.game-2048-tip{
-  margin:16px 0 0;
-  text-align:center;
-  color:rgba(71,85,105,.82);
-  font-size:.94rem;
-}
 .tool-card .tool-card-icon,
 .tool-card-2048 .tool-card-icon{
   letter-spacing:-.06em;
-}
-body.dark .tool-2048-hero p,
-html.dark .tool-2048-hero p{
-  color:rgba(203,213,225,.78);
 }
 body.dark .tool-back-link,
 html.dark .tool-back-link,
@@ -672,16 +642,9 @@ body.dark .game-2048-score-card strong,
 html.dark .game-2048-score-card strong{
   color:rgba(248,250,252,.94);
 }
-body.dark .game-2048-tip,
-html.dark .game-2048-tip{
-  color:rgba(203,213,225,.72);
-}
 @media(max-width:720px){
   .tool-2048-page{
     padding:18px 12px 34px;
-  }
-  .tool-2048-hero{
-    display:block;
   }
   .tool-back-link{
     margin-bottom:14px;

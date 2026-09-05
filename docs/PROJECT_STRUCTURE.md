@@ -19,6 +19,8 @@
 
 `data/build.json` 保留在根目录：它只提供 Hugo 的构建版本号，不是后台业务数据。
 
+站内朋友的星链只由管理员维护 `data/friends.json` 的 `links` 字段：填写本站朋友用户名或外部朋友 ID，例如 `"links": ["mxbt", "shoper"]`。关系线只需任一端配置；朋友个人资料保存不会覆盖该字段。
+
 ## `assets/data/`：随 Hugo 构建的公开配置
 
 这类 JSON 会被模板通过 `resources.Get` 读取，并参与前台静态构建：
@@ -28,6 +30,10 @@
 - `assets/data/tools/external.json`：外部工具卡片。
 
 这里不要放私密资料、后台账号数据或运行时统计。
+
+### 工具卡片图标
+
+两份工具清单均支持 `icon_url`。本站工具优先使用以 `/` 开头的站内素材 URL，例如 `"icon_url": "/uploads/admin/markdown-logo.png"`；外部工具使用完整的 `https://` 图标地址。`icon` 是文字兜底，只有未填写 `icon_url` 时才显示。本站图标迁入 `static/media/tools/` 后，只需把路径改为 `/media/tools/<文件名>`，不需要改模板。
 
 ## `static/`：浏览器直接请求的素材
 

@@ -1,4 +1,4 @@
-{template "admin-head" (dict "Title" "稿件设置" "Data" . "Navigation" true)}
+{{template "admin-head" (dict "Title" "稿件设置" "Data" . "Navigation" true)}}
 <body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
 {{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
 

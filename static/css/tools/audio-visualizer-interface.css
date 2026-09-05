@@ -1,12 +1,6 @@
 /* 音频可视化样式层：audio-visualizer-interface。按 baseof.html 与 page-modules.js 的既定顺序加载。 */
 
-/* v20.18.5：音频可视化引导与站点风格统一 */
-.av-subtitle{
-  margin:.8rem 0 0;
-  color:rgba(203,213,225,.76);
-  font-weight:650;
-  max-width:38rem;
-}
+/* v20.18.5：音频可视化控制与站点风格统一 */
 .av-status-stack{
   display:flex;
   align-items:flex-end;

@@ -37,7 +37,7 @@ func normalizePublicFriend(f PublicFriend) PublicFriend {
 	f.URL = friendProfileURL(f.Slug)
 	f.Bio = strings.TrimSpace(f.Bio)
 	f.Homepage = strings.TrimSpace(f.Homepage)
-	f.Avatar = firstNonEmpty(strings.TrimSpace(f.Avatar), "/uploads/admin/main_logo.png")
+	f.Avatar = normalizeUserAvatar(f.Avatar)
 	f.Cover = strings.TrimSpace(f.Cover)
 	f.UpdatedAt = strings.TrimSpace(f.UpdatedAt)
 	if f.PostTitles == nil {

@@ -19,11 +19,13 @@ type publicFriendAsset struct {
 }
 
 type localToolAsset struct {
-	ID       string   `json:"id"`
-	Href     string   `json:"href"`
-	Title    string   `json:"title"`
-	Desc     string   `json:"desc"`
-	Tags     []string `json:"tags"`
+	ID      string   `json:"id"`
+	Href    string   `json:"href"`
+	Icon    string   `json:"icon"`
+	IconURL string   `json:"icon_url"`
+	Title   string   `json:"title"`
+	Desc    string   `json:"desc"`
+	Tags    []string `json:"tags"`
 	Keywords []string `json:"keywords"`
 }
 
@@ -51,6 +53,27 @@ func requireHTTPURL(t *testing.T, raw, label string) {
 	if err != nil || (parsed.Scheme != "http" && parsed.Scheme != "https") || parsed.Host == "" {
 		t.Fatalf("%s must be an absolute HTTP(S) URL, got %q", label, raw)
 	}
+}
+
+func requireToolIcon(t *testing.T, rawURL, fallback, label string) {
+	t.Helper()
+	if strings.TrimSpace(rawURL) == "" {
+		if strings.TrimSpace(fallback) == "" {
+			t.Fatalf("%s needs icon_url or icon fallback", label)
+		}
+		return
+	}
+	if strings.HasPrefix(rawURL, "/") && !strings.HasPrefix(rawURL, "//") {
+		relative := filepath.Clean(filepath.FromSlash(strings.TrimPrefix(rawURL, "/")))
+		if relative == "." || strings.HasPrefix(relative, "..") {
+			t.Fatalf("%s local icon must stay within static/, got %q", label, rawURL)
+		}
+		if _, err := os.Stat(filepath.Join("..", "..", "static", relative)); err != nil {
+			t.Fatalf("%s local icon is missing: %q: %v", label, rawURL, err)
+		}
+		return
+	}
+	requireHTTPURL(t, rawURL, label)
 }
 
 func TestPublicFriendsAssetSchema(t *testing.T) {
@@ -89,6 +112,7 @@ func TestPublicToolsAssetSchema(t *testing.T) {
 		if len(tool.Tags) == 0 || len(tool.Keywords) == 0 {
 			t.Fatalf("local tool %q needs tags and keywords", tool.ID)
 		}
+		requireToolIcon(t, tool.IconURL, tool.Icon, "local tool "+tool.ID+" icon")
 		if _, exists := seen[tool.ID]; exists {
 			t.Fatalf("duplicate local tool id %q", tool.ID)
 		}

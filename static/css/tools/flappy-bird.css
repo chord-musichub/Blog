@@ -7,19 +7,6 @@
   max-width:960px;
   margin:0 auto;
 }
-.flappy-hero{
-  margin-bottom:22px;
-}
-.flappy-hero h1{
-  margin:.15em 0 .2em;
-  font-size:clamp(2.3rem, 8vw, 5.2rem);
-  line-height:.9;
-  letter-spacing:-.08em;
-}
-.flappy-hero p{
-  max-width:42rem;
-  color:rgba(71,85,105,.88);
-}
 .flappy-panel{
   position:relative;
   border:1px solid rgba(148,163,184,.24);
@@ -192,18 +179,6 @@
   width:min(100%, 760px);
   margin:18px auto 0!important;
 }
-.flappy-tip{
-  margin:16px 0 0;
-  text-align:center;
-  color:rgba(71,85,105,.82);
-  font-size:.94rem;
-}
-body.dark .flappy-hero p,
-html.dark .flappy-hero p,
-body.dark .flappy-tip,
-html.dark .flappy-tip{
-  color:rgba(203,213,225,.76);
-}
 body.dark .flappy-panel,
 html.dark .flappy-panel,
 body.dark .flappy-score-card,
@@ -237,5 +212,4 @@ html.dark .flappy-score-card strong{
     border-radius:24px;
   }
 }
-
 

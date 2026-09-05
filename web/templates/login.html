@@ -1,4 +1,4 @@
-{template "admin-head" (dict "Title" "登录" "Data" . "Navigation" false)}
+{{template "admin-head" (dict "Title" "登录" "Data" . "Navigation" false)}}
 <body class="auth-page{{with .Settings.Background.Image}} admin-has-site-bg{{end}}"{{with .Settings.Background.Image}} style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
 {{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
 <button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">

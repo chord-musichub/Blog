@@ -6,6 +6,7 @@
   {{ $siteTitle := default .Site.Title $cfg.site.title }}
   {{ $favicon := default $cfg.site.logo_icon $cfg.site.favicon }}
   {{ $isFriendsSurface := hasPrefix .RelPermalink "/friends/" }}
+  {{ $isToolsSurface := hasPrefix .RelPermalink "/tools/" }}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>{{ if .IsHome }}{{ $siteTitle }}{{ else }}{{ .Title }} - {{ $siteTitle }}{{ end }}</title>
@@ -16,10 +17,10 @@
         // 朋友列表和朋友资料页共用独立夜空场景，不能继承首页的浅色偏好。
         var theme = {{ if $isFriendsSurface }}'dark'{{ else }}localStorage.getItem('songline-theme') || 'dark'{{ end }};
         document.documentElement.setAttribute('data-theme', theme);
-        document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#fbfaf7';
+        document.documentElement.style.backgroundColor = {{ if $isToolsSurface }}(theme === 'dark' ? '#130906' : '#251208'){{ else }}(theme === 'dark' ? '#0d1728' : '#fbfaf7'){{ end }};
       }catch(e){
         document.documentElement.setAttribute('data-theme', 'dark');
-        document.documentElement.style.backgroundColor = '#0d1728';
+        document.documentElement.style.backgroundColor = {{ if $isToolsSurface }}'#130906'{{ else }}'#0d1728'{{ end }};
       }
     })();
   </script>

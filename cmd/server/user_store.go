@@ -74,7 +74,7 @@ func (s *Store) CreateUser(username, displayName, role, accountType, password st
 		return err
 	}
 	showInFriends := accountType == accountFriend
-	s.users[username] = User{Username: username, DisplayName: strings.TrimSpace(displayName), Role: role, AccountType: accountType, ShowInFriends: showInFriends, PasswordHash: h, CreatedAt: time.Now(), PasswordMustChange: role != roleAdmin}
+	s.users[username] = User{Username: username, DisplayName: strings.TrimSpace(displayName), Role: role, AccountType: accountType, Avatar: defaultUserAvatar, ShowInFriends: showInFriends, PasswordHash: h, CreatedAt: time.Now(), PasswordMustChange: role != roleAdmin}
 	return s.saveLocked("users.json", s.users)
 }
 
@@ -87,6 +87,7 @@ func (s *Store) GetUser(username string) (User, bool) {
 		if u.DisplayName == "" {
 			u.DisplayName = u.Username
 		}
+		u.Avatar = normalizeUserAvatar(u.Avatar)
 	}
 	return u, ok
 }
@@ -100,6 +101,7 @@ func (s *Store) Users() []User {
 		if u.DisplayName == "" {
 			u.DisplayName = u.Username
 		}
+		u.Avatar = normalizeUserAvatar(u.Avatar)
 		out = append(out, u)
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].CreatedAt.Before(out[j].CreatedAt) })
@@ -174,7 +176,7 @@ func (s *Store) SaveOwnProfile(username, displayName, bio, homepage, avatar, cov
 	u.DisplayName = displayName
 	u.Bio = strings.TrimSpace(bio)
 	u.Homepage = normalizeContactHref(homepage, "")
-	u.Avatar = cleanAssetPath(avatar)
+	u.Avatar = normalizeUserAvatar(cleanAssetPath(avatar))
 	u.Cover = cleanAssetPath(cover)
 	s.users[username] = u
 	return s.saveLocked("users.json", s.users)

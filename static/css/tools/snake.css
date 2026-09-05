@@ -11,14 +11,6 @@
   align-items:flex-start;
   margin-bottom:18px;
 }
-.snake-head h2{
-  margin:0 0 6px;
-  font-size:26px;
-}
-.snake-head p{
-  margin:0;
-  color:var(--muted);
-}
 .snake-stats{
   display:flex;
   gap:10px;
@@ -296,11 +288,6 @@ body.dark .snake-sound-toggle:hover{
 }
 
 
-/* v15.6：贪吃蛇边界穿越提示 */
-.snake-hero p::after{
-  content:" 边界已打通，蛇会从另一边出来。";
-}
-
 
 /* v15.8：贪吃蛇多果实机制 */
 .snake-overlay span{
@@ -312,8 +299,6 @@ body.dark .snake-sound-toggle:hover{
 @media(max-width:760px){
   .snake-tool-panel{padding:18px 14px!important;margin-left:-2px;margin-right:-2px}
   .snake-head{gap:14px!important}
-  .snake-head h2{font-size:24px}
-  .snake-head p{font-size:14px}
   .snake-stats{width:100%;display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px!important}
   .snake-stats span{justify-content:center;padding:8px 7px!important;font-size:12.5px}
   .snake-stage-wrap{width:100%;max-width:min(92vw, 430px);margin:0 auto}
@@ -332,7 +317,6 @@ body.dark .snake-sound-toggle:hover{
 }
 
 /* 街机 HUD、特殊道具和可读性收口。 */
-.snake-head p{max-width:520px}
 .snake-arcade-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:-4px auto 16px}
 .snake-chip{
   display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 12px;border-radius:999px;

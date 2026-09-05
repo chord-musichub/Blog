@@ -5,10 +5,10 @@
 {{ $first := dict }}
 {{ if gt (len $friends) 0 }}{{ $first = index $friends 0 }}{{ end }}
 {{ $firstName := "朋友星图" }}
-{{ $firstAvatar := "/uploads/admin/main_logo.png" }}
+{{ $firstAvatar := "/media/users/user-null.png" }}
 {{ with $first }}
   {{ $firstName = default (default .username .name) (default .display_name .name) }}
-  {{ $firstAvatar = default "/uploads/admin/main_logo.png" .avatar }}
+  {{ $firstAvatar = default "/media/users/user-null.png" .avatar }}
 {{ end }}
 
 {{/*
@@ -30,7 +30,7 @@
       {{ range after 1 $friends }}
         <a class="friends-constellation__node friends-constellation__node--server" href="{{ .url }}" aria-label="查看 {{ default .username .display_name }} 的资料页">
           <span class="friends-constellation__node-halo" aria-hidden="true"></span>
-          <img src="{{ default "/uploads/admin/main_logo.png" .avatar }}" alt="{{ default .username .display_name }}" loading="lazy" decoding="async">
+          <img src="{{ default "/media/users/user-null.png" .avatar }}" alt="{{ default .username .display_name }}" loading="lazy" decoding="async">
           <span class="friends-constellation__node-name">{{ default .username .display_name }}</span>
         </a>
       {{ end }}

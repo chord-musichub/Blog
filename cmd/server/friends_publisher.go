@@ -74,7 +74,7 @@ func (app *App) publicFriends() []PublicFriend {
 			URL:         friendProfileURL(slug),
 			Bio:         strings.TrimSpace(u.Bio),
 			Homepage:    strings.TrimSpace(u.Homepage),
-			Avatar:      firstNonEmpty(u.Avatar, "/uploads/admin/main_logo.png"),
+			Avatar:      normalizeUserAvatar(u.Avatar),
 			Cover:       firstNonEmpty(u.Cover, ""),
 			PostCount:   postCount[u.Username],
 			PostTitles:  titles,
@@ -130,7 +130,9 @@ func (app *App) syncFriendContentPages() error {
 	changed := false
 	for i := range friends {
 		normalized := normalizePublicFriend(friends[i])
-		if normalized.URL != friends[i].URL {
+		// URL 之外，历史默认头像也需要随构建迁移；否则内存里虽已替换，
+		// 运行时 friends.json 仍会在下一次启动时恢复成旧站点 Logo。
+		if normalized.URL != friends[i].URL || normalized.Avatar != friends[i].Avatar {
 			changed = true
 		}
 		friends[i] = normalized

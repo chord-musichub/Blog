@@ -1,9 +1,5 @@
 {{ define "main" }}
 {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-<section class="page-hero tools-hero">
-<h1>随机数生成器</h1>
-</section>
-
 <section class="card random-tool-panel" data-random-tool>
   <div class="random-form">
     <label>
@@ -18,9 +14,8 @@
   </div>
 
   <div class="random-result-box" aria-live="polite">
-    <span class="random-result-label">结果</span>
     <strong data-random-result>?</strong>
-    <p data-random-note>输入区间后点击生成。</p>
+    <p data-random-note aria-live="polite"></p>
   </div>
 </section>
 

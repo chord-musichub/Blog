@@ -5,6 +5,20 @@ import (
 	"time"
 )
 
+// defaultUserAvatar 用于未上传头像的普通用户；站点 Logo 仍独立由站点设置控制。
+const defaultUserAvatar = "/media/users/user-null.png"
+const legacyDefaultUserAvatar = "/uploads/admin/main_logo.png"
+
+// normalizeUserAvatar 兼容旧数据：此前空头像会被写成站点 Logo，
+// 因此需要在构建朋友页时将这类历史默认值一并迁移。
+func normalizeUserAvatar(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" || value == legacyDefaultUserAvatar {
+		return defaultUserAvatar
+	}
+	return value
+}
+
 // User 是后台账号及其公开个人资料。
 type User struct {
 	Username           string    `json:"username"`
