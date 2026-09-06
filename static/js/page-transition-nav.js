@@ -2,11 +2,12 @@
   'use strict';
 
   function createNavigation(){
-    function links(){ return Array.prototype.slice.call(document.querySelectorAll('[data-elevator-nav] a[data-page-key]')); }
+    function elevatorLinks(){ return Array.prototype.slice.call(document.querySelectorAll('[data-elevator-nav] a[data-page-key]')); }
+    function navigationLinks(){ return Array.prototype.slice.call(document.querySelectorAll('[data-elevator-nav] a[data-page-key], [data-site-map] a[data-page-key]')); }
     function setNavActiveByURL(url){
       if(!url || !window.SonglinePagePriority) return;
       var key = window.SonglinePagePriority.getPageKey(url.pathname || url);
-      links().forEach(function(link){
+      navigationLinks().forEach(function(link){
         var active = link.dataset.pageKey === key;
         link.classList.toggle('active', active);
         if(active) link.setAttribute('aria-current', 'page');
@@ -15,7 +16,7 @@
     }
     function setNavActiveNow(link){
       if(!link) return;
-      links().forEach(function(item){
+      navigationLinks().forEach(function(item){
         var active = item === link;
         item.classList.toggle('active', active);
         if(active) item.setAttribute('aria-current', 'page');
@@ -29,7 +30,7 @@
       nav.dataset.elevatorReady = '1';
       var desktopQuery = window.matchMedia ? window.matchMedia('(min-width: 981px)') : null;
       function setHoveredLink(link){
-        links().forEach(function(item){ item.classList.toggle('is-elevator-hovered', item === link); });
+        elevatorLinks().forEach(function(item){ item.classList.toggle('is-elevator-hovered', item === link); });
       }
       function clearHoveredLink(){
         nav.classList.remove('is-elevator-hovering');
@@ -59,7 +60,7 @@
       }
       function virtualLinkAt(x, y){
         if(!isDesktopElevator()) return null;
-        return links().find(function(link){ return isInside(virtualHitRect(link), x, y); }) || null;
+        return elevatorLinks().find(function(link){ return isInside(virtualHitRect(link), x, y); }) || null;
       }
       function setYieldingLink(link){
         if(yieldingLink === link) return;
@@ -134,6 +135,54 @@
           }
         }, 0);
       });
+
+      var siteMap = document.querySelector('[data-site-map]');
+      var mapToggle = siteMap && siteMap.querySelector('[data-site-map-toggle]');
+      if(siteMap && siteMap.dataset.siteMapReady !== '1'){
+        siteMap.dataset.siteMapReady = '1';
+        // 站点地图固定在侧侧栏，不应抢走恰好位于其下方的真实页面控件。
+        // 与电梯的扩展感应带一致：地图自身可用，但下层按钮和链接优先。
+        function underlyingMapControlAt(x, y){
+          if(typeof document.elementFromPoint !== 'function') return null;
+          siteMap.classList.add('is-site-map-probing');
+          var target = document.elementFromPoint(x, y);
+          siteMap.classList.remove('is-site-map-probing');
+          if(!target || siteMap.contains(target) || !target.closest) return null;
+          return target.closest(interactiveSelector);
+        }
+        function setMapOpen(open){
+          siteMap.classList.toggle('is-map-open', open);
+          if(mapToggle) mapToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        // 桌面端让缩略地图有一圈无形的感应范围：靠近就放大，但不占用下层控件的点击。
+        function updateMapProximity(event){
+          if(!window.matchMedia || !window.matchMedia('(min-width:981px)').matches) {
+            siteMap.classList.remove('is-site-map-expanded');
+            return;
+          }
+          var rect = siteMap.getBoundingClientRect();
+          var reach = 28;
+          var close = event.clientX >= rect.left - reach && event.clientX <= rect.right + reach && event.clientY >= rect.top - reach && event.clientY <= rect.bottom + reach;
+          siteMap.classList.toggle('is-site-map-expanded', close);
+        }
+        if(mapToggle) mapToggle.addEventListener('click', function(){ setMapOpen(!siteMap.classList.contains('is-map-open')); });
+        document.addEventListener('pointermove', updateMapProximity, { passive:true });
+        window.addEventListener('resize', function(){ siteMap.classList.remove('is-site-map-expanded'); });
+        document.addEventListener('click', function(event){
+          var region = event.target.closest && event.target.closest('[data-site-map] a[data-page-key]');
+          if(!region) return;
+          // 键盘触发的 click 没有可靠坐标，始终保留地图链接的原生可访问性。
+          if(event.detail === 0) return;
+          var underlying = underlyingMapControlAt(event.clientX, event.clientY);
+          if(!underlying) return;
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          if(typeof underlying.click === 'function') underlying.click();
+        }, true);
+        document.addEventListener('pointerdown', function(event){ if(siteMap.classList.contains('is-map-open') && !siteMap.contains(event.target)) setMapOpen(false); });
+        document.addEventListener('keydown', function(event){ if(event.key === 'Escape') setMapOpen(false); });
+        window.addEventListener('songline:page-transition-start', function(){ setMapOpen(false); });
+      }
     }
     function navIndex(pathname){
       return window.SonglinePagePriority ? window.SonglinePagePriority.getPagePriority(pathname) : -1;

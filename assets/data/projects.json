@@ -1,0 +1,100 @@
+[
+    {
+        "title": "Calculator",
+        "description": "第一个对外项目",
+        "year": "2025",
+        "status": "ACTIVE",
+        "role": "前端/后端",
+        "stack": ["C++","Qt"],
+        "cover": "/media/projects/calculator.png",
+        "github": "https://github.com/Songline-music/FirstProject_Calculator"
+    },
+    {
+        "title": "BrainTumor_FlairClassifier",
+        "description": "脑肿瘤二分模型",
+        "year": "2026",
+        "status": "ACTIVE",
+        "role": "模型",
+        "stack": ["Python"],
+        "github": "https://github.com/Songline-music/BrainTumor_FlairClassifier"
+    },
+    {
+        "title": "BTIR-BrainTumor-ImageRecognition",
+        "description": "BTIR脑肿瘤分析平台",
+        "year": "2026",
+        "status": "ACTIVE",
+        "role": "前端/后端",
+        "stack": ["Python","CSS","Shell","HTML","JavaScript","SQLite","Redis","Docker","Json"],
+        "cover": "/media/projects/btir.png",
+        "github": "https://github.com/ckckh2023/BTIR-BrainTumor-ImageRecognition",
+        "demo": "https://btir.xiao-blog.top/"
+    },
+    {
+        "title": "Demo-LifeGame",
+        "description": "恶魔轮盘的简易复刻",
+        "year": "2026",
+        "status": "ACTIVE",
+        "role": "前端/后端",
+        "stack": ["C++","Qt","CMake"],
+        "cover": "/media/projects/demo-lifegame.png",
+        "github": "https://github.com/Songline-music/Demo-LifeGame"
+    },
+    {
+        "title": "QMsg",
+        "description": "控制台简易即时通讯系统",
+        "year": "2025",
+        "status": "ACTIVE",
+        "role": "后端",
+        "stack": ["Go","GUI"],
+        "github": "https://github.com/Songline-music/QMsg"
+    },
+    {
+        "title": "GreedySnake",
+        "description": "初尝项目-贪吃蛇复刻",
+        "year": "2025",
+        "status": "ACTIVE",
+        "role": "后端",
+        "stack": ["C"],
+        "github": "https://github.com/Songline-music/GreedySnake"
+    },
+    {
+        "title": "chat-robot",
+        "description": "聊天机器人",
+        "year": "2026",
+        "status": "ACTIVE",
+        "role": "后端",
+        "stack": ["Python","AI"],
+        "github": "https://github.com/Songline-music/chat-robot"
+    },
+    {
+        "title": "Blog",
+        "description": "博客源码",
+        "year": "2026",
+        "status": "ACTIVE",
+        "role": "前端/后端",
+        "stack": ["CSS","Go","PowerShell","Shell","HTML","JavaScript"],
+        "cover": "/media/projects/blog.png",
+        "demo": "https://blog.songline-blog.com/",
+        "github": "https://github.com/chord-musichub/Blog"
+    },
+    {
+        "title": "WUST-csdiy",
+        "description": "WUST经验网站",
+        "year": "2026",
+        "status": "ACTIVE",
+        "role": "文章贡献",
+        "cover": "/media/projects/wust-csdiy.png",
+        "demo": "http://csdiy.wustacm.com/",
+        "github": "https://github.com/WUSTACM/CSDIY-Document-organization"
+    },
+    {
+        "title": "WUST-ACM-Blog",
+        "description": "WUST-ACM博客",
+        "year": "2026",
+        "status": "ACTIVE",
+        "role": "文章贡献",
+        "cover": "/media/projects/wust-acm.png",
+        "demo": "https://blog.wustacm.com/",
+        "github": "https://github.com/WUSTACM/blog.github.io"
+    }
+]

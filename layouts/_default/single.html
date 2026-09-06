@@ -6,7 +6,7 @@
 <section class="page-hero article-cover-hero article-cover-actual-image cover-mode-{{ $coverMode }}" style="background-image:url('{{ $cover }}')" aria-label="文章封面">
   <img class="article-cover-img" src="{{ $cover }}" alt="" loading="eager" decoding="async" fetchpriority="high">
 </section>
-<section class="card" style="padding:30px 34px;margin-top:-34px;position:relative;z-index:2">
+<section class="card article-intro" style="padding:30px 34px;margin-top:-34px;position:relative;z-index:2">
   {{ if .Params.is_notice }}<div class="notice-badge large">站点公告</div>{{ end }}
 <h1 style="font-size:42px;line-height:1.15;margin:0 0 12px">{{ .Title }}</h1>
   <p style="color:var(--muted);margin:0 0 20px">{{ with .Params.summary }}{{ . }}{{ else }}{{ .Summary }}{{ end }}</p>

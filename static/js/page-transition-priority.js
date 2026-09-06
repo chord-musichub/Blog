@@ -22,6 +22,10 @@
   function getPageKey(path){ return pageForPath(path).key || fallback.key; }
   function getPagePriority(path){ return Number(pageForPath(path).priority) || fallback.priority; }
   function getTransitionDirection(fromPath, toPath){
+    fromPath = normalizePath(fromPath); toPath = normalizePath(toPath);
+    // 朋友楼层右侧的回忆室是同层子房间，使用横向切换而不是普通上下楼。
+    if(fromPath === '/friends/' && toPath === '/friends/memories/') return 'right';
+    if(fromPath === '/friends/memories/' && toPath === '/friends/') return 'left';
     var from = getPagePriority(fromPath);
     var to = getPagePriority(toPath);
     return to > from ? 'forward' : to < from ? 'backward' : 'same';

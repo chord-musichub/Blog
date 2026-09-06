@@ -14,6 +14,14 @@
       </a>
       {{ end }}
     </nav>
+    <aside class="songline-site-map" aria-label="全局站点地图" data-site-map>
+      <button class="songline-site-map__toggle" type="button" aria-expanded="false" aria-controls="siteMapRegions" data-site-map-toggle><span>图</span><i aria-hidden="true">+</i></button>
+      <nav class="songline-site-map__regions" id="siteMapRegions" aria-label="站点地图区域">
+        {{ range partial "page-navigation-data.html" . }}{{ if .map_visible }}
+        <a class="songline-site-map__region" href="{{ .route }}" data-page-key="{{ .key }}" data-floor="{{ .floor }}" aria-label="前往{{ .label }}，{{ .floor }}层" style="--map-column:{{ .map_column }};--map-row:{{ .map_row }};--map-column-span:{{ .map_column_span }};--map-row-span:{{ .map_row_span }};"><span class="songline-site-map__label">{{ .system_label }}</span></a>
+        {{ end }}{{ end }}
+      </nav>
+    </aside>
     <div class="header-icons">
       <a class="icon-btn header-submit-link" href="/write/" aria-label="投稿" title="投稿">{{ partial "ui-icon.html" "upload" }}</a>
       <button class="icon-btn" data-theme-toggle type="button" aria-label="切换深色模式">{{ partial "ui-icon.html" "moon" }}</button>

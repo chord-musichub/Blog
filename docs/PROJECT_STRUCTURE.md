@@ -19,17 +19,29 @@
 
 `data/build.json` 保留在根目录：它只提供 Hugo 的构建版本号，不是后台业务数据。
 
-站内朋友的星链只由管理员维护 `data/friends.json` 的 `links` 字段：填写本站朋友用户名或外部朋友 ID，例如 `"links": ["mxbt", "shoper"]`。关系线只需任一端配置；朋友个人资料保存不会覆盖该字段。
+站内朋友的星链由管理员维护 `assets/data/friends/links.json`：键为本站朋友的用户名，值为本站朋友用户名或外部朋友 ID 的数组，例如 `"songline": ["mxbt", "shoper"]`。该文件随 Git 发布；关系线只需任一端配置。朋友个人资料保存不会影响该配置。
 
 ## `assets/data/`：随 Hugo 构建的公开配置
 
 这类 JSON 会被模板通过 `resources.Get` 读取，并参与前台静态构建：
 
 - `assets/data/friends/external.json`：外部朋友节点；
+- `assets/data/projects.json`：内容归档页的项目清单；
 - `assets/data/tools/local.json`：本站工具卡片；
 - `assets/data/tools/external.json`：外部工具卡片。
 
 这里不要放私密资料、后台账号数据或运行时统计。
+
+## `layouts/partials/page-navigation-data.html`：全站空间导航配置
+
+页面的 route、priority、楼层电梯和 SITE MAP 共用这一份配置，不能为地图再维护第二张页面清单。
+
+- `visible`：是否出现在 Elevator；
+- `map_visible`：是否出现在 SITE MAP；
+- `map_column`、`map_row`、`map_column_span`、`map_row_span`：8 × 8 固定网格中的稳定矩形位置；
+- `route` 与 `priority`：继续由现有全站转场读取，地图链接只使用普通链接，不自行计算切页方向。
+
+新增主页面时，在该 partial 增加一项并补齐上述地图字段；电梯、地图、当前页高亮和页面过场会自动读取新配置。
 
 ### 工具卡片图标
 

@@ -63,6 +63,12 @@ html.songline-page-transitioning .page-loading-orb{
   transform:translate3d(0,112svh,0);
   transition:transform .66s cubic-bezier(.54,0,.86,.42);
 }
+.songline-page-transition-overlay.is-right:not(.is-covering):not(.is-leaving){transform:translate3d(112vw,0,0)}
+.songline-page-transition-overlay.is-right.is-covering{transform:translate3d(0,0,0);transition:transform .72s cubic-bezier(.16,.82,.22,1)}
+.songline-page-transition-overlay.is-right.is-leaving{transform:translate3d(-112vw,0,0);transition:transform .66s cubic-bezier(.54,0,.86,.42)}
+.songline-page-transition-overlay.is-left:not(.is-covering):not(.is-leaving){transform:translate3d(-112vw,0,0)}
+.songline-page-transition-overlay.is-left.is-covering{transform:translate3d(0,0,0);transition:transform .72s cubic-bezier(.16,.82,.22,1)}
+.songline-page-transition-overlay.is-left.is-leaving{transform:translate3d(112vw,0,0);transition:transform .66s cubic-bezier(.54,0,.86,.42)}
 .songline-page-transition-overlay.is-same{opacity:0;transition:opacity .36s ease}
 .songline-page-transition-overlay.is-same.is-covering{opacity:1}
 .songline-page-transition-overlay.is-same.is-leaving{opacity:0;transition:opacity .44s ease}
@@ -128,15 +134,21 @@ html.songline-page-transitioning .page-loading-orb{
 }
 main.container.songline-page-exit-forward,
 main.container.songline-page-exit-backward,
+main.container.songline-page-exit-right,
+main.container.songline-page-exit-left,
 main.container.songline-page-exit-same{
   transition:transform .66s cubic-bezier(.2,.7,.2,1), opacity .58s ease;
   opacity:0;
 }
 main.container.songline-page-exit-forward{transform:translate3d(0,-126px,0) scale(.97)}
 main.container.songline-page-exit-backward{transform:translate3d(0,126px,0) scale(.97)}
+main.container.songline-page-exit-right{transform:translate3d(-126px,0,0) scale(.97)}
+main.container.songline-page-exit-left{transform:translate3d(126px,0,0) scale(.97)}
 main.container.songline-page-exit-same{transform:scale(.985)}
 main.container.songline-page-enter-forward{transform:translate3d(0,132px,0) scale(.97)}
 main.container.songline-page-enter-backward{transform:translate3d(0,-132px,0) scale(.97)}
+main.container.songline-page-enter-right{transform:translate3d(132px,0,0) scale(.97)}
+main.container.songline-page-enter-left{transform:translate3d(-132px,0,0) scale(.97)}
 main.container.songline-page-enter-same{transform:scale(.985)}
 main.container.songline-page-enter-active{
   transform:translate3d(0,0,0);
@@ -147,8 +159,12 @@ main.container.songline-page-enter-active{
   .songline-page-transition-loader{width:70px;height:70px}
   main.container.songline-page-exit-forward{transform:translate3d(0,-84px,0) scale(.978)}
   main.container.songline-page-exit-backward{transform:translate3d(0,84px,0) scale(.978)}
+  main.container.songline-page-exit-right{transform:translate3d(-84px,0,0) scale(.978)}
+  main.container.songline-page-exit-left{transform:translate3d(84px,0,0) scale(.978)}
   main.container.songline-page-enter-forward{transform:translate3d(0,90px,0) scale(.978)}
   main.container.songline-page-enter-backward{transform:translate3d(0,-90px,0) scale(.978)}
+  main.container.songline-page-enter-right{transform:translate3d(90px,0,0) scale(.978)}
+  main.container.songline-page-enter-left{transform:translate3d(-90px,0,0) scale(.978)}
 }
 @media(prefers-reduced-motion: reduce){
   .songline-page-transition-overlay{
@@ -165,9 +181,13 @@ main.container.songline-page-enter-active{
   .songline-page-transition-loader{display:none}
   main.container.songline-page-exit-forward,
   main.container.songline-page-exit-backward,
+  main.container.songline-page-exit-right,
+  main.container.songline-page-exit-left,
   main.container.songline-page-exit-same,
   main.container.songline-page-enter-forward,
   main.container.songline-page-enter-backward,
+  main.container.songline-page-enter-right,
+  main.container.songline-page-enter-left,
   main.container.songline-page-enter-same,
   main.container.songline-page-enter-active{
     transform:none!important;

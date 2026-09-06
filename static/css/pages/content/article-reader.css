@@ -594,3 +594,39 @@ body.dark .article-cover-hero.cover-mode-contain{
   margin:0!important;
   padding:0!important;
 }
+
+/* 文章详情的可读区域统一为液态玻璃，保留页面场景并避免文字直接压在背景上。 */
+body[data-page-section="posts"] .article-intro,
+body[data-page-section="posts"] .article-reader,
+body[data-page-section="posts"] .article-toc,
+body[data-page-section="posts"] .article-bottom-actions,
+body[data-page-section="posts"] .prev-next .nav-card,
+body[data-page-section="posts"] .related-card{
+  border:1px solid rgba(235,246,255,.34)!important;
+  background:linear-gradient(135deg,rgba(244,251,255,.22),rgba(108,146,181,.16) 52%,rgba(23,49,80,.24))!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 18px 48px rgba(4,13,27,.18)!important;
+  backdrop-filter:blur(16px) saturate(128%);
+  -webkit-backdrop-filter:blur(16px) saturate(128%);
+}
+body.dark[data-page-section="posts"] .article-intro,
+body.dark[data-page-section="posts"] .article-reader,
+body.dark[data-page-section="posts"] .article-toc,
+body.dark[data-page-section="posts"] .article-bottom-actions,
+body.dark[data-page-section="posts"] .prev-next .nav-card,
+body.dark[data-page-section="posts"] .related-card{
+  border-color:rgba(171,207,239,.28)!important;
+  background:linear-gradient(135deg,rgba(35,66,103,.38),rgba(8,23,46,.28) 54%,rgba(6,15,31,.38))!important;
+  box-shadow:inset 0 1px 0 rgba(212,236,255,.18),0 18px 48px rgba(0,0,0,.26)!important;
+}
+@media(max-width:760px){
+  body[data-page-section="posts"] .article-intro,
+  body[data-page-section="posts"] .article-reader,
+  body[data-page-section="posts"] .article-toc,
+  body[data-page-section="posts"] .article-bottom-actions,
+  body[data-page-section="posts"] .prev-next .nav-card,
+  body[data-page-section="posts"] .related-card{backdrop-filter:blur(11px) saturate(120%);-webkit-backdrop-filter:blur(11px) saturate(120%)}
+}
+
+/* 长文正文略比外围玻璃更实，保证连续阅读时的对比度。 */
+body[data-page-section="posts"] .article-reader{background:linear-gradient(135deg,rgba(244,251,255,.42),rgba(108,146,181,.34) 52%,rgba(23,49,80,.44))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.52),0 18px 48px rgba(4,13,27,.26)!important;}
+body.dark[data-page-section="posts"] .article-reader{background:linear-gradient(135deg,rgba(35,66,103,.64),rgba(8,23,46,.54) 54%,rgba(6,15,31,.64))!important;box-shadow:inset 0 1px 0 rgba(212,236,255,.28),0 18px 48px rgba(0,0,0,.38)!important;}

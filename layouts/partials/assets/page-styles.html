@@ -49,6 +49,9 @@
 {{ if or (eq .Section "friends") (hasPrefix .RelPermalink "/friends/") }}
 <link id="songline-friends-galaxy-style" rel="stylesheet" href="/css/pages/friends/galaxy.css?v={{ $assetVersion }}">
 {{ end }}
+{{ if hasPrefix .RelPermalink "/friends/memories/" }}
+<link id="songline-friends-memories-style" rel="stylesheet" href="/css/pages/friends/memories.css?v={{ $assetVersion }}">
+{{ end }}
 {{ if or (eq .Section "tags") (hasPrefix .RelPermalink "/tags/") }}
 <link id="songline-tags-style" rel="stylesheet" href="/css/pages/tags/index.css?v={{ $assetVersion }}">
 {{ end }}

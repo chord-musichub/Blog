@@ -6,6 +6,7 @@
   color:var(--text);
   isolation:isolate;
 }
+.friends-constellation__memory-door{position:absolute;z-index:8;right:clamp(18px,2.2vw,48px);top:50%;display:flex;align-items:center;gap:10px;padding:12px 0 12px 15px;border-left:1px solid rgba(191,219,246,.38);background:linear-gradient(90deg,rgba(8,20,37,.24),transparent);color:rgba(235,245,255,.88);font-size:12px;font-weight:650;letter-spacing:.16em;text-decoration:none;transform:translateY(-50%);transition:color .2s ease,transform .2s ease,border-color .2s ease}.friends-constellation__memory-door i{font-size:21px;font-style:normal;line-height:1}.friends-constellation__memory-door:hover,.friends-constellation__memory-door:focus-visible{border-color:rgba(236,247,255,.88);color:#fff;outline:0;transform:translate(4px,-50%)}@media(max-width:760px){.friends-constellation__memory-door{right:14px;top:auto;bottom:86px;transform:none}.friends-constellation__memory-door:hover,.friends-constellation__memory-door:focus-visible{transform:translateX(3px)}}
 /* 全站背景的超宽星轨在 Friends 场景内不应产生横向滚动条。 */
 html:has(body .friends-constellation),
 body:has(.friends-constellation){overflow-x:hidden;}

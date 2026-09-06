@@ -1,6 +1,8 @@
 {{ $localFriends := .Site.Data.friends | default slice }}
 {{ $externalFriends := slice }}
 {{ with resources.Get "data/friends/external.json" }}{{ $externalFriends = . | transform.Unmarshal }}{{ end }}
+{{ $linkConfig := dict }}
+{{ with resources.Get "data/friends/links.json" }}{{ $linkConfig = . | transform.Unmarshal }}{{ end }}
 {{ $friends := $localFriends | append $externalFriends }}
 {{ $first := dict }}
 {{ if gt (len $friends) 0 }}{{ $first = index $friends 0 }}{{ end }}
@@ -16,6 +18,7 @@
   assets/data/friends/external.json。外部朋友仅作为外链节点，不参与本地资料页生成。
 */}}
 <section class="friends-constellation" data-friend-galaxy>
+  <a class="friends-constellation__memory-door" href="/friends/memories/" aria-label="进入回忆室"><span>回忆</span><i aria-hidden="true">&gt;</i></a>
   <div class="friends-constellation__sky" data-galaxy-stage>
     <div class="friends-constellation__nebula" aria-hidden="true"></div>
     <div class="friends-constellation__meteor friends-constellation__meteor--one" aria-hidden="true"></div>
@@ -52,5 +55,12 @@
 
   <script id="friend-galaxy-data" type="application/json">
   {{- $friends | jsonify | safeJS -}}
+  </script>
+  {{/*
+    星链独立于运行时朋友资料：assets/data/friends/links.json 会随 Git 发布，
+    不会被服务器 shared/data/friends.json 覆盖。
+  */}}
+  <script id="friend-galaxy-link-data" type="application/json">
+  {{- $linkConfig | jsonify | safeJS -}}
   </script>
 </section>

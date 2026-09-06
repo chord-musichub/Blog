@@ -141,13 +141,19 @@
       key:'friend-galaxy',
       // 与服务端直开页面共用当前资源版本；固定版本号会让 AJAX 进入朋友页时
       // 命中旧缓存，导致新坐标逻辑没有真正执行。
-      src:'/js/pages/friends/galaxy.js?v=' + VERSION + '&friends=22.3',
+      src:'/js/pages/friends/galaxy.js?v=' + VERSION + '&friends=22.4',
       test:function(root){
         return !!query(root, '[data-friend-galaxy], .friend-galaxy, .friend-galaxy-stage, .friends-galaxy, .galaxy-map');
       },
       init:function(root){
         if(window.SonglineInitFriendGalaxy) window.SonglineInitFriendGalaxy(root || document);
       }
+    },
+    {
+      key:'memory-room',
+      src:'/js/pages/friends/memories.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-memory-room]'); },
+      init:function(root){ if(window.SonglineInitMemoryRoom) window.SonglineInitMemoryRoom(root || document); }
     },
     {
       key:'tag-flow',
@@ -311,7 +317,7 @@
       key:'posts-list-flat',
       src:'/js/pages/posts/list.js?v=' + VERSION,
       test:function(root){
-        return !!query(root, '.posts-list, #postList');
+        return !!query(root, '[data-content-archive], #postList');
       },
       init:function(root){
         if(window.SonglineInitPostsListFlat) window.SonglineInitPostsListFlat(root || document);

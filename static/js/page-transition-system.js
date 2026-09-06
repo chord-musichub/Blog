@@ -107,8 +107,8 @@
   function settleMain(main){
     if(!main) return;
     main.classList.remove(
-      'songline-page-exit-forward', 'songline-page-exit-backward', 'songline-page-exit-same',
-      'songline-page-enter-forward', 'songline-page-enter-backward', 'songline-page-enter-same',
+      'songline-page-exit-forward', 'songline-page-exit-backward', 'songline-page-exit-right', 'songline-page-exit-left', 'songline-page-exit-same',
+      'songline-page-enter-forward', 'songline-page-enter-backward', 'songline-page-enter-right', 'songline-page-enter-left', 'songline-page-enter-same',
       'songline-page-enter-active'
     );
     // 明确提交最终合成状态，再在下一帧交还给常规页面样式。
@@ -273,7 +273,7 @@
   }
 
   function setEnterState(main, direction){
-    main.classList.remove('songline-page-exit-forward', 'songline-page-exit-backward', 'songline-page-exit-same');
+    main.classList.remove('songline-page-exit-forward', 'songline-page-exit-backward', 'songline-page-exit-right', 'songline-page-exit-left', 'songline-page-exit-same');
     main.classList.add('songline-page-enter-' + direction);
     window.requestAnimationFrame(function(){
       window.requestAnimationFrame(function(){ main.classList.add('songline-page-enter-active'); });

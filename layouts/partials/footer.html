@@ -1,4 +1,5 @@
 {{ $cfg := .Site.Data.site }}
+{{ if .IsHome }}
 <footer class="footer site-footer-clean">
   <div class="footer-inner">
     <div class="footer-meta">
@@ -6,13 +7,16 @@
       <span class="footer-dot">·</span>
       <span>{{ default "由热爱驱动，持续记录" $cfg.site.footer_text }}</span>
     </div>
-    {{ with $cfg.site.icp }}
-      {{ if and . (ne . "暂无") }}
-        <a class="footer-icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">ICP备案号：{{ . }}</a>
+    {{ if .IsHome }}
+      {{ with $cfg.site.icp }}
+        {{ if and . (ne . "暂无") }}
+          <a class="footer-icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">ICP备案号：{{ . }}</a>
+        {{ end }}
       {{ end }}
     {{ end }}
   </div>
 </footer>
+{{ end }}
 {{ $assetVersion := partial "asset-version.html" . }}
 <script defer data-core-script="icon-system" src="/js/icon-system.js?v={{ $assetVersion }}"></script>
 <script defer data-core-script="theme-toggle" src="/js/theme-toggle.js?v={{ $assetVersion }}"></script>

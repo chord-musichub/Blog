@@ -1,0 +1,8 @@
+{
+  "songline": ["three", "mishi_a", "scanf", "zxlyzq"],
+  "mxbt": ["three"],
+  "three": ["songline", "mishi_a", "scanf"],
+  "mishi_a": ["songline", "three", "scanf"],
+  "scanf": ["songline", "three", "mishi_a"],
+  "zxlyzq": ["songline"]
+}

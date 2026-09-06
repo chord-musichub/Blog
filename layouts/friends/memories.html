@@ -1,0 +1,20 @@
+{{ define "main" }}
+{{ $memories := slice }}{{ with resources.Get "data/memories.json" }}{{ $memories = . | transform.Unmarshal }}{{ end }}
+<section class="memory-room" data-memory-room aria-label="回忆室">
+  <a class="memory-room__back" href="/friends/" aria-label="返回朋友星图">←</a>
+  <div class="memory-room__viewport" data-memory-viewport>
+    <div class="memory-room__track" data-memory-track style="--memory-count:{{ len $memories }}">
+    {{ range $index, $memory := $memories }}
+    <article class="memory-room__memory" data-memory-card data-memory-index="{{ $index }}" style="--memory-index:{{ $index }}">
+      <span class="memory-room__stem" aria-hidden="true"></span>
+      <button type="button" class="memory-room__image-button" data-memory-open aria-label="放大查看：{{ $memory.title | default $memory.date }}"><img src="{{ $memory.image }}" alt="{{ $memory.title | default $memory.date }}" loading="{{ if eq $index (sub (len $memories) 1) }}eager{{ else }}lazy{{ end }}" decoding="async"></button>
+      <div class="memory-room__caption"><h1>{{ $memory.title | default $memory.date }}</h1><p>{{ $memory.description }}</p></div>
+      <div class="memory-room__time"><i aria-hidden="true"></i><time>{{ $memory.date }}</time></div>
+    </article>
+    {{ else }}<p class="memory-room__empty">在 <code>assets/data/memories.json</code> 中加入第一段回忆。</p>{{ end }}
+    </div>
+  </div>
+  <script id="memory-room-data" type="application/json">{{ $memories | jsonify | safeJS }}</script>
+</section>
+<div class="memory-lightbox" data-memory-lightbox hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="回忆详情"><div class="memory-lightbox__panel"><button type="button" class="memory-lightbox__close" data-memory-close aria-label="关闭">×</button><img data-memory-lightbox-image alt=""><div><time data-memory-lightbox-date></time><h2 data-memory-lightbox-title></h2><p data-memory-lightbox-description></p></div></div></div>
+{{ end }}

@@ -2,11 +2,11 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.3.0';
+  var VERSION = '22.4.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   var DESKTOP_POSITIONS = [[15,28],[31,17],[58,24],[75,43],[68,71],[29,72],[12,57],[47,82]];
   var MOBILE_POSITIONS = [[16,29],[67,21],[82,45],[60,60],[20,66],[43,82],[82,83],[12,48]];
-  // 历史默认关系只用于尚未在 data/friends.json 配置本地 links 的旧数据；
+  // 历史默认关系只用于尚未在公开 links.json 配置星链的旧数据；
   // 一旦配置了关系图，连线完全由 JSON 驱动，避免前端写死的线无法修改。
   var DEFAULT_CONSTELLATION_EDGES = [
     ['mxbt','three'], ['three','songline'], ['songline','mishi'],
@@ -41,22 +41,26 @@
     var found = clean(value).match(/\d{4}-\d{2}-\d{2}/);
     return found ? found[0].replace(/-/g, '.') : '—';
   }
-  function normalize(raw){
+  function normalize(raw, linkConfig){
     return (raw || []).map(function(item, index){
       item = item || {};
       var name = clean(item.name || item.display_name || item.displayName || item.username || ('朋友 ' + (index + 1)));
       var id = key(item.id || item.slug || item.username || name);
+      var username = clean(item.username);
+      // 站内成员以受版本控制的 links.json 为准；外部节点继续使用其自身配置。
+      // hasOwnProperty 允许显式写 [] 来清空某位成员的全部连线。
+      var hasConfiguredLinks = !!username && Object.prototype.hasOwnProperty.call(linkConfig || {}, username);
       return {
         id:id,
         index:index,
-        username:clean(item.username),
+        username:username,
         name:name,
         bio:clean(item.bio) || '这个朋友还没有写简介。',
         avatar:url(item.avatar, '/media/users/user-null.png'),
         href:profileURL(item.url || item.href, '/friends/' + encodeURIComponent(clean(item.slug || name)) + '/'),
         count:Number(item.post_count || item.postCount || 0),
         updated:date(item.updated_at || item.updatedAt),
-        links:toArray(item.links || item.relations)
+        links:hasConfiguredLinks ? toArray(linkConfig[username]) : toArray(item.links || item.relations)
       };
     }).filter(function(friend){ return friend.id && !/^(admin|root|system|test|demo)$/.test(friend.id); });
   }
@@ -65,12 +69,20 @@
     if(!node) return [];
     try{ return JSON.parse(node.textContent || '[]'); }catch(e){ return []; }
   }
+  function inlineLinkConfig(){
+    var node = document.getElementById('friend-galaxy-link-data');
+    if(!node) return {};
+    try{
+      var value = JSON.parse(node.textContent || '{}');
+      return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    }catch(e){ return {}; }
+  }
   // 内嵌数据是构建期合并后的唯一来源：不能再让旧静态快照覆盖第三方节点。
   function friendData(){
     // 数据已经由 Hugo 内嵌到当前页面，不需要再经过 Promise 微任务。
     // 公开站某些导航/过场时序下，异步回调会在页面完成前被跳过，导致只保留
     // 服务端的头像保底节点，而星链和悬浮卡片从未开始构建。
-    return inlineData();
+    return { friends:inlineData(), linkConfig:inlineLinkConfig() };
   }
   function escapeHtml(value){ return clean(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -85,7 +97,7 @@
     // 初始直开和站内换页会处于不同的文档/过场时机；线上环境中此处的
     // isConnected/version 二次判断曾错误地把刚标记为 ready 的星图跳过。
     // 首层去重已经完成，拿到内嵌数据后直接构建即可。
-    build(shell, normalize(data));
+    build(shell, normalize(data.friends, data.linkConfig));
   }
 
   function build(shell, friends){
