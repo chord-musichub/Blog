@@ -118,6 +118,23 @@ html.nav-enter-from-left.is-nav-enter-ready body > :not(.site-boot-overlay):not(
   }
 }
 
+/* 极窄视口只保留底部的小地图开关，给页面电梯与首项内容留出完整纵向安全带。 */
+@media(max-width:420px){
+  .songline-site-map{
+    top:auto!important;
+    left:12px!important;
+    bottom:calc(max(10px, env(safe-area-inset-bottom)) + 58px)!important;
+    width:min(296px, calc(100vw - 24px))!important;
+  }
+  .songline-site-map__toggle{
+    width:46px!important;
+    min-width:46px;
+    height:34px;
+    padding:8px!important;
+  }
+  .songline-site-map__toggle span{font-size:9px;}
+}
+
 /* 地图本体保持中性灰；名称只在用户主动悬停或键盘聚焦时显现。 */
 .songline-site-map__region,
 .songline-site-map__region.active{

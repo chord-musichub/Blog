@@ -190,11 +190,20 @@
   }
 
   function syncPageStyles(doc){
+    var nextStyles = Object.create(null);
     doc.querySelectorAll('link[rel="stylesheet"][id^="songline-"]').forEach(function(next){
-      var id = next.id;
-      var current = document.getElementById(id);
-      if(current) return;
-      var clone = next.cloneNode(true);
+      nextStyles[next.id] = next;
+    });
+
+    // 页面专属样式必须随过场一起离开。此前这里只追加不移除，朋友页、档案页
+    // 和工具页会把旧 CSS 带到下一页，缩放后就会出现历史布局互相覆盖的情况。
+    document.querySelectorAll('link[rel="stylesheet"][id^="songline-"]').forEach(function(current){
+      if(!nextStyles[current.id]) current.remove();
+    });
+
+    Object.keys(nextStyles).forEach(function(id){
+      if(document.getElementById(id)) return;
+      var clone = nextStyles[id].cloneNode(true);
       clone.dataset.songlineTransitionStyle = 'true';
       document.head.appendChild(clone);
     });

@@ -8,26 +8,26 @@
   <link rel="stylesheet" href="/css/site-runtime.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site-modern.css?v={{ $assetVersion }}">
   {{ if $isSearchSurface }}
-  <link rel="stylesheet" href="/css/site-search-overrides.css?v={{ $assetVersion }}">
+  <link id="songline-search-overrides-style" rel="stylesheet" href="/css/site-search-overrides.css?v={{ $assetVersion }}">
   {{ end }}
   {{ if $isArticleSurface }}
-  <link rel="stylesheet" href="/css/site-article-compat.css?v={{ $assetVersion }}">
+  <link id="songline-article-compat-style" rel="stylesheet" href="/css/site-article-compat.css?v={{ $assetVersion }}">
   {{ end }}
   {{ if $isToolsSurface }}
-  <link rel="stylesheet" href="/css/site-tools-compat.css?v={{ $assetVersion }}">
+  <link id="songline-tools-compat-style" rel="stylesheet" href="/css/site-tools-compat.css?v={{ $assetVersion }}">
   {{ end }}
   {{/* 朋友星图兼容层只服务朋友页；过去全站加载会覆盖标签、工具与普通卡片。 */}}
   {{ if or (eq .Section "friends") (hasPrefix .RelPermalink "/friends/") }}
-  <link rel="stylesheet" href="/css/site-friends-compat.css?v={{ $assetVersion }}">
+  <link id="songline-friends-compat-style" rel="stylesheet" href="/css/site-friends-compat.css?v={{ $assetVersion }}">
   {{ end }}
   {{ if $isArticleSurface }}
-  <link rel="stylesheet" href="/css/site-markdown-compat.css?v={{ $assetVersion }}">
+  <link id="songline-markdown-compat-style" rel="stylesheet" href="/css/site-markdown-compat.css?v={{ $assetVersion }}">
   {{ end }}
   <link rel="stylesheet" href="/css/site-navigation-overrides.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/theme-transition.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/page-transition-scene.css?v={{ $assetVersion }}">
   {{ if $isArticleSurface }}
-  <link rel="stylesheet" href="/css/site-article-overrides.css?v={{ $assetVersion }}">
+  <link id="songline-article-overrides-style" rel="stylesheet" href="/css/site-article-overrides.css?v={{ $assetVersion }}">
   {{ end }}
   <link rel="stylesheet" href="/css/mobile-foundation.css?v={{ $assetVersion }}">
   {{/* responsive.css 是已废弃的 WAAPI 首页与多轮移动端补丁集合；

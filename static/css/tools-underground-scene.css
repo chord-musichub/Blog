@@ -81,6 +81,16 @@ html:root body[data-page-layout="tools"] .tools-grid .tool-card:hover .tool-card
 html:root body[data-page-layout="tools"] .tools-grid .tool-card:focus-visible .tool-card-icon { box-shadow:inset 0 1px rgba(255,241,210,.22),0 0 0 3px rgba(183,220,118,.16),0 5px 10px rgba(24,8,1,.20)!important; }
 @media(max-width:780px) { .tools-grid { gap:0!important; }.tools-strata { padding-top:18px; padding-bottom:17px; }.tools-strata-ridge { height:14px; }.tools-strata::after { height:19px; }.tools-strata-nodes .tool-card,.tools-strata-nodes .tool-card[data-tool-side="left"],.tools-strata-nodes .tool-card[data-tool-side="right"] { background:transparent!important; box-shadow:none!important; } }
 
+/* 小屏每层只保留一条工具轨道。该规则必须位于桌面双列补丁之后，避免右侧节点
+   在 390px 等宽度又被强行塞回第二列而截断名称。 */
+@media(max-width:780px) {
+  html:root body[data-page-layout="tools"] .tools-grid .tools-strata-nodes .tool-card[data-tool-side="left"],
+  html:root body[data-page-layout="tools"] .tools-grid .tools-strata-nodes .tool-card[data-tool-side="right"] {
+    grid-column:1!important;
+    justify-self:stretch!important;
+  }
+}
+
 /* v4：土层横带延展到全视口，彻底消除中间背景板与两侧原图的硬竖切。 */
 @media(min-width:781px) {
   .tools-grid { width:100%; }

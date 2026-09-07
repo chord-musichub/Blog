@@ -20,7 +20,9 @@
 
   function syncPageStyles(root){
     var path = window.location.pathname || '';
-    var isArticleSurface = path.indexOf('/posts/') === 0 || !!query(root, '.markdown-body, [data-article-renderer="songline-markdown"]');
+    // /posts/ 是档案列表，不是阅读页；用实际阅读容器判断可避免把文章阅读规则
+    // 注入归档页，尤其是在无刷新过场后造成列表样式被污染。
+    var isArticleSurface = path.indexOf('/tools/markdown-previewer/') === 0 || !!query(root, '.markdown-body, [data-article-renderer="songline-markdown"]');
     var isToolsPage = path.indexOf('/tools/') === 0 || !!query(root, '.tools-grid, .tool-card, .md-tool-layout, [data-snake-game], [data-game-2048]');
     var isSearchSurface = isToolsPage || path === '/' || path.indexOf('/posts/') === 0 || path.indexOf('/friends/') === 0 || path.indexOf('/tags/') === 0 || !!query(root, '[data-search-submit], [data-tag-search-panel], [data-tools-search], .home-friends-section');
     if(isArticleSurface){

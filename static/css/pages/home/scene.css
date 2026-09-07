@@ -917,8 +917,8 @@ body[data-page-kind="home"] .songline-home-system{
 }
 @media(max-width:500px){
   .songline-terminal-frame{ padding:16px 15px 14px; }
-  .songline-terminal-status{ gap:8px; font-size:8px; letter-spacing:.1em; }
-  .songline-terminal-brand{ margin-right:8px; font-size:clamp(22px, 7vw, 31px); }
+  .songline-terminal-status{ gap:8px; min-width:0; font-size:8px; letter-spacing:.1em; }
+  .songline-terminal-brand{ min-width:0; max-width:calc(100% - 104px); margin-right:8px; overflow:hidden; font-size:clamp(22px, 7vw, 31px); text-overflow:ellipsis; white-space:nowrap; }
   .songline-terminal-status > span:nth-child(2){ display:none; }
   .songline-terminal-stat-grid div{ min-height:89px; }
   .songline-terminal-links{ gap:14px; }
