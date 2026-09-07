@@ -6,6 +6,7 @@
   {{ $siteTitle := default .Site.Title $cfg.site.title }}
   {{ $favicon := default $cfg.site.logo_icon $cfg.site.favicon }}
   {{ $isFriendsSurface := hasPrefix .RelPermalink "/friends/" }}
+  {{ $isFixedFriendsScene := $isFriendsSurface }}
   {{ $isToolsSurface := hasPrefix .RelPermalink "/tools/" }}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -14,8 +15,8 @@
   <script>
     (function(){
       try{
-        // 朋友列表和朋友资料页共用独立夜空场景，不能继承首页的浅色偏好。
-        var theme = {{ if $isFriendsSurface }}'dark'{{ else }}localStorage.getItem('songline-theme') || 'dark'{{ end }};
+        // 朋友楼层及其子房间共用独立夜空场景，不能继承首页的浅色偏好。
+        var theme = {{ if $isFixedFriendsScene }}'dark'{{ else }}localStorage.getItem('songline-theme') || 'dark'{{ end }};
         document.documentElement.setAttribute('data-theme', theme);
         document.documentElement.style.backgroundColor = {{ if $isToolsSurface }}(theme === 'dark' ? '#130906' : '#251208'){{ else }}(theme === 'dark' ? '#0d1728' : '#fbfaf7'){{ end }};
       }catch(e){
@@ -73,7 +74,7 @@
   <script>
     (function(){
       try{
-        if({{ if $isFriendsSurface }}true{{ else }}(localStorage.getItem('songline-theme') || 'dark') === 'dark'{{ end }}) document.body.classList.add('dark');
+        if({{ if $isFixedFriendsScene }}true{{ else }}(localStorage.getItem('songline-theme') || 'dark') === 'dark'{{ end }}) document.body.classList.add('dark');
       }catch(e){
         document.body.classList.add('dark');
       }

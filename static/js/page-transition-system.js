@@ -216,6 +216,19 @@
     var description = document.querySelector('meta[name="description"]');
     if(nextDescription && description) description.setAttribute('content', nextDescription.getAttribute('content') || '');
     syncPageStyles(doc);
+    // 过场只替换 main；同步可选页脚，避免从首页切出后残留备案栏。
+    var currentFooter = document.querySelector('footer.site-footer-clean');
+    var nextFooter = doc.querySelector('footer.site-footer-clean');
+    if(nextFooter){
+      var footerClone = nextFooter.cloneNode(true);
+      if(currentFooter) currentFooter.replaceWith(footerClone);
+      else {
+        var currentMain = mainContainer();
+        if(currentMain) currentMain.insertAdjacentElement('afterend', footerClone);
+      }
+    }else if(currentFooter){
+      currentFooter.remove();
+    }
     if(navigation){
       navigation.bindNavIndicatorHover();
       navigation.setNavActiveByURL(url);

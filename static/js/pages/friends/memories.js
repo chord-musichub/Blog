@@ -16,21 +16,28 @@
     var cards = Array.prototype.slice.call(room.querySelectorAll('[data-memory-card]'));
     var lightbox = document.querySelector('[data-memory-lightbox]');
     if(!data.length || !viewport || !track) return;
-    var step = 0, offset = 0, minimum = 0, drag = null, dragged = false;
+    var monthCount = Math.max(1, Number(track.dataset.memoryCount) || data.length);
+    var step = 0, position = 0, target = 0, minimum = 0, drag = null, frame = 0;
     function reduced(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
     function measure(){
       step = Math.round(Math.min(390, Math.max(218, window.innerWidth * .27)));
       track.style.setProperty('--memory-step', step + 'px');
-      minimum = -Math.max(0, (data.length - 1) * step);
+      minimum = -Math.max(0, (monthCount - 1) * step);
     }
-    function render(animate){
-      offset = Math.max(minimum, Math.min(0, offset));
-      track.classList.toggle('is-dragging', !animate);
-      track.style.transform = 'translate3d(' + offset + 'px,0,0)';
+    function clamp(value){ return Math.max(minimum, Math.min(0, value)); }
+    function paint(){ track.style.transform = 'translate3d(' + position + 'px,0,0)'; }
+    function glide(){
+      position += (target - position) * .16;
+      if(Math.abs(target - position) < .25){ position = target; paint(); frame = 0; return; }
+      paint(); frame = window.requestAnimationFrame(glide);
     }
-    function focusMemory(index, animate){
-      offset = -Math.max(0, Math.min(data.length - 1, index)) * step;
-      render(animate);
+    function moveTo(value, immediate){
+      target = clamp(value);
+      if(immediate){ position = target; paint(); return; }
+      if(!frame) frame = window.requestAnimationFrame(glide);
+    }
+    function focusMemory(index){
+      moveTo(-Math.max(0, Math.min(monthCount - 1, index)) * step, true);
     }
     function open(index){
       var item = data[index]; if(!item || !lightbox) return;
@@ -52,30 +59,29 @@
       if(event.button !== undefined && event.button !== 0) return;
       // 卡片自身只负责预览/放大；横向拖动从轨道空白处开始，避免捕获按钮的 click。
       if(event.target.closest && event.target.closest('[data-memory-open]')) return;
-      drag = { x:event.clientX, offset:offset }; dragged = false;
+      drag = { x:event.clientX, position:target };
       viewport.setPointerCapture && viewport.setPointerCapture(event.pointerId);
       viewport.classList.add('is-dragging'); track.classList.add('is-dragging');
     });
     viewport.addEventListener('pointermove', function(event){
       if(!drag) return;
       var delta = event.clientX - drag.x;
-      if(Math.abs(delta) > 5) dragged = true;
-      offset = drag.offset + delta; render(false);
+      moveTo(drag.position + delta, true);
     });
-    function stopDrag(){ if(!drag) return; drag = null; viewport.classList.remove('is-dragging'); track.classList.remove('is-dragging'); render(true); window.setTimeout(function(){ dragged = false; }, 0); }
+    function stopDrag(){ if(!drag) return; drag = null; viewport.classList.remove('is-dragging'); track.classList.remove('is-dragging'); moveTo(target, false); }
     viewport.addEventListener('pointerup', stopDrag); viewport.addEventListener('pointercancel', stopDrag);
     viewport.addEventListener('wheel', function(event){
       var delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
       if(!delta) return;
-      event.preventDefault(); offset -= delta; render(false); window.clearTimeout(viewport._memoryWheelTimer); viewport._memoryWheelTimer = window.setTimeout(function(){ render(true); }, 90);
+      event.preventDefault(); moveTo(target - delta * .62, false);
     }, {passive:false});
     if(lightbox){
       lightbox.addEventListener('click', function(event){ if(event.target === lightbox) close(); });
       var closeButton = lightbox.querySelector('[data-memory-close]'); if(closeButton) closeButton.addEventListener('click', close);
     }
     document.addEventListener('keydown', function(event){ if(event.key === 'Escape') close(); });
-    window.addEventListener('resize', function(){ measure(); render(!reduced()); });
-    measure(); focusMemory(data.length - 1, !reduced());
+    window.addEventListener('resize', function(){ measure(); moveTo(target, true); });
+    measure(); focusMemory(Number(cards[cards.length - 1].dataset.memoryMonthIndex) || 0);
   }
   window.SonglineInitMemoryRoom = init;
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){init(document);},{once:true}); else init(document);

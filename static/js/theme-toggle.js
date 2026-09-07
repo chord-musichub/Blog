@@ -73,9 +73,11 @@
   }
 
   function isFriendsScene(){
-    // 朋友列表和 /friends/<成员>/ 资料子页都属于固定夜空场景。
-    // 子页没有星图 DOM，不能只用 .friends-constellation 判断。
-    return !!document.querySelector('.friends-constellation') ||
+    // 朋友楼层、回忆室及 /friends/<成员>/ 资料子页都属于固定夜空场景。
+    // 回忆室的 Hugo Section 为 memories，因此单独以组件根节点判定。
+    // 朋友资料子页没有星图 DOM，不能只用 .friends-constellation 判断。
+    return !!document.querySelector('[data-memory-room]') ||
+      !!document.querySelector('.friends-constellation') ||
       !!(document.body && document.body.getAttribute('data-page-section') === 'friends');
   }
 
