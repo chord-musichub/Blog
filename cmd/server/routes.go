@@ -13,6 +13,7 @@ func (app *App) router() http.Handler {
 	// Markdown 源文件属于运行时数据，不能依赖公开站的静态目录或 SPA 兜底规则。
 	mux.Handle("/md-source/", http.StripPrefix("/md-source/", http.FileServer(http.Dir(filepath.Join(app.runtimeStaticDir(), "md-source")))))
 	mux.HandleFunc("/api/views", app.handleViewsAPI)
+	mux.HandleFunc("/api/messages", app.handleMessagesAPI)
 
 	app.registerScoreRoutes(mux, app.handleSnakeScoresAPI, "snake-scores")
 	app.registerScoreRoutes(mux, app.handleGame2048ScoresAPI, "2048-scores")

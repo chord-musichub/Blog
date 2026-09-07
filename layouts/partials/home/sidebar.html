@@ -8,8 +8,6 @@
 {{- $lastPost := first 1 $posts -}}
 {{- $recommendable := where $posts ".Params.is_notice" "ne" true -}}
 {{- $featuredPosts := first 5 $recommendable -}}
-{{- $messages := slice -}}
-{{- with resources.Get "data/home/messages.json" }}{{ $messages = . | transform.Unmarshal }}{{ end -}}
 <aside class="sidebar songline-home-system" aria-label="站点信息终端" data-home-parallax="system" data-home-panel data-home-panel-state="system">
   <div class="songline-terminal-frame">
     <div class="songline-home-system-panel" data-home-panel-system>
@@ -114,27 +112,13 @@
         <button class="songline-home-message-return" type="button" data-home-panel-return><span aria-hidden="true">‹</span> 返回</button>
         <div>
           <h2 id="songline-message-board-title">留言</h2>
-          <p><b>{{ len $messages }}</b> 条留言</p>
+          <p><b data-home-message-count>0</b> 条留言</p>
         </div>
         <span class="songline-home-message-brass" aria-hidden="true"></span>
       </header>
 
       <div class="songline-home-message-scroll" data-home-message-scroll tabindex="0" aria-label="留言列表">
-        <div class="songline-home-message-list">
-          {{ range $index, $message := $messages }}
-          <article class="songline-home-message-entry{{ if eq (mod $index 2) 1 }} is-offset{{ end }}">
-            <span class="songline-home-message-entry-no">{{ printf "%03d" (add $index 1) }}</span>
-            <div class="songline-home-message-entry-copy">
-              <p>{{ $message.content }}</p>
-              <footer>
-                <b>{{ $message.name | default "访客" }}</b>
-                {{ with $message.time }}<time>{{ . }}</time>{{ end }}
-                {{ with $message.replies }}<span>{{ . }} REPLY</span>{{ end }}
-              </footer>
-            </div>
-          </article>
-          {{ end }}
-        </div>
+        <div class="songline-home-message-list" data-home-message-list></div>
       </div>
 
       <footer class="songline-home-message-footer">
@@ -143,10 +127,12 @@
 
       <form class="songline-home-message-compose" data-home-message-form hidden>
         <div class="songline-home-message-compose-head"><strong>写下留言</strong><button type="button" data-home-message-compose-cancel aria-label="取消留言">×</button></div>
-        <label>QQ 号<input name="qq" type="text" inputmode="numeric" pattern="[0-9]{5,12}" maxlength="12" autocomplete="off" placeholder="用于识别昵称与头像"></label>
-        <label>自定义昵称（可选）<input name="name" type="text" maxlength="32" autocomplete="nickname" placeholder="填写后优先显示此名称"></label>
-        <label>内容 <span>支持 Markdown</span><textarea name="content" rows="4" maxlength="1000" required placeholder="写下一句话…"></textarea></label>
-        <div class="songline-home-message-compose-actions"><button type="submit">提交留言 <span aria-hidden="true">↵</span></button><span data-home-message-compose-status aria-live="polite"></span></div>
+        <label>QQ 号（可选）<input name="qq" type="text" inputmode="numeric" pattern="[0-9]{5,12}" maxlength="12" autocomplete="off" placeholder="用于昵称与头像显示"></label>
+        <label>自定义名字（优先）<input name="name" type="text" maxlength="32" autocomplete="nickname" placeholder="不填写则使用 QQ 或匿名"></label>
+        <div class="songline-home-message-compose-mode"><span>内容 <i>Markdown</i></span><button type="button" data-home-message-preview-toggle aria-pressed="false">预览</button></div>
+        <label data-home-message-content-field><textarea name="content" rows="4" maxlength="1000" required placeholder="写下一句话…"></textarea></label>
+        <div class="songline-home-message-preview" data-home-message-preview hidden aria-label="Markdown 预览"></div>
+        <div class="songline-home-message-compose-actions"><button type="submit">发布留言 <span aria-hidden="true">↵</span></button><span data-home-message-compose-status aria-live="polite"></span></div>
       </form>
     </section>
   </div>

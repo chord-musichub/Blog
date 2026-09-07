@@ -57,9 +57,11 @@ type App struct {
 	startedAt time.Time
 	buildMu   sync.Mutex
 	// 运行时统计文件不再占用用户/文章仓储锁，避免小游戏请求阻塞后台操作。
-	viewsMu    sync.Mutex
-	scoresMu   sync.Mutex
-	scoreCache map[string][]SnakeScoreRecord
+	viewsMu       sync.Mutex
+	scoresMu      sync.Mutex
+	scoreCache    map[string][]SnakeScoreRecord
+	messagesMu    sync.Mutex
+	messagesCache []MessageRecord
 }
 
 // Store 是后台长期数据的内存索引和文件访问入口。
