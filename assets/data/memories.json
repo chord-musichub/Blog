@@ -32,7 +32,7 @@
   {
     "date": "2025-8",
     "title": "CS50",
-    "image": "/media/memories/6.jpg",
+    "image": "/media/memories/6.png",
     "description": "谁能想到呢，我的第一节课竟然是CS50"
   },
   {
@@ -62,7 +62,7 @@
   {
     "date": "2026-5",
     "title": "和弦",
-    "image": "/media/memories/11.jpg",
+    "image": "/media/memories/11.png",
     "description": "那是人造的旋律，与我相遇的故事"
   },
   {
@@ -86,7 +86,7 @@
   {
     "date": "2026-9",
     "title": "BTIR",
-    "image": "/media/memories/15.jpg",
+    "image": "/media/memories/15.png",
     "description": "怀念，一个暑假都在搞这玩意"
   }
 ]

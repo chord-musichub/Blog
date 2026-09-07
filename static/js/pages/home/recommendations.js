@@ -82,6 +82,12 @@
       }, 1400);
     }
 
+    window.addEventListener('songline:home-panel-state', function(event){
+      var state = event.detail && event.detail.state;
+      if(state === 'system') resume();
+      else pause();
+    });
+
     function showCopyTip(message, failed){
       if(!copyTip) return;
       if(copyTipTimer) window.clearTimeout(copyTipTimer);
@@ -157,6 +163,8 @@
     }, { once:true });
 
     updateControls();
+    var homePanel = panel.closest && panel.closest('[data-home-panel]');
+    if(homePanel && homePanel.dataset.homePanelState !== 'system') pause();
     window.requestAnimationFrame(function(){ panel.classList.add('is-ready'); });
     schedule(5200);
   }

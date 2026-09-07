@@ -100,6 +100,16 @@
       }
     },
     {
+      key:'home-message-board',
+      src:'/js/pages/home/message-board.js?v=' + VERSION,
+      test:function(root){
+        return !!query(root, '[data-home-panel]');
+      },
+      init:function(root){
+        if(window.SonglineInitHomeMessageBoard) window.SonglineInitHomeMessageBoard(root || document);
+      }
+    },
+    {
       key:'markdown-code-tools',
       src:'/js/markdown-code-tools.js?v=' + VERSION,
       test:function(root){
