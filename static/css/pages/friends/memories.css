@@ -31,3 +31,47 @@ body:has(.memory-room) .modern-site-header{position:fixed!important}
 /* 返回入口避开左上角站点标识，始终位于稳定的页面操作位。 */
 body:has(.memory-room) .memory-room__back{position:fixed!important;top:98px!important;left:28px!important;z-index:12010!important}
 @media(max-width:760px){body:has(.memory-room) .memory-room__back{top:78px!important;left:16px!important}}
+
+/* 标题沿图片右侧显示；只有图片本身可触发放大与预览效果。 */
+.memory-room__memory{--memory-card-w:clamp(118px,13vw,194px);width:var(--memory-card-w)}
+.memory-room__caption{bottom:calc(var(--memory-rise) + var(--memory-stack-offset) + 108px);left:calc(50% + var(--memory-card-w)/2 + clamp(12px,1.6vw,24px));width:min(220px,calc(50vw - 44px));text-align:left;opacity:.74;transform:translateY(50%)}
+.memory-room__caption h1{font-size:clamp(14px,1.2vw,18px);line-height:1.35}.memory-room__caption p{margin-top:5px}
+.memory-room__memory:hover .memory-room__image-button{z-index:auto;border-color:rgba(220,237,255,.38);box-shadow:0 14px 32px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.18);transform:translateX(-50%)}
+.memory-room__memory:hover .memory-room__image-button img{transform:none;filter:none}
+.memory-room__image-button:hover,.memory-room__image-button:focus-visible{z-index:2;border-color:rgba(245,251,255,.92);box-shadow:0 18px 44px rgba(0,0,0,.34),0 0 0 5px rgba(174,213,250,.1);outline:0;transform:translateX(-50%) translateY(-6px) scale(1.08)}
+.memory-room__image-button:hover img,.memory-room__image-button:focus-visible img{transform:scale(1.06);filter:saturate(1.08) brightness(1.06)}
+.memory-room__memory:hover .memory-room__caption{opacity:.74;transform:translateY(50%)}
+.memory-room__memory:hover .memory-room__caption p{max-height:0;opacity:0}
+.memory-room__image-button:hover + .memory-room__caption,.memory-room__image-button:focus-visible + .memory-room__caption{opacity:1;transform:translateY(calc(50% - 3px))}
+.memory-room__image-button:hover + .memory-room__caption p,.memory-room__image-button:focus-visible + .memory-room__caption p{max-height:42px;opacity:1}
+.memory-room__memory:hover .memory-room__time{color:rgba(209,227,246,.7)}.memory-room__memory:hover .memory-room__time i{background:rgba(14,34,57,.96);box-shadow:0 0 0 4px rgba(19,45,76,.72)}
+.memory-room__image-button:hover ~ .memory-room__time,.memory-room__image-button:focus-visible ~ .memory-room__time{color:#f5faff}.memory-room__image-button:hover ~ .memory-room__time i,.memory-room__image-button:focus-visible ~ .memory-room__time i{background:#d7ebff;box-shadow:0 0 0 7px rgba(173,214,250,.12)}
+@media(max-width:760px){.memory-room__memory{--memory-card-w:124px;width:var(--memory-card-w)}.memory-room__caption{left:calc(50% + var(--memory-card-w)/2 + 12px);width:min(138px,calc(50vw - 78px))}}
+
+/* 透明纵向卡片不截获鼠标；只有可见图片按钮承担 hover 与点击。 */
+.memory-room__viewport,.memory-room__track,.memory-room__memory,.memory-room__caption,.memory-room__time{user-select:none;-webkit-user-select:none}
+.memory-room__memory{pointer-events:none}.memory-room__image-button{pointer-events:auto}.memory-room__image-button img{-webkit-user-drag:none;user-select:none}
+
+/* 标题与说明均允许自然换行，长文本只在图片悬停时展开。 */
+.memory-room__caption h1,.memory-room__caption p{overflow-wrap:anywhere;word-break:break-word}
+.memory-room__caption h1{white-space:normal}.memory-room__caption p{line-height:1.55}
+.memory-room__image-button:hover + .memory-room__caption p,.memory-room__image-button:focus-visible + .memory-room__caption p{max-height:8em}
+
+/* 不以媒体断点隐藏简介：缩放触发窄布局时也完整换行显示。 */
+.memory-room__caption{width:min(360px,calc(50vw - 142px))}
+.memory-room__caption p{display:block!important;font-size:clamp(11px,.9vw,14px);line-height:1.6}
+.memory-room__image-button:hover + .memory-room__caption p,.memory-room__image-button:focus-visible + .memory-room__caption p{max-height:none!important;overflow:visible;padding:6px 9px;border-radius:8px;background:linear-gradient(90deg,rgba(6,17,32,.72),rgba(6,17,32,.26));backdrop-filter:blur(5px)}
+
+@media(max-width:640px){
+  .memory-room__caption{bottom:calc(var(--memory-rise) + var(--memory-stack-offset) + var(--memory-card-h) + 76px);left:50%;width:min(260px,calc(100vw - 48px));text-align:center;transform:translate(-50%,6px)}
+  .memory-room__memory:hover .memory-room__caption{transform:translate(-50%,6px)}
+  .memory-room__image-button:hover + .memory-room__caption,.memory-room__image-button:focus-visible + .memory-room__caption{transform:translate(-50%,0)}
+}
+
+/* 悬停信息压在相邻卡片之上，长简介不会再被下一张图片截断。 */
+.memory-room__memory:has(.memory-room__image-button:hover),.memory-room__memory:focus-within{z-index:12}
+.memory-room__image-button:hover + .memory-room__caption,.memory-room__image-button:focus-visible + .memory-room__caption{z-index:13}
+.memory-room__image-button:hover + .memory-room__caption p,.memory-room__image-button:focus-visible + .memory-room__caption p{position:relative;z-index:14}
+
+/* 简介控制为短阅读行宽：完整显示，但不会在大屏变成过长的一行。 */
+.memory-room__caption p{inline-size:min(16em,100%)}

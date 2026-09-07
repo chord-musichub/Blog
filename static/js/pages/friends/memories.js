@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  var VERSION = '2.0.0';
+  var VERSION = '2.3.0';
   function parseData(root){
     var node = root.querySelector('#memory-room-data');
     try{return node ? JSON.parse(node.textContent || '[]') : [];}catch(e){return [];}
@@ -10,14 +10,22 @@
     var room = root.querySelector && root.querySelector('[data-memory-room]');
     if(!room || room.dataset.memoryReady === VERSION) return;
     room.dataset.memoryReady = VERSION;
-    var data = parseData(room);
+    var data = parseData(room).sort(function(a, b){
+      function dateKey(item){
+        var parts = String(item && item.date || '').split('-');
+        var year = Number(parts[0]) || 0;
+        var month = Number(parts[1]) || 0;
+        return year * 100 + month;
+      }
+      return dateKey(a) - dateKey(b);
+    });
     var viewport = room.querySelector('[data-memory-viewport]');
     var track = room.querySelector('[data-memory-track]');
     var cards = Array.prototype.slice.call(room.querySelectorAll('[data-memory-card]'));
     var lightbox = document.querySelector('[data-memory-lightbox]');
     if(!data.length || !viewport || !track) return;
     var monthCount = Math.max(1, Number(track.dataset.memoryCount) || data.length);
-    var step = 0, position = 0, target = 0, minimum = 0, drag = null, frame = 0;
+    var step = 0, position = 0, target = 0, minimum = 0, drag = null, frame = 0, dragFrame = 0, dragNext = 0;
     function reduced(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
     function measure(){
       step = Math.round(Math.min(390, Math.max(218, window.innerWidth * .27)));
@@ -59,6 +67,9 @@
       if(event.button !== undefined && event.button !== 0) return;
       // 卡片自身只负责预览/放大；横向拖动从轨道空白处开始，避免捕获按钮的 click。
       if(event.target.closest && event.target.closest('[data-memory-open]')) return;
+      // 防止横向拖动时浏览器选中标题、导航等页面文字。
+      event.preventDefault();
+      if(frame){ window.cancelAnimationFrame(frame); frame = 0; }
       drag = { x:event.clientX, position:target };
       viewport.setPointerCapture && viewport.setPointerCapture(event.pointerId);
       viewport.classList.add('is-dragging'); track.classList.add('is-dragging');
@@ -66,9 +77,18 @@
     viewport.addEventListener('pointermove', function(event){
       if(!drag) return;
       var delta = event.clientX - drag.x;
-      moveTo(drag.position + delta, true);
+      dragNext = drag.position + delta;
+      // 高频 pointermove 合并至每个动画帧，避免图片很多时反复重排造成卡顿。
+      if(!dragFrame) dragFrame = window.requestAnimationFrame(function(){
+        dragFrame = 0;
+        if(drag) moveTo(dragNext, true);
+      });
     });
-    function stopDrag(){ if(!drag) return; drag = null; viewport.classList.remove('is-dragging'); track.classList.remove('is-dragging'); moveTo(target, false); }
+    function stopDrag(){
+      if(!drag) return;
+      if(dragFrame){ window.cancelAnimationFrame(dragFrame); dragFrame = 0; moveTo(dragNext, true); }
+      drag = null; viewport.classList.remove('is-dragging'); track.classList.remove('is-dragging'); moveTo(target, false);
+    }
     viewport.addEventListener('pointerup', stopDrag); viewport.addEventListener('pointercancel', stopDrag);
     viewport.addEventListener('wheel', function(event){
       var delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;

@@ -47,9 +47,10 @@
       var name = clean(item.name || item.display_name || item.displayName || item.username || ('朋友 ' + (index + 1)));
       var id = key(item.id || item.slug || item.username || name);
       var username = clean(item.username);
-      // 站内成员以受版本控制的 links.json 为准；外部节点继续使用其自身配置。
+      // links.json 同时支持站内 username 和第三方节点 id；
       // hasOwnProperty 允许显式写 [] 来清空某位成员的全部连线。
-      var hasConfiguredLinks = !!username && Object.prototype.hasOwnProperty.call(linkConfig || {}, username);
+      var linkOwner = username && Object.prototype.hasOwnProperty.call(linkConfig || {}, username) ? username : id;
+      var hasConfiguredLinks = !!linkOwner && Object.prototype.hasOwnProperty.call(linkConfig || {}, linkOwner);
       return {
         id:id,
         index:index,
@@ -60,7 +61,8 @@
         href:profileURL(item.url || item.href, '/friends/' + encodeURIComponent(clean(item.slug || name)) + '/'),
         count:Number(item.post_count || item.postCount || 0),
         updated:date(item.updated_at || item.updatedAt),
-        links:hasConfiguredLinks ? toArray(linkConfig[username]) : toArray(item.links || item.relations)
+        configuredLinks:hasConfiguredLinks,
+        links:hasConfiguredLinks ? toArray(linkConfig[linkOwner]) : toArray(item.links || item.relations)
       };
     }).filter(function(friend){ return friend.id && !/^(admin|root|system|test|demo)$/.test(friend.id); });
   }
@@ -200,7 +202,7 @@
     function configuredEdges(){
       var edges = [];
       var seen = Object.create(null);
-      var hasConfiguredLocalLinks = false;
+      var hasConfiguredGraphLinks = false;
       function add(a, b){
         if(!a || !b || a === b) return;
         var edge = edgeFor(a,b);
@@ -209,10 +211,10 @@
         edges.push([a,b]);
       }
       friends.forEach(function(friend){
-        if(friend.username && friend.links.length) hasConfiguredLocalLinks = true;
+        if(friend.configuredLinks && friend.links.length) hasConfiguredGraphLinks = true;
         friend.links.forEach(function(target){ add(friend, byKey[key(target)]); });
       });
-      if(!hasConfiguredLocalLinks){
+      if(!hasConfiguredGraphLinks){
         DEFAULT_CONSTELLATION_EDGES.forEach(function(pair){ add(byKey[key(pair[0])], byKey[key(pair[1])]); });
       }
       // 没有关系数据时，维持一个稀疏、非放射的星座链。

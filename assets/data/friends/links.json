@@ -4,5 +4,7 @@
   "three": ["songline", "mishi_a", "scanf"],
   "mishi_a": ["songline", "three", "scanf"],
   "scanf": ["songline", "three", "mishi_a"],
-  "zxlyzq": ["songline"]
+  "zxlyzq": ["songline"],
+  "shoper": ["songline", "mishi_a", "ckckh2023"],
+  "ckckh2023": ["songline", "shoper"]
 }

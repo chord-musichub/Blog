@@ -64,5 +64,29 @@
     "title": "和弦",
     "image": "/media/memories/11.jpg",
     "description": "那是人造的旋律，与我相遇的故事"
+  },
+  {
+    "date": "2026-3",
+    "title": "羊宴",
+    "image": "/media/memories/12.jpg",
+    "description": "烤全羊，一生总得有那么几次吧"
+  },
+  {
+    "date": "2026-7",
+    "title": "恩施",
+    "image": "/media/memories/13.jpg",
+    "description": "说起来我想坐这个还没坐上呢"
+  },
+  {
+    "date": "2025-12",
+    "title": "新生程序省赛",
+    "image": "/media/memories/14.jpg",
+    "description": "第一次去见大世面"
+  },
+  {
+    "date": "2026-9",
+    "title": "BTIR",
+    "image": "/media/memories/15.jpg",
+    "description": "怀念，一个暑假都在搞这玩意"
   }
 ]
