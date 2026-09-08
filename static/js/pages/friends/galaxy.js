@@ -47,6 +47,9 @@
       var name = clean(item.name || item.display_name || item.displayName || item.username || ('朋友 ' + (index + 1)));
       var id = key(item.id || item.slug || item.username || name);
       var username = clean(item.username);
+      // 外部节点没有填写第三方地址时，只作为星图卡片存在；不能伪造一个
+      // /friends/... 的本地地址，否则第二次点击会进入不存在的资料页。
+      var explicitHref = clean(item.url || item.href);
       // links.json 同时支持站内 username 和第三方节点 id；
       // hasOwnProperty 允许显式写 [] 来清空某位成员的全部连线。
       var linkOwner = username && Object.prototype.hasOwnProperty.call(linkConfig || {}, username) ? username : id;
@@ -58,7 +61,7 @@
         name:name,
         bio:clean(item.bio) || '这个朋友还没有写简介。',
         avatar:url(item.avatar, '/media/users/user-null.png'),
-        href:profileURL(item.url || item.href, '/friends/' + encodeURIComponent(clean(item.slug || name)) + '/'),
+        href:explicitHref ? profileURL(explicitHref) : '',
         count:Number(item.post_count || item.postCount || 0),
         updated:date(item.updated_at || item.updatedAt),
         configuredLinks:hasConfiguredLinks,
@@ -252,7 +255,9 @@
         node.addEventListener('blur', function(){ if(!isTouch()){ setProfile(selected); hideHoverCard(); } });
         node.addEventListener('click', function(event){
           event.preventDefault();
-          if(selected === friend){ window.location.href = friend.href; return; }
+          // 已选中节点只有在明确配置了地址时才可跳转；未填第三方连接的
+          // 节点仍可查看悬浮信息和关系线，但不会发生空白/404 跳转。
+          if(selected === friend){ if(friend.href) window.location.href = friend.href; return; }
           selected = friend;
           setProfile(friend);
           showHoverCard(friend, node);

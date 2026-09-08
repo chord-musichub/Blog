@@ -191,6 +191,7 @@
 
   function syncPageStyles(doc){
     var nextStyles = Object.create(null);
+    var pendingStyles = [];
     doc.querySelectorAll('link[rel="stylesheet"][id^="songline-"]').forEach(function(next){
       nextStyles[next.id] = next;
     });
@@ -206,10 +207,90 @@
       var clone = nextStyles[id].cloneNode(true);
       clone.dataset.songlineTransitionStyle = 'true';
       document.head.appendChild(clone);
+      pendingStyles.push(clone);
     });
+
+    // 页面专属 CSS 是下一页场景的一部分。等它们至少完成加载（或明确失败）
+    // 后再揭幕，避免工具土层、星图等在入场后才补上一帧。
+    if(!pendingStyles.length) return Promise.resolve();
+    return Promise.all(pendingStyles.map(function(style){
+      if(style.sheet) return Promise.resolve();
+      return new Promise(function(resolve){
+        var done = false;
+        function finish(){
+          if(done) return;
+          done = true;
+          style.removeEventListener('load', finish);
+          style.removeEventListener('error', finish);
+          resolve();
+        }
+        style.addEventListener('load', finish, { once:true });
+        style.addEventListener('error', finish, { once:true });
+        window.setTimeout(finish, 1600);
+      });
+    }));
   }
 
-  function syncDocumentShell(doc, url, pushState){
+  function normalizeAssetUrl(value){
+    value = String(value || '').trim().replace(/^['"]|['"]$/g, '');
+    if(!value || value === 'none' || value.indexOf('data:') === 0 || value.indexOf('blob:') === 0) return '';
+    try{ return new URL(value, window.location.href).href; }catch(e){ return ''; }
+  }
+
+  function cssAssetUrls(value){
+    var urls = [];
+    String(value || '').replace(/url\((['"]?)(.*?)\1\)/g, function(_, quote, raw){
+      var normalized = normalizeAssetUrl(raw);
+      if(normalized) urls.push(normalized);
+      return _;
+    });
+    return urls;
+  }
+
+  function collectIncomingAssets(doc){
+    var urls = Object.create(null);
+    function add(value){
+      var normalized = normalizeAssetUrl(value);
+      if(normalized) urls[normalized] = true;
+    }
+    function addCss(value){ cssAssetUrls(value).forEach(function(value){ urls[value] = true; }); }
+
+    doc.querySelectorAll('img[src], source[src], [data-bg], [style*="background"]').forEach(function(node){
+      add(node.getAttribute('src'));
+      add(node.getAttribute('data-bg'));
+      addCss(node.getAttribute('style'));
+      var srcset = node.getAttribute('srcset') || '';
+      srcset.split(',').forEach(function(part){ add(part.trim().split(/\s+/)[0]); });
+    });
+    // 工具页等场景的首屏背景来自刚载入的页面 CSS，而非 HTML 内联属性。
+    try{ addCss(window.getComputedStyle(document.body).backgroundImage); }catch(e){}
+    return Object.keys(urls).slice(0, 32);
+  }
+
+  function preloadIncomingAssets(urls){
+    if(!urls.length) return Promise.resolve();
+    var tasks = urls.map(function(url){
+      return new Promise(function(resolve){
+        var image = new Image();
+        var settled = false;
+        function finish(){
+          if(settled) return;
+          settled = true;
+          image.onload = null;
+          image.onerror = null;
+          resolve();
+        }
+        image.onload = finish;
+        image.onerror = finish;
+        image.src = url;
+        window.setTimeout(finish, 2400);
+      });
+    });
+    // 外部朋友头像等资源允许失败或慢速返回；它们不会无限阻塞全站导航。
+    return Promise.all(tasks).then(function(){});
+  }
+
+  async function syncDocumentShell(doc, url, pushState){
     if(doc.title) document.title = doc.title;
     var nextBody = doc.body;
     if(nextBody){
@@ -224,7 +305,7 @@
     var nextDescription = doc.querySelector('meta[name="description"]');
     var description = document.querySelector('meta[name="description"]');
     if(nextDescription && description) description.setAttribute('content', nextDescription.getAttribute('content') || '');
-    syncPageStyles(doc);
+    await syncPageStyles(doc);
     // 过场只替换 main；同步可选页脚，避免从首页切出后残留备案栏。
     var currentFooter = document.querySelector('footer.site-footer-clean');
     var nextFooter = doc.querySelector('footer.site-footer-clean');
@@ -334,10 +415,13 @@
       if(!nextMain) throw new Error('next page main container missing');
 
       await waitUntil(startedAt, TIMELINE.loaderRelease);
+      // 幕布下先切换页面壳与专属样式，并预热首屏图片；此前在这里直接替换
+      // main，慢网速时会先露出无背景/未定位的页面，再陆续加载场景资源。
+      await syncDocumentShell(doc, url, options.pushState === true);
+      await preloadIncomingAssets(collectIncomingAssets(doc));
       await waitForLoaderCloseNode();
       closeLoader();
       await wait(160);
-      syncDocumentShell(doc, url, options.pushState === true);
       main.innerHTML = nextMain.innerHTML;
       didSwapMain = true;
       hydrateDynamicBits(main);

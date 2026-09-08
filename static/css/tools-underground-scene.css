@@ -3,7 +3,9 @@
 
 html:has(body[data-page-layout="tools"]) { background:#211008; }
 body[data-page-layout="tools"] { min-height:100svh; color:var(--tools-ink); background-color:#251208; background-image:linear-gradient(180deg,rgba(52,21,4,.06),rgba(25,9,2,.46) 100%),url('/uploads/admin/under-ground.png'),url('/uploads/admin/tools-underground-soil-light-v1.png'); background-repeat:no-repeat,no-repeat,repeat-y; background-position:center top,center top,center 190px; background-size:100% auto,100% auto,100% auto; }
-body.dark[data-page-layout="tools"] { background-color:#130906; background-image:linear-gradient(180deg,rgba(4,7,16,.14),rgba(8,3,2,.60) 100%),url('/uploads/admin/under-ground-black.png'),url('/uploads/admin/tools-underground-soil-dark-v1.png'); }
+/* site.css 的通用 dark 背景使用了 !important；三层场景的图、尺寸、定位和循环必须作为一组覆盖。
+   第一张夜校图只出现一次，下面才接可无限延伸的深色土层。 */
+body.dark[data-page-layout="tools"] { background-color:#130906!important; background-image:linear-gradient(180deg,rgba(4,7,16,.14),rgba(8,3,2,.60) 100%),url('/uploads/admin/under-ground-black.png'),url('/uploads/admin/tools-underground-soil-dark-v1.png')!important; background-repeat:no-repeat,no-repeat,repeat-y!important; background-position:center top,center top,center 190px!important; background-size:100% auto,100% auto,100% auto!important; }
 body[data-page-layout="tools"]::before,body[data-page-layout="tools"] .site-bg-layer,body[data-page-layout="tools"] .songline-starstream-layer,body[data-page-layout="tools"] .songline-ribbon-layer { display:none!important; }
 body[data-page-layout="tools"] .modern-site-header { background:linear-gradient(180deg,rgba(34,15,4,.48),transparent)!important; border-bottom-color:rgba(255,228,176,.10)!important; box-shadow:none!important; }
 body[data-page-layout="tools"] .modern-site-header .logo,body[data-page-layout="tools"] .modern-site-header .logo-text,body[data-page-layout="tools"] .modern-site-header .header-icons .icon-btn,body[data-page-layout="tools"] .modern-site-header .header-icons .ui-icon { color:#fff1d2!important; }
