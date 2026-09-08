@@ -415,3 +415,16 @@ body:has(.friends-constellation) .modern-site-header .header-icons .icon-btn{ co
   .friends-constellation__core{height:112px;}
   .friends-constellation__core-name{top:calc(50% + 51px);}
 }
+
+/* 星图工作区比视窗略大：新朋友可向四周延展，拖动时节点与连线始终作为一个整体。 */
+.friends-constellation__sky{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;}
+.friends-constellation__sky.is-dragging{cursor:grabbing;}
+.friends-constellation__world{position:absolute;z-index:3;top:-22.5%;left:-30%;width:160%;height:145%;will-change:transform;transform:translate3d(0,0,0);}
+.friends-constellation__world.is-dragging{transition:none!important;}
+.friends-constellation__world .friends-constellation__lines{width:100%;height:100%;}
+.friends-constellation__world .friends-constellation__nodes{animation:none!important;}
+.friends-constellation__world .friends-constellation__node,.friends-constellation__world .friends-constellation__core{cursor:pointer;}
+.friends-constellation__world img{user-select:none;-webkit-user-drag:none;}
+@media(max-width:760px){
+  .friends-constellation__world{top:-20%;left:-35%;width:170%;height:140%;}
+}

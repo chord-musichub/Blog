@@ -1,15 +1,16 @@
 {
-  "songline": ["three", "mishi_a", "scanf", "zxlyzq","shoper","ckckh2023","LuZ-_Ek","chord","furina","ikun","tangibledreams913"],
+  "songline": ["three", "mishi_a", "scanf", "zxlyzq","shoper","ckckh2023","LuZ-_Ek","chord","furina","ikun","tangibledreams913","Luska"],
   "mxbt": ["three"],
   "three": ["songline", "mishi_a", "scanf","LuZ-_Ek"],
   "mishi_a": ["songline", "three", "scanf","LuZ-_Ek"],
   "scanf": ["songline", "three", "mishi_a","LuZ-_Ek"],
-  "zxlyzq": ["songline","ikun","furina"],
+  "zxlyzq": ["songline","ikun","furina","Luska"],
   "shoper": ["songline", "mishi_a", "ckckh2023"],
   "ckckh2023": ["songline", "shoper"],
   "LuZ-_Ek": ["songline","mishi_a","three","scanf"],
   "chord": ["songline"],
-  "furina": ["songline","zxlyzq","ikun"],
-  "ikun": ["songline","zxlyzq","furina"],
-  "tangibledreams913": ["songline","ckckh2023"]
+  "furina": ["songline","zxlyzq","ikun","Luska"],
+  "ikun": ["songline","zxlyzq","furina","Luska"],
+  "tangibledreams913": ["songline","ckckh2023"],
+  "Luska": ["furina","ikun","zxlyzq","songline"]
 }

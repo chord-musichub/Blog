@@ -2,10 +2,10 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.4.0';
+  var VERSION = '22.6.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
-  var DESKTOP_POSITIONS = [[15,28],[31,17],[58,24],[75,43],[68,71],[29,72],[12,57],[47,82]];
-  var MOBILE_POSITIONS = [[16,29],[67,21],[82,45],[60,60],[20,66],[43,82],[82,83],[12,48]];
+  var DESKTOP_POSITIONS = [[24,30],[38,18],[57,22],[76,30],[80,51],[72,72],[54,82],[31,77],[19,61],[19,43],[38,44],[62,44],[43,63],[57,62],[30,27],[70,18],[83,68],[17,75]];
+  var MOBILE_POSITIONS = [[27,30],[49,19],[70,25],[75,46],[67,70],[50,80],[30,72],[23,52],[38,44],[61,47],[43,61],[58,62]];
   // 历史默认关系只用于尚未在公开 links.json 配置星链的旧数据；
   // 一旦配置了关系图，连线完全由 JSON 驱动，避免前端写死的线无法修改。
   var DEFAULT_CONSTELLATION_EDGES = [
@@ -109,6 +109,7 @@
 
   function build(shell, friends){
     var stage = shell.querySelector('[data-galaxy-stage], .friends-constellation__sky');
+    var world = shell.querySelector('[data-galaxy-world], .friends-constellation__world');
     // 线上旧版 Hugo 的 HTML 压缩器会移除 SVG 上的空 data-* 属性，
     // 但 class 会完整保留；这里以 class 作为兼容回退，不能再只依赖 data 属性。
     var lines = shell.querySelector('[data-galaxy-lines], .friends-constellation__lines');
@@ -130,7 +131,7 @@
     var input = shell.querySelector('#friendGalaxySearch');
     var submit = shell.querySelector('[data-friend-search-submit]');
     var results = shell.querySelector('[data-galaxy-results]');
-    if(!stage || !lines || !nodeLayer || !core) return;
+    if(!stage || !world || !lines || !nodeLayer || !core) return;
 
     if(!friends.length){
       if(empty){ empty.hidden = false; empty.textContent = '还没有可显示的朋友数据。'; }
@@ -147,6 +148,8 @@
     var resizeFrame = 0;
     var settleTimer = 0;
     var stageObserver = null;
+    // 工作区比视窗更大；只平移这个世界层，背景、回忆入口和 hover 卡片保持固定。
+    var pan = { x:0, y:0, targetX:0, targetY:0, zoom:1, frame:0, dragFrame:0, drag:null, nextX:0, nextY:0, suppressUntil:0 };
 
     // 星图通过百分比定位，但图片、字体和移动端可视视口会在首帧后继续稳定。
     // 统一收敛到同一轮布局，保证 SVG 线端永远读取头像的最终圆心。
@@ -159,6 +162,82 @@
       if(!stage.isConnected) return;
       scheduleLayout();
       window.requestAnimationFrame(scheduleLayout);
+    }
+
+    function panBounds(){
+      return {
+        x:Math.max(0, (world.offsetWidth * pan.zoom - stage.clientWidth) / 2),
+        y:Math.max(0, (world.offsetHeight * pan.zoom - stage.clientHeight) / 2)
+      };
+    }
+    function clampPan(x, y){
+      var bounds = panBounds();
+      return { x:Math.max(-bounds.x, Math.min(bounds.x, x)), y:Math.max(-bounds.y, Math.min(bounds.y, y)) };
+    }
+    function paintPan(){ world.style.transform = 'translate3d(' + Math.round(pan.x) + 'px,' + Math.round(pan.y) + 'px,0) scale(' + pan.zoom.toFixed(3) + ')'; }
+    function glidePan(){
+      pan.x += (pan.targetX - pan.x) * .18;
+      pan.y += (pan.targetY - pan.y) * .18;
+      if(Math.abs(pan.targetX - pan.x) < .25 && Math.abs(pan.targetY - pan.y) < .25){ pan.x = pan.targetX; pan.y = pan.targetY; paintPan(); pan.frame = 0; return; }
+      paintPan(); pan.frame = window.requestAnimationFrame(glidePan);
+    }
+    function movePan(x, y, immediate){
+      var next = clampPan(x, y);
+      pan.targetX = next.x; pan.targetY = next.y;
+      if(immediate){ pan.x = next.x; pan.y = next.y; paintPan(); return; }
+      if(!pan.frame) pan.frame = window.requestAnimationFrame(glidePan);
+    }
+    function onPointerDown(event){
+      if(event.button !== undefined && event.button !== 0) return;
+      // 头像及主星仍优先承担原有点击交互；从周围空白处拖动画布。
+      if(event.target.closest && event.target.closest('.friends-constellation__node, .friends-constellation__core, a, button, input, textarea, select')) return;
+      if(pan.frame){ window.cancelAnimationFrame(pan.frame); pan.frame = 0; }
+      hideHoverCard();
+      pan.drag = { x:event.clientX, y:event.clientY, originX:pan.targetX, originY:pan.targetY, moved:false };
+      stage.setPointerCapture && stage.setPointerCapture(event.pointerId);
+      stage.classList.add('is-dragging'); world.classList.add('is-dragging');
+      event.preventDefault();
+    }
+    function onPointerMove(event){
+      if(!pan.drag) return;
+      var dx = event.clientX - pan.drag.x, dy = event.clientY - pan.drag.y;
+      if(Math.abs(dx) > 3 || Math.abs(dy) > 3) pan.drag.moved = true;
+      pan.nextX = pan.drag.originX + dx; pan.nextY = pan.drag.originY + dy;
+      // 高频移动每帧只绘制一次，节点增多后也不触发重复布局。
+      if(!pan.dragFrame) pan.dragFrame = window.requestAnimationFrame(function(){
+        pan.dragFrame = 0;
+        if(pan.drag) movePan(pan.nextX, pan.nextY, true);
+      });
+    }
+    function stopPan(event){
+      if(!pan.drag) return;
+      var moved = pan.drag.moved;
+      if(pan.dragFrame){ window.cancelAnimationFrame(pan.dragFrame); pan.dragFrame = 0; movePan(pan.nextX, pan.nextY, true); }
+      pan.drag = null;
+      stage.classList.remove('is-dragging'); world.classList.remove('is-dragging');
+      if(event && stage.releasePointerCapture && event.pointerId != null){ try{ stage.releasePointerCapture(event.pointerId); }catch(error){} }
+      if(moved) pan.suppressUntil = Date.now() + 320;
+      movePan(pan.targetX, pan.targetY, false);
+    }
+    function blockDragClick(event){
+      if(Date.now() < pan.suppressUntil){ event.preventDefault(); event.stopPropagation(); }
+    }
+    function onWheel(event){
+      var delta = event.deltaY || event.deltaX;
+      if(!delta) return;
+      // Friends 是全屏画布，没有页面内纵向阅读内容；滚轮专门用于地图缩放。
+      event.preventDefault();
+      var nextZoom = Math.max(.72, Math.min(1.58, pan.zoom * Math.exp(-delta * .0015)));
+      if(Math.abs(nextZoom - pan.zoom) < .001) return;
+      // 在鼠标所在处缩放：计算缩放前该点相对世界中心的位置，并补偿平移。
+      var stageRect = stage.getBoundingClientRect();
+      var pointX = event.clientX - stageRect.left - stage.clientWidth / 2;
+      var pointY = event.clientY - stageRect.top - stage.clientHeight / 2;
+      var ratio = nextZoom / pan.zoom;
+      var nextX = pointX - (pointX - pan.x) * ratio;
+      var nextY = pointY - (pointY - pan.y) * ratio;
+      pan.zoom = nextZoom;
+      movePan(nextX, nextY, true);
     }
 
     function safeImage(image, source){
@@ -246,6 +325,7 @@
         node.dataset.position = String(index);
         node.setAttribute('aria-label', '查看 ' + friend.name + ' 的星图标注');
         node.innerHTML = '<span class="friends-constellation__node-halo" aria-hidden="true"></span><img alt=""><span class="friends-constellation__node-name"></span>';
+        node.querySelector('img').draggable = false;
         safeImage(node.querySelector('img'), friend.avatar);
         node.querySelector('.friends-constellation__node-name').textContent = friend.name;
         // 不以 hover media query 判断设备：二合一设备也可能连接鼠标。
@@ -272,8 +352,10 @@
     function presetFor(index){
       var presets = window.matchMedia && window.matchMedia('(max-width: 760px)').matches ? MOBILE_POSITIONS : DESKTOP_POSITIONS;
       if(index < presets.length) return presets[index];
-      var angle = (-Math.PI / 2) + (index * (Math.PI * 2 / Math.max(visibleFriends.length, 1)));
-      return [50 + Math.cos(angle) * 34, 50 + Math.sin(angle) * 32];
+      var overflowIndex = index - presets.length;
+      var overflowCount = Math.max(1, visibleFriends.length - presets.length);
+      var angle = (-Math.PI / 2) + (overflowIndex * (Math.PI * 2 / overflowCount));
+      return [50 + Math.cos(angle) * 43, 50 + Math.sin(angle) * 40];
     }
     function positionNodes(){
       visibleFriends.forEach(function(friend, index){
@@ -284,18 +366,18 @@
       });
     }
     function drawLines(){
-      var stageRect = stage.getBoundingClientRect();
+      var worldRect = world.getBoundingClientRect();
       // 过场期间 main 会缩放；getBoundingClientRect 会得到缩放后的视觉尺寸，
       // 而 SVG viewBox 必须使用未缩放的布局尺寸。否则过场结束后节点已回到
       // 正常大小，连线仍停留在缩小后的坐标系中。
-      var layoutWidth = stage.clientWidth || stageRect.width;
-      var layoutHeight = stage.clientHeight || stageRect.height;
-      if(!stageRect.width || !stageRect.height || !layoutWidth || !layoutHeight) return;
+      var layoutWidth = world.clientWidth || worldRect.width;
+      var layoutHeight = world.clientHeight || worldRect.height;
+      if(!worldRect.width || !worldRect.height || !layoutWidth || !layoutHeight) return;
       lines.setAttribute('viewBox', '0 0 ' + Math.round(layoutWidth) + ' ' + Math.round(layoutHeight));
       lines.innerHTML = '';
       var centers = Object.create(null);
-      centers[host.id] = centerOf(core, stageRect, layoutWidth, layoutHeight);
-      visibleFriends.forEach(function(friend){ centers[friend.id] = centerOf(nodeById[friend.id], stageRect, layoutWidth, layoutHeight); });
+      centers[host.id] = centerOf(core, worldRect, layoutWidth, layoutHeight);
+      visibleFriends.forEach(function(friend){ centers[friend.id] = centerOf(nodeById[friend.id], worldRect, layoutWidth, layoutHeight); });
       edges.forEach(function(edge){
         var from = centers[edge[0].id], to = centers[edge[1].id];
         if(!from || !to) return;
@@ -327,6 +409,7 @@
     }
     function layout(){
       if(!stage.isConnected) return;
+      movePan(pan.targetX, pan.targetY, true);
       positionNodes();
       window.requestAnimationFrame(drawLines);
     }
@@ -368,12 +451,22 @@
     function cleanup(){
       window.cancelAnimationFrame(resizeFrame);
       window.clearTimeout(settleTimer);
+      if(pan.frame) window.cancelAnimationFrame(pan.frame);
+      if(pan.dragFrame) window.cancelAnimationFrame(pan.dragFrame);
+      pan.frame = 0; pan.dragFrame = 0; pan.drag = null;
+      stage.classList.remove('is-dragging'); world.classList.remove('is-dragging');
       if(stageObserver) stageObserver.disconnect();
       window.removeEventListener('resize', scheduleLayout);
       if(window.visualViewport) window.visualViewport.removeEventListener('resize', scheduleLayout);
       window.removeEventListener('load', onWindowLoad);
       window.removeEventListener('songline:page-transition-end', onTransitionEnd);
       window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      stage.removeEventListener('pointerdown', onPointerDown);
+      stage.removeEventListener('pointermove', onPointerMove);
+      stage.removeEventListener('pointerup', stopPan);
+      stage.removeEventListener('pointercancel', stopPan);
+      stage.removeEventListener('click', blockDragClick, true);
+      stage.removeEventListener('wheel', onWheel);
       if(window.__songlineFriendGalaxyCleanup === cleanup) window.__songlineFriendGalaxyCleanup = null;
     }
     function onTransitionStart(event){
@@ -397,6 +490,12 @@
     // main 的入场只影响合成层，ResizeObserver 不会感知它结束；在最终帧再对齐一次。
     window.addEventListener('songline:page-transition-end', onTransitionEnd);
     window.addEventListener('songline:page-transition-start', onTransitionStart);
+    stage.addEventListener('pointerdown', onPointerDown);
+    stage.addEventListener('pointermove', onPointerMove);
+    stage.addEventListener('pointerup', stopPan);
+    stage.addEventListener('pointercancel', stopPan);
+    stage.addEventListener('click', blockDragClick, true);
+    stage.addEventListener('wheel', onWheel, {passive:false});
     window.__songlineFriendGalaxyCleanup = cleanup;
     if(submit) submit.addEventListener('click', renderSearch);
     if(input){ input.addEventListener('input', renderSearch); input.addEventListener('keydown', function(event){ if(event.key === 'Enter') renderSearch(); }); }
