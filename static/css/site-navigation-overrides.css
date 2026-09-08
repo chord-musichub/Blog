@@ -666,60 +666,9 @@ main.container.live-enter-from-left .live-nav-item{
 main.container.is-live-swap-cut{
   opacity:.98;
 }
-main.container.live-leave-to-left,
-main.container.live-leave-to-right{
-  transition:opacity .13s ease, transform .13s cubic-bezier(.4,0,.2,1);
-  opacity:.80;
-}
-main.container.live-leave-to-left{
-  transform:translateX(-22px);
-}
-main.container.live-leave-to-right{
-  transform:translateX(22px);
-}
-main.container .live-nav-item{
-  transition:
-    transform .54s cubic-bezier(.16,1,.3,1) var(--live-nav-delay, 0ms),
-    opacity .40s ease var(--live-nav-delay, 0ms);
-}
-main.container.live-enter-from-right .live-nav-item{
-  transform:translateX(64px);
-}
-main.container.live-enter-from-left .live-nav-item{
-  transform:translateX(-64px);
-}
-main.container.is-live-enter-ready .live-nav-item{
-  opacity:1;
-  transform:translateX(0);
-}
-@media(max-width:760px){
-  main.container.live-enter-from-right .live-nav-item{
-    transform:translateX(38px);
-  }
-  main.container.live-enter-from-left .live-nav-item{
-    transform:translateX(-38px);
-  }
-}
-
-
-/* v20.18.5：页面横向滚动切换增强 + 朋友星图圆角 */
+/* 朋友星图圆角兼容。页面切换的最终动画由 runtime-animation.css 统一维护。 */
 html.is-live-nav-swapping .site-header{
   z-index:50;
-}
-main.container.live-leave-to-left,
-main.container.live-leave-to-right{
-  transition:
-    transform .20s cubic-bezier(.4,0,.2,1),
-    opacity .18s ease,
-    filter .20s ease;
-  opacity:.52;
-  filter:blur(.8px);
-}
-main.container.live-leave-to-left{
-  transform:translateX(-78px);
-}
-main.container.live-leave-to-right{
-  transform:translateX(78px);
 }
 main.container .live-nav-item{
   transition:
@@ -727,17 +676,6 @@ main.container .live-nav-item{
     opacity .46s ease var(--live-nav-delay, 0ms),
     filter .46s ease var(--live-nav-delay, 0ms);
   filter:blur(1.4px);
-}
-main.container.live-enter-from-right .live-nav-item{
-  transform:translateX(118px);
-}
-main.container.live-enter-from-left .live-nav-item{
-  transform:translateX(-118px);
-}
-main.container.is-live-enter-ready .live-nav-item{
-  opacity:1;
-  transform:translateX(0);
-  filter:blur(0);
 }
 .friend-map-wrap,
 .friend-map-card,
@@ -759,14 +697,6 @@ main.container.is-live-enter-ready .live-nav-item{
 .star-map canvas{
   border-radius:inherit!important;
 }
-@media(max-width:760px){
-  main.container.live-leave-to-left{transform:translateX(-44px)}
-  main.container.live-leave-to-right{transform:translateX(44px)}
-  main.container.live-enter-from-right .live-nav-item{transform:translateX(64px)}
-  main.container.live-enter-from-left .live-nav-item{transform:translateX(-64px)}
-}
-
-
 /* v20.18.5：页面切换同步启动 / 朋友星图真实圆角 / 文章页返回键 */
 .modern-nav-links.is-click-sliding a.active{
   color:var(--accent-2)!important;

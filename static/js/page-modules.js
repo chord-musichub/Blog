@@ -33,7 +33,6 @@
     }
     if(isToolsPage){
       ensureStylesheet('songline-tool-shared-style', '/css/tool-shared.css');
-      ensureStylesheet('songline-tools-compat-style', '/css/site-tools-compat.css');
     }
     if(isSearchSurface){
       ensureStylesheet('songline-search-overrides-style', '/css/site-search-overrides.css');
@@ -79,16 +78,6 @@
       },
       init:function(root){
         if(window.SonglineInitViews) window.SonglineInitViews(root || document);
-      }
-    },
-    {
-      key:'recommended-posts',
-      src:'/js/recommended-posts.js?v=' + VERSION,
-      test:function(root){
-        return !!query(root, '[data-recommended-posts]');
-      },
-      init:function(root){
-        if(window.SonglineInitRecommendedViews) window.SonglineInitRecommendedViews(root || document);
       }
     },
     {

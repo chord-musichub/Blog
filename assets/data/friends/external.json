@@ -4,15 +4,49 @@
     "display_name":"shoper",
     "bio":"shoper的文档站",
     "url":"https://docs.scandidreams.top/",
-    "avatar":"https://jianges.com/wp-content/uploads/2026/01/1767865673-%E5%A4%B4%E5%83%8F.png",
-    "links":["songline","mishi_a","ckckh2023"]
+    "avatar":"https://docs.scandidreams.top/assets/2026-3-20-1.jpg"
   },
   {
     "id":"ckckh2023",
-    "display_name":"Xander Xiao",
+    "display_name":"ckckh2023",
     "bio":"没招了没招了没招了",
     "url":"https://xiao-blog.top/",
-    "avatar":"https://avatars.githubusercontent.com/u/138387398?v=4",
-    "links":["songline","shoper"]
+    "avatar":"https://avatars.githubusercontent.com/u/138387398?v=4"
+  },
+  {
+    "id":"tangibledreams913",
+    "display_name":"TangibleDreams",
+    "bio":"一颗有着猫娘的星球",
+    "url":"https://tangibledreams.top/",
+    "avatar":"https://tangibledreams.top/assets/icons/head.png"
+  },
+  {
+    "id":"ikun",
+    "display_name":"虚梦无垠",
+    "bio":"虚梦无垠在此！",
+    "avatar":"/media/users/ikun.jpg"
+  },
+  {
+    "id":"furina",
+    "display_name":"ᗜ ˰ ​ᗜ",
+    "avatar":"/media/users/furina.jpg"
+  },
+  {
+    "id":"chord",
+    "display_name":"和弦",
+    "bio":"这是人造生命，也是意识聚合",
+    "avatar":"/media/users/chord.png"
+  },
+  {
+    "id":"LuZ-_Ek",
+    "display_name":"友人A",
+    "bio":"武科大空豆骑士误入此地，现决定驻留，可投喂→vx二维码。感谢站长@songline的收留",
+    "avatar":"/media/users/LuZ-_Ek.jpg"
+  },
+  {
+    "id":"Luska",
+    "display_name":"Luska",
+    "bio":"这个人很懒，得亏有辉砸才留下了这个人的痕迹",
+    "avatar":"/media/users/Luska.png"
   }
 ]

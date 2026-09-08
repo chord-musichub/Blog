@@ -10,7 +10,6 @@
 | `site-modern.css` | 现代页面布局、卡片、搜索与视觉兼容规则。 |
 | `site-search-overrides.css` | 搜索反馈、筛选状态与搜索相关覆盖规则。 |
 | `site-article-compat.css` | 文章目录和 Markdown 表格的兼容规则。 |
-| `site-tools-compat.css` | 工具页浮动阅读控制的兼容规则。 |
 | `site-friends-compat.css` | 仅朋友页加载的星图、资料展示与交互兼容规则。 |
 | `site-markdown-compat.css` | Markdown 代码高亮、注释字体与目录锚点兼容规则。 |
 | `site-navigation-overrides.css` | 导航滑块、页面切换与锚点反馈。 |

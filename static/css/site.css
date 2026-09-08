@@ -1670,32 +1670,18 @@ body.dark select{
 .back-to-top-button{
   position:fixed;
   right:18px;
-  bottom:132px;
   z-index:45;
-  width:44px;
-  height:44px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:rgba(255,242,220,.92);
-  color:var(--accent-2);
-  box-shadow:var(--shadow);
   cursor:pointer;
   opacity:0;
   transform:translateY(10px);
   pointer-events:none;
   transition:opacity .18s ease, transform .18s ease;
-  font-size:20px;
   font-weight:800;
 }
 .back-to-top-button.show{
   opacity:1;
   transform:translateY(0);
   pointer-events:auto;
-}
-body.dark .back-to-top-button{
-  background:rgba(19,43,66,.86) !important;
-  border-color:#2b4360 !important;
-  color:#cfe6ff !important;
 }
 .activity-list li{
   padding:0;
@@ -1721,12 +1707,6 @@ body.dark .back-to-top-button{
   color:var(--accent-2);
 }
 @media (max-width:760px){
-  .back-to-top-button{
-    right:14px;
-    bottom:124px;
-    width:42px;
-    height:42px;
-  }
   .activity-link{
     grid-template-columns:1fr;
     gap:2px;
@@ -1734,34 +1714,7 @@ body.dark .back-to-top-button{
 }
 
 
-/* v10.0：回顶按钮增强 + 朋友搜索 + 账号链接修复 */
-.back-to-top-button{
-  width:54px !important;
-  height:54px !important;
-  font-size:30px !important;
-  right:max(22px, calc((100vw - 1280px)/2 + 76px)) !important;
-  bottom:118px !important;
-  border-width:1.5px !important;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-}
-.back-to-top-button:hover{
-  transform:translateY(-3px) scale(1.06) !important;
-  background:rgba(246,220,181,.96) !important;
-  border-color:var(--accent-2) !important;
-  color:#6f3f1d !important;
-  box-shadow:0 18px 42px rgba(87,58,31,.18);
-}
-.back-to-top-button.show:hover{
-  opacity:1;
-}
-body.dark .back-to-top-button:hover{
-  background:rgba(19,43,66,.96) !important;
-  color:#ffffff !important;
-  border-color:#7dd3fc !important;
-  box-shadow:0 18px 42px rgba(0,0,0,.34);
-}
+/* v10.0：朋友搜索 + 账号链接修复 */
 .friends-search-panel{
   margin-bottom:8px;
 }
@@ -1774,38 +1727,7 @@ body.dark .back-to-top-button:hover{
 }
 .activity-link small{color:var(--muted)}
 .mini-password-field{min-width:210px;display:inline-flex}
-@media (max-width:760px){
-  .back-to-top-button{
-    right:14px !important;
-    bottom:126px !important;
-    width:48px !important;
-    height:48px !important;
-    font-size:26px !important;
-  }
-}
-
-
-/* v10.1：回顶按钮位置修正 + 首页 hover 修复 */
-.back-to-top-button{
-  right:28px !important;
-  bottom:118px !important;
-}
-.back-to-top-button:hover,
-.back-to-top-button:focus-visible{
-  transform:translateY(-3px) scale(1.08) !important;
-  background:rgba(246,220,181,.98) !important;
-  border-color:var(--accent-2) !important;
-  color:#6f3f1d !important;
-  box-shadow:0 18px 42px rgba(87,58,31,.20) !important;
-  outline:none;
-}
-body.dark .back-to-top-button:hover,
-body.dark .back-to-top-button:focus-visible{
-  background:rgba(19,43,66,.98) !important;
-  color:#ffffff !important;
-  border-color:#7dd3fc !important;
-  box-shadow:0 18px 42px rgba(0,0,0,.34) !important;
-}
+/* v10.1：首页 hover 修复 */
 .recent-list li{
   display:block !important;
 }
@@ -1838,67 +1760,7 @@ body.dark .recent-link:focus-visible{
   background:rgba(19,43,66,.72);
   color:#7dd3fc;
 }
-.friend-card .btn,
-.featured-card .btn,
-.small-friend .btn{
-  transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease;
-}
-.friend-card:hover .btn,
-.friend-card:focus-visible .btn,
-.featured-card:hover .btn,
-.featured-card:focus-visible .btn,
-.small-friend:hover .btn,
-.small-friend:focus-visible .btn{
-  background:rgba(246,220,181,.88) !important;
-  border-color:var(--accent-2) !important;
-  color:#6f3f1d !important;
-  transform:translateY(-1px);
-  box-shadow:0 8px 22px rgba(87,58,31,.12);
-}
-body.dark .friend-card:hover .btn,
-body.dark .friend-card:focus-visible .btn,
-body.dark .featured-card:hover .btn,
-body.dark .featured-card:focus-visible .btn,
-body.dark .small-friend:hover .btn,
-body.dark .small-friend:focus-visible .btn{
-  background:#2c4c70 !important;
-  border-color:#7dd3fc !important;
-  color:#ffffff !important;
-  box-shadow:none;
-}
-@media (max-width:760px){
-  .back-to-top-button{
-    right:16px !important;
-    bottom:126px !important;
-  }
-}
-
-
-/* v10.2：回顶按钮位置权衡、深色最近更新、朋友卡片 hover、导航 hover */
-.back-to-top-button{
-  right:clamp(22px, calc((100vw - var(--max)) / 2 + 24px), 88px) !important;
-  bottom:132px !important;
-  width:46px;
-  height:46px;
-  font-size:23px;
-}
-.back-to-top-button:hover,
-.back-to-top-button:focus-visible{
-  opacity:1;
-  transform:translateY(-2px) scale(1.04);
-  background:var(--accent-2) !important;
-  border-color:var(--accent-2) !important;
-  color:#fff !important;
-  box-shadow:0 18px 42px rgba(37,99,235,.24);
-  outline:none;
-}
-body.dark .back-to-top-button:hover,
-body.dark .back-to-top-button:focus-visible{
-  background:#38bdf8 !important;
-  border-color:#38bdf8 !important;
-  color:#07111f !important;
-  box-shadow:0 18px 42px rgba(56,189,248,.22);
-}
+/* v10.2：深色最近更新、朋友卡片 hover、导航 hover */
 
 /* 深色模式下主页最近更新文字提亮 */
 body.dark .latest-card,
@@ -1915,50 +1777,6 @@ body.dark .latest-card small{
 body.dark .latest-card:hover{
   border-color:#3b82f6;
   background:rgba(19,35,58,.96);
-}
-
-/* 朋友大卡片和按钮 hover 分离：卡片只抬升/描边，按钮只有自身 hover 才高亮 */
-.featured-card .btn,
-.friend-card .btn,
-.small-friend .btn{
-  transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease;
-}
-.featured-card:hover .btn,
-.friend-card:hover .btn,
-.small-friend:hover .btn{
-  background:transparent !important;
-  color:var(--accent-2) !important;
-  border-color:var(--border) !important;
-  transform:none !important;
-}
-.featured-card .btn:hover,
-.featured-card .btn:focus-visible,
-.friend-card .btn:hover,
-.friend-card .btn:focus-visible,
-.small-friend .btn:hover,
-.small-friend .btn:focus-visible{
-  background:var(--accent-2) !important;
-  color:#fff !important;
-  border-color:var(--accent-2) !important;
-  transform:translateY(-1px) !important;
-  outline:none;
-}
-body.dark .featured-card:hover .btn,
-body.dark .friend-card:hover .btn,
-body.dark .small-friend:hover .btn{
-  background:transparent !important;
-  color:#7dd3fc !important;
-  border-color:#2b4360 !important;
-}
-body.dark .featured-card .btn:hover,
-body.dark .featured-card .btn:focus-visible,
-body.dark .friend-card .btn:hover,
-body.dark .friend-card .btn:focus-visible,
-body.dark .small-friend .btn:hover,
-body.dark .small-friend .btn:focus-visible{
-  background:#38bdf8 !important;
-  color:#07111f !important;
-  border-color:#38bdf8 !important;
 }
 
 /* 客户端顶部四个导航增加明确 hover */
@@ -1982,21 +1800,7 @@ body.dark .nav-links a:focus-visible{
   background:rgba(14,165,233,.14);
 }
 
-@media (max-width:760px){
-  .back-to-top-button{
-    right:72px !important;
-    bottom:72px !important;
-    width:42px;
-    height:42px;
-    font-size:21px;
-  }
-}
-
-
-/* v10.3：继续微调回顶、深色最近更新、朋友按钮与顶部导航 hover */
-.back-to-top-button{
-  right:clamp(78px, calc((100vw - var(--max)) / 2 + 88px), 150px) !important;
-}
+/* v10.3：深色最近更新、朋友按钮与顶部导航 hover */
 
 /* 深色模式下最近更新：文字、背景、hover 对比度进一步加强 */
 body.dark .latest-card,
@@ -2061,36 +1865,6 @@ body.dark .post-card.latest-card:hover h3{
   color:#ffffff !important;
 }
 
-/* 我的朋友们：查看朋友按钮 hover 同步四个小卡片的柔和胶囊风格 */
-.friend-card .btn,
-.featured-card .btn,
-.small-friend .btn{
-  border-radius:999px;
-}
-.friend-card .btn:hover,
-.friend-card .btn:focus-visible,
-.featured-card .btn:hover,
-.featured-card .btn:focus-visible,
-.small-friend .btn:hover,
-.small-friend .btn:focus-visible{
-  background:var(--soft-blue) !important;
-  color:var(--accent-2) !important;
-  border-color:rgba(14,165,233,.20) !important;
-  transform:translateY(-1px) !important;
-  box-shadow:0 10px 24px rgba(37,99,235,.10) !important;
-}
-body.dark .friend-card .btn:hover,
-body.dark .friend-card .btn:focus-visible,
-body.dark .featured-card .btn:hover,
-body.dark .featured-card .btn:focus-visible,
-body.dark .small-friend .btn:hover,
-body.dark .small-friend .btn:focus-visible{
-  background:#203753 !important;
-  color:#7dd3fc !important;
-  border-color:#34577a !important;
-  box-shadow:0 10px 24px rgba(56,189,248,.10) !important;
-}
-
 /* 顶部四个导航 hover 改成横向矩形，不再是圆胶囊 */
 .nav-links a{
   border-radius:12px !important;
@@ -2115,9 +1889,6 @@ body.dark .nav-links a:focus-visible{
 }
 
 @media (max-width:760px){
-  .back-to-top-button{
-    right:96px !important;
-  }
   .nav-links a{
     border-radius:12px !important;
     padding:8px 12px !important;
@@ -2125,36 +1896,7 @@ body.dark .nav-links a:focus-visible{
 }
 
 
-/* v10.4：回顶按钮动态定位兜底、最近更新深色清晰度、朋友按钮 hover 同步 */
-.back-to-top-button{
-  right:auto !important;
-  left:auto;
-  width:46px !important;
-  height:46px !important;
-  font-size:24px !important;
-  bottom:126px !important;
-  background:rgba(255,242,220,.95) !important;
-}
-.back-to-top-button:hover,
-.back-to-top-button:focus-visible{
-  background:rgba(246,220,181,.98) !important;
-  color:#6f3f1d !important;
-  border-color:var(--accent-2) !important;
-  box-shadow:0 18px 42px rgba(87,58,31,.20) !important;
-  transform:translateY(-2px) scale(1.05) !important;
-}
-body.dark .back-to-top-button{
-  background:rgba(20,39,65,.96) !important;
-  border-color:#4b6f93 !important;
-  color:#eaf6ff !important;
-}
-body.dark .back-to-top-button:hover,
-body.dark .back-to-top-button:focus-visible{
-  background:#2c4c70 !important;
-  color:#ffffff !important;
-  border-color:#7dd3fc !important;
-  box-shadow:0 18px 42px rgba(0,0,0,.34) !important;
-}
+/* v10.4：最近更新深色清晰度、朋友按钮 hover 同步 */
 
 /* 首页右侧「最近更新」实际使用 recent-list/recent-link，这里直接修它 */
 body.dark .sidebar-card:has(.recent-list){
@@ -2213,6 +1955,7 @@ body.dark .recent-link:focus-visible span:last-child{
   font-weight:720 !important;
   font-size:14px !important;
   box-shadow:none !important;
+  transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease;
 }
 .friend-card:hover .btn:not(:hover):not(:focus-visible),
 .friend-card:focus-within .btn:not(:hover):not(:focus-visible),
@@ -2267,16 +2010,6 @@ body.dark .small-friend .btn:focus-visible{
   transform:translateY(-1px) !important;
 }
 
-@media (max-width:760px){
-  .back-to-top-button{
-    left:auto !important;
-    right:82px !important;
-    bottom:72px !important;
-    width:42px !important;
-    height:42px !important;
-    font-size:21px !important;
-  }
-}
 
 
 /* v10.5：主页最近更新无边框 + 浅色模式文字加深 */
@@ -2956,47 +2689,18 @@ body.dark .friend-detail-hero .friend-cover{
 .scroll-to-bottom-button{
   position:fixed;
   right:18px;
-  bottom:58px;
   z-index:45;
-  width:54px;
-  height:54px;
-  border-radius:999px;
-  border:1.5px solid var(--border);
-  background:rgba(255,242,220,.92);
-  color:var(--accent-2);
-  box-shadow:var(--shadow);
   cursor:pointer;
   opacity:0;
   transform:translateY(10px);
   pointer-events:none;
   transition:opacity .18s ease, transform .18s ease;
-  font-size:30px;
   font-weight:800;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
 }
 .scroll-to-bottom-button.show{
   opacity:1;
   transform:translateY(0);
   pointer-events:auto;
-}
-.scroll-to-bottom-button:hover{
-  transform:translateY(-3px) scale(1.06) !important;
-  background:rgba(246,220,181,.96) !important;
-  border-color:var(--accent-2) !important;
-  color:#6f3f1d !important;
-  box-shadow:0 18px 42px rgba(87,58,31,.18);
-}
-body.dark .scroll-to-bottom-button{
-  background:rgba(19,43,66,.86) !important;
-  border-color:#2b4360 !important;
-  color:#cfe6ff !important;
-}
-body.dark .scroll-to-bottom-button:hover{
-  background:rgba(19,43,66,.96) !important;
-  color:#ffffff !important;
-  border-color:#7dd3fc !important;
 }
 @media(max-width:760px){
   .article-bottom-actions{
@@ -3006,13 +2710,6 @@ body.dark .scroll-to-bottom-button:hover{
   }
   .md-download-button{
     width:100%;
-  }
-  .scroll-to-bottom-button{
-    right:14px;
-    bottom:64px;
-    width:42px;
-    height:42px;
-    font-size:24px;
   }
 }
 
@@ -3093,22 +2790,6 @@ body.dark .scroll-to-bottom-button:hover{
   box-shadow:var(--shadow);
   background:var(--panel);
 }
-@media(max-width:760px){
-  .back-to-top-button,
-  .scroll-to-bottom-button{
-    width:42px !important;
-    height:42px !important;
-    font-size:24px !important;
-  }
-  .back-to-top-button{
-    bottom:124px !important;
-  }
-  .scroll-to-bottom-button{
-    bottom:70px !important;
-  }
-}
-
-
 /* v13.5：卡片整体点击体验 */
 .clickable-card{
   cursor:pointer;
@@ -3319,12 +3000,6 @@ body.dark .article-toc[data-toc-toggle-card]:hover{
     bottom:124px !important;
   }
   .scroll-to-bottom-button{
-    bottom:70px !important;
-  }
-  .tool-page-top-button{
-    bottom:124px !important;
-  }
-  .tool-page-bottom-button{
     bottom:70px !important;
   }
 }

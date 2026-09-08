@@ -13,9 +13,6 @@
   {{ if $isArticleSurface }}
   <link id="songline-article-compat-style" rel="stylesheet" href="/css/site-article-compat.css?v={{ $assetVersion }}">
   {{ end }}
-  {{ if $isToolsSurface }}
-  <link id="songline-tools-compat-style" rel="stylesheet" href="/css/site-tools-compat.css?v={{ $assetVersion }}">
-  {{ end }}
   {{/* 朋友星图兼容层只服务朋友页；过去全站加载会覆盖标签、工具与普通卡片。 */}}
   {{ if or (eq .Section "friends") (hasPrefix .RelPermalink "/friends/") }}
   <link id="songline-friends-compat-style" rel="stylesheet" href="/css/site-friends-compat.css?v={{ $assetVersion }}">

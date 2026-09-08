@@ -45,6 +45,15 @@
 }
 .tool-page-top-button{bottom:118px !important}
 .tool-page-bottom-button{bottom:58px !important}
+.tool-page-top-button.tool-edge-hidden,
+.tool-page-bottom-button.tool-edge-hidden{
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+.tool-page-top-button,
+.tool-page-bottom-button{
+  will-change:left,right,opacity;
+}
 @media(max-width:760px){
   .tool-page-top-button{
     right:14px !important;
