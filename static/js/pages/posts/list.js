@@ -85,12 +85,24 @@
     ensureStylesheet();
     flattenPostCards(list);
     if(list.dataset.songlinePostsListBound === '1') return;
+    if(typeof window.__songlinePostsListLayoutCleanup === 'function') window.__songlinePostsListLayoutCleanup();
     list.dataset.songlinePostsListBound = '1';
-    new MutationObserver(function(){ flattenPostCards(list); }).observe(list, {childList:true, subtree:false});
+    const observer = new MutationObserver(function(){ flattenPostCards(list); });
+    observer.observe(list, {childList:true, subtree:false});
+    function cleanup(){
+      observer.disconnect();
+      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      if(window.__songlinePostsListLayoutCleanup === cleanup) window.__songlinePostsListLayoutCleanup = null;
+    }
+    function onTransitionStart(event){
+      if((event.detail && event.detail.from || '').indexOf('/posts/') === 0) cleanup();
+    }
+    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    window.__songlinePostsListLayoutCleanup = cleanup;
   }
 
   function refresh(){ init(document); }
-  window.SonglineInitPostsListFlat = init;
+  window.SonglineInitPostsListLayout = init;
   if(!window.SonglinePostsListFlatGlobalBound){
     window.SonglinePostsListFlatGlobalBound = true;
     window.addEventListener('resize', function(){
@@ -98,6 +110,8 @@
       window.__postsMobileTimer = window.setTimeout(refresh, 120);
     });
   }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ init(document); }, {once:true});
+  else init(document);
 })();
 
 /* Content Archive：索引、抽屉、双模式和轻量搜索。 */

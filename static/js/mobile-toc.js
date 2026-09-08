@@ -10,6 +10,7 @@
     source: null,
     readyForPath: ''
   };
+  var onDocumentKeydown = null;
 
   function isMobile(){
     return !mq || mq.matches;
@@ -77,6 +78,10 @@
       var node = document.getElementById(id);
       if(node) node.remove();
     });
+    if(onDocumentKeydown){
+      document.removeEventListener('keydown', onDocumentKeydown);
+      onDocumentKeydown = null;
+    }
     document.documentElement.classList.remove('mobile-toc-open');
   }
 
@@ -151,9 +156,8 @@
       renderLinks(this.value || '');
     });
 
-    document.addEventListener('keydown', function(event){
-      if(event.key === 'Escape') closeDrawer();
-    });
+    onDocumentKeydown = function(event){ if(event.key === 'Escape') closeDrawer(); };
+    document.addEventListener('keydown', onDocumentKeydown);
 
     return { fab:fab, drawer:drawer, backdrop:backdrop };
   }
@@ -313,4 +317,5 @@
   if(mq && mq.addEventListener){
     mq.addEventListener('change', function(){ init(document); });
   }
+  window.addEventListener('songline:page-transition-start', removeUi);
 })();

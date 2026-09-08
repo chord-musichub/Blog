@@ -920,9 +920,19 @@
       if(!raf) raf = requestAnimationFrame(draw);
     }
 
+    function stop(){
+      if(raf){
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      window.clearTimeout(root.__avSoftResumeTimer);
+      root.classList.remove('is-av-soft-resume');
+    }
+
     return {
       resize: resize,
       start: start,
+      stop: stop,
       invalidate: invalidate,
       handleVisibility: handleVisibility,
       syncVisualPhase: syncVisualPhase,

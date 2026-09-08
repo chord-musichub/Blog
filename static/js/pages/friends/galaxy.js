@@ -92,6 +92,8 @@
     root = root || document;
     var shell = root.querySelector ? root.querySelector('[data-friend-galaxy]') : null;
     if(!shell || shell.dataset.friendGalaxyReady === VERSION) return;
+    // 无刷新回到朋友页时，先释放上一份已被替换的星图运行时。
+    if(typeof window.__songlineFriendGalaxyCleanup === 'function') window.__songlineFriendGalaxyCleanup();
     shell.dataset.friendGalaxyReady = VERSION;
 
     // 页面内 JSON 与 Hugo 本次构建使用同一份合并结果。
@@ -140,14 +142,18 @@
     var selected = host;
     var nodeById = Object.create(null);
     var resizeFrame = 0;
+    var settleTimer = 0;
+    var stageObserver = null;
 
     // 星图通过百分比定位，但图片、字体和移动端可视视口会在首帧后继续稳定。
     // 统一收敛到同一轮布局，保证 SVG 线端永远读取头像的最终圆心。
     function scheduleLayout(){
+      if(!stage.isConnected) return;
       window.cancelAnimationFrame(resizeFrame);
       resizeFrame = window.requestAnimationFrame(layout);
     }
     function settleLayout(){
+      if(!stage.isConnected) return;
       scheduleLayout();
       window.requestAnimationFrame(scheduleLayout);
     }
@@ -343,26 +349,50 @@
       });
     }
 
-    createNodes();
-    setHost();
-    setProfile(host);
-    settleLayout();
-    if(window.ResizeObserver) new ResizeObserver(scheduleLayout).observe(stage);
-    else window.addEventListener('resize', scheduleLayout, {passive:true});
-    if(window.visualViewport) window.visualViewport.addEventListener('resize', scheduleLayout, {passive:true});
-    if(document.fonts && document.fonts.ready) document.fonts.ready.then(settleLayout);
-    if(document.readyState === 'complete') settleLayout();
-    else window.addEventListener('load', settleLayout, {once:true});
-    // main 的入场只影响合成层，ResizeObserver 不会感知它结束；在最终帧再对齐一次。
-    window.addEventListener('songline:page-transition-end', function(){
+    function onWindowLoad(){ settleLayout(); }
+    function onTransitionEnd(){
       if(!stage.isConnected) return;
       window.requestAnimationFrame(function(){
         window.requestAnimationFrame(function(){
           layout();
-          window.setTimeout(layout, 48);
+          window.clearTimeout(settleTimer);
+          settleTimer = window.setTimeout(layout, 48);
         });
       });
-    });
+    }
+    function cleanup(){
+      window.cancelAnimationFrame(resizeFrame);
+      window.clearTimeout(settleTimer);
+      if(stageObserver) stageObserver.disconnect();
+      window.removeEventListener('resize', scheduleLayout);
+      if(window.visualViewport) window.visualViewport.removeEventListener('resize', scheduleLayout);
+      window.removeEventListener('load', onWindowLoad);
+      window.removeEventListener('songline:page-transition-end', onTransitionEnd);
+      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      if(window.__songlineFriendGalaxyCleanup === cleanup) window.__songlineFriendGalaxyCleanup = null;
+    }
+    function onTransitionStart(event){
+      var from = event.detail && event.detail.from || '';
+      if(from.indexOf('/friends/') === 0) cleanup();
+    }
+
+    createNodes();
+    setHost();
+    setProfile(host);
+    settleLayout();
+    if(window.ResizeObserver){
+      stageObserver = new ResizeObserver(scheduleLayout);
+      stageObserver.observe(stage);
+    }
+    else window.addEventListener('resize', scheduleLayout, {passive:true});
+    if(window.visualViewport) window.visualViewport.addEventListener('resize', scheduleLayout, {passive:true});
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(settleLayout);
+    if(document.readyState === 'complete') settleLayout();
+    else window.addEventListener('load', onWindowLoad, {once:true});
+    // main 的入场只影响合成层，ResizeObserver 不会感知它结束；在最终帧再对齐一次。
+    window.addEventListener('songline:page-transition-end', onTransitionEnd);
+    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    window.__songlineFriendGalaxyCleanup = cleanup;
     if(submit) submit.addEventListener('click', renderSearch);
     if(input){ input.addEventListener('input', renderSearch); input.addEventListener('keydown', function(event){ if(event.key === 'Enter') renderSearch(); }); }
   }

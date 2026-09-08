@@ -23,6 +23,7 @@
   var SOUND_MASTER_GAIN = 1.35;
   function initGame(root){
     if(!root || root.dataset.game2048Booted === VERSION) return;
+    if(typeof window.__songline2048Cleanup === 'function') window.__songline2048Cleanup();
     root.dataset.game2048Booted = VERSION;
 
     var boardEl = root.querySelector('[data-2048-board]');
@@ -298,6 +299,16 @@
 
     window.addEventListener('keydown', onKeydown, {passive:false});
     window.addEventListener('resize', onResize, {passive:true});
+    function cleanup(){
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener('keydown', onKeydown);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      if(window.__songline2048Cleanup === cleanup) window.__songline2048Cleanup = null;
+    }
+    function onTransitionStart(){ cleanup(); }
+    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    window.__songline2048Cleanup = cleanup;
 
     root.querySelectorAll('[data-2048-new], [data-2048-overlay-new]').forEach(function(btn){
       btn.addEventListener('click', function(){ ensureAudio(); newGame(); });

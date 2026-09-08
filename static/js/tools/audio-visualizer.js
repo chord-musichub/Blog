@@ -6,6 +6,7 @@
 
   function init(root){
     if(!root || root.dataset.audioVisualizerBooted === VERSION) return;
+    if(typeof window.__songlineAudioVisualizerCleanup === 'function') window.__songlineAudioVisualizerCleanup();
     root.dataset.audioVisualizerBooted = VERSION;
 
     var canvas = root.querySelector('[data-av-canvas]');
@@ -855,16 +856,20 @@
       stage.addEventListener('dragleave', handleDragAudioLeave);
       stage.addEventListener('drop', handleDragAudioDrop);
 
-      window.addEventListener('dragover', function(event){
-        if(dataTransferHasFiles(event)) event.preventDefault();
-      });
-      window.addEventListener('drop', function(event){
-        if(dataTransferHasFiles(event) && !stage.contains(event.target)){
-          event.preventDefault();
-          dragAudioDepth = 0;
-          setDragAudioActive(false);
-        }
-      });
+      window.addEventListener('dragover', onWindowDragOver);
+      window.addEventListener('drop', onWindowDrop);
+    }
+
+    function onWindowDragOver(event){
+      if(dataTransferHasFiles(event)) event.preventDefault();
+    }
+
+    function onWindowDrop(event){
+      if(dataTransferHasFiles(event) && !stage.contains(event.target)){
+        event.preventDefault();
+        dragAudioDepth = 0;
+        setDragAudioActive(false);
+      }
     }
 
     function openLocalAudioPicker(){
@@ -1012,7 +1017,7 @@
       });
     }
 
-    document.addEventListener('keydown', function(event){
+    function onDocumentKeydown(event){
       if(event.key === 'Escape' && displayMode){
         setDisplayMode(false);
         event.preventDefault();
@@ -1023,7 +1028,8 @@
       if(isTypingOrControlTarget(event.target)) return;
       event.preventDefault();
       toggleLocalAudioPlayback();
-    });
+    }
+    document.addEventListener('keydown', onDocumentKeydown);
 
     if(volumeInput){
       var stored = 80;
@@ -1058,15 +1064,45 @@
     bindSourceCards();
     renderer.resize();
 
+    function onVisibilityChange(){ renderer.handleVisibility(document.hidden); }
+    function onPageShow(event){ if(event && event.persisted) renderer.softenAnimationResume(); }
+    function cleanup(){
+      renderer.stop();
+      setDisplayMode(false);
+      setDragAudioActive(false);
+      stopBrowserStream();
+      revokeUrls();
+      if(audio){
+        try{ audio.pause(); audio.removeAttribute('src'); audio.load(); }catch(err){}
+      }
+      try{ if(elementSource) elementSource.disconnect(); }catch(err){}
+      try{ if(analyser) analyser.disconnect(); }catch(err){}
+      elementSource = null;
+      analyser = null;
+      if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
+      audioCtx = null;
+      document.removeEventListener('keydown', onDocumentKeydown);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('dragover', onWindowDragOver);
+      window.removeEventListener('drop', onWindowDrop);
+      window.removeEventListener('resize', renderer.invalidate);
+      window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('songline:animation-before-resume', renderer.syncVisualPhase);
+      window.removeEventListener('songline:animation-resume', renderer.softenAnimationResume);
+      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      window.removeEventListener('pagehide', cleanup);
+      if(document.fullscreenElement && root.contains(document.fullscreenElement) && document.exitFullscreen) document.exitFullscreen().catch(function(){});
+      if(window.__songlineAudioVisualizerCleanup === cleanup) window.__songlineAudioVisualizerCleanup = null;
+    }
+    function onTransitionStart(){ cleanup(); }
     window.addEventListener('resize', renderer.invalidate, {passive:true});
-    document.addEventListener('visibilitychange', function(){
-      renderer.handleVisibility(document.hidden);
-    });
-    window.addEventListener('pageshow', function(event){
-      if(event && event.persisted) renderer.softenAnimationResume();
-    });
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pageshow', onPageShow);
     window.addEventListener('songline:animation-before-resume', renderer.syncVisualPhase);
     window.addEventListener('songline:animation-resume', renderer.softenAnimationResume);
+    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    window.addEventListener('pagehide', cleanup, {once:true});
+    window.__songlineAudioVisualizerCleanup = cleanup;
     renderer.start();
   }
 

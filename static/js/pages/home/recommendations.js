@@ -5,6 +5,8 @@
     root = root || document;
     var panel = root.querySelector('[data-home-recommendations]');
     if(!panel || panel.dataset.recommendationsReady === '1') return;
+    // 首页通过过场离开时不会触发 pagehide；主动撤销旧轮播的全局监听和定时器。
+    if(typeof window.__songlineHomeRecommendationsCleanup === 'function') window.__songlineHomeRecommendationsCleanup();
 
     var cards = Array.prototype.slice.call(panel.querySelectorAll('[data-home-recommendation-card]'));
     var indicators = Array.prototype.slice.call(panel.querySelectorAll('[data-home-recommend-indicator]'));
@@ -82,11 +84,11 @@
       }, 1400);
     }
 
-    window.addEventListener('songline:home-panel-state', function(event){
+    function onPanelState(event){
       var state = event.detail && event.detail.state;
       if(state === 'system') resume();
       else pause();
-    });
+    }
 
     function showCopyTip(message, failed){
       if(!copyTip) return;
@@ -151,16 +153,27 @@
         });
       });
     }
-    document.addEventListener('visibilitychange', function(){
+    function onVisibilityChange(){
       if(document.visibilityState === 'hidden') clearTimer();
       else if(!paused) schedule(1400);
-    });
-    window.addEventListener('pagehide', function(){
+    }
+    function cleanup(){
       clearTimer();
       if(releaseTimer) window.clearTimeout(releaseTimer);
       if(leavingTimer) window.clearTimeout(leavingTimer);
       if(copyTipTimer) window.clearTimeout(copyTipTimer);
-    }, { once:true });
+      window.removeEventListener('songline:home-panel-state', onPanelState);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', cleanup);
+      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      if(window.__songlineHomeRecommendationsCleanup === cleanup) window.__songlineHomeRecommendationsCleanup = null;
+    }
+    function onTransitionStart(event){ if((event.detail && event.detail.from) === '/') cleanup(); }
+    window.addEventListener('songline:home-panel-state', onPanelState);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pagehide', cleanup, { once:true });
+    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    window.__songlineHomeRecommendationsCleanup = cleanup;
 
     updateControls();
     var homePanel = panel.closest && panel.closest('[data-home-panel]');

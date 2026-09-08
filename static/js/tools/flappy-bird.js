@@ -10,6 +10,7 @@
 
   function init(root){
     if(!root || root.dataset.flappyBooted === VERSION) return;
+    if(typeof window.__songlineFlappyBirdCleanup === 'function') window.__songlineFlappyBirdCleanup();
     root.dataset.flappyBooted = VERSION;
 
     var canvas = root.querySelector('[data-flappy-canvas]');
@@ -712,6 +713,21 @@
     window.addEventListener('keydown', onKey, {passive:false});
     window.addEventListener('keyup', onKeyUp, {passive:true});
     window.addEventListener('resize', resize, {passive:true});
+    function cleanup(){
+      running = false;
+      if(raf){ cancelAnimationFrame(raf); raf = 0; }
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      window.removeEventListener('pagehide', cleanup);
+      if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
+      if(window.__songlineFlappyBirdCleanup === cleanup) window.__songlineFlappyBirdCleanup = null;
+    }
+    function onTransitionStart(){ cleanup(); }
+    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    window.addEventListener('pagehide', cleanup, {once:true});
+    window.__songlineFlappyBirdCleanup = cleanup;
 
     setOverlay(true, '准备起飞', '点击开始', '点击屏幕 / 按空格：向上飞一下。');
     updateStats();

@@ -13,6 +13,10 @@
   var depth = { background:1.5, rear:2, middle:4, system:7, front:7 };
 
   function clearLayers(){
+    if(frame){
+      window.cancelAnimationFrame(frame);
+      frame = 0;
+    }
     layers.forEach(function(layer){
       layer.style.removeProperty('transform');
       layer.style.removeProperty('--home-parallax-x');

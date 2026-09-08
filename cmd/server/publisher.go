@@ -9,11 +9,13 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // 本文件负责将后台运行时数据转换为 Hugo 的公开站输入，并串行执行构建。
 
 func (app *App) syncPublishedArticles() error {
+	published := make([]Article, 0)
 	for _, a := range app.store.AllArticles() {
 		if a.Status != stPublished {
 			continue
@@ -21,11 +23,81 @@ func (app *App) syncPublishedArticles() error {
 		if strings.TrimSpace(a.Slug) == "" {
 			continue
 		}
+		published = append(published, a)
 		if err := app.writeHugoArticle(a); err != nil {
 			return err
 		}
 	}
+	return app.removeLegacyGeneratedArticleCopies(published)
+}
+
+// removeLegacyGeneratedArticleCopies cleans up a historic UTF-8 encoding issue
+// that produced a second generated directory for the same published article.
+// It only removes an entry if its generated title and date exactly match a
+// currently published record while its directory name is no longer that record's slug.
+func (app *App) removeLegacyGeneratedArticleCopies(published []Article) error {
+	validSlugs := make(map[string]struct{}, len(published))
+	identities := make(map[string]struct{}, len(published))
+	for _, article := range published {
+		validSlugs[article.Slug] = struct{}{}
+		date := article.CreatedAt
+		if article.PublishedAt != nil {
+			date = *article.PublishedAt
+		}
+		identities[article.Title+"\x00"+date.Format(time.RFC3339)] = struct{}{}
+	}
+
+	entries, err := os.ReadDir(app.cfg.HugoContentDir)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
+		return err
+	}
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		if _, isCurrentSlug := validSlugs[entry.Name()]; isCurrentSlug {
+			continue
+		}
+		title, date, ok := generatedArticleIdentity(filepath.Join(app.cfg.HugoContentDir, entry.Name(), "index.md"))
+		if !ok {
+			continue
+		}
+		if _, isLegacyCopy := identities[title+"\x00"+date]; !isLegacyCopy {
+			continue
+		}
+		if err := os.RemoveAll(filepath.Join(app.cfg.HugoContentDir, entry.Name())); err != nil {
+			return err
+		}
+	}
 	return nil
+}
+
+func generatedArticleIdentity(path string) (string, string, bool) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", "", false
+	}
+	var title, date string
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, "title:") {
+			if err := json.Unmarshal([]byte(strings.TrimSpace(strings.TrimPrefix(line, "title:"))), &title); err != nil {
+				return "", "", false
+			}
+		}
+		if strings.HasPrefix(line, "date:") {
+			if err := json.Unmarshal([]byte(strings.TrimSpace(strings.TrimPrefix(line, "date:"))), &date); err != nil {
+				return "", "", false
+			}
+		}
+		if line == "---" && title != "" && date != "" {
+			return title, date, true
+		}
+	}
+	return "", "", false
 }
 
 func (app *App) ensureBuiltinContentPages() error {
@@ -98,6 +170,11 @@ func (app *App) runHugo(ctx context.Context) error {
 	if app.cfg.PublicSiteURL != "" && strings.EqualFold(filepath.Base(parts[0]), "hugo") {
 		parts = append(parts, "--baseURL", app.cfg.PublicSiteURL)
 	}
+	if strings.EqualFold(filepath.Base(parts[0]), "hugo") && !hasHugoFlag(parts, "--cleanDestinationDir") {
+		// Hugo 默认保留上一轮已经不再生成的文件；发布时清掉这些陈旧输出，
+		// 才能让 slug 修复或文章删除真正同步到公开站。
+		parts = append(parts, "--cleanDestinationDir")
+	}
 	cmd := exec.CommandContext(cctx, parts[0], parts[1:]...)
 	cmd.Dir = "."
 	out, err := cmd.CombinedOutput()
@@ -105,6 +182,15 @@ func (app *App) runHugo(ctx context.Context) error {
 		return fmt.Errorf("%v\n%s", err, string(out))
 	}
 	return nil
+}
+
+func hasHugoFlag(parts []string, flag string) bool {
+	for _, part := range parts {
+		if part == flag || strings.HasPrefix(part, flag+"=") {
+			return true
+		}
+	}
+	return false
 }
 
 func (app *App) writeRuntimeConfig() error {

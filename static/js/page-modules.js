@@ -332,6 +332,7 @@
         return !!query(root, '[data-content-archive], #postList');
       },
       init:function(root){
+        if(window.SonglineInitPostsListLayout) window.SonglineInitPostsListLayout(root || document);
         if(window.SonglineInitPostsListFlat) window.SonglineInitPostsListFlat(root || document);
       }
     }

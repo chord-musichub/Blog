@@ -9,7 +9,7 @@
     {{ range $index, $memory := $memories }}
     {{ $date := printf "%v" $memory.date }}{{ $monthIndex := 0 }}{{ range $dateIndex, $knownDate := $dates }}{{ if eq $knownDate $date }}{{ $monthIndex = $dateIndex }}{{ end }}{{ end }}
     {{ $slot := 0 }}{{ if gt $index 0 }}{{ range first $index $memories }}{{ if eq (printf "%v" .date) $date }}{{ $slot = add $slot 1 }}{{ end }}{{ end }}{{ end }}
-    <article class="memory-room__memory" data-memory-card data-memory-index="{{ $index }}" data-memory-month-index="{{ $monthIndex }}" style="--memory-index:{{ $monthIndex }};--memory-slot:{{ $slot }}">
+    <article class="memory-room__memory" data-memory-card data-memory-index="{{ $index }}" data-memory-month-index="{{ $monthIndex }}" data-memory-date="{{ $memory.date }}" data-memory-title="{{ $memory.title | default $memory.date }}" data-memory-image="{{ $memory.image }}" data-memory-description="{{ $memory.description }}" style="--memory-index:{{ $monthIndex }};--memory-slot:{{ $slot }}">
       <span class="memory-room__stem" aria-hidden="true"></span>
       <button type="button" class="memory-room__image-button" data-memory-open aria-label="放大查看：{{ $memory.title | default $memory.date }}"><img src="{{ $memory.image }}" alt="{{ $memory.title | default $memory.date }}" loading="eager" decoding="async" draggable="false"></button>
       <div class="memory-room__caption"><h1>{{ $memory.title | default $memory.date }}</h1><p>{{ $memory.description }}</p></div>

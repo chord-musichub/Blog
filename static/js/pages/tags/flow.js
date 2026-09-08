@@ -198,6 +198,15 @@
 
   // v20.3.5：CSS 里历史 transform:none !important 会压住 keyframes，
   // 所以这里用 requestAnimationFrame 写入 inline important transform，保证漂流带一定会动。
+  function stopTagRiverMotion(stage){
+    if(!stage) return;
+    stage.__tagRiverMotionToken = (stage.__tagRiverMotionToken || 0) + 1;
+    if(stage.__tagRiverMotionFrame){
+      window.cancelAnimationFrame(stage.__tagRiverMotionFrame);
+      stage.__tagRiverMotionFrame = 0;
+    }
+  }
+
   function startTagRiverMotion(stage){
     if(!stage || !window.requestAnimationFrame) return;
 
@@ -207,7 +216,8 @@
     // v20.18.5：漂流带 DOM 会在 AJAX 回页/重新初始化时被重建。
     // 旧版用 __tagRiverMotionStarted 锁死，导致新 DOM 创建后动画不再启动。
     // 这里改成 token：每次 render 都启动新 token，旧 RAF 循环自动失效。
-    var token = (stage.__tagRiverMotionToken || 0) + 1;
+    stopTagRiverMotion(stage);
+    var token = stage.__tagRiverMotionToken;
     stage.__tagRiverMotionToken = token;
     stage.__tagRiverMotionStarted = true;
 
@@ -239,9 +249,9 @@
         var x = -(progress * 50);
         strip.style.setProperty('transform', 'translate3d(' + x.toFixed(4) + '%,0,0)', 'important');
       });
-      window.requestAnimationFrame(tick);
+      stage.__tagRiverMotionFrame = window.requestAnimationFrame(tick);
     }
-    window.requestAnimationFrame(tick);
+    stage.__tagRiverMotionFrame = window.requestAnimationFrame(tick);
   }
 
   function renderRiver(tags){
@@ -249,11 +259,12 @@
     if(!shell) return;
     var stage = shell.querySelector('[data-tag-river-stage]') || shell.querySelector('.tag-river-stage');
     if(!stage) return;
+    stopTagRiverMotion(stage);
     stage.innerHTML = '';
     stage.removeAttribute('data-tag-river-motion-stale');
     if(!tags.length){
       stage.innerHTML = '<div class="tag-river-empty">暂无标签，发布文章后会自动生成。</div>';
-      return;
+      return stage;
     }
 
     var maxCount = tags.reduce(function(m, t){ return Math.max(m, t.count || 0); }, 0);
@@ -303,6 +314,7 @@
     });
     shell.classList.add('is-ready', 'is-scattered');
     startTagRiverMotion(stage);
+    return stage;
   }
 
   function scoreTags(tags, query){
@@ -389,11 +401,19 @@
     // root 参数用于和 page-modules.js 的生命周期接口保持一致；
     // 当前标签数据使用全局唯一 DOM id，因此这里仍从 document 读取。
     if(!document.querySelector('[data-tag-river]')) return;
+    if(typeof window.__songlineTagRiverCleanup === 'function') window.__songlineTagRiverCleanup();
     ensureStylesheet();
     var tags = parseTags();
-    renderRiver(tags);
+    var stage = renderRiver(tags);
     bindSearch(tags);
     document.documentElement.setAttribute('data-tag-river-version', VERSION);
+    function cleanup(){
+      stopTagRiverMotion(stage);
+      window.removeEventListener('songline:page-transition-start', cleanup);
+      if(window.__songlineTagRiverCleanup === cleanup) window.__songlineTagRiverCleanup = null;
+    }
+    window.addEventListener('songline:page-transition-start', cleanup);
+    window.__songlineTagRiverCleanup = cleanup;
   }
 
   window.SonglineInitTagFlow = init;

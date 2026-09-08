@@ -5,6 +5,7 @@
     root = root || document;
     var panel = root.querySelector('[data-home-panel]');
     if(!panel || panel.dataset.messageBoardReady === '1') return;
+    if(typeof window.__songlineHomeMessageBoardCleanup === 'function') window.__songlineHomeMessageBoardCleanup();
     panel.dataset.messageBoardReady = '1';
 
     var board = panel.querySelector('[data-home-message-board]');
@@ -132,12 +133,25 @@
       window.setTimeout(function(){ focus.querySelector('.songline-home-message-focus-panel').focus(); }, 0);
     }
 
-    if(focus.dataset.messageFocusBound !== '1'){
-      focus.dataset.messageFocusBound = '1';
-      focus.addEventListener('click', function(event){ if(event.target === focus) closeFocus(); });
-      focus.querySelector('[data-home-message-focus-close]').addEventListener('click', closeFocus);
-      document.addEventListener('keydown', function(event){ if(event.key === 'Escape') closeFocus(); });
+    var closeFocusButton = focus.querySelector('[data-home-message-focus-close]');
+    function onFocusLayerClick(event){ if(event.target === focus) closeFocus(); }
+    function onFocusKeydown(event){ if(event.key === 'Escape') closeFocus(); }
+    focus.addEventListener('click', onFocusLayerClick);
+    closeFocusButton.addEventListener('click', closeFocus);
+    document.addEventListener('keydown', onFocusKeydown);
+
+    function cleanup(){
+      closeFocus();
+      focus.removeEventListener('click', onFocusLayerClick);
+      closeFocusButton.removeEventListener('click', closeFocus);
+      document.removeEventListener('keydown', onFocusKeydown);
+      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      if(focus.parentNode) focus.parentNode.removeChild(focus);
+      if(window.__songlineHomeMessageBoardCleanup === cleanup) window.__songlineHomeMessageBoardCleanup = null;
     }
+    function onTransitionStart(event){ if((event.detail && event.detail.from) === '/') cleanup(); }
+    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    window.__songlineHomeMessageBoardCleanup = cleanup;
 
     function updatePreview(){
       if(!preview || !messageInput) return;

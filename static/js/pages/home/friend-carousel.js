@@ -6,6 +6,7 @@
     const track = root.querySelector ? root.querySelector('[data-home-friend-track]') : document.querySelector('[data-home-friend-track]');
     if(!carousel || !track) return;
     if(carousel.dataset.songlineFriendCarouselBound === '1') return;
+    if(typeof window.__songlineHomeFriendCarouselCleanup === 'function') window.__songlineHomeFriendCarouselCleanup();
     carousel.dataset.songlineFriendCarouselBound = '1';
     const prev = document.querySelector('[data-home-friend-prev]');
     const next = document.querySelector('[data-home-friend-next]');
@@ -33,9 +34,15 @@
       next.hidden = !canScroll;
     }
 
+    let updateTimer = 0;
+    function scheduleUpdate(){
+      window.clearTimeout(updateTimer);
+      updateTimer = window.setTimeout(update, 360);
+    }
+
     function move(dir){
       track.scrollBy({left: dir * step(), behavior:'smooth'});
-      window.setTimeout(update, 360);
+      scheduleUpdate();
     }
 
     if(prev){
@@ -48,6 +55,15 @@
     }
     track.addEventListener('scroll', update, {passive:true});
     window.addEventListener('resize', update);
+    function cleanup(){
+      window.clearTimeout(updateTimer);
+      window.removeEventListener('resize', update);
+      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      if(window.__songlineHomeFriendCarouselCleanup === cleanup) window.__songlineHomeFriendCarouselCleanup = null;
+    }
+    function onTransitionStart(event){ if((event.detail && event.detail.from) === '/') cleanup(); }
+    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    window.__songlineHomeFriendCarouselCleanup = cleanup;
     update();
   }
 

@@ -89,6 +89,7 @@
 
   function init(root){
     if(!root || root.dataset.typingBooted === VERSION) return;
+    if(typeof window.__songlineTypingPracticeCleanup === 'function') window.__songlineTypingPracticeCleanup();
     root.dataset.typingBooted = VERSION;
 
     var input = root.querySelector('[data-typing-input]');
@@ -243,6 +244,16 @@
     function stopTimer(){
       if(timer){ clearInterval(timer); timer = 0; }
     }
+
+    function cleanup(){
+      stopTimer();
+      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
+      if(window.__songlineTypingPracticeCleanup === cleanup) window.__songlineTypingPracticeCleanup = null;
+    }
+    function onTransitionStart(){ cleanup(); }
+    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    window.__songlineTypingPracticeCleanup = cleanup;
 
     function endpoints(){
       var q = '?mode=' + encodeURIComponent(mode);
