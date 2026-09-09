@@ -2,11 +2,28 @@
 (function(){
   const reader = document.querySelector('[data-article-renderer="songline-markdown"]');
   const sourceElement = document.getElementById('article-md-source');
-  if(!reader || !sourceElement || !window.SonglineMarkdown || reader.dataset.songlineRenderSyncBound === '1') return;
+  if(!reader || !sourceElement || reader.dataset.songlineRenderSyncBound === '1') return;
+  // 站内过场会动态重新插入 defer 脚本；外链脚本的完成顺序不能假定。
+  // 若渲染器晚到，等它发出就绪信号后再执行本初始化，而不是留下 Hugo 的原始正文。
+  if(!window.SonglineMarkdown){
+    window.addEventListener('songline:markdown-ready', function(){
+      if(reader.dataset.songlineRenderSyncBound === '1' || !reader.isConnected) return;
+      const retry = document.createElement('script');
+      retry.src = '/js/article-render-sync.js';
+      retry.async = false;
+      document.body.appendChild(retry);
+    }, {once:true});
+    return;
+  }
   reader.dataset.songlineRenderSyncBound = '1';
 
   function decodeBase64Utf8(value){
-    const clean = String(value || '').replace(/\s+/g, '');
+    let clean = String(value || '').trim();
+    // 早期导入的 source_md_b64 有一部分被 JSON 再包了一次；兼容该历史格式。
+    if(/^"[\s\S]*"$/.test(clean)){
+      try{ clean = JSON.parse(clean); }catch(error){ clean = clean.slice(1, -1); }
+    }
+    clean = String(clean || '').replace(/\s+/g, '');
     const binary = atob(clean);
     const bytes = new Uint8Array(binary.length);
     for(let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
@@ -57,13 +74,33 @@
     const used = {};
     const levels = headings.map(function(heading){ return Number(heading.tagName.slice(1)); }).filter(Boolean);
     const baseLevel = levels.length ? Math.min.apply(null, levels) : 1;
-    const items = headings.map(function(heading){
+    const root = {level:0, children:[]};
+    const stack = [root];
+    headings.forEach(function(heading){
       if(!heading.id) heading.id = slugify(heading.textContent, used);
       const rawLevel = Number(heading.tagName.slice(1)) || baseLevel;
       const relativeLevel = Math.min(6, Math.max(1, rawLevel - baseLevel + 1));
-      return '<li class="toc-level-' + rawLevel + ' toc-depth-' + relativeLevel + '" data-toc-level="' + rawLevel + '" data-toc-depth="' + relativeLevel + '"><a href="#' + heading.id + '">' + heading.textContent + '</a></li>';
-    }).join('');
-    tocBody.innerHTML = '<nav><ul>' + items + '</ul></nav>';
+      while(stack.length > 1 && relativeLevel <= stack[stack.length - 1].level) stack.pop();
+      const node = {
+        id:heading.id,
+        label:heading.textContent || '',
+        rawLevel:rawLevel,
+        level:relativeLevel,
+        children:[]
+      };
+      stack[stack.length - 1].children.push(node);
+      stack.push(node);
+    });
+    function escapeHtml(value){
+      return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function renderBranch(nodes){
+      return '<ul>' + nodes.map(function(node){
+        const children = node.children.length ? renderBranch(node.children) : '';
+        return '<li class="toc-level-' + node.rawLevel + ' toc-depth-' + node.level + '" data-toc-level="' + node.rawLevel + '" data-toc-depth="' + node.level + '"><a href="#' + encodeURIComponent(node.id) + '">' + escapeHtml(node.label) + '</a>' + children + '</li>';
+      }).join('') + '</ul>';
+    }
+    tocBody.innerHTML = '<nav class="toc-tree" aria-label="文章目录">' + renderBranch(root.children) + '</nav>';
   }
 
   async function getMarkdown(){

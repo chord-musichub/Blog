@@ -48,5 +48,27 @@
     "display_name":"Luska",
     "bio":"这个人很懒，得亏有辉砸才留下了这个人的痕迹",
     "avatar":"/media/users/Luska.png"
+  },
+  {
+    "id":"xiong",
+    "display_name":"ベ断桥残雪ミ",
+    "avatar":"/media/users/xiong.jpg"
+  },
+  {
+    "id":"Nordstern",
+    "display_name":"Nordstern",
+    "bio":"逸一时误一世 逸久逸久罢以龄",
+    "avatar":"/media/users/Nordstern.jpg"
+  },
+  {
+    "id":"chou",
+    "display_name":"幽靈東京",
+    "avatar":"/media/users/chou.jpg"
+  },
+  {
+    "id":"kfc",
+    "display_name":"K.FC先生",
+    "bio":"最美的不是下雨天，是曾与你躲过雨的屋檐。",
+    "avatar":"/media/users/kfc.jpg"
   }
 ]

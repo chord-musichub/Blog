@@ -584,4 +584,5 @@
     render: renderMarkdown,
     escapeHtml: escapeHtml
   };
+  window.dispatchEvent(new CustomEvent('songline:markdown-ready'));
 })();

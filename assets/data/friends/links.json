@@ -1,16 +1,20 @@
 {
-  "songline": ["three", "mishi_a", "scanf", "zxlyzq","shoper","ckckh2023","LuZ-_Ek","chord","furina","ikun","tangibledreams913","Luska"],
+  "songline": ["three", "mishi_a", "scanf", "zxlyzq","shoper","ckckh2023","LuZ-_Ek","chord","furina","ikun","tangibledreams913","Luska","xiong","kfc","chou","Nordstern"],
   "mxbt": ["three"],
   "three": ["songline", "mishi_a", "scanf","LuZ-_Ek"],
   "mishi_a": ["songline", "three", "scanf","LuZ-_Ek"],
   "scanf": ["songline", "three", "mishi_a","LuZ-_Ek"],
-  "zxlyzq": ["songline","ikun","furina","Luska"],
+  "zxlyzq": ["songline","ikun","furina","Luska","xiong","Nordstern"],
   "shoper": ["songline", "mishi_a", "ckckh2023"],
   "ckckh2023": ["songline", "shoper"],
   "LuZ-_Ek": ["songline","mishi_a","three","scanf"],
   "chord": ["songline"],
-  "furina": ["songline","zxlyzq","ikun","Luska"],
-  "ikun": ["songline","zxlyzq","furina","Luska"],
+  "furina": ["songline","zxlyzq","ikun","Luska","xiong","Nordstern"],
+  "ikun": ["songline","zxlyzq","furina","Luska","xiong","Nordstern"],
   "tangibledreams913": ["songline","ckckh2023"],
-  "Luska": ["furina","ikun","zxlyzq","songline"]
+  "Luska": ["furina","ikun","zxlyzq","songline","xiong","Nordstern"],
+  "xiong": ["Luska","ikun","furina","zxlyzq","songline","Nordstern"],
+  "kfc": ["chou","songline"],
+  "chou": ["kfc","songline"],
+  "Nordstern": ["songline","zxlyzq","furina","Luska","xiong","ikun"]
 }

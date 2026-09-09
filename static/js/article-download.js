@@ -7,7 +7,12 @@
   button.dataset.songlineDownloadBound = '1';
 
   function decodeBase64Utf8(value){
-    const clean = String(value || '').replace(/\s+/g, '');
+    let clean = String(value || '').trim();
+    // 兼容历史文章中被 JSON 额外包裹的 Base64 内容。
+    if(/^"[\s\S]*"$/.test(clean)){
+      try{ clean = JSON.parse(clean); }catch(error){ clean = clean.slice(1, -1); }
+    }
+    clean = String(clean || '').replace(/\s+/g, '');
     const binary = atob(clean);
     const bytes = new Uint8Array(binary.length);
     for(let index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);

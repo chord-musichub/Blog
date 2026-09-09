@@ -24,9 +24,10 @@
     {{ end }}{{ end }}
     <span class="views real-views article-view-counter meta-icon-item" data-view-mode="post" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span>
   </div>
+  <button class="article-intro-download" type="button" data-md-download aria-label="下载本文 Markdown 源文件">下载 .md</button>
 </section>
 
-<div class="article-shell section" data-toc-state="collapsed">
+<div class="article-shell section" data-toc-state="expanded">
   <article class="card article-reader markdown-body" data-article-renderer="songline-markdown" data-article-title="{{ .Title }}">
     {{ .Content }}
   </article>
@@ -42,14 +43,6 @@
 
 <script defer src="/js/article-hard-breaks.js?v={{ partial "asset-version.html" . }}"></script>
 
-<section class="article-bottom-actions card">
-  <div>
-    <h3>Markdown 源文件</h3>
-    <p>喜欢离线保存的话，可以把这篇文章下载为 Markdown 文件。</p>
-  </div>
-  <button class="btn md-download-button" type="button" data-md-download>下载 .md</button>
-</section>
-
 <button class="back-to-top-button" type="button" aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "arrow-up" }}</button>
 <button class="scroll-to-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "arrow-down" }}</button>
 <script defer src="/js/markdown-renderer.js?v={{ partial "asset-version.html" . }}"></script>
@@ -59,18 +52,17 @@
 <script defer src="/js/article-download.js?v={{ partial "asset-version.html" . }}"></script>
 
 {{ $pages := where .Site.RegularPages "Section" "posts" }}
-<section class="prev-next">
-  {{ with .PrevInSection }}<a class="card nav-card" href="{{ .RelPermalink }}"><span>{{ partial "ui-icon.html" "back" }}</span><div><small>上一篇</small><strong>{{ .Title }}</strong><br><small>{{ .Date.Format "2006-01-02" }}</small></div></a>{{ else }}<div></div>{{ end }}
-  {{ with .NextInSection }}<a class="card nav-card" href="{{ .RelPermalink }}"><div><small>下一篇</small><strong>{{ .Title }}</strong><br><small>{{ .Date.Format "2006-01-02" }}</small></div><span>{{ partial "ui-icon.html" "arrow-right" }}</span></a>{{ else }}<div></div>{{ end }}
-</section>
-<section class="section">
-  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "article" }}</span><h2>相关文章</h2></div>
-  <div class="related-grid">
-    {{ range first 3 (where $pages "Permalink" "ne" .Permalink) }}
-    <article class="card related-card" data-card-link="{{ .RelPermalink }}" role="link" tabindex="0" aria-label="阅读相关文章：{{ .Title }}">
-      <a class="post-thumb lazy-bg cover-mode-{{ .Params.cover_mode | default "cover" }}" href="{{ .RelPermalink }}" data-bg="{{ .Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}"></a>
-      <div class="post-info"><h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3><div class="meta-row"><span>{{ .Date.Format "2006-01-02" }}</span><span class="views real-views meta-icon-item" data-view-mode="get" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span></div></div>
-    </article>
+<section class="article-explore" aria-label="继续阅读">
+  <div class="article-explore__sequence">
+    {{ with .PrevInSection }}<a class="article-explore__step article-explore__step--previous" href="{{ .RelPermalink }}"><span class="article-explore__arrow">{{ partial "ui-icon.html" "back" }}</span><span><small>上一篇</small><strong>{{ .Title }}</strong></span></a>{{ end }}
+    {{ with .NextInSection }}<a class="article-explore__step article-explore__step--next" href="{{ .RelPermalink }}"><span><small>下一篇</small><strong>{{ .Title }}</strong></span><span class="article-explore__arrow">{{ partial "ui-icon.html" "arrow-right" }}</span></a>{{ end }}
+  </div>
+  <div class="article-explore__related" aria-label="相关文章">
+    {{ range $index, $related := first 3 (where $pages "Permalink" "ne" .Permalink) }}
+    <a class="article-explore__related-item" href="{{ $related.RelPermalink }}" aria-label="阅读相关文章：{{ $related.Title }}">
+      <span class="article-explore__index">{{ printf "%02d" (add $index 1) }}</span>
+      <span><strong>{{ $related.Title }}</strong><small>{{ $related.Date.Format "2006-01-02" }}</small></span>
+    </a>
     {{ end }}
   </div>
 </section>

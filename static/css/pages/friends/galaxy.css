@@ -425,6 +425,12 @@ body:has(.friends-constellation) .modern-site-header .header-icons .icon-btn{ co
 .friends-constellation__world .friends-constellation__nodes{animation:none!important;}
 .friends-constellation__world .friends-constellation__node,.friends-constellation__world .friends-constellation__core{cursor:pointer;}
 .friends-constellation__world img{user-select:none;-webkit-user-drag:none;}
+/* 不遮挡星图操作的四周柔焦：中心内容最清晰，边缘作为可探索的延展空间。 */
+.friends-constellation__edge-vignette{position:absolute;z-index:6;inset:0;overflow:hidden;pointer-events:none;box-shadow:inset 0 0 clamp(68px,9vw,172px) rgba(2,9,21,.46),inset 0 0 clamp(16px,2.5vw,42px) rgba(172,209,247,.10);}
+.friends-constellation__edge-vignette::before,.friends-constellation__edge-vignette::after{position:absolute;inset:-18px;content:"";filter:blur(10px);opacity:.92;}
+.friends-constellation__edge-vignette::before{background:linear-gradient(180deg,rgba(3,11,24,.54),rgba(9,24,43,.21) 18%,transparent 37%,transparent 63%,rgba(4,13,28,.40) 82%,rgba(2,9,21,.62));}
+.friends-constellation__edge-vignette::after{background:linear-gradient(90deg,rgba(2,10,24,.56),rgba(10,28,50,.20) 20%,transparent 38%,transparent 62%,rgba(3,11,26,.27) 80%,rgba(2,9,21,.54));}
 @media(max-width:760px){
   .friends-constellation__world{top:-20%;left:-35%;width:170%;height:140%;}
+  .friends-constellation__edge-vignette{box-shadow:inset 0 0 68px rgba(2,9,21,.38);}
 }

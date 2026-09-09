@@ -142,7 +142,7 @@
       key:'friend-galaxy',
       // 与服务端直开页面共用当前资源版本；固定版本号会让 AJAX 进入朋友页时
       // 命中旧缓存，导致新坐标逻辑没有真正执行。
-      src:'/js/pages/friends/galaxy.js?v=' + VERSION + '&friends=22.4',
+      src:'/js/pages/friends/galaxy.js?v=' + VERSION + '&friends=22.8',
       test:function(root){
         return !!query(root, '[data-friend-galaxy], .friend-galaxy, .friend-galaxy-stage, .friends-galaxy, .galaxy-map');
       },
