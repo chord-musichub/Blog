@@ -8,14 +8,10 @@
   function routeFor(path){
     path = norm(path);
     if(path === '/') return 'dashboard';
-    if(path === '/admin') return 'review';
-    if(path === '/admin/site' || path === '/admin/theme' || path === '/admin/manuscript') return 'site';
+    if(path === '/admin' || path === '/admin/site' || path === '/admin/theme' || path === '/admin/manuscript') return 'settings';
     if(path === '/admin/media') return 'media';
-    if(path === '/articles/new') return 'new';
-    if(path === '/articles/upload') return 'upload';
-    if(path.indexOf('/articles/') === 0) return 'dashboard';
-    if(path === '/users/new' || path.indexOf('/users/') === 0) return 'users';
-    if(path === '/account') return 'account';
+    if(path === '/articles/new' || path === '/articles/upload' || path.indexOf('/articles/') === 0) return 'compose';
+    if(path === '/users/new' || path.indexOf('/users/') === 0 || path === '/account' || path === '/settings') return 'settings';
     return '';
   }
   function init(){

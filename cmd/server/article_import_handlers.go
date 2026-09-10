@@ -14,7 +14,8 @@ import (
 func (app *App) handleUploadArticle(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
 	if r.Method == http.MethodGet {
-		app.render(w, "upload.html", map[string]any{"User": u})
+		// 保留旧的 POST 导入接口，GET 统一收口到投稿编辑器。
+		app.redirect(w, r, "/articles/new?import=1", http.StatusSeeOther)
 		return
 	}
 	if r.Method != http.MethodPost {

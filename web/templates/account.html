@@ -1,4 +1,4 @@
-{{ $pageTitle := "账号设置" }}{{ if eq .User.Role "admin" }}{{ $pageTitle = "账号管理" }}{{ end }}{{template "admin-head" (dict "Title" $pageTitle "Data" . "Navigation" true)}}
+{{ $pageTitle := "账号资料" }}{{ if eq .User.Role "admin" }}{{ $pageTitle = "账号与作者" }}{{ end }}{{template "admin-head" (dict "Title" $pageTitle "Data" . "Navigation" true)}}
 <body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
 {{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
 
@@ -13,13 +13,13 @@
 </svg></button>
   </nav>
 
-  <section class="hero compact"><h1>{{if eq .User.Role "admin"}}账号管理{{else}}账号设置{{end}}</h1><p>当前账号：{{.User.Username}}{{if .User.PasswordMustChange}} · <span class="badge pending">需要修改临时密码</span>{{end}}</p></section>
+  <section class="hero compact"><h1>{{if eq .User.Role "admin"}}账号与作者{{else}}账号资料{{end}}</h1><p>当前账号：{{.User.Username}}{{if .User.PasswordMustChange}} · <span class="badge pending">需要修改临时密码</span>{{end}}</p></section>
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
   {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
 
   {{if eq .User.Role "admin"}}
   <section class="preview-layout account-admin-layout">
-    <form method="post" class="card form">
+    <form id="authors" method="post" class="card form">
       <input type="hidden" name="action" value="add_user">
       <h2>添加作者账号</h2>
       <p class="meta">这里用于创建朋友作者、站长身份或系统公告账号。管理员账号通常不需要填写个人简介。</p>

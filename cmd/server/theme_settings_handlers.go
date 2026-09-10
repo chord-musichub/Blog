@@ -62,5 +62,5 @@ func (app *App) handleThemeSettings(w http.ResponseWriter, r *http.Request) {
 		app.redirect(w, r, "/admin/site?msg=外观已保存，但公开站构建失败，请看日志", http.StatusSeeOther)
 		return
 	}
-	app.redirect(w, r, "/admin/site?msg=外观设置已保存并重建公开站", http.StatusSeeOther)
+	app.redirect(w, r, "/settings?msg=外观设置已保存并重建公开站", http.StatusSeeOther)
 }

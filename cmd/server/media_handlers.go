@@ -55,6 +55,8 @@ func (app *App) handleMediaLibrary(w http.ResponseWriter, r *http.Request) {
 			app.deleteMediaFile(w, r, media)
 		case "cover-crop":
 			app.saveCoverCrop(w, r, media)
+		case "cover-upload":
+			app.saveCoverUpload(w, r, media)
 		default:
 			app.uploadMediaFile(w, r, media)
 		}

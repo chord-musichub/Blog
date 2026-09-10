@@ -13,6 +13,17 @@ import (
 
 // 登录、账号资料、个人文章入口和密码申请处理器。
 
+// handleSettingsHub is the creator-facing settings entry. Existing account and
+// administrator routes stay intact so old bookmarks and operational data keep
+// working, while the primary navigation no longer needs to expose each one.
+func (app *App) handleSettingsHub(w http.ResponseWriter, r *http.Request) {
+	u, _ := app.currentUser(r)
+	app.render(w, "settings_hub.html", map[string]any{
+		"User":  u,
+		"Flash": r.URL.Query().Get("msg"),
+	})
+}
+
 func (app *App) handleNewArticle(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
 	if r.Method == http.MethodGet {
@@ -147,7 +158,7 @@ func (app *App) handleAccount(w http.ResponseWriter, r *http.Request) {
 			app.render(w, "account.html", map[string]any{"User": newProfileUser, "CoverFiles": coverFiles, "Error": "个人资料已保存，但公开站重建失败，请看日志：" + err.Error()})
 			return
 		}
-		app.redirect(w, r, "/?msg=个人资料已保存，公开站已重建", http.StatusSeeOther)
+		app.redirect(w, r, "/settings?msg=个人资料已保存，公开站已重建", http.StatusSeeOther)
 		return
 	}
 	oldPass := r.FormValue("old_password")
@@ -161,5 +172,5 @@ func (app *App) handleAccount(w http.ResponseWriter, r *http.Request) {
 		app.render(w, "account.html", map[string]any{"User": u, "CoverFiles": coverFiles, "Error": err.Error()})
 		return
 	}
-	app.redirect(w, r, "/?msg=账号密码已修改", http.StatusSeeOther)
+	app.redirect(w, r, "/settings?msg=账号密码已修改", http.StatusSeeOther)
 }

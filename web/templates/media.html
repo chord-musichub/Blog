@@ -16,12 +16,13 @@
   {{if .Error}}<div class="flash error">{{.Error}}</div>{{end}}
   <section class="hero compact admin-hero">
     <div>
-<h1>我的媒体库</h1>
+      <h1>媒体库</h1>
+      <p>上传一次，投稿时即可直接选作封面或插入正文。</p>
     </div>
   </section>
 
   <section class="card">
-    <h2>上传文件</h2>
+    <h2>添加素材</h2>
     <form method="post" action="{{adminURL "/admin/media"}}" enctype="multipart/form-data" class="media-upload-form">
       <input type="file" name="media" accept=".jpg,.jpeg,.png,.webp,.svg,.gif,.ico,.pdf,.zip,.mp3,.wav,.m4a,.ogg,.mp4,.webm,.mov,.txt,.md,.markdown,image/*,application/pdf,audio/*,video/mp4,video/webm,video/quicktime">
       <label class="media-name-field">自定义文件名，可选
@@ -30,14 +31,17 @@
       </label>
       <button><span class="btn-ico" aria-hidden="true">⇧</span><span class="btn-text">上传并重建公开站</span></button>
     </form>
-    <p class="meta">支持图片、视频（mp4 / webm / mov）、音频、pdf、zip、txt、md；默认单文件上限 512MB。每个账号的文件会放在自己的目录里，不会和其他作者混在一起。</p>
+    <p class="meta">支持图片、视频、音频、PDF、ZIP、TXT 与 Markdown；素材按账号独立保存。</p>
   </section>
 
   <section class="card">
-    <h2>我的已上传文件</h2>
-    <div class="media-grid">
+    <div class="toolbar media-library-toolbar">
+      <h2>我的素材 <span class="soft-count">{{len .Files}}</span></h2>
+      <label class="media-search"><span class="sr-only">搜索素材</span><input id="mediaSearch" type="search" placeholder="搜索文件名"></label>
+    </div>
+    <div class="media-grid" id="mediaGrid">
     {{range .Files}}
-      <div class="media-item">
+      <div class="media-item" data-media-item>
         <a href="{{.Path}}" target="_blank" class="media-preview">
           {{if or (eq .Ext "jpg") (or (eq .Ext "jpeg") (or (eq .Ext "png") (or (eq .Ext "webp") (or (eq .Ext "svg") (or (eq .Ext "gif") (eq .Ext "ico"))))))}}
             <img src="{{.Path}}" alt="{{.Name}}" loading="lazy" decoding="async">
@@ -65,6 +69,7 @@
       <p class="meta">还没有上传文件。</p>
     {{end}}
     </div>
+    <p id="mediaSearchEmpty" class="meta media-search-empty" hidden>没有找到匹配的素材。</p>
   </section>
 </main>
 </body>

@@ -26,4 +26,20 @@
       btn.__timer=window.setTimeout(function(){ if(text) text.textContent=old || '复制路径'; }, 1300);
     });
   });
+
+  var search = document.getElementById('mediaSearch');
+  var empty = document.getElementById('mediaSearchEmpty');
+  if(search){
+    var items = Array.prototype.slice.call(document.querySelectorAll('[data-media-item]'));
+    search.addEventListener('input', function(){
+      var query = search.value.trim().toLowerCase();
+      var shown = 0;
+      items.forEach(function(item){
+        var match = !query || item.textContent.toLowerCase().indexOf(query) !== -1;
+        item.hidden = !match;
+        if(match) shown += 1;
+      });
+      if(empty) empty.hidden = shown !== 0 || !query;
+    });
+  }
 })();

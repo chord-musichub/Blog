@@ -40,7 +40,7 @@ func (app *App) handleManuscriptSettings(w http.ResponseWriter, r *http.Request)
 		app.redirect(w, r, "/admin/manuscript?msg=稿件设置已保存，但公开站构建失败，请看日志", http.StatusSeeOther)
 		return
 	}
-	app.redirect(w, r, "/admin/manuscript?msg=稿件设置已保存并重建公开站", http.StatusSeeOther)
+	app.redirect(w, r, "/settings?msg=稿件设置已保存并重建公开站", http.StatusSeeOther)
 }
 
 func (app *App) handleSiteSettings(w http.ResponseWriter, r *http.Request) {
@@ -144,5 +144,5 @@ func (app *App) handleSiteSettings(w http.ResponseWriter, r *http.Request) {
 		app.redirect(w, r, "/admin/site?msg=设置已保存，但公开站构建失败，请看日志", http.StatusSeeOther)
 		return
 	}
-	app.redirect(w, r, "/admin?msg=站点设置已保存并重建公开站", http.StatusSeeOther)
+	app.redirect(w, r, "/settings?msg=站点设置已保存并重建公开站", http.StatusSeeOther)
 }

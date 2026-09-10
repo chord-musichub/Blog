@@ -10,15 +10,14 @@
 
   <section class="card admin-dashboard-card">
     <div class="admin-dashboard-copy">
-      <span class="admin-dashboard-kicker">Dashboard · v20.18.5</span>
+      <span class="admin-dashboard-kicker">CREATOR HOME</span>
       <h1>创作工作台</h1>
-      <p>顶部导航已经接管主要入口，这里只保留最常用的写作操作和文章列表。</p>
+      <p>从这里继续修改草稿、发起新投稿，或进入媒体库整理素材。</p>
     </div>
     <div class="admin-dashboard-actions">
-      <a class="btn" href="{{adminURL "/articles/new"}}">新建文章</a>
-      <a class="btn secondary" href="{{adminURL "/articles/upload"}}">上传 .md</a>
-      <a class="btn ghost" href="{{adminURL "/admin/media"}}">媒体库</a>
-      {{if eq .User.Role "admin"}}<a class="btn ghost" href="{{adminURL "/admin/site"}}">站点设置</a>{{end}}
+      <a class="btn" href="{{adminURL "/articles/new"}}">开始投稿</a>
+      <a class="btn secondary" href="{{adminURL "/articles/new"}}?import=1">导入 .md</a>
+      {{if eq .User.Role "admin"}}<a class="btn ghost" href="{{adminURL "/admin"}}">审核与管理</a>{{end}}
     </div>
   </section>
 

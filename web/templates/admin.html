@@ -8,12 +8,7 @@
   <nav class="nav admin-main-nav admin-glass-nav">
     <strong class="admin-brand"><span class="admin-brand-mark">S</span><span>审核与站点管理</span></strong>
     <a class="btn small ghost admin-back-icon" href="{{adminURL "/"}}" data-admin-back aria-label="返回" title="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
-    <a class="btn small" href="{{adminURL "/articles/upload"}}">上传 .md</a>
-    <a class="btn small secondary" href="{{adminURL "/articles/new"}}">新建文章</a>
-    <a class="btn small" href="{{adminURL "/users/new"}}">添加作者</a>
-    <a class="btn small secondary" href="{{adminURL "/admin/site"}}">站点设置</a>
-    <a class="btn small secondary" href="{{adminURL "/admin/manuscript"}}">稿件设置</a>
-    <a class="btn small secondary" href="{{adminURL "/admin/media"}}">媒体库</a>
+    <a class="btn small secondary" href="{{adminURL "/settings"}}">返回设置</a>
     <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
   <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg></button>
@@ -25,9 +20,8 @@
       <p>这里优先处理「待审核稿件」。审核通过才会发布并重建公开站；草稿不会自动出现在首页。</p>
     </div>
     <div class="admin-hero-actions">
-      <a class="btn" href="{{adminURL "/articles/upload"}}">上传 .md</a>
-      <a class="btn secondary" href="{{adminURL "/articles/new"}}">新建文章</a>
-      <a class="btn secondary" href="{{adminURL "/admin/site"}}">站点设置</a>
+      <a class="btn" href="{{adminURL "/articles/new"}}">前往投稿</a>
+      <a class="btn secondary" href="{{adminURL "/settings"}}">返回设置</a>
       <a class="btn ghost" href="{{publicURL}}" target="_blank">公开站 ↗</a>
     </div>
   </section>

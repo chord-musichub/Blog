@@ -25,6 +25,7 @@ func (app *App) router() http.Handler {
 	mux.HandleFunc("/healthz", app.handleHealth)
 	mux.HandleFunc("/login", app.withRate("login", 10, time.Minute, app.handleLogin))
 	mux.HandleFunc("/logout", app.handleLogout)
+	mux.HandleFunc("/settings", app.requireLogin(app.handleSettingsHub))
 	mux.HandleFunc("/account", app.requireLogin(app.handleAccount))
 	mux.HandleFunc("/password/request", app.withRate("password-request", 5, time.Hour, app.handlePasswordResetRequest))
 	mux.HandleFunc("/articles/new", app.requireLogin(app.handleNewArticle))

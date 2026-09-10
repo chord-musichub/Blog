@@ -18,6 +18,17 @@
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
   {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
 
+  <section class="card editor-import-card" aria-labelledby="editorImportTitle">
+    <div>
+      <strong id="editorImportTitle">从 Markdown 开始</strong>
+      <p class="meta">导入内容后仍可在下方继续编辑；不会自动发布。</p>
+    </div>
+    <label class="btn secondary editor-import-button">导入 .md
+      <input id="mdImport" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden>
+    </label>
+    <span id="mdImportStatus" class="meta" role="status" aria-live="polite"></span>
+  </section>
+
   <section class="hero compact admin-hero editor-hero">
     <div>
 <h1>{{if .Article.ID}}编辑文章{{else}}新建文章{{end}}</h1>
@@ -38,9 +49,13 @@
       <input name="cover" id="coverInput" value="{{.Article.Cover}}" placeholder="/uploads/{{.User.Username}}/article-cover.png；留空则使用站点默认插画">
       <small>从「我的媒体库」复制路径，或者在下面选择。只建议使用你自己账号目录下的图片。</small>
     </label>
-    <div class="cover-crop-launch">
-      <button id="coverCropOpen" type="button" class="btn small secondary">裁剪为 16:9</button>
-      <span id="coverCropStatus" class="meta" role="status" aria-live="polite">原图会保留，裁剪结果将另存为新的 WebP 封面。</span>
+    <div class="cover-crop-launch" data-media-url="{{adminURL "/admin/media"}}">
+      <label class="btn small secondary cover-upload-button">上传封面
+        <input id="coverUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden>
+      </label>
+      <button id="coverCropOpen" type="button" class="btn small ghost">裁剪为 16:9</button>
+      <a class="btn small ghost" href="{{adminURL "/admin/media"}}" target="_blank" rel="noopener">打开媒体库</a>
+      <span id="coverCropStatus" class="meta" role="status" aria-live="polite">上传后可直接使用；裁剪会保留原图并另存一张 16:9 WebP。</span>
     </div>
     <label>封面展示方式
       <select id="coverModeInput" name="cover_mode">
@@ -128,5 +143,7 @@
 <script src="/static/markdown-renderer.js?v=20.3.4"></script>
 <script src="/static/editor.js?v=20.3.4"></script>
 <script src="/static/cover-cropper.js?v=20.19.0"></script>
+<script src="/static/cover-uploader.js?v=20.19.0"></script>
+<script src="/static/editor-import.js?v=20.19.0"></script>
 </body>
 </html>

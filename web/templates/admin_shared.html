@@ -16,9 +16,9 @@
     }
   })();
   </script>
-  <link rel="stylesheet" href="/static/style.css?v=20.18.5">
+<link rel="stylesheet" href="/static/style.css?v=20.19.0">
   <script defer src="/static/admin-theme.js"></script>
-  {{if .Navigation}}<script defer src="/static/admin-nav.js?v=20.18.5"></script>
+  {{if .Navigation}}<script defer src="/static/admin-nav.js?v=20.19.0"></script>
   <script defer src="/static/admin-mobile.js?v=20.18.5"></script>{{end}}
   <script defer src="/static/page-transition.js?v=20.18.5"></script>
   {{with .ExtraScript}}<script defer src="{{.}}"></script>{{end}}
@@ -82,16 +82,12 @@
 
 {{define "admin-client-nav"}}
 <nav class="admin-client-nav" data-admin-client-nav>
-  <a class="admin-client-brand admin-client-brand-simple" href="{{adminURL "/"}}">后台</a>
+  <a class="admin-client-brand admin-client-brand-simple" href="{{adminURL "/"}}">创作中心</a>
   <div class="admin-client-links">
-    <a href="{{adminURL "/"}}" data-admin-route="dashboard">工作台</a>
-    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin"}}" data-admin-route="review">审核</a>{{end}}
-    <a href="{{adminURL "/articles/new"}}" data-admin-route="new">新建</a>
-    <a href="{{adminURL "/articles/upload"}}" data-admin-route="upload">上传</a>
+    <a href="{{adminURL "/"}}" data-admin-route="dashboard">首页</a>
+    <a href="{{adminURL "/articles/new"}}" data-admin-route="compose">投稿</a>
     <a href="{{adminURL "/admin/media"}}" data-admin-route="media">媒体库</a>
-    {{if eq .User.Role "admin"}}<a href="{{adminURL "/admin/site"}}" data-admin-route="site">站点</a>{{end}}
-    {{if eq .User.Role "admin"}}<a href="{{adminURL "/users/new"}}" data-admin-route="users">作者</a>{{end}}
-    <a href="{{adminURL "/account"}}" data-admin-route="account">账号</a>
+    <a href="{{adminURL "/settings"}}" data-admin-route="settings">设置</a>
   </div>
   <div class="admin-client-actions">
     <a class="admin-client-home" href="{{publicURL}}" target="_blank" rel="noopener">回主页 ↗</a>

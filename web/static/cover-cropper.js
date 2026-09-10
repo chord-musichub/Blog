@@ -9,6 +9,7 @@
   var zoomInput = document.getElementById('coverCropZoom');
   var saveButton = document.getElementById('coverCropSave');
   var coverModeInput = document.getElementById('coverModeInput');
+  var launch = document.querySelector('.cover-crop-launch[data-media-url]');
   if(!coverInput || !openButton || !dialog || !canvas || !zoomInput || !saveButton) return;
 
   var ctx = canvas.getContext('2d');
@@ -141,7 +142,7 @@
       var form = new FormData();
       form.append('source', sourcePath);
       form.append('crop', new File([blob], 'cover-16x9.webp', {type:'image/webp'}));
-      fetch('/admin/media?action=cover-crop', {method:'POST', credentials:'same-origin', body:form})
+      fetch((launch ? launch.getAttribute('data-media-url') : '/admin/media') + '?action=cover-crop', {method:'POST', credentials:'same-origin', body:form})
         .then(function(response){ return response.json().catch(function(){ return {ok:false, error:'裁剪服务返回了无效响应'}; }); })
         .then(function(result){
           if(!result || !result.ok || !result.path) throw new Error((result && result.error) || '保存裁剪封面失败');

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"io"
 	"log"
@@ -129,6 +130,72 @@ func (app *App) uploadMediaFile(w http.ResponseWriter, r *http.Request, media me
 		log.Printf("hugo build after media upload error: %v", err)
 	}
 	app.redirect(w, r, "/admin/media?msg=已上传："+url.QueryEscape(userMediaPublicPath(media.owner, name)), http.StatusSeeOther)
+}
+
+// saveCoverUpload is the lightweight editor-side upload path. Unlike a general
+// media-library upload it does not rebuild the public site: the file is only
+// referenced when the creator later saves or publishes the article.
+func (app *App) saveCoverUpload(w http.ResponseWriter, r *http.Request, media mediaLibraryContext) {
+	writeError := func(status int, message string) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(status)
+		_ = json.NewEncoder(w).Encode(map[string]any{"ok": false, "error": message})
+	}
+
+	maxBytes := app.cfg.MaxUploadBytes
+	if maxBytes <= 0 || maxBytes > 16*1024*1024 {
+		maxBytes = 16 * 1024 * 1024
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, maxBytes+1024*1024)
+	if err := r.ParseMultipartForm(maxBytes + 1024*1024); err != nil {
+		writeError(http.StatusBadRequest, "封面过大或表单格式错误")
+		return
+	}
+	file, header, err := r.FormFile("cover")
+	if err != nil {
+		writeError(http.StatusBadRequest, "没有收到封面图片")
+		return
+	}
+	defer file.Close()
+
+	ext := strings.ToLower(filepath.Ext(header.Filename))
+	if !isCoverImageExtension(ext) {
+		writeError(http.StatusBadRequest, "封面只支持 JPG、PNG、WebP、GIF 或 SVG")
+		return
+	}
+	name := uniqueUploadName(media.dir, safeUploadName("cover-"+strings.TrimSuffix(header.Filename, ext)+ext))
+	if name == "" {
+		name = uniqueUploadName(media.dir, "cover"+ext)
+	}
+	outputPath := filepath.Join(media.dir, name)
+	out, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
+	if err != nil {
+		writeError(http.StatusInternalServerError, "无法保存封面")
+		return
+	}
+	n, copyErr := io.Copy(out, io.LimitReader(file, maxBytes+1))
+	closeErr := out.Close()
+	if copyErr != nil || closeErr != nil || n > maxBytes {
+		_ = os.Remove(outputPath)
+		writeError(http.StatusBadRequest, "封面保存失败或超过大小限制")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"ok":   true,
+		"path": userMediaPublicPath(media.owner, name),
+		"name": name,
+	})
+}
+
+func isCoverImageExtension(ext string) bool {
+	switch strings.ToLower(strings.TrimSpace(ext)) {
+	case ".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg":
+		return true
+	default:
+		return false
+	}
 }
 
 // saveCoverCrop 保存由后台 Canvas 导出的 16:9 WebP 封面。
