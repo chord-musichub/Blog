@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"io"
 	"log"
@@ -128,4 +129,69 @@ func (app *App) uploadMediaFile(w http.ResponseWriter, r *http.Request, media me
 		log.Printf("hugo build after media upload error: %v", err)
 	}
 	app.redirect(w, r, "/admin/media?msg=已上传："+url.QueryEscape(userMediaPublicPath(media.owner, name)), http.StatusSeeOther)
+}
+
+// saveCoverCrop 保存由后台 Canvas 导出的 16:9 WebP 封面。
+// 原文件只作为裁剪来源，始终保留在媒体库内，避免不可逆覆盖。
+func (app *App) saveCoverCrop(w http.ResponseWriter, r *http.Request, media mediaLibraryContext) {
+	const maxCropBytes int64 = 16 * 1024 * 1024
+	writeError := func(status int, message string) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(status)
+		_, _ = w.Write([]byte(`{"ok":false,"error":"` + strings.ReplaceAll(message, `"`, `'`) + `"}`))
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxCropBytes+1024*1024)
+	if err := r.ParseMultipartForm(maxCropBytes + 1024*1024); err != nil {
+		writeError(http.StatusBadRequest, "裁剪图过大或表单格式错误")
+		return
+	}
+	sourceName, err := isMediaPathOwnedBy(media.owner, strings.TrimSpace(r.FormValue("source")))
+	if err != nil {
+		writeError(http.StatusForbidden, "只能裁剪自己媒体库中的图片")
+		return
+	}
+	if _, err := os.Stat(filepath.Join(media.dir, sourceName)); err != nil {
+		writeError(http.StatusNotFound, "找不到用于裁剪的原图")
+		return
+	}
+	switch strings.ToLower(filepath.Ext(sourceName)) {
+	case ".jpg", ".jpeg", ".png", ".webp":
+	default:
+		writeError(http.StatusBadRequest, "目前仅支持 JPG、PNG、WebP 图片裁剪")
+		return
+	}
+
+	file, _, err := r.FormFile("crop")
+	if err != nil {
+		writeError(http.StatusBadRequest, "没有收到裁剪后的封面")
+		return
+	}
+	defer file.Close()
+
+	// Canvas 输出必须是 WebP，检查文件签名后再落盘，避免接口变成任意文件上传入口。
+	header := make([]byte, 12)
+	if _, err := io.ReadFull(file, header); err != nil || string(header[:4]) != "RIFF" || string(header[8:12]) != "WEBP" {
+		writeError(http.StatusBadRequest, "裁剪结果格式无效，请重新生成")
+		return
+	}
+	base := strings.TrimSuffix(sourceName, filepath.Ext(sourceName))
+	name := uniqueUploadName(media.dir, safeUploadName(base+"-16x9.webp"))
+	outputPath := filepath.Join(media.dir, name)
+	out, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
+	if err != nil {
+		writeError(http.StatusInternalServerError, "无法保存裁剪封面")
+		return
+	}
+	defer out.Close()
+
+	n, err := io.Copy(out, io.LimitReader(io.MultiReader(bytes.NewReader(header), file), maxCropBytes+1))
+	if err != nil || n > maxCropBytes {
+		_ = out.Close()
+		_ = os.Remove(outputPath)
+		writeError(http.StatusBadRequest, "裁剪封面超过 16MB 或保存失败")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	_, _ = w.Write([]byte(`{"ok":true,"path":"` + userMediaPublicPath(media.owner, name) + `"}`))
 }

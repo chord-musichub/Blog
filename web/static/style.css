@@ -1674,6 +1674,22 @@ textarea{
   background:rgba(234,246,255,.74) !important;
   transform:translateY(-1px);
 }
+
+/* 非破坏性文章封面裁剪器。 */
+.cover-crop-launch{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:4px 0 16px}
+.cover-crop-launch .meta{margin:0;font-size:13px}
+.cover-crop-dialog{width:min(920px,calc(100vw - 32px));padding:0;border:1px solid var(--admin-border);border-radius:22px;background:var(--admin-panel,#fff);color:var(--admin-text);box-shadow:0 28px 80px rgba(5,15,32,.42)}
+.cover-crop-dialog::backdrop{background:rgba(4,12,25,.48);backdrop-filter:blur(5px)}
+.cover-crop-dialog__bar{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:22px 24px 12px;border-bottom:1px solid var(--admin-border)}
+.cover-crop-dialog__bar h2{margin:0 0 5px;font-size:21px}.cover-crop-dialog__bar p{margin:0;color:var(--admin-muted);font-size:13px}
+.cover-crop-stage{padding:22px 24px 14px;background:rgba(17,39,67,.08)}
+.cover-crop-stage canvas{display:block;width:100%;max-height:58vh;aspect-ratio:16/9;object-fit:contain;cursor:grab;touch-action:none;background:#17243a;border-radius:13px;box-shadow:0 10px 28px rgba(11,26,43,.22)}
+.cover-crop-stage canvas.is-dragging{cursor:grabbing}
+.cover-crop-dialog__controls{display:flex;align-items:center;gap:16px;padding:14px 24px 22px}.cover-crop-dialog__controls label{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700}.cover-crop-dialog__controls input{width:min(260px,32vw)}
+.cover-crop-dialog__controls #coverCropSize{margin-left:auto;color:var(--admin-muted);font-size:13px}
+html[data-admin-theme="dark"] .cover-crop-dialog{background:#111c2e;border-color:rgba(151,183,219,.26)}
+html[data-admin-theme="dark"] .cover-crop-stage{background:rgba(3,11,24,.48)}
+@media(max-width:640px){.cover-crop-dialog__bar,.cover-crop-dialog__controls{padding-left:16px;padding-right:16px}.cover-crop-stage{padding-left:16px;padding-right:16px}.cover-crop-dialog__bar{display:block}.cover-crop-dialog__bar .btn{margin-top:12px}.cover-crop-dialog__controls{flex-wrap:wrap}.cover-crop-dialog__controls #coverCropSize{margin-left:0}.cover-crop-dialog__controls input{width:58vw}}
 .media-grid{
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
 }

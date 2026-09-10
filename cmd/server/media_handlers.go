@@ -43,11 +43,18 @@ func (app *App) handleMediaLibrary(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		app.renderMediaLibrary(w, r, media, nil)
 	case http.MethodPost:
-		switch strings.TrimSpace(r.FormValue("action")) {
+		// 裁剪器通过 query 传递 action，避免在读取动作前提前解析整张 Canvas 图片。
+		action := strings.TrimSpace(r.URL.Query().Get("action"))
+		if action == "" {
+			action = strings.TrimSpace(r.FormValue("action"))
+		}
+		switch action {
 		case "rename":
 			app.renameMediaFile(w, r, media)
 		case "delete":
 			app.deleteMediaFile(w, r, media)
+		case "cover-crop":
+			app.saveCoverCrop(w, r, media)
 		default:
 			app.uploadMediaFile(w, r, media)
 		}
