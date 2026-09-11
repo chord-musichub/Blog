@@ -42,6 +42,7 @@ func newApp(cfg Config, store *Store) *App {
 			}
 		},
 		"joinTags":    func(tags []string) string { return strings.Join(tags, ", ") },
+		"add":         func(a, b int) int { return a + b },
 		"statusText":  statusText,
 		"statusClass": statusClass,
 		"fmtTime": func(t time.Time) string {
@@ -52,12 +53,17 @@ func newApp(cfg Config, store *Store) *App {
 		},
 		"canSubmit":        func(a Article) bool { return a.Status == stDraft || a.Status == stRejected },
 		"canPublish":       func(a Article) bool { return a.Status == stPending || a.Status == stDraft || a.Status == stRejected },
-		"isAdminUser":      func(u User) bool { return u.Role == roleAdmin },
+		"isAdminUser":      isAdmin,
+		"isOwnerUser":      isOwner,
+		"canModerateUser":  isAdmin,
+		"canManageArticle": canManageArticles,
+		"canManageUser":    canManageUser,
+		"roleText":         roleText,
 		"userArticleCount": func(username string) int { return store.ArticleCountByAuthor(username) },
-		"canDeleteUser":    func(u User) bool { return u.Role != roleAdmin && store.ArticleCountByAuthor(u.Username) == 0 },
+		"canDeleteUser":    func(u User) bool { return !isOwner(u) && store.ArticleCountByAuthor(u.Username) == 0 },
 		"userDeleteReason": func(u User) string {
-			if u.Role == roleAdmin {
-				return "管理员账号不可删除"
+			if isOwner(u) {
+				return "站主账号不可删除"
 			}
 			n := store.ArticleCountByAuthor(u.Username)
 			if n > 0 {

@@ -13,6 +13,10 @@ import (
 
 func (app *App) handleUploadArticle(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
+	if isAdmin(u) {
+		app.redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodGet {
 		// 保留旧的 POST 导入接口，GET 统一收口到投稿编辑器。
 		app.redirect(w, r, "/articles/new?import=1", http.StatusSeeOther)
@@ -74,7 +78,7 @@ func (app *App) handleUploadArticle(w http.ResponseWriter, r *http.Request) {
 			uploadIntent = "publish"
 		} else if r.FormValue("submit_after_upload") == "1" {
 			uploadIntent = "submit"
-		} else if u.Role != roleAdmin && r.FormValue("submit_after_upload") != "0" {
+		} else if !isAdmin(u) && r.FormValue("submit_after_upload") != "0" {
 			uploadIntent = "submit"
 		} else {
 			uploadIntent = "draft"
@@ -83,10 +87,10 @@ func (app *App) handleUploadArticle(w http.ResponseWriter, r *http.Request) {
 	if uploadIntent != "draft" && uploadIntent != "submit" && uploadIntent != "publish" {
 		uploadIntent = "draft"
 	}
-	if uploadIntent == "publish" && u.Role != roleAdmin {
+	if uploadIntent == "publish" && !isAdmin(u) {
 		uploadIntent = "submit"
 	}
-	publishNow := uploadIntent == "publish" && u.Role == roleAdmin
+	publishNow := uploadIntent == "publish" && isAdmin(u)
 	submitAfterUpload := uploadIntent == "submit"
 	if publishNow {
 		now := time.Now()
@@ -125,12 +129,17 @@ func (app *App) deleteArticle(w http.ResponseWriter, r *http.Request, id string,
 		http.NotFound(w, r)
 		return
 	}
-	// 作者只能删除自己的草稿/退回文章；管理员可以删除任何文章。
-	if u.Role != roleAdmin {
-		if a.Author != u.Username || !(a.Status == stDraft || a.Status == stRejected) {
-			http.Error(w, "forbidden", 403)
+	// 管理员可删除所有稿件；站主只代管普通成员稿件；作者只能删除自己的草稿/退回稿。
+	if isAdmin(u) {
+		// allowed
+	} else if isOwner(u) {
+		if !app.canAccessArticle(u, a) {
+			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}
+	} else if a.Author != u.Username || !(a.Status == stDraft || a.Status == stRejected) {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
 	}
 	if err := app.removeHugoArticle(a); err != nil {
 		http.Error(w, "删除发布文件失败: "+err.Error(), 500)
@@ -143,7 +152,7 @@ func (app *App) deleteArticle(w http.ResponseWriter, r *http.Request, id string,
 	if err := app.runHugo(r.Context()); err != nil {
 		log.Printf("hugo build after delete error: %v", err)
 	}
-	if u.Role == roleAdmin {
+	if canManageArticles(u) {
 		app.redirect(w, r, "/admin?msg=文章已删除", http.StatusSeeOther)
 		return
 	}

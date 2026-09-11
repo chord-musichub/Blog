@@ -2,7 +2,7 @@
 {{ $cfg := .Site.Data.site }}
 {{ $posts := sort (where .Site.RegularPages "Section" "posts") "Date" "desc" }}
 {{ $projects := slice }}
-{{ with resources.Get "data/projects.json" }}{{ $projects = . | transform.Unmarshal }}{{ end }}
+{{ with .Site.Data.projects }}{{ $projects = . }}{{ else }}{{ with resources.Get "data/projects.json" }}{{ $projects = . | transform.Unmarshal }}{{ end }}{{ end }}
 {{ $searchTerms := slice }}{{ range $posts }}{{ range .Params.tags }}{{ $searchTerms = $searchTerms | append . }}{{ end }}{{ end }}
 <section class="content-archive" data-content-archive aria-label="内容归档">
   <header class="content-archive__header">

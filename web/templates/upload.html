@@ -6,7 +6,7 @@
 
 <main class="wrap narrow">
   <nav class="nav compact-nav">
-    <a class="btn small ghost admin-back-icon" href="{{adminURL "/"}}" data-admin-back aria-label="返回" title="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
+    <a class="btn small ghost admin-back-icon" href="{{adminURL "/compose"}}" data-admin-back aria-label="返回投稿" title="返回投稿"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
     <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
   <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg></button>
@@ -30,7 +30,7 @@
     <div class="actions">
       <button class="secondary" name="upload_intent" value="draft"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">上传到草稿箱</span></button>
       <button name="upload_intent" value="submit"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text">上传并提交审核</span></button>
-      {{if eq .User.Role "admin"}}
+      {{if canModerateUser .User}}
       <button name="upload_intent" value="publish"><span class="btn-ico" aria-hidden="true">↗</span><span class="btn-text">上传并直接发布</span></button>
       {{end}}
     </div>

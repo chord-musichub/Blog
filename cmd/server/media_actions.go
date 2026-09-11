@@ -198,6 +198,65 @@ func isCoverImageExtension(ext string) bool {
 	}
 }
 
+// importLegacyMedia is a narrow migration bridge for pictures that existed
+// before the personal media library. It never accepts arbitrary filesystem
+// paths: only the image-only /media/projects and /media/memories trees are
+// eligible, and the result is copied into the current user's upload folder.
+func (app *App) importLegacyMedia(w http.ResponseWriter, r *http.Request, media mediaLibraryContext) {
+	writeError := func(status int, message string) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(status)
+		_ = json.NewEncoder(w).Encode(map[string]any{"ok": false, "error": message})
+	}
+	if err := r.ParseForm(); err != nil {
+		writeError(http.StatusBadRequest, "迁移图片请求无效")
+		return
+	}
+	publicPath := strings.TrimSpace(r.FormValue("source"))
+	if !strings.HasPrefix(publicPath, "/media/projects/") && !strings.HasPrefix(publicPath, "/media/memories/") {
+		writeError(http.StatusForbidden, "只能迁移站点原有的项目或回忆图片")
+		return
+	}
+	rel := filepath.Clean(filepath.FromSlash(strings.TrimPrefix(publicPath, "/")))
+	root := filepath.Clean(filepath.Join("static", "media"))
+	sourcePath := filepath.Join("static", rel)
+	if !strings.HasPrefix(filepath.Clean(sourcePath), root+string(os.PathSeparator)) || !isCoverImageExtension(filepath.Ext(sourcePath)) {
+		writeError(http.StatusBadRequest, "旧图片路径无效")
+		return
+	}
+	info, err := os.Stat(sourcePath)
+	if err != nil || info.IsDir() {
+		writeError(http.StatusNotFound, "找不到旧图片")
+		return
+	}
+	const maxLegacyImageBytes = int64(16 * 1024 * 1024)
+	if info.Size() > maxLegacyImageBytes {
+		writeError(http.StatusBadRequest, "旧图片超过 16MB，请先在本地压缩后上传")
+		return
+	}
+	in, err := os.Open(sourcePath)
+	if err != nil {
+		writeError(http.StatusInternalServerError, "无法读取旧图片")
+		return
+	}
+	defer in.Close()
+	name := uniqueUploadName(media.dir, safeUploadName("legacy-"+filepath.Base(sourcePath)))
+	out, err := os.OpenFile(filepath.Join(media.dir, name), os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
+	if err != nil {
+		writeError(http.StatusInternalServerError, "无法复制旧图片")
+		return
+	}
+	_, copyErr := io.Copy(out, io.LimitReader(in, maxLegacyImageBytes+1))
+	closeErr := out.Close()
+	if copyErr != nil || closeErr != nil {
+		_ = os.Remove(filepath.Join(media.dir, name))
+		writeError(http.StatusInternalServerError, "复制旧图片失败")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	_ = json.NewEncoder(w).Encode(map[string]any{"ok": true, "path": userMediaPublicPath(media.owner, name)})
+}
+
 // saveCoverCrop 保存由后台 Canvas 导出的 16:9 WebP 封面。
 // 原文件只作为裁剪来源，始终保留在媒体库内，避免不可逆覆盖。
 func (app *App) saveCoverCrop(w http.ResponseWriter, r *http.Request, media mediaLibraryContext) {
@@ -243,7 +302,8 @@ func (app *App) saveCoverCrop(w http.ResponseWriter, r *http.Request, media medi
 		return
 	}
 	base := strings.TrimSuffix(sourceName, filepath.Ext(sourceName))
-	name := uniqueUploadName(media.dir, safeUploadName(base+"-16x9.webp"))
+	variant := normalizeCropVariant(r.FormValue("variant"))
+	name := uniqueUploadName(media.dir, safeUploadName(base+"-"+variant+".webp"))
 	outputPath := filepath.Join(media.dir, name)
 	out, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
 	if err != nil {
@@ -261,4 +321,13 @@ func (app *App) saveCoverCrop(w http.ResponseWriter, r *http.Request, media medi
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	_, _ = w.Write([]byte(`{"ok":true,"path":"` + userMediaPublicPath(media.owner, name) + `"}`))
+}
+
+func normalizeCropVariant(raw string) string {
+	switch strings.TrimSpace(raw) {
+	case "1x1", "3x2", "4x3", "16x9":
+		return strings.TrimSpace(raw)
+	default:
+		return "16x9"
+	}
 }

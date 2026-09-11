@@ -8,6 +8,9 @@ import (
 )
 
 // 用户账户相关的数据读写。
+// EnsureAdmin 保留旧函数名，保证环境变量 ADMIN_USER 是系统管理员。
+// 站主优先依据历史 account_type=owner 识别：这是原后台中“站长 / 主账号”
+// 的既有语义。只有旧数据里完全没有主账号时，才把 ADMIN_USER 兜底升级为站主。
 func (s *Store) EnsureAdmin(username, password string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -15,14 +18,48 @@ func (s *Store) EnsureAdmin(username, password string) error {
 	if username == "" {
 		return errors.New("ADMIN_USER must be configured before creating the initial administrator")
 	}
+	ownerUsername := ""
+	for key, existing := range s.users {
+		if key == username {
+			continue
+		}
+		if existing.Role == roleOwner || normalizeAccountType(existing.Role, existing.AccountType) == accountOwner {
+			ownerUsername = key
+			break
+		}
+	}
+	if ownerUsername == "" {
+		if existing, ok := s.users[username]; ok && (existing.Role == roleOwner || normalizeAccountType(existing.Role, existing.AccountType) == accountOwner) {
+			ownerUsername = username
+		}
+	}
+	changed := false
+	for key, existing := range s.users {
+		previousRole := existing.Role
+		previousType := existing.AccountType
+		if key == ownerUsername {
+			existing.Role = roleOwner
+			existing.AccountType = accountOwner
+		} else if key == username {
+			existing.Role = roleAdmin
+			existing.AccountType = accountSystem
+		} else {
+			existing.Role = normalizeRole(existing.Role)
+			existing.AccountType = normalizeAccountType(existing.Role, existing.AccountType)
+		}
+		if existing.Role != previousRole || existing.AccountType != previousType {
+			changed = true
+		}
+		s.users[key] = existing
+	}
 	if _, ok := s.users[username]; ok {
 		u := s.users[username]
-		if u.Role != roleAdmin {
-			return errors.New("ADMIN_USER already belongs to a non-admin account; choose a different username or resolve the account conflict")
-		}
 		// 本地环境配置是初始管理员的唯一权威来源。
 		// 这样 .env 中的密码修改会在每次重启后生效，其他用户仍由应用数据存储管理。
 		if VerifyPassword(password, u.PasswordHash) {
+			if changed {
+				return s.saveLocked("users.json", s.users)
+			}
 			return nil
 		}
 		h, err := HashPassword(password)
@@ -30,6 +67,13 @@ func (s *Store) EnsureAdmin(username, password string) error {
 			return err
 		}
 		u.PasswordHash = h
+		if ownerUsername == username {
+			u.Role = roleOwner
+			u.AccountType = accountOwner
+		} else {
+			u.Role = roleAdmin
+			u.AccountType = accountSystem
+		}
 		u.PasswordMustChange = false
 		s.users[username] = u
 		return s.saveLocked("users.json", s.users)
@@ -41,7 +85,7 @@ func (s *Store) EnsureAdmin(username, password string) error {
 	if err != nil {
 		return err
 	}
-	s.users[username] = User{Username: username, DisplayName: "站点公告", Role: roleAdmin, AccountType: accountSystem, PasswordHash: h, CreatedAt: time.Now(), ShowInFriends: false}
+	s.users[username] = User{Username: username, DisplayName: username, Role: roleOwner, AccountType: accountOwner, Avatar: defaultUserAvatar, PasswordHash: h, CreatedAt: time.Now(), ShowInFriends: false}
 	return s.saveLocked("users.json", s.users)
 }
 
@@ -58,8 +102,9 @@ func (s *Store) CreateUser(username, displayName, role, accountType, password st
 	if _, ok := s.users[username]; ok {
 		return errors.New("用户已经存在")
 	}
-	if role != roleAdmin {
-		role = roleAuthor
+	role = normalizeRole(role)
+	if role == roleOwner {
+		return errors.New("站主由 ADMIN_USER 环境配置指定，不能在后台重复创建")
 	}
 	accountType = normalizeAccountType(role, accountType)
 	if strings.TrimSpace(displayName) == "" {
@@ -74,7 +119,7 @@ func (s *Store) CreateUser(username, displayName, role, accountType, password st
 		return err
 	}
 	showInFriends := accountType == accountFriend
-	s.users[username] = User{Username: username, DisplayName: strings.TrimSpace(displayName), Role: role, AccountType: accountType, Avatar: defaultUserAvatar, ShowInFriends: showInFriends, PasswordHash: h, CreatedAt: time.Now(), PasswordMustChange: role != roleAdmin}
+	s.users[username] = User{Username: username, DisplayName: strings.TrimSpace(displayName), Role: role, AccountType: accountType, Avatar: defaultUserAvatar, ShowInFriends: showInFriends, PasswordHash: h, CreatedAt: time.Now(), PasswordMustChange: role != roleOwner}
 	return s.saveLocked("users.json", s.users)
 }
 
@@ -83,6 +128,7 @@ func (s *Store) GetUser(username string) (User, bool) {
 	defer s.mu.Unlock()
 	u, ok := s.users[username]
 	if ok {
+		u.Role = normalizeRole(u.Role)
 		u.AccountType = normalizeAccountType(u.Role, u.AccountType)
 		if u.DisplayName == "" {
 			u.DisplayName = u.Username
@@ -97,6 +143,7 @@ func (s *Store) Users() []User {
 	defer s.mu.Unlock()
 	out := make([]User, 0, len(s.users))
 	for _, u := range s.users {
+		u.Role = normalizeRole(u.Role)
 		u.AccountType = normalizeAccountType(u.Role, u.AccountType)
 		if u.DisplayName == "" {
 			u.DisplayName = u.Username
@@ -115,8 +162,8 @@ func (s *Store) ToggleUser(username string) error {
 	if !ok {
 		return errors.New("用户不存在")
 	}
-	if u.Role == roleAdmin {
-		return errors.New("不能禁用管理员")
+	if isOwner(u) {
+		return errors.New("不能禁用站主")
 	}
 	u.Disabled = !u.Disabled
 	s.users[username] = u
@@ -150,8 +197,8 @@ func (s *Store) DeleteUser(username string) error {
 	if !ok {
 		return errors.New("用户不存在")
 	}
-	if u.Role == roleAdmin {
-		return errors.New("不能删除管理员")
+	if isOwner(u) {
+		return errors.New("不能删除站主")
 	}
 	for _, a := range s.articles {
 		if a.Author == username && a.Status != stDeleted {

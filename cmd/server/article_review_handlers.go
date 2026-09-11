@@ -14,7 +14,7 @@ func (app *App) submitArticle(w http.ResponseWriter, r *http.Request, id string,
 		http.NotFound(w, r)
 		return
 	}
-	if !canAccessArticle(u, a) {
+	if !app.canAccessArticle(u, a) {
 		http.Error(w, "forbidden", 403)
 		return
 	}
@@ -32,7 +32,7 @@ func (app *App) submitArticle(w http.ResponseWriter, r *http.Request, id string,
 }
 
 func (app *App) publishArticle(w http.ResponseWriter, r *http.Request, id string, u User) {
-	if u.Role != roleAdmin {
+	if !isAdmin(u) {
 		http.Error(w, "forbidden", 403)
 		return
 	}
@@ -62,7 +62,7 @@ func (app *App) publishArticle(w http.ResponseWriter, r *http.Request, id string
 }
 
 func (app *App) rejectArticle(w http.ResponseWriter, r *http.Request, id string, u User) {
-	if u.Role != roleAdmin {
+	if !isAdmin(u) {
 		http.Error(w, "forbidden", 403)
 		return
 	}

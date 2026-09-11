@@ -24,8 +24,28 @@ func (app *App) handleSettingsHub(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// handleComposeHub makes 投稿 a choice of creator tasks rather than silently
+// assuming every visit means a new article. Author accounts keep the one
+// action they are allowed to publish; site-level project and memory records
+// remain owner-only.
+func (app *App) handleComposeHub(w http.ResponseWriter, r *http.Request) {
+	u, _ := app.currentUser(r)
+	if isAdmin(u) {
+		app.redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
+	app.render(w, "compose_hub.html", map[string]any{
+		"User":  u,
+		"Flash": r.URL.Query().Get("msg"),
+	})
+}
+
 func (app *App) handleNewArticle(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
+	if isAdmin(u) {
+		app.redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
 	if r.Method == http.MethodGet {
 		a := Article{Author: u.Username, Status: stDraft}
 		app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "new", "CoverFiles": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username))})
@@ -110,7 +130,7 @@ func (app *App) handleAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	action := strings.TrimSpace(r.FormValue("action"))
 	if action == "add_user" {
-		if u.Role != roleAdmin {
+		if !isAdmin(u) {
 			http.Error(w, "forbidden", 403)
 			return
 		}

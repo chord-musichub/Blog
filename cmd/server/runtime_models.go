@@ -7,7 +7,11 @@ import (
 )
 
 const (
+	// 角色和账号类型分开：角色决定后台能力，账号类型决定公开朋友页的呈现。
+	// roleAuthor 保留为旧数据兼容值，启动迁移后会写成 roleUser。
+	roleOwner  = "owner"
 	roleAdmin  = "admin"
+	roleUser   = "user"
 	roleAuthor = "author"
 
 	accountSystem = "system"

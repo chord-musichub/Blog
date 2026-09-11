@@ -8,20 +8,24 @@
 
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
 
+  {{if isAdminUser .User}}
+  <section class="card admin-dashboard-card">
+    <div class="admin-dashboard-copy"><h1>管理工作台</h1></div>
+    <div class="admin-dashboard-actions"><a class="btn" href="{{adminURL "/admin#reviews"}}">进入审核</a></div>
+  </section>
+  {{else}}
   <section class="card admin-dashboard-card">
     <div class="admin-dashboard-copy">
-      <span class="admin-dashboard-kicker">CREATOR HOME</span>
       <h1>创作工作台</h1>
-      <p>从这里继续修改草稿、发起新投稿，或进入媒体库整理素材。</p>
     </div>
     <div class="admin-dashboard-actions">
       <a class="btn" href="{{adminURL "/articles/new"}}">开始投稿</a>
       <a class="btn secondary" href="{{adminURL "/articles/new"}}?import=1">导入 .md</a>
-      {{if eq .User.Role "admin"}}<a class="btn ghost" href="{{adminURL "/admin"}}">审核与管理</a>{{end}}
+      {{if isOwnerUser .User}}<a class="btn ghost" href="{{adminURL "/admin"}}">成员文章</a>{{end}}
     </div>
   </section>
 
-  <div class="toolbar section-toolbar"><h2>{{if eq .User.Role "admin"}}全部文章{{else}}我的文章{{end}} <span class="soft-count">{{len .Articles}}</span></h2></div>
+  <div class="toolbar section-toolbar"><h2>我的文章 <span class="soft-count">{{len .Articles}}</span></h2></div>
 
   {{range .Articles}}
   <article class="card article-row">
@@ -33,13 +37,13 @@
     </div>
     <div class="actions vertical">
       <a class="btn small secondary" href="{{adminURL (printf "/articles/%s/edit" .ID)}}">编辑</a>
-      {{if canSubmit .}}<form method="post" action="{{adminURL (printf "/articles/%s/submit" .ID)}}"><button class="small"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text optional">{{if eq $.User.Role "admin"}}放入审核队列{{else}}提交审核{{end}}</span></button></form>{{end}}
-      {{if eq $.User.Role "admin"}}{{if canPublish .}}<form method="post" action="{{adminURL (printf "/articles/%s/publish" .ID)}}"><button class="small"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text optional">{{if eq .Status "pending"}}审核通过并发布{{else if eq .Status "published"}}更新公开站{{else}}直接发布{{end}}</span></button></form>{{end}}{{end}}
-      {{if or (eq $.User.Role "admin") (or (eq .Status "draft") (eq .Status "rejected"))}}<form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" onsubmit="return confirm('确定删除这篇文章吗？已发布文章会同步从公开博客移除。')"><button class="small danger"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text optional">删除</span></button></form>{{end}}
+      {{if canSubmit .}}<form method="post" action="{{adminURL (printf "/articles/%s/submit" .ID)}}"><button class="small"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text optional">提交审核</span></button></form>{{end}}
+      {{if or (eq .Status "draft") (eq .Status "rejected")}}<form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" onsubmit="return confirm('确定删除这篇文章吗？已发布文章会同步从公开博客移除。')"><button class="small danger"><span class="btn-text optional">删除</span></button></form>{{end}}
     </div>
   </article>
   {{else}}
-  <div class="empty card">还没有文章。可以点「写文章」，也可以直接「上传 .md」。</div>
+  <div class="empty card">还没有文章。</div>
+  {{end}}
   {{end}}
 </main>
 </body>

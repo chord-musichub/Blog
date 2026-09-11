@@ -11,6 +11,7 @@ import (
 // 管理员用户状态、密码重置申请与用户清理处理器。
 
 func (app *App) handleUserRoutes(w http.ResponseWriter, r *http.Request) {
+	actor, _ := app.currentUser(r)
 	parts := strings.Split(strings.Trim(strings.TrimPrefix(r.URL.Path, "/users/"), "/"), "/")
 	if len(parts) < 2 || r.Method != http.MethodPost {
 		http.NotFound(w, r)
@@ -18,6 +19,15 @@ func (app *App) handleUserRoutes(w http.ResponseWriter, r *http.Request) {
 	}
 	username := cleanUsername(parts[0])
 	action := parts[1]
+	target, ok := app.store.GetUser(username)
+	if !ok {
+		app.redirect(w, r, "/admin?msg=用户不存在", http.StatusSeeOther)
+		return
+	}
+	if !canManageUser(actor, target) {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
 	switch action {
 	case "toggle":
 		if err := app.store.ToggleUser(username); err != nil {

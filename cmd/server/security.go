@@ -26,8 +26,32 @@ func (app *App) requireLogin(next http.HandlerFunc) http.HandlerFunc {
 func (app *App) requireAdmin(next http.HandlerFunc) http.HandlerFunc {
 	return app.requireLogin(func(w http.ResponseWriter, r *http.Request) {
 		u, _ := app.currentUser(r)
-		if u.Role != roleAdmin {
+		if !isAdmin(u) {
 			http.Error(w, "forbidden", 403)
+			return
+		}
+		next(w, r)
+	})
+}
+
+// requireArticleManager is shared by the review workspace: the administrator
+// reviews/publishes, while the owner can only inspect and edit member drafts.
+func (app *App) requireArticleManager(next http.HandlerFunc) http.HandlerFunc {
+	return app.requireLogin(func(w http.ResponseWriter, r *http.Request) {
+		u, _ := app.currentUser(r)
+		if !canManageArticles(u) {
+			http.Error(w, "forbidden", http.StatusForbidden)
+			return
+		}
+		next(w, r)
+	})
+}
+
+func (app *App) requireOwner(next http.HandlerFunc) http.HandlerFunc {
+	return app.requireLogin(func(w http.ResponseWriter, r *http.Request) {
+		u, _ := app.currentUser(r)
+		if !isOwner(u) {
+			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}
 		next(w, r)

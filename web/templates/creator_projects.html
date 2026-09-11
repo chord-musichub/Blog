@@ -1,0 +1,38 @@
+{{template "admin-head" (dict "Title" "投稿 · 项目" "Data" . "Navigation" true)}}
+<body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
+{{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
+{{template "admin-client-nav" .}}
+<main class="wrap wide creator-manager" data-media-url="{{adminURL "/admin/media"}}">
+  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
+  <section class="hero compact admin-hero creator-manager__hero">
+    <div><h1>投稿</h1></div>
+    <nav class="creator-manager__types" aria-label="投稿类型"><a href="{{adminURL "/articles/new"}}">文章</a><a class="is-active" href="{{adminURL "/compose/projects"}}">项目</a><a href="{{adminURL "/compose/memories"}}">回忆</a></nav>
+  </section>
+
+  <section class="card creator-entry" id="new-project">
+    <div class="creator-entry__heading"><span>新项目</span></div>
+    <form method="post" class="form creator-entry__form">
+      <div class="grid two"><label>项目名称<input name="title" required placeholder="项目名称"></label><label>年份<input name="year" placeholder="2026"></label></div>
+      <label>一句话说明<input name="description" placeholder="这个项目解决了什么问题？"></label>
+      <div class="grid two"><label>状态<input name="status" placeholder="ACTIVE"></label><label>我的职责<input name="role" placeholder="前端 / 后端 / 设计"></label></div>
+      <label>技术栈（逗号分隔）<input name="stack" placeholder="Go, Hugo, JavaScript"></label>
+      <label>项目封面<input id="projectCoverNew" name="cover" placeholder="上传后会自动填入路径"></label>
+      <div class="cover-crop-launch"><label class="btn small secondary cover-upload-button">上传图片<input data-cover-upload data-cover-target="#projectCoverNew" data-cover-status="#projectNewStatus" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden></label><button type="button" class="btn small ghost" data-crop-source="#projectCoverNew" data-crop-target="#projectCoverNew" data-crop-ratio="16x9" data-crop-label="项目封面" data-crop-status="#projectNewStatus">裁剪为 16:9</button><span id="projectNewStatus" class="meta" role="status">可留空；上传后也可以去媒体库管理原图。</span></div>
+      <div class="grid two"><label>展示页链接<input name="demo" type="url" placeholder="https://..."></label><label>源码链接<input name="github" type="url" placeholder="https://github.com/..."></label></div>
+      <label>备用跳转链接（没有展示页和源码时使用）<input name="route" type="url" placeholder="https://..."></label>
+      <div class="actions"><button name="action" value="create" type="submit">发布项目</button></div>
+    </form>
+  </section>
+
+  <section class="creator-manager__list" aria-label="已发布项目">
+  {{range $index, $project := .Projects}}
+    <details class="card creator-entry creator-entry--saved"><summary><span>{{printf "%02d" (add $index 1)}} · {{$project.Title}}</span><small>{{$project.Year}} {{with $project.Status}}· {{.}}{{end}}</small></summary>
+      <form method="post" class="form creator-entry__form"><input type="hidden" name="index" value="{{$index}}"><div class="grid two"><label>项目名称<input name="title" value="{{$project.Title}}" required></label><label>年份<input name="year" value="{{$project.Year}}"></label></div><label>一句话说明<input name="description" value="{{$project.Description}}"></label><div class="grid two"><label>状态<input name="status" value="{{$project.Status}}"></label><label>我的职责<input name="role" value="{{$project.Role}}"></label></div><label>技术栈（逗号分隔）<input name="stack" value="{{joinTags $project.Stack}}"></label><label>项目封面<input id="projectCover{{$index}}" name="cover" value="{{$project.Cover}}"></label><div class="cover-crop-launch"><label class="btn small secondary cover-upload-button">上传图片<input data-cover-upload data-cover-target="#projectCover{{$index}}" data-cover-status="#projectStatus{{$index}}" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden></label><button type="button" class="btn small ghost" data-crop-source="#projectCover{{$index}}" data-crop-target="#projectCover{{$index}}" data-crop-ratio="16x9" data-crop-label="项目封面" data-crop-status="#projectStatus{{$index}}">裁剪为 16:9</button><span id="projectStatus{{$index}}" class="meta" role="status"></span></div><div class="grid two"><label>展示页链接<input name="demo" type="url" value="{{$project.Demo}}"></label><label>源码链接<input name="github" type="url" value="{{$project.GitHub}}"></label></div><label>备用跳转链接<input name="route" type="url" value="{{$project.Route}}"></label><div class="actions"><button name="action" value="update" type="submit">保存修改</button><button name="action" value="delete" type="submit" class="danger" onclick="return confirm('确定删除这个项目吗？')">删除</button></div></form>
+    </details>
+  {{end}}
+  </section>
+</main>
+{{template "media-crop-dialog" .}}
+<script src="/static/cover-cropper.js?v=20.20.0"></script><script src="/static/cover-uploader.js?v=20.20.0"></script>
+</body></html>

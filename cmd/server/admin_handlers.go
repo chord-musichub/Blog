@@ -5,21 +5,60 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 )
 
 // 后台审核、用户管理、文章上传删除与清理路由。
 
+type articleAuthorGroup struct {
+	Username    string
+	DisplayName string
+	Articles    []Article
+}
+
+func articleGroupsByAuthor(articles []Article, users []User, include func(User) bool) []articleAuthorGroup {
+	byName := make(map[string]User, len(users))
+	for _, user := range users {
+		byName[user.Username] = user
+	}
+	groups := make(map[string][]Article)
+	for _, article := range articles {
+		user, ok := byName[article.Author]
+		if ok && !include(user) {
+			continue
+		}
+		groups[article.Author] = append(groups[article.Author], article)
+	}
+	result := make([]articleAuthorGroup, 0, len(groups))
+	for username, grouped := range groups {
+		user := byName[username]
+		displayName := user.DisplayName
+		if displayName == "" {
+			displayName = username
+		}
+		result = append(result, articleAuthorGroup{Username: username, DisplayName: displayName, Articles: grouped})
+	}
+	sort.Slice(result, func(i, j int) bool { return result[i].DisplayName < result[j].DisplayName })
+	return result
+}
+
 func (app *App) handleAdmin(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
+	users := app.store.Users()
+	articles := app.store.AllArticles()
+	include := func(User) bool { return true }
+	if isOwner(u) {
+		// 站主在此只管理普通成员稿件；自己的创作留在首页，管理员稿件不在这里混排。
+		include = func(user User) bool { return normalizeRole(user.Role) == roleUser }
+	}
 	app.render(w, "admin.html", map[string]any{
-		"User":            u,
-		"PendingArticles": app.store.ArticlesByStatus(stPending),
-		"OtherArticles":   app.store.ArticlesExceptStatus(stPending),
-		"Articles":        app.store.AllArticles(),
-		"Users":           app.store.Users(),
-		"PasswordResets":  app.store.PasswordResetRequests(),
-		"Flash":           r.URL.Query().Get("msg"),
+		"User":           u,
+		"ArticleGroups":  articleGroupsByAuthor(articles, users, include),
+		"Users":          users,
+		"Messages":       app.adminMessages(),
+		"PasswordResets": app.store.PasswordResetRequests(),
+		"Flash":          r.URL.Query().Get("msg"),
 	})
 }
 
@@ -80,7 +119,16 @@ func (app *App) handleCleanup(w http.ResponseWriter, r *http.Request) {
 	app.redirect(w, r, "/admin?msg=未知清理操作", http.StatusSeeOther)
 }
 
-func canAccessArticle(u User, a Article) bool { return u.Role == roleAdmin || a.Author == u.Username }
+func (app *App) canAccessArticle(u User, a Article) bool {
+	if a.Author == u.Username || isAdmin(u) {
+		return true
+	}
+	if !isOwner(u) {
+		return false
+	}
+	author, ok := app.store.GetUser(a.Author)
+	return ok && normalizeRole(author.Role) == roleUser
+}
 
 func safeIntRange(raw string, min int, max int, fallback int) int {
 	v := strings.TrimSpace(raw)

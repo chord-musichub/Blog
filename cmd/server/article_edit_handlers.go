@@ -14,7 +14,7 @@ func (app *App) showEditor(w http.ResponseWriter, r *http.Request, id string, u 
 		http.NotFound(w, r)
 		return
 	}
-	if !canAccessArticle(u, a) {
+	if !app.canAccessArticle(u, a) {
 		http.Error(w, "forbidden", 403)
 		return
 	}
@@ -22,6 +22,10 @@ func (app *App) showEditor(w http.ResponseWriter, r *http.Request, id string, u 
 }
 
 func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id string, u User) {
+	if id == "" && isAdmin(u) {
+		http.Error(w, "审核管理员不能投稿", http.StatusForbidden)
+		return
+	}
 	r.Body = http.MaxBytesReader(w, r.Body, 600*1024)
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "表单太大或格式错误", 400)
@@ -35,7 +39,7 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 	if intent != "save" && intent != "submit" && intent != "publish" {
 		intent = "save"
 	}
-	if intent == "publish" && u.Role != roleAdmin {
+	if intent == "publish" && !isAdmin(u) {
 		intent = "submit"
 	}
 
@@ -50,7 +54,7 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 			http.NotFound(w, r)
 			return
 		}
-		if !canAccessArticle(u, old) {
+		if !app.canAccessArticle(u, old) {
 			http.Error(w, "forbidden", 403)
 			return
 		}
@@ -58,7 +62,7 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 		if a.Status == stPublished {
 			wasPublished = true
 			oldPublished = old
-			if u.Role != roleAdmin {
+			if !isAdmin(u) {
 				// 普通作者修改已发布文章时，先从公开站撤下，保存后需要重新提交审核。
 				_ = app.removeHugoArticle(old)
 				_ = app.runHugo(r.Context())
@@ -133,7 +137,7 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 		if wasPublished {
 			_ = app.removeHugoArticle(oldPublished)
 		}
-	} else if intent == "publish" && u.Role == roleAdmin {
+	} else if intent == "publish" && isAdmin(u) {
 		now := time.Now()
 		a.Status = stPublished
 		a.PublishedAt = &now
@@ -167,7 +171,7 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 	}
 
 	if intent == "submit" {
-		if u.Role == roleAdmin {
+		if canModerate(u) {
 			app.redirect(w, r, "/articles/"+a.ID+"/edit?msg=已放入审核队列（测试用），可到审核后台发布", http.StatusSeeOther)
 		} else {
 			app.redirect(w, r, "/articles/"+a.ID+"/edit?msg=已提交给管理员审核，公开站暂不会更新", http.StatusSeeOther)

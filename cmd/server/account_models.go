@@ -36,6 +36,45 @@ type User struct {
 	PasswordMustChange bool      `json:"password_must_change,omitempty"`
 }
 
+func normalizeRole(role string) string {
+	switch strings.TrimSpace(role) {
+	case roleOwner, roleAdmin, roleUser:
+		return strings.TrimSpace(role)
+	case roleAuthor:
+		return roleUser
+	default:
+		return roleUser
+	}
+}
+
+func isOwner(u User) bool { return normalizeRole(u.Role) == roleOwner }
+
+// isAdmin 表示专职审核管理员。站主拥有内容所有权，但不再被混同为审核账号。
+func isAdmin(u User) bool { return normalizeRole(u.Role) == roleAdmin }
+
+// canManageArticles 保留站主编辑成员文章的能力；审核、发布和退回则只交给管理员。
+func canManageArticles(u User) bool { return isOwner(u) || isAdmin(u) }
+func canModerate(u User) bool {
+	return isAdmin(u)
+}
+
+// canManageUser limits account operations to the dedicated administrator and
+// prevents any account from changing the site owner's credentials or status.
+func canManageUser(actor, target User) bool {
+	return isAdmin(actor) && actor.Username != target.Username && !isOwner(target)
+}
+
+func roleText(role string) string {
+	switch normalizeRole(role) {
+	case roleOwner:
+		return "站主"
+	case roleAdmin:
+		return "管理员"
+	default:
+		return "普通用户"
+	}
+}
+
 // PasswordResetRequest 记录用户提交给管理员的密码重置申请。
 type PasswordResetRequest struct {
 	ID         string    `json:"id"`
@@ -53,7 +92,10 @@ func normalizeAccountType(role, accountType string) string {
 	case accountSystem, accountOwner, accountFriend:
 		return accountType
 	}
-	if role == roleAdmin {
+	if normalizeRole(role) == roleOwner {
+		return accountOwner
+	}
+	if normalizeRole(role) == roleAdmin {
 		return accountSystem
 	}
 	return accountFriend

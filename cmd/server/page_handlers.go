@@ -38,9 +38,8 @@ func (app *App) handleHome(w http.ResponseWriter, r *http.Request) {
 		app.redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
+	// 首页始终只展示登录者自己的稿件。审核管理员从专门的工作台按作者查看全站稿件，
+	// 站主需要编辑成员文章时也从成员文章入口进入，避免创作首页被所有人的稿件淹没。
 	articles := app.store.ArticlesByAuthor(u.Username)
-	if u.Role == roleAdmin {
-		articles = app.store.AllArticles()
-	}
-	app.render(w, "home.html", map[string]any{"User": u, "Articles": articles, "Flash": r.URL.Query().Get("msg")})
+	app.render(w, "home.html", map[string]any{"User": u, "Articles": articles, "Flash": r.URL.Query().Get("msg"), "IsDashboard": true})
 }

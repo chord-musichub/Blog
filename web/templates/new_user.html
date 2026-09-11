@@ -6,24 +6,24 @@
 
 <main class="wrap narrow">
   <nav class="nav compact-nav">
-    <a class="btn small ghost admin-back-icon" href="{{adminURL "/admin"}}" data-admin-back aria-label="返回" title="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
+    <a class="btn small ghost admin-back-icon" href="{{adminURL "/account"}}" data-admin-back aria-label="返回账号与用户" title="返回账号与用户"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
     <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
   <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg></button>
   </nav>
-  <h1>添加作者</h1>
+  <h1>添加用户</h1>
   {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
   <form method="post" class="card form">
     <label>用户名 <input name="username" required placeholder="friend01"><small>只能用字母、数字、下划线、短横线。</small></label>
     <label>显示名 <input name="display" placeholder="朋友的名字"></label>
-    <label>角色 <select name="role"><option value="author">author 作者</option><option value="admin">admin 管理员</option></select><small>普通创作账号选 author；只有管理站点的人才选 admin。</small></label>
+    <label>角色 <select name="role"><option value="user">普通用户：投稿后等待审核</option><option value="admin">管理员：审核与发布文章</option></select><small>项目、回忆、站点设置始终仅站主可管理。</small></label>
     <label>账号类型
       <select name="account_type">
         <option value="friend">朋友作者：会显示在朋友页</option>
         <option value="owner">站长 / 主账号：你的个人创作身份</option>
         <option value="system">系统账号 / 公告：用于通知、公告、更新日志</option>
       </select>
-      <small>建议：admin 设置为“系统账号 / 公告”；你自己的账号管理为“站长 / 主账号”。</small>
+      <small>普通用户一般选“朋友作者”；管理员一般选“系统账号 / 公告”。</small>
     </label>
     <label>初始密码 <span class="password-field"><input id="new-user-password" name="password" type="password" required placeholder="至少 6 位"><button class="password-toggle" type="button" data-password-toggle="#new-user-password" aria-label="显示密码"></button></span></label>
     <button><span class="btn-ico" aria-hidden="true">+</span><span class="btn-text">创建用户</span></button>

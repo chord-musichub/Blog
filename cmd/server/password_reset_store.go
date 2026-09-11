@@ -13,8 +13,8 @@ func (s *Store) CreatePasswordReset(username, note string) error {
 	defer s.mu.Unlock()
 	username = cleanUsername(username)
 	u, ok := s.users[username]
-	if !ok || u.Role == roleAdmin {
-		return errors.New("用户不存在，或管理员账号不能走申请流程")
+	if !ok || isOwner(u) {
+		return errors.New("用户不存在，或站主账号不能走申请流程")
 	}
 	if u.Disabled {
 		return errors.New("账号已被禁用，请直接联系管理员")

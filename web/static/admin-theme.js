@@ -37,10 +37,10 @@
     localStorage.setItem(KEY, theme);
     document.documentElement.setAttribute("data-admin-theme", theme);
     document.documentElement.classList.toggle("admin-dark-root", theme === "dark");
-    document.documentElement.style.backgroundColor = theme === "dark" ? "#0d1728" : "#fbfaf7";
+    document.documentElement.style.backgroundColor = theme === "dark" ? "#0d1728" : "#dbe6ef";
     if(document.body){
       document.body.classList.toggle("admin-dark", theme === "dark");
-      document.body.style.backgroundColor = theme === "dark" ? "#0d1728" : "";
+      document.body.style.backgroundColor = theme === "dark" ? "#0d1728" : "#dbe6ef";
       document.body.style.backgroundImage = theme === "dark" ? "none" : "";
     }
     document.querySelectorAll("[data-admin-theme-toggle]").forEach(btn => {
@@ -135,27 +135,5 @@
 
 
 
-/* v14.6：后台返回图标逻辑 */
-(function(){
-  function initAdminBack(){
-    document.querySelectorAll('[data-admin-back]').forEach(function(link){
-      if(link.dataset.backReady === '1') return;
-      link.dataset.backReady = '1';
-      link.addEventListener('click', function(event){
-        if(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-        const ref = document.referrer || '';
-        let sameOrigin = false;
-        try{ sameOrigin = ref && new URL(ref, window.location.href).origin === window.location.origin; }catch(e){}
-        if(sameOrigin && window.history.length > 1){
-          event.preventDefault();
-          window.history.back();
-        }
-      });
-    });
-  }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', initAdminBack);
-  }else{
-    initAdminBack();
-  }
-})();
+/* 后台返回按钮一律遵循模板中的明确父级地址。
+   不再借用浏览器历史，避免从外部页面、刷新页或表单提交后跳回错误位置。 */

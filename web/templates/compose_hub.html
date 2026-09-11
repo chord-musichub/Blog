@@ -1,0 +1,16 @@
+{{template "admin-head" (dict "Title" "投稿" "Data" . "Navigation" true)}}
+<body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
+{{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
+{{template "admin-client-nav" .}}
+<main class="wrap wide compose-hub">
+  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  <section class="hero compact admin-hero"><div><h1>投稿</h1></div></section>
+  <section class="compose-hub__grid" aria-label="创作类型">
+    <a class="card compose-hub__item" href="{{adminURL "/articles/new"}}"><span>01</span><h2>文章</h2><b aria-hidden="true">→</b></a>
+    {{if isOwnerUser .User}}
+    <a class="card compose-hub__item" href="{{adminURL "/compose/projects"}}"><span>02</span><h2>项目</h2><b aria-hidden="true">→</b></a>
+    <a class="card compose-hub__item" href="{{adminURL "/compose/memories"}}"><span>03</span><h2>回忆</h2><b aria-hidden="true">→</b></a>
+    {{end}}
+  </section>
+</main>
+</body></html>

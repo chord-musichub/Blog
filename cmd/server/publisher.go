@@ -147,6 +147,11 @@ func (app *App) runHugo(ctx context.Context) error {
 	if err := app.ensureThemeDefaults(); err != nil {
 		return err
 	}
+	// 旧版项目/回忆存在 assets/data；首次运行时迁入持久 data 卷，
+	// 让后台编辑和 Hugo 公共页始终读取同一份数据。
+	if err := app.ensureCreatorContentData(); err != nil {
+		return err
+	}
 	if err := app.syncPublishedArticles(); err != nil {
 		return err
 	}

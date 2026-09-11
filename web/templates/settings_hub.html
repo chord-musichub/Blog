@@ -9,40 +9,29 @@
   <section class="hero compact admin-hero">
     <div>
       <h1>设置</h1>
-      <p>把不常用的管理能力收在这里；日常创作只需要回到投稿和媒体库。</p>
     </div>
   </section>
 
   <section class="settings-hub-grid" aria-label="设置入口">
     <a class="card settings-hub-card" href="{{adminURL "/account"}}">
-      <span class="settings-hub-index">01</span><h2>账号与资料</h2>
-      <p>修改显示资料、头像和登录密码。</p>
+      <span class="settings-hub-index">01</span><h2>{{if isOwnerUser .User}}账号与权限{{else}}账号与资料{{end}}</h2>
       <span class="settings-hub-go" aria-hidden="true">→</span>
     </a>
-    {{if eq .User.Role "admin"}}
+    {{if isOwnerUser .User}}
     <a class="card settings-hub-card" href="{{adminURL "/admin/site"}}">
       <span class="settings-hub-index">02</span><h2>站点内容</h2>
-      <p>首页、公开信息和页面素材。</p>
       <span class="settings-hub-go" aria-hidden="true">→</span>
     </a>
     <a class="card settings-hub-card" href="{{adminURL "/admin/theme"}}">
       <span class="settings-hub-index">03</span><h2>外观主题</h2>
-      <p>调整配色、背景和视觉效果。</p>
       <span class="settings-hub-go" aria-hidden="true">→</span>
     </a>
     <a class="card settings-hub-card" href="{{adminURL "/admin/manuscript"}}">
-      <span class="settings-hub-index">04</span><h2>投稿默认值</h2>
-      <p>设置文章默认摘要与审核规则。</p>
+      <span class="settings-hub-index">04</span><h2>文章默认</h2>
       <span class="settings-hub-go" aria-hidden="true">→</span>
     </a>
     <a class="card settings-hub-card" href="{{adminURL "/admin"}}">
-      <span class="settings-hub-index">05</span><h2>审核与用户</h2>
-      <p>处理投稿、密码申请和作者状态。</p>
-      <span class="settings-hub-go" aria-hidden="true">→</span>
-    </a>
-    <a class="card settings-hub-card" href="{{adminURL "/account"}}#authors">
-      <span class="settings-hub-index">06</span><h2>添加作者</h2>
-      <p>创建新的作者、朋友或系统账号。</p>
+      <span class="settings-hub-index">05</span><h2>成员文章</h2>
       <span class="settings-hub-go" aria-hidden="true">→</span>
     </a>
     {{end}}

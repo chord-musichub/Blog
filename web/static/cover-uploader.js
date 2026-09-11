@@ -1,19 +1,24 @@
 (function () {
   'use strict';
 
-  var input = document.getElementById('coverUpload');
-  var cover = document.getElementById('coverInput');
-  var status = document.getElementById('coverCropStatus');
-  var launch = document.querySelector('.cover-crop-launch[data-media-url]');
-  if (!input || !cover || !launch) return;
+  var inputs = Array.prototype.slice.call(document.querySelectorAll('[data-cover-upload], #coverUpload'));
+  if (!inputs.length) return;
 
-  function setStatus(message, isError) {
-    if (!status) return;
-    status.textContent = message;
-    status.classList.toggle('error', !!isError);
-  }
+  inputs.forEach(function (input) {
+    var targetSelector = input.getAttribute('data-cover-target') || '#coverInput';
+    var cover = document.querySelector(targetSelector);
+    var statusSelector = input.getAttribute('data-cover-status') || '#coverCropStatus';
+    var status = document.querySelector(statusSelector);
+    var launch = input.closest('[data-media-url]') || document.querySelector('.cover-crop-launch[data-media-url]');
+    if (!cover || !launch) return;
 
-  input.addEventListener('change', function () {
+    function setStatus(message, isError) {
+      if (!status) return;
+      status.textContent = message;
+      status.classList.toggle('error', !!isError);
+    }
+
+    input.addEventListener('change', function () {
     var file = input.files && input.files[0];
     if (!file) return;
     if (!/^image\/(jpeg|png|webp|gif|svg\+xml)$/i.test(file.type) && !/\.(jpe?g|png|webp|gif|svg)$/i.test(file.name)) {
@@ -47,5 +52,6 @@
         setStatus(error && error.message ? error.message : '上传封面失败', true);
       })
       .finally(function () { input.value = ''; });
+    });
   });
 }());

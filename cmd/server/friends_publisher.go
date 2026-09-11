@@ -38,7 +38,7 @@ func (app *App) publicFriends() []PublicFriend {
 	friends := []PublicFriend{}
 	usedSlugs := map[string]int{}
 	for _, u := range users {
-		if u.Disabled || u.Role == roleAdmin {
+		if u.Disabled || isOwner(u) {
 			continue
 		}
 		accountType := normalizeAccountType(u.Role, u.AccountType)

@@ -7,7 +7,7 @@
 <main class="wrap wide">
   <nav class="nav compact-nav admin-glass-nav">
     <strong class="admin-brand"><span class="admin-brand-mark">S</span><span>文章编辑器</span></strong>
-    <a class="btn small ghost admin-back-icon" href="{{adminURL "/"}}" data-admin-back aria-label="返回" title="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
+    <a class="btn small ghost admin-back-icon" href="{{adminURL "/compose"}}" data-admin-back aria-label="返回投稿" title="返回投稿"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
     <a class="btn small ghost" href="{{adminURL "/admin/media"}}">媒体库</a>
     <a class="btn small ghost" href="{{publicURL}}tools/markdown-previewer/" target="_blank">MD 工具 ↗</a>
     <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -53,7 +53,7 @@
       <label class="btn small secondary cover-upload-button">上传封面
         <input id="coverUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden>
       </label>
-      <button id="coverCropOpen" type="button" class="btn small ghost">裁剪为 16:9</button>
+      <button id="coverCropOpen" type="button" class="btn small ghost" data-crop-source="#coverInput" data-crop-target="#coverInput" data-crop-ratio="16x9" data-crop-label="文章封面" data-crop-mode="#coverModeInput" data-crop-status="#coverCropStatus">裁剪为 16:9</button>
       <a class="btn small ghost" href="{{adminURL "/admin/media"}}" target="_blank" rel="noopener">打开媒体库</a>
       <span id="coverCropStatus" class="meta" role="status" aria-live="polite">上传后可直接使用；裁剪会保留原图并另存一张 16:9 WebP。</span>
     </div>
@@ -82,31 +82,20 @@
       <textarea name="body" id="md" maxlength="204800" required placeholder="# 标题&#10;&#10;从这里开始写 Markdown...">{{.Article.Body}}</textarea>
     </label>
     <div class="actions">
-      <button type="submit" name="intent" value="save" class="secondary"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">{{if and (eq .User.Role "admin") (eq .Article.Status "published")}}仅保存后台（不更新公开站）{{else}}保存到草稿箱{{end}}</span></button>
-      {{if eq .User.Role "admin"}}
+      <button type="submit" name="intent" value="save" class="secondary"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">{{if and (canModerateUser .User) (eq .Article.Status "published")}}仅保存后台（不更新公开站）{{else}}保存到草稿箱{{end}}</span></button>
+      {{if canModerateUser .User}}
         {{if or (not .Article.ID) (canSubmit .Article)}}<button type="submit" name="intent" value="submit" class="ghost"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text">放入审核队列（测试）</span></button>{{end}}
         <button type="submit" name="intent" value="publish"><span class="btn-ico" aria-hidden="true">↗</span><span class="btn-text">{{if eq .Article.Status "pending"}}审核通过并发布{{else if eq .Article.Status "published"}}保存并更新公开站{{else}}直接发布到公开站{{end}}</span></button>
       {{else}}
         {{if or (not .Article.ID) (canSubmit .Article)}}<button type="submit" name="intent" value="submit"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text">提交给管理员审核</span></button>{{end}}
       {{end}}
-      {{if .Article.ID}}{{if or (eq .User.Role "admin") (or (eq .Article.Status "draft") (eq .Article.Status "rejected"))}}<button type="submit" form="delete-form" class="danger"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text">删除</span></button>{{end}}{{end}}
+      {{if .Article.ID}}{{if or (canModerateUser .User) (or (eq .Article.Status "draft") (eq .Article.Status "rejected"))}}<button type="submit" form="delete-form" class="danger"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text">删除</span></button>{{end}}{{end}}
       <a class="btn ghost" href="{{adminURL "/"}}"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></span><span class="btn-text">返回</span></a>
     </div>
     <p class="meta form-hint">流程：草稿/后台保存不会更新公开站；提交审核会进入「审核后台」的待审核队列；只有管理员点击发布或更新公开站后，首页才会同步。</p>
   </form>
 
-  <dialog id="coverCropDialog" class="cover-crop-dialog" aria-labelledby="coverCropTitle">
-    <form method="dialog" class="cover-crop-dialog__bar">
-      <div><h2 id="coverCropTitle">裁剪 16:9 封面</h2><p>拖动画面调整取景；滚轮或滑杆缩放。原图不会被修改。</p></div>
-      <button class="btn small ghost" value="cancel" aria-label="关闭裁剪器">关闭</button>
-    </form>
-    <div class="cover-crop-stage"><canvas id="coverCropCanvas" width="1600" height="900" aria-label="16:9 封面裁剪预览"></canvas></div>
-    <div class="cover-crop-dialog__controls">
-      <label>缩放 <input id="coverCropZoom" type="range" min="1" max="3" step="0.01" value="1"></label>
-      <span id="coverCropSize">1600 × 900</span>
-      <button id="coverCropSave" type="button" class="btn">保存为 16:9 封面</button>
-    </div>
-  </dialog>
+  {{template "media-crop-dialog" .}}
 
   {{if .Article.ID}}
   <form id="delete-form" method="post" action="{{adminURL (printf "/articles/%s/delete" .Article.ID)}}" onsubmit="return confirm('确定删除这篇文章吗？已发布文章会同步从公开博客移除。')"></form>
@@ -142,7 +131,7 @@
 </script>
 <script src="/static/markdown-renderer.js?v=20.3.4"></script>
 <script src="/static/editor.js?v=20.3.4"></script>
-<script src="/static/cover-cropper.js?v=20.19.0"></script>
+<script src="/static/cover-cropper.js?v=20.20.0"></script>
 <script src="/static/cover-uploader.js?v=20.19.0"></script>
 <script src="/static/editor-import.js?v=20.19.0"></script>
 </body>

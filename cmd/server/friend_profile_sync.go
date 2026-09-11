@@ -15,7 +15,7 @@ func sameProfileFriendKey(a, b string) bool {
 
 func (app *App) syncUserProfileToFriendsJSON(oldUser, newUser User) error {
 	accountType := normalizeAccountType(newUser.Role, newUser.AccountType)
-	if accountType == accountSystem || newUser.Disabled || newUser.Role == roleAdmin {
+	if accountType == accountSystem || newUser.Disabled || isOwner(newUser) {
 		return nil
 	}
 

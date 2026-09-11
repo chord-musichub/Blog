@@ -65,6 +65,38 @@ func (app *App) saveMessages(records []MessageRecord) error {
 	return nil
 }
 
+// adminMessages is deliberately separate from the public API path so the
+// administration screen never has to fetch its own data through a browser
+// request.
+func (app *App) adminMessages() []MessageRecord {
+	app.messagesMu.Lock()
+	defer app.messagesMu.Unlock()
+	return app.loadMessages()
+}
+
+func (app *App) deleteMessage(id string) error {
+	id = strings.TrimSpace(id)
+	if id == "" {
+		return fmt.Errorf("留言不存在")
+	}
+	app.messagesMu.Lock()
+	defer app.messagesMu.Unlock()
+	records := app.loadMessages()
+	kept := make([]MessageRecord, 0, len(records))
+	found := false
+	for _, record := range records {
+		if record.ID == id {
+			found = true
+			continue
+		}
+		kept = append(kept, record)
+	}
+	if !found {
+		return fmt.Errorf("留言不存在")
+	}
+	return app.saveMessages(kept)
+}
+
 func (app *App) handleMessagesAPI(w http.ResponseWriter, r *http.Request) {
 	if !app.allowPublicCORS(w, r) {
 		http.Error(w, "forbidden origin", http.StatusForbidden)
