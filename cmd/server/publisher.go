@@ -288,10 +288,22 @@ func (app *App) prepareHugoBuildWorkspace() (string, error) {
 		return "", fmt.Errorf("create Hugo build workspace: %w", err)
 	}
 
-	for _, name := range []string{"hugo.toml", "assets", "content", "layouts", "static"} {
+	// Hugo 0.92 does not reliably discover a configuration file through a
+	// symbolic link, so this small file must be copied into the workspace.  The
+	// large source directories below remain links and are never duplicated.
+	configSource := filepath.Join(root, "hugo.toml")
+	config, err := os.ReadFile(configSource)
+	if err != nil {
+		return "", fmt.Errorf("read Hugo config: %w", err)
+	}
+	if err := os.WriteFile(filepath.Join(workspace, "hugo.toml"), config, 0644); err != nil {
+		return "", fmt.Errorf("write Hugo workspace config: %w", err)
+	}
+
+	for _, name := range []string{"assets", "content", "layouts", "static"} {
 		source := filepath.Join(root, name)
 		if _, err := os.Lstat(source); err != nil {
-			if errors.Is(err, os.ErrNotExist) && name != "hugo.toml" {
+			if errors.Is(err, os.ErrNotExist) {
 				continue
 			}
 			return "", fmt.Errorf("prepare Hugo input %s: %w", name, err)
