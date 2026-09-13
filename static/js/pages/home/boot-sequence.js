@@ -11,7 +11,7 @@
     logoDeparture:900,
     revealStart:1220,
     revealFinish:2040,
-    logoFallback:'/uploads/admin/main_logo.png'
+    logoFallback:'/uploads/admin/logo/main_logo.png'
   });
   var root = document.documentElement;
   var active = false;

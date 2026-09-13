@@ -10,10 +10,9 @@
 ├── current -> releases/...   # 正在对外服务的稳定版本
 ├── next -> releases/...      # 仅监听 127.0.0.1:8081 的候选版本
 └── shared/                   # 永不提交、不会被发布覆盖的私有运行数据
-    ├── blog-admin.env
-    ├── data/
+├── blog-admin.env
+    ├── data/                 # 账号、业务 JSON、媒体与 Markdown 源文件
     ├── content/{posts,friends,tags}/
-    └── static/{uploads,md-source}/
 ```
 
 不要把 `shared/` 放入 Git 仓库，也不要删除旧站 `/opt/gexian-blog-mvp`，直到新版本已稳定运行一段时间。
@@ -35,7 +34,6 @@ id blog >/dev/null 2>&1 || sudo useradd --system --home /opt/songline-blog --she
 sudo install -d -o blog -g blog -m 0755 /opt/songline-blog/releases /opt/songline-blog/shared
 sudo install -d -o blog -g blog -m 0700 /opt/songline-blog/shared/data
 sudo install -d -o blog -g blog -m 0755 /opt/songline-blog/shared/content/posts /opt/songline-blog/shared/content/friends /opt/songline-blog/shared/content/tags
-sudo install -d -o blog -g blog -m 0755 /opt/songline-blog/shared/static/uploads /opt/songline-blog/shared/static/md-source
 ```
 
 将当前线上数据复制到 `shared/`。这是复制，不会改变旧站：
@@ -45,12 +43,14 @@ sudo rsync -a /opt/gexian-blog-mvp/data/ /opt/songline-blog/shared/data/
 sudo rsync -a /opt/gexian-blog-mvp/content/posts/ /opt/songline-blog/shared/content/posts/
 sudo rsync -a /opt/gexian-blog-mvp/content/friends/ /opt/songline-blog/shared/content/friends/
 sudo rsync -a /opt/gexian-blog-mvp/content/tags/ /opt/songline-blog/shared/content/tags/
-sudo rsync -a /opt/gexian-blog-mvp/static/uploads/ /opt/songline-blog/shared/static/uploads/
-sudo rsync -a /opt/gexian-blog-mvp/static/md-source/ /opt/songline-blog/shared/static/md-source/
-sudo chown -R blog:blog /opt/songline-blog/shared/data /opt/songline-blog/shared/content /opt/songline-blog/shared/static
+sudo rsync -a /opt/gexian-blog-mvp/static/uploads/ /opt/songline-blog/shared/data/media/
+sudo rsync -a /opt/gexian-blog-mvp/static/md-source/ /opt/songline-blog/shared/data/md-source/
+sudo chown -R blog:blog /opt/songline-blog/shared/data /opt/songline-blog/shared/content
 ```
 
 若其中某个旧目录不存在，先跳过对应的一行即可。
+
+旧服务器如果已经按更早的发布脚本保留了 `shared/static/`，也不必删除它。首次运行新版本时可以临时保留 `RUNTIME_STATIC_DIR=/opt/songline-blog/shared/static`，服务会只复制 `data/` 中缺失的媒体与 Markdown；确认迁移完成后即可删除该环境变量与旧目录。
 
 ### 整理早期站点图标
 

@@ -2,15 +2,18 @@
 <body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
 {{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
 {{template "admin-client-nav" .}}
-<main class="wrap wide compose-hub">
+<main class="wrap wide workspace-shell compose-hub">
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
-  <section class="hero compact admin-hero"><div><h1>投稿</h1></div></section>
-  <section class="compose-hub__grid" aria-label="创作类型">
-    <a class="card compose-hub__item" href="{{adminURL "/articles/new"}}"><span>01</span><h2>文章</h2><b aria-hidden="true">→</b></a>
+  {{template "workspace-sidebar" .}}
+  <section class="workspace-detail compose-hub__detail">
+    <header class="workspace-detail-header"><h1>投稿</h1></header>
+    <section class="workspace-list" aria-label="创作类型">
+    <a href="{{adminURL "/articles/new"}}"><span>01</span><b>文章</b><i aria-hidden="true">↵</i></a>
     {{if isOwnerUser .User}}
-    <a class="card compose-hub__item" href="{{adminURL "/compose/projects"}}"><span>02</span><h2>项目</h2><b aria-hidden="true">→</b></a>
-    <a class="card compose-hub__item" href="{{adminURL "/compose/memories"}}"><span>03</span><h2>回忆</h2><b aria-hidden="true">→</b></a>
+    <a href="{{adminURL "/compose/projects"}}"><span>02</span><b>项目</b><i aria-hidden="true">↵</i></a>
+    <a href="{{adminURL "/compose/memories"}}"><span>03</span><b>回忆</b><i aria-hidden="true">↵</i></a>
     {{end}}
+    </section>
   </section>
 </main>
 </body></html>

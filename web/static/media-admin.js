@@ -1,9 +1,8 @@
 (function(){
   function copyText(text){
-    if(!text) return;
+    if(!text) return Promise.reject(new Error('没有可复制的路径'));
     if(navigator.clipboard && window.isSecureContext){
-      navigator.clipboard.writeText(text).catch(function(){});
-      return;
+      return navigator.clipboard.writeText(text);
     }
     const input=document.createElement('textarea');
     input.value=text;
@@ -12,18 +11,21 @@
     input.style.left='-9999px';
     document.body.appendChild(input);
     input.select();
-    try{document.execCommand('copy');}catch(e){}
+    let copied=false;
+    try{copied=document.execCommand('copy');}catch(e){}
     document.body.removeChild(input);
+    return copied ? Promise.resolve() : Promise.reject(new Error('复制失败'));
   }
   document.querySelectorAll('.copy-media-path').forEach(function(btn){
     btn.addEventListener('click', function(){
       const path=btn.getAttribute('data-path') || '';
-      copyText(path);
       const text=btn.querySelector('.btn-text');
       const old=text ? text.textContent : '';
-      if(text) text.textContent='已复制';
-      window.clearTimeout(btn.__timer);
-      btn.__timer=window.setTimeout(function(){ if(text) text.textContent=old || '复制路径'; }, 1300);
+      copyText(path).then(function(){ if(text)text.textContent='已复制'; },function(){ if(text)text.textContent='请手动复制'; })
+        .finally(function(){
+          window.clearTimeout(btn.__timer);
+          btn.__timer=window.setTimeout(function(){ if(text) text.textContent=old || '复制路径'; }, 1300);
+        });
     });
   });
 
@@ -38,6 +40,9 @@
         var match = !query || item.textContent.toLowerCase().indexOf(query) !== -1;
         item.hidden = !match;
         if(match) shown += 1;
+      });
+      document.querySelectorAll('[data-media-group]').forEach(function(group){
+        group.hidden = !group.querySelector('[data-media-item]:not([hidden])');
       });
       if(empty) empty.hidden = shown !== 0 || !query;
     });

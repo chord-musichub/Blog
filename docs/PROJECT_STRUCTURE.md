@@ -4,33 +4,35 @@
 
 ## `data/`：运行时私有 JSON
 
-这些文件由后台服务读写，Git 与 Docker 构建上下文都不会收录。当前线上仍使用 `data/*.json` 的扁平结构；在源码、展示配置和素材边界全部稳定前，不自动移动或复制运行时数据。
+这些文件由后台服务读写，Git 与 Docker 构建上下文都不会收录。JSON 继续使用 `data/*.json` 的稳定兼容路径，媒体和 Markdown 已不再和 `static/` 混放：
 
-下表是后续统一迁移的目标结构。迁移时会先完整备份 `shared/data`，停止旧实例，再一次性切换读写路径并验证；不会在候选版本与线上版本并行期间产生两套业务数据。
-
-| 目录 | 内容 |
+| 路径 | 内容 |
 | --- | --- |
-| `data/settings/` | `site.json`、`theme.json`，站点与主题设置。 |
-| `data/content/` | `articles.json`、`tag_urls.json`，文章元数据与标签链接。 |
-| `data/community/` | `friends.json`，站内朋友资料。 |
-| `data/auth/` | `users.json`、`password_resets.json`，账号与重置请求。 |
-| `data/metrics/` | `views.json`，阅读量。 |
-| `data/games/` | 各小游戏排行榜。 |
+| `data/users.json`、`password_resets.json` | 账号、密码哈希与重置请求。 |
+| `data/articles.json` | 用户文章、草稿与投稿状态。 |
+| `data/friends.json` | 当前实例的可修改朋友资料；首次从公开种子补入。 |
+| `data/messages.json`、`views.json`、`*_scores.json` | 留言、统计和小游戏排行榜。 |
+| `data/media/<用户>/` | 所有运行时上传媒体，由 `/uploads/` 提供。 |
+| `data/md-source/` | Markdown 下载源文件。 |
 
 `data/build.json` 保留在根目录：它只提供 Hugo 的构建版本号，不是后台业务数据。
 
-站内朋友的星链由管理员维护 `assets/data/friends/links.json`：键为本站朋友的用户名，值为本站朋友用户名或外部朋友 ID 的数组，例如 `"songline": ["mxbt", "shoper"]`。该文件随 Git 发布；关系线只需任一端配置。朋友个人资料保存不会影响该配置。
+站内朋友的星链由管理员维护 `assets/data/friends/links.json`：键为本站朋友的用户名或第三方朋友 ID，值为朋友用户名或第三方朋友 ID 的数组，例如 `"songline": ["mxbt", "shoper"]`。该文件随 Git 发布；关系线只需任一端配置。公开朋友基础资料维护在同目录的 `friends.json`；部署后的资料修改只写入 `data/friends.json`。
 
 ## `assets/data/`：随 Hugo 构建的公开配置
 
 这类 JSON 会被模板通过 `resources.Get` 读取，并参与前台静态构建：
 
-- `assets/data/friends/external.json`：外部朋友节点；
+- `assets/data/friends/friends.json`：朋友星图的公开种子，包含本站用户的基础资料与第三方节点；
 - `assets/data/projects.json`：内容归档页的项目清单；
 - `assets/data/tools/local.json`：本站工具卡片；
 - `assets/data/tools/external.json`：外部工具卡片。
 
 这里不要放私密资料、后台账号数据或运行时统计。
+
+## `assets/bootstrap/`：首次启动的公开快照
+
+空白克隆第一次启动时，服务会从这里初始化 `site.json` 与 `theme.json`。这些文件用于复刻公开呈现，不包含账号、密码、留言、草稿或统计；已存在的 `data/` 永远优先，不会被覆盖。朋友星图种子单独放在 `assets/data/friends/friends.json`。
 
 ## `layouts/partials/page-navigation-data.html`：全站空间导航配置
 
@@ -45,13 +47,14 @@
 
 ### 工具卡片图标
 
-两份工具清单均支持 `icon_url`。本站工具优先使用以 `/` 开头的站内素材 URL，例如 `"icon_url": "/uploads/admin/markdown-logo.png"`；外部工具使用完整的 `https://` 图标地址。`icon` 是文字兜底，只有未填写 `icon_url` 时才显示。本站图标迁入 `static/media/tools/` 后，只需把路径改为 `/media/tools/<文件名>`，不需要改模板。
+两份工具清单均支持 `icon_url`。本站工具优先使用以 `/` 开头的站内素材 URL，例如 `"icon_url": "/uploads/admin/markdown-logo.png"`；外部工具使用完整的 `https://` 图标地址。`icon` 是文字兜底，只有未填写 `icon_url` 时才显示。本站图标放入 `static/uploads/admin/tools/` 后，只需把路径写为 `/uploads/admin/tools/<文件名>`，不需要改模板。
 
 ## `static/`：浏览器直接请求的素材
 
-- `static/uploads/` 是后台上传的运行时媒体，按上传者或用途保留现有子目录；不要将新的前端源码素材继续放进这里。
-- 后续新增、受版本控制的站点视觉素材应放在 `static/media/<页面或场景>/`，例如 `static/media/tools/` 或 `static/media/home/`；模板与 CSS 通过 `/media/...` 引用。
-- 当前 `static/uploads/admin/` 的既有图片继续使用原 URL，以免破坏文章、后台设置或已经公开的链接。迁移旧素材应当逐项更新引用并保留兼容路径，而不是批量移动。
+- `/uploads/` 是唯一的公开媒体 URL 根目录，但实际读取的是 `data/media/`。后台新上传的文件只会写入这里，不会污染 Git 工作区。
+- `static/uploads/` 是随仓库发布的公开媒体种子；首次部署会补入 `data/media/`，但不会覆盖服务器已有文件。
+- 已发布页面引用的媒体可以随仓库提交。`static/uploads/` 始终按公开资源处理；不应公开的原图应放在仓库根目录 `local-only/`，该目录不会进入 Git 或 Docker 镜像。
+- 站点自有公开媒体采用 [CC BY-NC-SA 4.0](../MEDIA-LICENSE.md)；第三方商标、用户上传和朋友提供的素材不因仓库收录而改变其原有权利归属。
 
 ### 前端脚本分层
 
@@ -72,5 +75,6 @@
 
 1. 当前后台会修改、部署后应持久化的 JSON：仍放现有 `data/*.json`；统一迁移完成后才改为 `data/<职责>/`。
 2. 公开页面构建时读取的清单 JSON：放 `assets/data/<模块>/`。
-3. 代码库维护的图片、音频或插图：放 `static/media/<模块>/`。
-4. 用户上传或后台配置指定的文件：留在 `static/uploads/`。
+3. 代码库维护或后台配置指定的公开图片、音频和插图：放 `static/uploads/<归属或模块>/`。
+4. 用户上传的公开文件：运行时写入 `data/media/<用户>/`；需要作为新安装默认内容时，再人工挑选并加入 `static/uploads/<用户>/`。
+5. 只供本机保留、绝不能公开的原图或备份：放 `local-only/`，不得由页面 URL 引用。

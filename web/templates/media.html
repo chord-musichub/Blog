@@ -4,73 +4,83 @@
 
 {{template "admin-client-nav" .}}
 
-<main class="wrap">
-  <nav class="nav compact-nav">
-    <a class="btn small ghost admin-back-icon" href="{{adminURL "/"}}" data-admin-back aria-label="返回" title="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
-    {{if isOwnerUser .User}}<a class="btn small ghost" href="{{adminURL "/admin/site"}}">站点设置</a>{{end}}
-    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-  <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg></button>
-  </nav>
+<main class="wrap wide workspace-shell media-workspace">
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
   {{if .Error}}<div class="flash error">{{.Error}}</div>{{end}}
-  <section class="hero compact admin-hero">
-    <div>
-      <h1>媒体库</h1>
-      <p>上传一次，投稿时即可直接选作封面或插入正文。</p>
-    </div>
-  </section>
+  {{template "workspace-sidebar" .}}
+  <section class="workspace-detail">
+  <header class="workspace-detail-header"><h1>媒体库</h1></header>
 
-  <section class="card">
+  <section class="card workspace-section">
     <h2>添加素材</h2>
     <form method="post" action="{{adminURL "/admin/media"}}" enctype="multipart/form-data" class="media-upload-form">
       <input type="file" name="media" accept=".jpg,.jpeg,.png,.webp,.svg,.gif,.ico,.pdf,.zip,.mp3,.wav,.m4a,.ogg,.mp4,.webm,.mov,.txt,.md,.markdown,image/*,application/pdf,audio/*,video/mp4,video/webm,video/quicktime">
-      <label class="media-name-field">自定义文件名，可选
-        <input name="filename" placeholder="例如 logo.png / notes.pdf / demo.zip / music.mp3">
-        <small>留空会使用原文件名；只建议用英文、数字、横线和下划线。</small>
+      <label class="media-name-field">文件名（选填）
+        <input name="filename" placeholder="留空使用原文件名">
       </label>
-      <button><span class="btn-ico" aria-hidden="true">⇧</span><span class="btn-text">上传并重建公开站</span></button>
+      <label class="media-category-field">归类
+        <select name="category">
+          <option value="general">通用素材</option>
+          <option value="articles">文章</option>
+          {{if isOwnerUser .User}}<option value="projects">项目</option><option value="memories">回忆</option>{{end}}
+          <option value="profile">个人资料</option>
+          {{if eq .Owner "admin"}}<option value="friends">朋友</option><option value="site">站点</option><option value="backgrounds">背景</option><option value="tools">工具</option>{{end}}
+        </select>
+      </label>
+      <button><span class="btn-ico" aria-hidden="true">⇧</span><span class="btn-text">上传素材</span></button>
     </form>
-    <p class="meta">支持图片、视频、音频、PDF、ZIP、TXT 与 Markdown；素材按账号独立保存。</p>
   </section>
 
-  <section class="card">
+  <section class="card workspace-section">
     <div class="toolbar media-library-toolbar">
       <h2>我的素材 <span class="soft-count">{{len .Files}}</span></h2>
       <label class="media-search"><span class="sr-only">搜索素材</span><input id="mediaSearch" type="search" placeholder="搜索文件名"></label>
     </div>
-    <div class="media-grid" id="mediaGrid">
-    {{range .Files}}
+    {{range $groupIndex, $group := .Groups}}
+    <section class="media-group" data-media-group>
+      <h3>{{$group.Label}} <span class="soft-count">{{len $group.Files}}</span></h3>
+      <div class="media-grid">
+    {{range $index, $file := $group.Files}}
       <div class="media-item" data-media-item>
-        <a href="{{.Path}}" target="_blank" class="media-preview">
-          {{if or (eq .Ext "jpg") (or (eq .Ext "jpeg") (or (eq .Ext "png") (or (eq .Ext "webp") (or (eq .Ext "svg") (or (eq .Ext "gif") (eq .Ext "ico"))))))}}
-            <img src="{{.Path}}" alt="{{.Name}}" loading="lazy" decoding="async">
+        <a href="{{$file.Path}}" target="_blank" class="media-preview">
+          {{if or (eq $file.Ext "jpg") (or (eq $file.Ext "jpeg") (or (eq $file.Ext "png") (or (eq $file.Ext "webp") (or (eq $file.Ext "svg") (or (eq $file.Ext "gif") (eq $file.Ext "ico"))))))}}
+            <img src="{{$file.Path}}" alt="{{$file.Name}}" loading="lazy" decoding="async">
           {{else}}
-            <div class="media-file-preview"><span>{{.Ext}}</span><small>{{.Name}}</small></div>
+            <div class="media-file-preview"><span>{{$file.Ext}}</span><small>{{$file.Name}}</small></div>
           {{end}}
         </a>
-        <code>{{.Path}}</code>
+        <p class="media-filename" title="{{$file.Name}}">{{$file.Name}}</p>
         <div class="media-actions">
-          <button class="btn small secondary copy-media-path" type="button" data-path="{{.Path}}"><span class="btn-ico" aria-hidden="true">⧉</span><span class="btn-text">复制路径</span></button>
+          <button class="btn small secondary copy-media-path" type="button" data-path="{{$file.Path}}">{{template "admin-icon" "copy"}}<span class="btn-text">复制路径</span></button>
+          {{if or (eq $file.Ext "jpg") (or (eq $file.Ext "jpeg") (or (eq $file.Ext "png") (eq $file.Ext "webp")))}}
+          <input id="mediaCropSource{{$groupIndex}}-{{$index}}" type="hidden" value="{{$file.Path}}">
+          <button class="btn small secondary media-crop-button" type="button" data-crop-source="#mediaCropSource{{$groupIndex}}-{{$index}}" data-crop-target="#mediaCropSource{{$groupIndex}}-{{$index}}" data-crop-ratio="16x9" data-crop-label="图片" data-crop-status="#mediaCropStatus{{$groupIndex}}-{{$index}}" data-crop-refresh="true"><span class="btn-ico" aria-hidden="true">✂</span><span class="btn-text">裁剪 16:9</span></button>
+          <span id="mediaCropStatus{{$groupIndex}}-{{$index}}" class="meta media-crop-status" role="status" aria-live="polite"></span>
+          {{end}}
+          <details class="media-more"><summary>管理</summary><code>{{$file.Path}}</code>
           <form method="post" action="{{adminURL "/admin/media"}}" class="media-rename-form">
             <input type="hidden" name="action" value="rename">
-            <input type="hidden" name="old_path" value="{{.Path}}">
-            <input name="new_name" value="{{.Name}}" aria-label="新文件名">
+            <input type="hidden" name="old_path" value="{{$file.Path}}">
+            <input name="new_name" value="{{$file.Name}}" aria-label="新文件名">
             <button class="btn small" type="submit"><span class="btn-ico" aria-hidden="true">✎</span><span class="btn-text">重命名</span></button>
           </form>
           <form method="post" action="{{adminURL "/admin/media"}}" class="media-delete-form" onsubmit="return confirm('确定删除这个媒体文件吗？如果文章或站点设置仍在使用它，图片会失效。');">
             <input type="hidden" name="action" value="delete">
-            <input type="hidden" name="old_path" value="{{.Path}}">
-            <button class="btn small danger" type="submit"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text">删除</span></button>
+            <input type="hidden" name="old_path" value="{{$file.Path}}">
+            <button class="icon-button danger" type="submit" title="删除文件" aria-label="删除文件">{{template "admin-icon" "trash"}}</button>
           </form>
+          </details>
         </div>
       </div>
-    {{else}}
-      <p class="meta">还没有上传文件。</p>
     {{end}}
-    </div>
+      </div>
+    </section>
+    {{else}}<p class="meta">还没有上传文件。</p>{{end}}
     <p id="mediaSearchEmpty" class="meta media-search-empty" hidden>没有找到匹配的素材。</p>
   </section>
+  </section>
 </main>
+{{template "media-crop-dialog" .}}
+<script src="/static/cover-cropper.js?v=20.25.0"></script>
 </body>
 </html>

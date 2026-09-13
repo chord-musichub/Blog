@@ -103,7 +103,7 @@
   }
   function loadImage(){
     configureCanvas();
-    if(title) title.textContent = '裁剪' + (button.getAttribute('data-crop-label') || '图片') + '（' + variant.replace('x', ':') + '）';
+    if(title) title.textContent = '裁剪' + (activeButton.getAttribute('data-crop-label') || '图片') + '（' + variant.replace('x', ':') + '）';
     saveButton.textContent = '保存 ' + variant.replace('x', ':') + ' 图片';
     setStatus('正在读取原图…');
     image = new Image(); image.decoding = 'async';
@@ -150,6 +150,9 @@
           document.querySelectorAll('.cover-option').forEach(function(option){ option.classList.toggle('active', option.getAttribute('data-cover') === result.path); });
           if(typeof dialog.close === 'function') dialog.close(); else dialog.removeAttribute('open');
           setStatus('已生成裁剪图片，保存当前内容后即可生效。');
+          if(activeButton.hasAttribute('data-crop-refresh')){
+            window.setTimeout(function(){ window.location.reload(); }, 700);
+          }
         })
         .catch(function(error){ setStatus(error && error.message ? error.message : '保存裁剪图片失败', true); })
         .finally(function(){ saveButton.disabled = false; });

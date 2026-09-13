@@ -10,6 +10,7 @@
   {{ $isToolsSurface := hasPrefix .RelPermalink "/tools/" }}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script src="/static/document-transition.js?v=21.1.1"></script>
   <title>{{ if .IsHome }}{{ $siteTitle }}{{ else }}{{ .Title }} - {{ $siteTitle }}{{ end }}</title>
   <meta name="description" content="{{ with .Params.summary }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
   <script>
@@ -44,7 +45,7 @@
     (function(){
       try{
         var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var played = sessionStorage.getItem('songline-home-boot-v21.4') === '1';
+        var played = window.__songlineDocumentArrival || sessionStorage.getItem('songline-home-boot-v21.4') === '1';
         if(!reduced && !played){
           document.documentElement.classList.add('is-boot-preparing');
           document.documentElement.style.backgroundColor = '#000';

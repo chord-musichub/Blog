@@ -4,16 +4,12 @@
 
 {{template "admin-client-nav" .}}
 
-<main class="wrap">
-  <nav class="nav compact-nav">
-    <a class="btn small ghost admin-back-icon" href="{{adminURL "/settings"}}" data-admin-back aria-label="返回设置" title="返回设置"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
-    <a class="btn small ghost" href="{{adminURL "/admin/site"}}">站点设置</a>
-    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-  <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg></button>
-  </nav>
+<main class="wrap wide settings-page">
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
-  <section class="hero compact"><h1>外观设置</h1><p>不用碰代码也能调公开站样式。可以先选预设，也可以勾选自定义后微调颜色、圆角、宽度和 Hero 高度。</p></section>
+  <section class="settings-workspace">
+    {{template "settings-sidebar" .}}
+    <section class="settings-detail">
+      <header class="settings-detail-header"><h1>外观主题</h1></header>
 
   <form method="post" action="{{adminURL "/admin/theme"}}">
     <section class="card">
@@ -47,8 +43,10 @@
       <label class="check"><input type="checkbox" name="watercolor" {{if .Theme.Watercolor}}checked{{end}}> 显示水彩背景图</label>
     </section>
 
-    <div class="actions"><button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">保存外观并重建公开站</span></button><a class="btn secondary" href="{{adminURL "/admin"}}"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text">取消</span></a></div>
+    <div class="actions"><button title="保存外观并重建公开站"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text optional">保存</span></button></div>
   </form>
+    </section>
+  </section>
 </main>
 </body>
 </html>

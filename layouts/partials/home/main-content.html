@@ -1,7 +1,7 @@
 {{- $cfg := .Site.Data.site -}}
 {{- $posts := where .Site.RegularPages "Section" "posts" -}}
 <div class="songline-home-main">
-  {{ $homeHeroImage := default "/uploads/admin/show.png" $cfg.home.hero_image }}
+  {{ $homeHeroImage := default "/uploads/admin/background/qiandai_background.png" $cfg.home.hero_image }}
   <section class="songline-home-scene" aria-label="首页场景" data-home-parallax-root>
     <div class="songline-home-scene-frame">
       <section class="hero-banner hero-banner-image-only hero-banner-actual-image" style="background-image:url('{{ $homeHeroImage }}')" aria-label="首页视觉封面">

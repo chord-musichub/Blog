@@ -15,11 +15,13 @@ type mediaLibraryContext struct {
 
 func (app *App) renderMediaLibrary(w http.ResponseWriter, r *http.Request, media mediaLibraryContext, extra map[string]any) {
 	data := map[string]any{
-		"User":  media.user,
-		"Owner": media.owner,
-		"Files": listMediaFiles(media.dir, userMediaPublicPrefix(media.owner)),
-		"Flash": r.URL.Query().Get("msg"),
+		"User":      media.user,
+		"Owner":     media.owner,
+		"Files":     listMediaFiles(media.dir, userMediaPublicPrefix(media.owner)),
+		"Flash":     r.URL.Query().Get("msg"),
+		"Workspace": "media",
 	}
+	data["Groups"] = mediaGroups(data["Files"].([]MediaFile))
 	for k, v := range extra {
 		data[k] = v
 	}
@@ -36,6 +38,10 @@ func (app *App) handleMediaLibrary(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := os.MkdirAll(media.dir, 0755); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := app.ensureCanonicalMediaLayout(); err != nil {
+		http.Error(w, "初始化统一媒体库失败: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 

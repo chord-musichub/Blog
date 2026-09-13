@@ -2,91 +2,91 @@
   {
     "date": "2023-11",
     "title": "复活",
-    "image": "/media/memories/1.jpg",
+    "image": "/uploads/admin/memories/1.jpg",
     "description": "一张照片，留下的是一整个高中的回忆"
   },
   {
     "date": "2023-11",
     "title": "彩虹之旅",
-    "image": "/media/memories/2.jpg",
+    "image": "/uploads/admin/memories/2.jpg",
     "description": "第一次写谱子"
   },
   {
     "date": "2026-7",
     "title": "打铁花",
-    "image": "/media/memories/3.jpg",
+    "image": "/uploads/admin/memories/3.jpg",
     "description": "恩施的铁花，很像一棵树对吧？"
   },
   {
     "date": "2025-6",
     "title": "在那之后",
-    "image": "/media/memories/4.jpg",
+    "image": "/uploads/admin/memories/4.jpg",
     "description": "高考的最后一天，那天的晚霞很美"
   },
   {
     "date": "2026-6",
     "title": "沁湖",
-    "image": "/media/memories/5.jpg",
+    "image": "/uploads/admin/memories/5.jpg",
     "description": "学校总是有美景的，不妨找找"
   },
   {
     "date": "2025-8",
     "title": "CS50",
-    "image": "/media/memories/6.png",
+    "image": "/uploads/admin/memories/6.png",
     "description": "谁能想到呢，我的第一节课竟然是CS50"
   },
   {
     "date": "2025-7",
     "title": "通知书",
-    "image": "/media/memories/7.jpg",
+    "image": "/uploads/admin/memories/7.jpg",
     "description": "通知书到的时候无疑是最兴奋的"
   },
   {
     "date": "2025-9",
     "title": "军训",
-    "image": "/media/memories/8.jpg",
+    "image": "/uploads/admin/memories/8.jpg",
     "description": "都说大学军训时间长，不好玩，不过我觉得还挺有意思的"
   },
   {
     "date": "2024-9",
     "title": "中秋节",
-    "image": "/media/memories/9.jpg",
+    "image": "/uploads/admin/memories/9.jpg",
     "description": "中秋节海报，其实我也没想到那时候我这么有创造力"
   },
   {
     "date": "2025-11",
     "title": "初来乍到",
-    "image": "/media/memories/10.jpg",
+    "image": "/uploads/admin/memories/10.jpg",
     "description": "大学摄影兴趣班作品，其实是个小溪()"
   },
   {
     "date": "2026-5",
     "title": "和弦",
-    "image": "/media/memories/11.png",
+    "image": "/uploads/admin/memories/11.png",
     "description": "那是人造的旋律，与我相遇的故事"
   },
   {
     "date": "2026-3",
     "title": "羊宴",
-    "image": "/media/memories/12.jpg",
+    "image": "/uploads/admin/memories/12.jpg",
     "description": "烤全羊，一生总得有那么几次吧"
   },
   {
     "date": "2026-7",
     "title": "恩施",
-    "image": "/media/memories/13.jpg",
+    "image": "/uploads/admin/memories/13.jpg",
     "description": "说起来我想坐这个还没坐上呢"
   },
   {
     "date": "2025-12",
     "title": "新生程序省赛",
-    "image": "/media/memories/14.jpg",
+    "image": "/uploads/admin/memories/14.jpg",
     "description": "第一次去见大世面"
   },
   {
     "date": "2026-9",
     "title": "BTIR",
-    "image": "/media/memories/15.png",
+    "image": "/uploads/admin/memories/15.png",
     "description": "怀念，一个暑假都在搞这玩意"
   }
 ]

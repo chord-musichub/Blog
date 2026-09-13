@@ -46,7 +46,7 @@ MAX_UPLOAD_BYTES=104857600
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($envPath, $envContent, $utf8NoBom)
 
-foreach ($relativePath in @("data", "content/posts", "content/friends", "content/tags", "static/uploads", "published")) {
+foreach ($relativePath in @("data", "content/posts", "content/friends", "content/tags", "static/uploads", "published", "local-only")) {
     $null = New-Item -ItemType Directory -Path (Join-Path $projectRoot $relativePath) -Force
 }
 

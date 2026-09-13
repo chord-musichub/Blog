@@ -18,7 +18,7 @@
 </svg>`;
 
   function getTheme(){
-    return localStorage.getItem(KEY) || "dark";
+    try { return localStorage.getItem("songline-theme") || localStorage.getItem(KEY) || "dark"; } catch(e) { return "dark"; }
   }
 
   function ensureButton(){
@@ -34,18 +34,15 @@
   }
 
   function setTheme(theme){
-    localStorage.setItem(KEY, theme);
+    try { localStorage.setItem(KEY, theme); localStorage.setItem("songline-theme", theme); } catch(e) {}
     document.documentElement.setAttribute("data-admin-theme", theme);
     document.documentElement.classList.toggle("admin-dark-root", theme === "dark");
-    document.documentElement.style.backgroundColor = theme === "dark" ? "#0d1728" : "#dbe6ef";
     if(document.body){
       document.body.classList.toggle("admin-dark", theme === "dark");
-      document.body.style.backgroundColor = theme === "dark" ? "#0d1728" : "#dbe6ef";
-      document.body.style.backgroundImage = theme === "dark" ? "none" : "";
     }
     document.querySelectorAll("[data-admin-theme-toggle]").forEach(btn => {
       const isFloating = btn.classList.contains("floating-admin-theme-button");
-      btn.className = "admin-theme-icon-button" + (isFloating ? " floating-admin-theme-button" : "");
+      btn.classList.add("admin-theme-icon-button");
       // 显示当前状态：浅色显示太阳，深色显示月亮
       btn.setAttribute("aria-label", theme === "dark" ? "当前深色模式，点击切换浅色" : "当前浅色模式，点击切换深色");
       btn.setAttribute("title", theme === "dark" ? "当前深色模式" : "当前浅色模式");

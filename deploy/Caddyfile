@@ -18,6 +18,13 @@
         reverse_proxy 127.0.0.1:8080
     }
 
+    # 上传素材属于 shared/data/media 的运行时数据；直接由后台服务读取，
+    # 不依赖本次 Hugo 构建是否已经完成。
+    @uploadedMedia path /uploads/*
+    handle @uploadedMedia {
+        reverse_proxy 127.0.0.1:8080
+    }
+
     @publicAPI path /api/*
     handle @publicAPI {
         reverse_proxy 127.0.0.1:8080

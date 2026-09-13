@@ -1,0 +1,16 @@
+{
+  "preset": "winter",
+  "accent": "#38bdf8",
+  "accent_2": "#0284c7",
+  "background": "#f3f9ff",
+  "panel": "#ffffff",
+  "text": "#12324d",
+  "muted": "#5c7288",
+  "radius": "24px",
+  "shadow": "strong",
+  "max_width": "1280px",
+  "hero_height": "320px",
+  "content_width": "880px",
+  "body_font_size": "17px",
+  "watercolor": true
+}

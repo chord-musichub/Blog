@@ -4,27 +4,14 @@
 
 {{template "admin-client-nav" .}}
 
-<main class="wrap">
-  <nav class="nav compact-nav">
-    <a class="btn small ghost admin-back-icon" href="{{adminURL "/settings"}}" data-admin-back aria-label="返回设置" title="返回设置"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
-    <a class="btn small ghost" href="{{adminURL "/admin/site"}}">站点设置</a>
-    <a class="btn small ghost" href="{{adminURL "/admin/media"}}">媒体库</a>
-    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-  <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg></button>
-  </nav>
-
+<main class="wrap wide settings-page">
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
   {{if .Error}}<div class="flash error">{{.Error}}</div>{{end}}
-
-  <section class="hero compact admin-hero">
-    <div>
-<h1>稿件设置</h1>
-      <p>这里单独管理投稿、摘要与稿件默认规则。当前只有管理员能访问。</p>
-    </div>
-  </section>
-
-  <form method="post" action="{{adminURL "/admin/manuscript"}}" class="card form">
+  <section class="settings-workspace">
+    {{template "settings-sidebar" .}}
+    <section class="settings-detail">
+      <header class="settings-detail-header"><h1>文章默认</h1></header>
+      <form method="post" action="{{adminURL "/admin/manuscript"}}" class="card form">
     <h2>默认简介</h2>
     <label>默认简介内容
       <textarea name="default_summary" rows="4" placeholder="这篇文章暂时还没有填写简介，先点进去看看正文吧。">{{.Settings.Manuscript.DefaultSummary}}</textarea>
@@ -33,11 +20,10 @@
       <b>生效方式</b>
       <p class="meta">保存后会自动重建公开站。以后你修改默认简介，那些没有自定义摘要的已发布文章也会跟着更新。</p>
     </div>
-    <div class="actions">
-      <button type="submit"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">保存稿件设置并重建公开站</span></button>
-      <a class="btn secondary" href="{{adminURL "/admin"}}">返回后台</a>
-    </div>
-  </form>
+    <div class="actions"><button type="submit" title="保存稿件设置并重建公开站"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text optional">保存</span></button></div>
+      </form>
+    </section>
+  </section>
 </main>
 </body>
 </html>

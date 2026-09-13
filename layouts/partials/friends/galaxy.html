@@ -1,21 +1,19 @@
-{{ $localFriends := .Site.Data.friends | default slice }}
-{{ $externalFriends := slice }}
-{{ with resources.Get "data/friends/external.json" }}{{ $externalFriends = . | transform.Unmarshal }}{{ end }}
+{{ $friends := .Site.Data.friends | default slice }}
+{{ if eq (len $friends) 0 }}{{ with resources.Get "data/friends/friends.json" }}{{ $friends = . | transform.Unmarshal }}{{ end }}{{ end }}
 {{ $linkConfig := dict }}
 {{ with resources.Get "data/friends/links.json" }}{{ $linkConfig = . | transform.Unmarshal }}{{ end }}
-{{ $friends := $localFriends | append $externalFriends }}
 {{ $first := dict }}
 {{ if gt (len $friends) 0 }}{{ $first = index $friends 0 }}{{ end }}
 {{ $firstName := "朋友星图" }}
-{{ $firstAvatar := "/media/users/user-null.png" }}
+{{ $firstAvatar := "/uploads/admin/friends/user-null.png" }}
 {{ with $first }}
   {{ $firstName = default (default .username .name) (default .display_name .name) }}
-  {{ $firstAvatar = default "/media/users/user-null.png" .avatar }}
+  {{ $firstAvatar = default "/uploads/admin/friends/user-null.png" .avatar }}
 {{ end }}
 
 {{/*
-  星图在构建时合并本地成员 data/friends.json 与外部朋友
-  assets/data/friends/external.json。外部朋友仅作为外链节点，不参与本地资料页生成。
+  assets/data/friends/friends.json 是可提交的平台种子；首次启动会补入
+  data/friends.json。外部朋友仅作为星图节点，不参与本地资料页生成。
 */}}
 <section class="friends-constellation" data-friend-galaxy>
   <a class="friends-constellation__memory-door" href="/friends/memories/" aria-label="进入回忆室"><span>回忆</span><i aria-hidden="true">&gt;</i></a>
@@ -36,13 +34,13 @@
         {{ if $friendURL }}
         <a class="friends-constellation__node friends-constellation__node--server" href="{{ $friendURL }}" aria-label="查看 {{ default .username .display_name }} 的资料页">
           <span class="friends-constellation__node-halo" aria-hidden="true"></span>
-          <img src="{{ default "/media/users/user-null.png" .avatar }}" alt="{{ default .username .display_name }}" loading="lazy" decoding="async">
+          <img src="{{ default "/uploads/admin/friends/user-null.png" .avatar }}" alt="{{ default .username .display_name }}" loading="lazy" decoding="async">
           <span class="friends-constellation__node-name">{{ default .username .display_name }}</span>
         </a>
         {{ else }}
         <div class="friends-constellation__node friends-constellation__node--server" aria-label="{{ default .username .display_name }} 的星图标注">
           <span class="friends-constellation__node-halo" aria-hidden="true"></span>
-          <img src="{{ default "/media/users/user-null.png" .avatar }}" alt="{{ default .username .display_name }}" loading="lazy" decoding="async">
+          <img src="{{ default "/uploads/admin/friends/user-null.png" .avatar }}" alt="{{ default .username .display_name }}" loading="lazy" decoding="async">
           <span class="friends-constellation__node-name">{{ default .username .display_name }}</span>
         </div>
         {{ end }}
@@ -69,8 +67,8 @@
   {{- $friends | jsonify | safeJS -}}
   </script>
   {{/*
-    星链独立于运行时朋友资料：assets/data/friends/links.json 会随 Git 发布，
-    不会被服务器 shared/data/friends.json 覆盖。
+    星链独立于实例朋友资料：assets/data/friends/links.json 会随 Git 发布，
+    不会被服务器 data/friends.json 覆盖。
   */}}
   <script id="friend-galaxy-link-data" type="application/json">
   {{- $linkConfig | jsonify | safeJS -}}

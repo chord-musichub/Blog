@@ -1,0 +1,142 @@
+{
+  "site": {
+    "title": "Welcome home",
+    "display_name": "songline-blog",
+    "footer_text": "由热爱驱动",
+    "icp": "鄂ICP备2026022721号",
+    "logo": "Blog",
+    "logo_icon": "/uploads/admin/logo/main_logo.png",
+    "favicon": "/uploads/admin/logo/main_logo.png",
+    "enable_dark_toggle": true
+  },
+  "home": {
+    "hero_title": "欢迎来到 Blog",
+    "hero_subtitle": "欢迎你回来",
+    "hero_image": "/uploads/admin/background/qiandai_background.png",
+    "intro_title": "该网站",
+    "intro_body": "该网站是一个个人博客，专注于分享技术、创作、与生活中的所思所感",
+    "founded_at": "2026/5/8",
+    "recommended_count": 5
+  },
+  "pages": {
+    "posts_hero_title": "文章",
+    "posts_hero_subtitle": "记录思考，分享见解",
+    "posts_hero_image": "/uploads/admin/background/ground-background.png",
+    "tags_hero_title": "标签",
+    "tags_hero_subtitle": "按主题浏览，发现感兴趣的内容",
+    "tags_hero_image": "/uploads/admin/background/ground-background.png",
+    "friends_hero_title": "朋友",
+    "friends_hero_subtitle": "他们用文字记录生活，也温暖着彼此",
+    "friends_hero_image": "/uploads/admin/background/qiandai_background.png",
+    "article_default_cover": "/uploads/admin/article/article_default.png",
+    "tag_default_cover": "/uploads/admin/article/article_default.png",
+    "friend_default_cover": "/uploads/admin/article/article_default.png",
+    "tools_hero_title": "工具",
+    "tools_hero_subtitle": "一些轻量小工具。"
+  },
+  "boot": {
+    "welcome_text": "欢迎回来"
+  },
+  "orbit": {
+    "title": "穿越",
+    "posts": {
+      "label": "文章",
+      "kicker": "Archive",
+      "title": "文章",
+      "description": "浏览所有文章",
+      "href": "/posts/",
+      "link_text": "进入文章"
+    },
+    "tags": {
+      "label": "标签",
+      "kicker": "Tags",
+      "title": "标签",
+      "description": "按标签寻找内容",
+      "href": "/tags/",
+      "link_text": "查看标签"
+    },
+    "friends": {
+      "label": "朋友",
+      "kicker": "Friends",
+      "title": "朋友",
+      "description": "查看朋友们的主页与文字",
+      "href": "/friends/",
+      "link_text": "查看朋友"
+    },
+    "tools": {
+      "label": "工具",
+      "kicker": "Tools",
+      "title": "工具",
+      "description": "打开站内小工具和实验页面",
+      "href": "/tools/",
+      "link_text": "进入工具"
+    },
+    "notice": {
+      "label": "公告",
+      "kicker": "Notice",
+      "title": "公告",
+      "description": "查看站点更新、投稿说明和一些通知",
+      "href": "#site-notice",
+      "link_text": "查看公告"
+    },
+    "about": {
+      "label": "关于本站",
+      "kicker": "About",
+      "title": "关于本站",
+      "description": "查看站点说明",
+      "href": "#site-intro",
+      "link_text": "查看关于"
+    }
+  },
+  "manuscript": {
+    "default_summary": "这个作者很懒，什么都没有写。"
+  },
+  "background": {
+    "image": "/uploads/admin/background/background01.png",
+    "height": "1220px",
+    "blur": "18px",
+    "opacity": "0.38"
+  },
+  "about_card": {
+    "title": "Hello",
+    "avatar_text": "S",
+    "avatar_image": "/uploads/admin/friends/snowMan.png",
+    "name": "Songilne",
+    "body": "希望各位都能在这个网站有所收获"
+  },
+  "social": {
+    "github": "https://github.com/Songline-music?tab=repositories",
+    "email": "mailto:songline_music@163.com",
+    "bilibili": "https://space.bilibili.com/383697044?spm_id_from=333.1007.0.0",
+    "show_github": true,
+    "show_email": true,
+    "show_bilibili": true,
+    "bilibili_icon": "/uploads/admin/logo/bilibili.png"
+  },
+  "content_areas": [
+    {
+      "title": "程序",
+      "description": "Hello World!",
+      "icon": "code",
+      "link": "/tags/程序/"
+    },
+    {
+      "title": "创作",
+      "description": "讲讲自己的创作心得",
+      "icon": "pen",
+      "link": "/tags/创作/"
+    },
+    {
+      "title": "频道",
+      "description": "我在b站的一些记录",
+      "icon": "folder",
+      "link": "/tags/频道/"
+    },
+    {
+      "title": "随笔",
+      "description": "生活的所见所闻，发来吐吐槽",
+      "icon": "cup",
+      "link": "/tags/随笔/"
+    }
+  ]
+}

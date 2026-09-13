@@ -2,105 +2,72 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>{{.Title}}</title>
+  <title>{{.Title}} · 创作中心</title>
   {{template "admin-favicon" .Data}}
-  <script>
-  (function(){
-    try{
-      var theme = localStorage.getItem('gexian-admin-theme') || 'dark';
-      document.documentElement.setAttribute('data-admin-theme', theme);
-      document.documentElement.style.backgroundColor = theme === 'dark' ? '#0d1728' : '#dbe6ef';
-    }catch(e){
-      document.documentElement.setAttribute('data-admin-theme', 'dark');
-      document.documentElement.style.backgroundColor = '#0d1728';
-    }
-  })();
-  </script>
-<link rel="stylesheet" href="/static/style.css?v=20.22.0">
-  <script defer src="/static/admin-theme.js?v=20.22.0"></script>
-  {{if .Navigation}}<script defer src="/static/admin-nav.js?v=20.22.0"></script>
-  <script defer src="/static/admin-mobile.js?v=20.18.5"></script>{{end}}
-  <script defer src="/static/page-transition.js?v=20.18.5"></script>
+  <script>(function(){try{document.documentElement.dataset.adminTheme=localStorage.getItem('songline-theme')||localStorage.getItem('gexian-admin-theme')||'dark'}catch(e){document.documentElement.dataset.adminTheme='dark'}})();</script>
+  <link rel="stylesheet" href="/static/creator-center.css?v=21.1.0">
+  <script defer src="/static/admin-theme.js?v=21.1.0"></script>
+  {{if .Navigation}}<script defer src="/static/admin-nav.js?v=21.1.0"></script>{{end}}
+  <script defer src="/static/creator-center.js?v=21.1.0"></script>
+  <script src="/static/document-transition.js?v=21.1.1" data-backend data-backend-base="{{adminURL "/"}}"></script>
   {{with .ExtraScript}}<script defer src="{{.}}"></script>{{end}}
-  <style>
-  :root{
-    --admin-bg:{{default "#fbfaf7" .Data.Theme.Background}};
-    --admin-panel:color-mix(in srgb, {{default "#fffdfa" .Data.Theme.Panel}} 86%, transparent);
-    --admin-panel-strong:{{default "#fffdfa" .Data.Theme.Panel}};
-    --admin-text:{{default "#15345b" .Data.Theme.Text}};
-    --admin-muted:{{default "#64748b" .Data.Theme.Muted}};
-    --admin-accent:{{default "#0ea5e9" .Data.Theme.Accent}};
-    --admin-accent-2:{{default "#2563eb" .Data.Theme.Accent2}};
-    --admin-soft:color-mix(in srgb, {{default "#0ea5e9" .Data.Theme.Accent}} 11%, {{default "#fbfaf7" .Data.Theme.Background}});
-    --admin-warm:color-mix(in srgb, #ffe7bd 36%, {{default "#fbfaf7" .Data.Theme.Background}});
-  }
-  </style>
-  <style id="admin-dark-top-hardfix">
-  html[data-admin-theme="dark"],
-  html[data-admin-theme="dark"] body,
-  html[data-admin-theme="dark"] body::before,
-  html[data-admin-theme="dark"] body::after{
-    background:#0d1728!important;
-    background-image:none!important;
-  }
-  html[data-admin-theme="dark"] body{
-    margin-top:0!important;
-    border-top:0!important;
-    box-shadow:none!important;
-  }
-  html[data-admin-theme="dark"] .admin-site-bg-layer{
-    display:block!important;
-    visibility:visible!important;
-    opacity:var(--admin-site-bg-opacity, .38)!important;
-    background-image:var(--admin-site-bg-image)!important;
-    background-size:cover!important;
-    background-position:center top!important;
-  }
-  html[data-admin-theme="dark"] .admin-client-nav{
-    background:#101c30!important;
-    background-image:none!important;
-    border-color:rgba(125,211,252,.18)!important;
-  }
-  html[data-admin-theme="dark"] .admin-main-nav,
-  html[data-admin-theme="dark"] .admin-glass-nav,
-  html[data-admin-theme="dark"] main.wrap > nav.nav:first-child,
-  html[data-admin-theme="dark"] .wrap > nav.nav:first-child{
-    display:none!important;
-    height:0!important;
-    min-height:0!important;
-    margin:0!important;
-    padding:0!important;
-    border:0!important;
-    overflow:hidden!important;
-    background:transparent!important;
-    box-shadow:none!important;
-  }
-  </style>
-  <script defer src="/static/space-ribbons.js?v=20.18.5"></script>
 </head>
 {{end}}
 
 {{define "admin-client-nav"}}
-<nav class="admin-client-nav" data-admin-client-nav>
-  <a class="admin-client-brand admin-client-brand-simple" href="{{adminURL "/"}}">创作中心</a>
-  <div class="admin-client-links">
-    {{if isAdminUser .User}}
-    <a href="{{adminURL "/"}}" data-admin-route="dashboard">首页</a>
-    <a href="{{adminURL "/admin#reviews"}}" data-admin-route="admin" data-admin-section="reviews">审核</a>
-    <a href="{{adminURL "/admin#messages"}}" data-admin-route="admin" data-admin-section="messages">留言</a>
-    <a href="{{adminURL "/admin#users"}}" data-admin-route="admin" data-admin-section="users">用户</a>
-    {{else}}
-    <a href="{{adminURL "/"}}" data-admin-route="dashboard">首页</a>
-    <a href="{{adminURL "/compose"}}" data-admin-route="compose">投稿</a>
-    <a href="{{adminURL "/admin/media"}}" data-admin-route="media">媒体库</a>
-    <a href="{{adminURL "/settings"}}" data-admin-route="settings">设置</a>
-    {{end}}
-  </div>
+<header class="admin-client-nav" data-admin-client-nav data-base="{{adminURL "/"}}">
+  <button class="rail-toggle icon-button" type="button" aria-label="展开导航" aria-expanded="false" aria-controls="creatorRail">{{template "admin-icon" "menu"}}</button>
+  <a class="admin-client-brand" href="{{adminURL "/"}}"><img class="creator-brand-mark" src="{{default "/uploads/admin/logo/main_logo.png" .Settings.Site.LogoIcon}}" alt="" data-image-fallback="/uploads/admin/logo/main_logo.png">{{if isAdminUser .User}}管理中心{{else}}创作中心{{end}}</a>
   <div class="admin-client-actions">
-    <span class="admin-client-identity" title="当前登录账号">{{.User.Username}} · {{roleText .User.Role}}</span>
-    {{if .IsDashboard}}<a class="admin-client-home" href="{{publicURL}}" target="_blank" rel="noopener">回主页 ↗</a>{{end}}
-    <button class="admin-theme-icon-button admin-client-theme" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <a class="admin-client-logout" href="{{adminURL "/logout"}}">退出</a>
+    {{if .IsDashboard}}<a class="admin-client-home icon-button" href="{{publicURL}}" data-document-transition aria-label="回主页" title="回主页">{{template "admin-icon" "home"}}</a>{{end}}
+    <button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换主题" title="切换主题">◐</button>
+    <a class="admin-client-identity" href="{{adminURL "/account"}}" title="账号设置"><img class="identity-avatar" src="{{userAvatar .User.Avatar}}" alt="" data-image-fallback="/uploads/admin/friends/user-null.png"><span><strong>{{default .User.Username .User.DisplayName}}</strong><small>{{.User.Username}} · {{roleText .User.Role}}</small></span></a>
+    <a class="admin-client-logout icon-button" href="{{adminURL "/logout"}}" aria-label="退出登录" title="退出登录">{{template "admin-icon" "logout"}}</a>
   </div>
-</nav>
+</header>
+<aside class="creator-rail" id="creatorRail" aria-label="创作中心导航">
+  {{if not (isAdminUser .User)}}<a class="rail-publish btn" href="{{adminURL "/articles/new"}}"><span aria-hidden="true">＋</span> 投稿</a>{{end}}
+  <nav class="admin-client-links">
+    <a href="{{adminURL "/"}}" data-cc-page="home">{{template "admin-icon" "home"}}工作台</a>
+    {{if isAdminUser .User}}
+    <div class="rail-label">社区管理</div>
+    <a href="{{adminURL "/admin#reviews"}}" data-cc-page="reviews">{{template "admin-icon" "file"}}稿件审核</a>
+    <a href="{{adminURL "/admin#messages"}}" data-cc-page="messages">{{template "admin-icon" "message"}}留言管理</a>
+    <a href="{{adminURL "/admin#users"}}" data-cc-page="users">{{template "admin-icon" "user"}}用户管理</a>
+    <a href="{{adminURL "/admin#password-requests"}}" data-cc-page="password-requests">{{template "admin-icon" "key"}}密码申请</a>
+    <a href="{{adminURL "/account"}}" data-cc-page="account">{{template "admin-icon" "settings"}}账号设置</a>
+    {{else}}
+    <div class="rail-label">内容管理</div>
+    <a href="{{adminURL "/#manuscripts"}}" data-cc-page="manuscripts">{{template "admin-icon" "file"}}稿件管理</a>
+    {{if isOwnerUser .User}}
+    <a href="{{adminURL "/compose/projects"}}" data-cc-page="projects">{{template "admin-icon" "grid"}}项目管理</a>
+    <a href="{{adminURL "/compose/memories"}}" data-cc-page="memories">{{template "admin-icon" "clock"}}回忆管理</a>
+    {{end}}
+    <a href="{{adminURL "/admin/media"}}" data-cc-page="media">{{template "admin-icon" "image"}}素材管理</a>
+    {{if isOwnerUser .User}}<a href="{{adminURL "/admin#reviews"}}" data-cc-page="reviews">{{template "admin-icon" "file"}}成员文章</a>{{end}}
+    <div class="rail-label">设置</div>
+    <a href="{{adminURL "/account"}}" data-cc-page="account">{{template "admin-icon" "settings"}}账号设置</a>
+    {{if isOwnerUser .User}}<a href="{{adminURL "/admin/site"}}" data-cc-page="settings">{{template "admin-icon" "grid"}}站点设置</a>{{end}}
+    {{end}}
+  </nav>
+  <div class="rail-foot">{{default .User.Username .User.DisplayName}} · {{roleText .User.Role}}</div>
+</aside>
 {{end}}
+{{define "admin-icon"}}<svg class="admin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+{{if eq . "home"}}<path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/>
+{{else if eq . "logout"}}<path d="M10 4H4v16h6M10 12h11m-5-5 5 5-5 5"/>
+{{else if eq . "menu"}}<path d="M4 6h16M4 12h16M4 18h16"/>
+{{else if eq . "user"}}<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>
+{{else if eq . "file"}}<path d="M14 3H5v18h14V8l-5-5v5h5M8 12h8M8 16h6"/>
+{{else if eq . "message"}}<path d="M3 4h18v13H9l-6 4V4ZM7 8h10M7 12h6"/>
+{{else if eq . "image"}}<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8" cy="8" r="1.5"/><path d="m3 18 6-6 4 4 3-3 5 5"/>
+{{else if eq . "key"}}<circle cx="8" cy="9" r="5"/><path d="m12 13 8 8m-4-4 3-3m-6 0 3-3"/>
+{{else if eq . "clock"}}<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>
+{{else if eq . "grid"}}<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+{{else if eq . "settings"}}<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/>
+{{else if eq . "edit"}}<path d="m14 5 5 5M4 20l5-1L21 7l-5-5L4 14v6Z"/>
+{{else if eq . "trash"}}<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>
+{{else if eq . "copy"}}<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V3H3v13h5"/>
+{{else if eq . "back"}}<path d="m15 5-7 7 7 7"/>
+{{else if eq . "next"}}<path d="m9 5 7 7-7 7"/>
+{{end}}</svg>{{end}}

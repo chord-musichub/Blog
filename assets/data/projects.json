@@ -6,7 +6,7 @@
         "status": "ACTIVE",
         "role": "前端/后端",
         "stack": ["C++","Qt"],
-        "cover": "/media/projects/calculator.png",
+        "cover": "/uploads/admin/projects/calculator.png",
         "github": "https://github.com/Songline-music/FirstProject_Calculator"
     },
     {
@@ -25,7 +25,7 @@
         "status": "ACTIVE",
         "role": "前端/后端",
         "stack": ["Python","CSS","Shell","HTML","JavaScript","SQLite","Redis","Docker","Json"],
-        "cover": "/media/projects/btir.png",
+        "cover": "/uploads/admin/projects/btir.png",
         "github": "https://github.com/ckckh2023/BTIR-BrainTumor-ImageRecognition",
         "demo": "https://btir.xiao-blog.top/"
     },
@@ -36,7 +36,7 @@
         "status": "ACTIVE",
         "role": "前端/后端",
         "stack": ["C++","Qt","CMake"],
-        "cover": "/media/projects/demo-lifegame.png",
+        "cover": "/uploads/admin/projects/demo-lifegame.png",
         "github": "https://github.com/Songline-music/Demo-LifeGame"
     },
     {
@@ -73,7 +73,7 @@
         "status": "ACTIVE",
         "role": "前端/后端",
         "stack": ["CSS","Go","PowerShell","Shell","HTML","JavaScript"],
-        "cover": "/media/projects/blog.png",
+        "cover": "/uploads/admin/projects/blog.png",
         "demo": "https://blog.songline-blog.com/",
         "github": "https://github.com/chord-musichub/Blog"
     },
@@ -83,7 +83,7 @@
         "year": "2026",
         "status": "ACTIVE",
         "role": "文章贡献",
-        "cover": "/media/projects/wust-csdiy.png",
+        "cover": "/uploads/admin/projects/wust-csdiy.png",
         "demo": "http://csdiy.wustacm.com/",
         "github": "https://github.com/WUSTACM/CSDIY-Document-organization"
     },
@@ -93,7 +93,7 @@
         "year": "2026",
         "status": "ACTIVE",
         "role": "文章贡献",
-        "cover": "/media/projects/wust-acm.png",
+        "cover": "/uploads/admin/projects/wust-acm.png",
         "demo": "https://blog.wustacm.com/",
         "github": "https://github.com/WUSTACM/blog.github.io"
     }

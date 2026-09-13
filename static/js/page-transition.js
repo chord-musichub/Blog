@@ -4,7 +4,7 @@
   const isHome = window.location.pathname === '/' || (document.body && document.body.dataset && document.body.dataset.pageKind === 'home');
   const bootKey = 'songline-home-boot-v21.4';
   const bootWelcomeText = (document.body && document.body.getAttribute('data-boot-welcome')) || '欢迎回来';
-  const shouldBoot = !reduceMotion && isHome && !sessionStorage.getItem(bootKey);
+  const shouldBoot = !window.__songlineDocumentArrival && !reduceMotion && isHome && !sessionStorage.getItem(bootKey);
 
   function forceBootReveal(reason){
     try{
@@ -67,6 +67,7 @@
   }
 
   function shouldHandleLink(link){
+    if(window.SonglineDocumentTransition && window.SonglineDocumentTransition.handles(link)) return false;
     if(!link) return false;
     if(link.target && link.target !== '_self') return false;
     if(link.hasAttribute('download')) return false;

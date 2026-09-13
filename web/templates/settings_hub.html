@@ -1,40 +1,23 @@
 {{template "admin-head" (dict "Title" "设置" "Data" . "Navigation" true)}}
 <body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
 {{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
-
 {{template "admin-client-nav" .}}
 
-<main class="wrap wide settings-hub">
+<main class="wrap wide settings-page">
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
-  <section class="hero compact admin-hero">
-    <div>
-      <h1>设置</h1>
-    </div>
-  </section>
-
-  <section class="settings-hub-grid" aria-label="设置入口">
-    <a class="card settings-hub-card" href="{{adminURL "/account"}}">
-      <span class="settings-hub-index">01</span><h2>{{if isOwnerUser .User}}账号与权限{{else}}账号与资料{{end}}</h2>
-      <span class="settings-hub-go" aria-hidden="true">→</span>
-    </a>
-    {{if isOwnerUser .User}}
-    <a class="card settings-hub-card" href="{{adminURL "/admin/site"}}">
-      <span class="settings-hub-index">02</span><h2>站点内容</h2>
-      <span class="settings-hub-go" aria-hidden="true">→</span>
-    </a>
-    <a class="card settings-hub-card" href="{{adminURL "/admin/theme"}}">
-      <span class="settings-hub-index">03</span><h2>外观主题</h2>
-      <span class="settings-hub-go" aria-hidden="true">→</span>
-    </a>
-    <a class="card settings-hub-card" href="{{adminURL "/admin/manuscript"}}">
-      <span class="settings-hub-index">04</span><h2>文章默认</h2>
-      <span class="settings-hub-go" aria-hidden="true">→</span>
-    </a>
-    <a class="card settings-hub-card" href="{{adminURL "/admin"}}">
-      <span class="settings-hub-index">05</span><h2>成员文章</h2>
-      <span class="settings-hub-go" aria-hidden="true">→</span>
-    </a>
-    {{end}}
+  <section class="settings-workspace">
+    {{template "settings-sidebar" .}}
+    <section class="settings-detail settings-overview">
+      <header class="settings-detail-header"><h1>设置</h1></header>
+      <div class="settings-overview-list">
+        <a href="{{adminURL "/account"}}"><span aria-hidden="true">◌</span><b>账号资料</b><i aria-hidden="true">›</i></a>
+        {{if isOwnerUser .User}}
+        <a href="{{adminURL "/admin/site"}}"><span aria-hidden="true">◇</span><b>站点信息</b><i aria-hidden="true">›</i></a>
+        <a href="{{adminURL "/admin/theme"}}"><span aria-hidden="true">◐</span><b>外观主题</b><i aria-hidden="true">›</i></a>
+        <a href="{{adminURL "/admin/manuscript"}}"><span aria-hidden="true">≡</span><b>文章默认</b><i aria-hidden="true">›</i></a>
+        {{end}}
+      </div>
+    </section>
   </section>
 </main>
 </body>

@@ -38,6 +38,10 @@ func (app *App) renameMediaFile(w http.ResponseWriter, r *http.Request, media me
 		return
 	}
 	oldFile := filepath.Join(media.dir, oldName)
+	newName = filepath.Join(filepath.Dir(oldName), newName)
+	if filepath.Dir(oldName) == "." {
+		newName = filepath.Base(newName)
+	}
 	newFile := filepath.Join(media.dir, newName)
 	if oldFile == newFile {
 		app.redirect(w, r, "/admin/media?msg="+url.QueryEscape("文件名没有变化："+userMediaPublicPath(media.owner, oldName)), http.StatusSeeOther)
@@ -100,9 +104,14 @@ func (app *App) uploadMediaFile(w http.ResponseWriter, r *http.Request, media me
 		app.renderMediaLibrary(w, r, media, map[string]any{"Error": "只允许上传图片、视频（mp4/webm/mov）、音频、pdf、zip、txt、md"})
 		return
 	}
+	categoryDir, category, err := mediaDirectoryForCategory(media, r.FormValue("category"))
+	if err != nil {
+		app.renderMediaLibrary(w, r, media, map[string]any{"Error": "上传失败：无法创建素材分类"})
+		return
+	}
 	name := safeUploadName(strings.TrimSpace(r.FormValue("filename")))
 	if name == "" {
-		name = uniqueUploadName(media.dir, safeUploadName(header.Filename))
+		name = uniqueUploadName(categoryDir, safeUploadName(header.Filename))
 	}
 	if filepath.Ext(name) == "" {
 		name += ext
@@ -112,7 +121,7 @@ func (app *App) uploadMediaFile(w http.ResponseWriter, r *http.Request, media me
 		return
 	}
 
-	out, err := os.OpenFile(filepath.Join(media.dir, name), os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
+	out, err := os.OpenFile(filepath.Join(categoryDir, name), os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
 	if err != nil {
 		if errors.Is(err, os.ErrExist) {
 			app.renderMediaLibrary(w, r, media, map[string]any{"Error": "上传失败：同名文件已存在，请换一个文件名"})
@@ -129,7 +138,7 @@ func (app *App) uploadMediaFile(w http.ResponseWriter, r *http.Request, media me
 	if err := app.runHugo(r.Context()); err != nil {
 		log.Printf("hugo build after media upload error: %v", err)
 	}
-	app.redirect(w, r, "/admin/media?msg=已上传："+url.QueryEscape(userMediaPublicPath(media.owner, name)), http.StatusSeeOther)
+	app.redirect(w, r, "/admin/media?msg=已上传："+url.QueryEscape(userMediaPublicPath(media.owner, filepath.Join(category, name))), http.StatusSeeOther)
 }
 
 // saveCoverUpload is the lightweight editor-side upload path. Unlike a general
@@ -163,11 +172,16 @@ func (app *App) saveCoverUpload(w http.ResponseWriter, r *http.Request, media me
 		writeError(http.StatusBadRequest, "封面只支持 JPG、PNG、WebP、GIF 或 SVG")
 		return
 	}
-	name := uniqueUploadName(media.dir, safeUploadName("cover-"+strings.TrimSuffix(header.Filename, ext)+ext))
-	if name == "" {
-		name = uniqueUploadName(media.dir, "cover"+ext)
+	categoryDir, category, err := mediaDirectoryForCategory(media, r.FormValue("category"))
+	if err != nil {
+		writeError(http.StatusInternalServerError, "无法创建素材分类")
+		return
 	}
-	outputPath := filepath.Join(media.dir, name)
+	name := uniqueUploadName(categoryDir, safeUploadName("cover-"+strings.TrimSuffix(header.Filename, ext)+ext))
+	if name == "" {
+		name = uniqueUploadName(categoryDir, "cover"+ext)
+	}
+	outputPath := filepath.Join(categoryDir, name)
 	out, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
 	if err != nil {
 		writeError(http.StatusInternalServerError, "无法保存封面")
@@ -184,7 +198,7 @@ func (app *App) saveCoverUpload(w http.ResponseWriter, r *http.Request, media me
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	_ = json.NewEncoder(w).Encode(map[string]any{
 		"ok":   true,
-		"path": userMediaPublicPath(media.owner, name),
+		"path": userMediaPublicPath(media.owner, filepath.Join(category, name)),
 		"name": name,
 	})
 }
@@ -208,7 +222,13 @@ func (app *App) importLegacyMedia(w http.ResponseWriter, r *http.Request, media 
 		w.WriteHeader(status)
 		_ = json.NewEncoder(w).Encode(map[string]any{"ok": false, "error": message})
 	}
-	if err := r.ParseForm(); err != nil {
+	contentType := strings.ToLower(r.Header.Get("Content-Type"))
+	if strings.HasPrefix(contentType, "multipart/form-data") {
+		if err := r.ParseMultipartForm(2 * 1024 * 1024); err != nil {
+			writeError(http.StatusBadRequest, "迁移图片请求无效")
+			return
+		}
+	} else if err := r.ParseForm(); err != nil {
 		writeError(http.StatusBadRequest, "迁移图片请求无效")
 		return
 	}
@@ -240,8 +260,20 @@ func (app *App) importLegacyMedia(w http.ResponseWriter, r *http.Request, media 
 		return
 	}
 	defer in.Close()
-	name := uniqueUploadName(media.dir, safeUploadName("legacy-"+filepath.Base(sourcePath)))
-	out, err := os.OpenFile(filepath.Join(media.dir, name), os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
+	category := "general"
+	if strings.HasPrefix(publicPath, "/media/projects/") {
+		category = "projects"
+	}
+	if strings.HasPrefix(publicPath, "/media/memories/") {
+		category = "memories"
+	}
+	categoryDir, category, err := mediaDirectoryForCategory(media, category)
+	if err != nil {
+		writeError(http.StatusInternalServerError, "无法创建素材分类")
+		return
+	}
+	name := uniqueUploadName(categoryDir, safeUploadName("legacy-"+filepath.Base(sourcePath)))
+	out, err := os.OpenFile(filepath.Join(categoryDir, name), os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
 	if err != nil {
 		writeError(http.StatusInternalServerError, "无法复制旧图片")
 		return
@@ -249,12 +281,12 @@ func (app *App) importLegacyMedia(w http.ResponseWriter, r *http.Request, media 
 	_, copyErr := io.Copy(out, io.LimitReader(in, maxLegacyImageBytes+1))
 	closeErr := out.Close()
 	if copyErr != nil || closeErr != nil {
-		_ = os.Remove(filepath.Join(media.dir, name))
+		_ = os.Remove(filepath.Join(categoryDir, name))
 		writeError(http.StatusInternalServerError, "复制旧图片失败")
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	_ = json.NewEncoder(w).Encode(map[string]any{"ok": true, "path": userMediaPublicPath(media.owner, name)})
+	_ = json.NewEncoder(w).Encode(map[string]any{"ok": true, "path": userMediaPublicPath(media.owner, filepath.Join(category, name))})
 }
 
 // saveCoverCrop 保存由后台 Canvas 导出的 16:9 WebP 封面。
@@ -301,9 +333,16 @@ func (app *App) saveCoverCrop(w http.ResponseWriter, r *http.Request, media medi
 		writeError(http.StatusBadRequest, "裁剪结果格式无效，请重新生成")
 		return
 	}
-	base := strings.TrimSuffix(sourceName, filepath.Ext(sourceName))
+	sourceDir := filepath.Dir(sourceName)
+	base := strings.TrimSuffix(filepath.Base(sourceName), filepath.Ext(sourceName))
 	variant := normalizeCropVariant(r.FormValue("variant"))
-	name := uniqueUploadName(media.dir, safeUploadName(base+"-"+variant+".webp"))
+	targetDir := filepath.Join(media.dir, sourceDir)
+	if err := os.MkdirAll(targetDir, 0755); err != nil {
+		writeError(http.StatusInternalServerError, "无法创建素材目录")
+		return
+	}
+	name := uniqueUploadName(targetDir, safeUploadName(base+"-"+variant+".webp"))
+	name = filepath.Join(sourceDir, name)
 	outputPath := filepath.Join(media.dir, name)
 	out, err := os.OpenFile(outputPath, os.O_CREATE|os.O_WRONLY|os.O_EXCL, 0644)
 	if err != nil {

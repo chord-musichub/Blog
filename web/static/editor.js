@@ -65,12 +65,21 @@ function enhanceCodeBlocks(root){
 
 function update(){
   if(out && src){
-    out.innerHTML = window.SonglineMarkdown ? window.SonglineMarkdown.render(src.value) : src.value;
+    if(window.SonglineMarkdown) out.innerHTML = window.SonglineMarkdown.render(src.value);
+    else out.textContent = src.value;
     enhanceCodeBlocks(out);
   }
 }
 
 if(src){
-  src.addEventListener('input', update);
+  let pendingPreview = 0;
+  src.addEventListener('input', () => {
+    clearTimeout(pendingPreview);
+    pendingPreview = setTimeout(update, 120);
+  });
+  document.querySelector('[data-writing-mode="preview"]')?.addEventListener('click', () => {
+    clearTimeout(pendingPreview);
+    update();
+  });
   update();
 }

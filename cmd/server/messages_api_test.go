@@ -68,7 +68,7 @@ func TestMessagesAPIAcceptsAnonymousMessageAndRejectsEmptyContent(t *testing.T) 
 	if err := json.NewDecoder(validResponse.Body).Decode(&created); err != nil {
 		t.Fatal(err)
 	}
-	if len(created.Messages) != 1 || created.Messages[0].Name != "匿名" || created.Messages[0].Avatar != "/media/users/user-null.png" {
+	if len(created.Messages) != 1 || created.Messages[0].Name != "匿名" || created.Messages[0].Avatar != defaultUserAvatar {
 		t.Fatalf("unexpected anonymous message: %#v", created.Messages)
 	}
 

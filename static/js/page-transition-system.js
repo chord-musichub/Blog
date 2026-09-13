@@ -151,6 +151,7 @@
   }
 
   function shouldHandleLink(link){
+    if(window.SonglineDocumentTransition && window.SonglineDocumentTransition.handles(link)) return false;
     if(!link || link.closest('[data-no-page-transition], [data-no-page-loading]')) return false;
     if(link.target && link.target !== '_self') return false;
     if(link.hasAttribute('download') || link.getAttribute('rel') === 'external') return false;

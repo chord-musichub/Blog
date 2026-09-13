@@ -11,6 +11,7 @@ import (
 
 type publicFriendAsset struct {
 	ID          string   `json:"id"`
+	Username    string   `json:"username"`
 	DisplayName string   `json:"display_name"`
 	Bio         string   `json:"bio"`
 	URL         string   `json:"url"`
@@ -19,13 +20,13 @@ type publicFriendAsset struct {
 }
 
 type localToolAsset struct {
-	ID      string   `json:"id"`
-	Href    string   `json:"href"`
-	Icon    string   `json:"icon"`
-	IconURL string   `json:"icon_url"`
-	Title   string   `json:"title"`
-	Desc    string   `json:"desc"`
-	Tags    []string `json:"tags"`
+	ID       string   `json:"id"`
+	Href     string   `json:"href"`
+	Icon     string   `json:"icon"`
+	IconURL  string   `json:"icon_url"`
+	Title    string   `json:"title"`
+	Desc     string   `json:"desc"`
+	Tags     []string `json:"tags"`
 	Keywords []string `json:"keywords"`
 }
 
@@ -78,20 +79,26 @@ func requireToolIcon(t *testing.T, rawURL, fallback, label string) {
 
 func TestPublicFriendsAssetSchema(t *testing.T) {
 	var friends []publicFriendAsset
-	readPublicAsset(t, filepath.Join("friends", "external.json"), &friends)
+	readPublicAsset(t, filepath.Join("friends", "friends.json"), &friends)
 	if len(friends) == 0 {
-		t.Fatal("external friends must not be empty")
+		t.Fatal("public friends must not be empty")
 	}
 	seen := map[string]struct{}{}
 	for _, friend := range friends {
-		if strings.TrimSpace(friend.ID) == "" || strings.TrimSpace(friend.DisplayName) == "" || strings.TrimSpace(friend.Bio) == "" || strings.TrimSpace(friend.Avatar) == "" {
+		key := strings.TrimSpace(friend.Username)
+		if key == "" {
+			key = strings.TrimSpace(friend.ID)
+		}
+		if key == "" || strings.TrimSpace(friend.DisplayName) == "" || strings.TrimSpace(friend.Bio) == "" || strings.TrimSpace(friend.Avatar) == "" {
 			t.Fatalf("friend has required empty fields: %#v", friend)
 		}
-		if _, exists := seen[friend.ID]; exists {
-			t.Fatalf("duplicate friend id %q", friend.ID)
+		if _, exists := seen[strings.ToLower(key)]; exists {
+			t.Fatalf("duplicate friend id %q", key)
 		}
-		seen[friend.ID] = struct{}{}
-		requireHTTPURL(t, friend.URL, "friend "+friend.ID+" URL")
+		seen[strings.ToLower(key)] = struct{}{}
+		if strings.TrimSpace(friend.URL) != "" {
+			requireHTTPURL(t, friend.URL, "friend "+key+" URL")
+		}
 	}
 }
 
@@ -130,5 +137,23 @@ func TestPublicToolsAssetSchema(t *testing.T) {
 		}
 		requireHTTPURL(t, tool.Href, "external tool "+tool.Title+" href")
 		requireHTTPURL(t, tool.IconURL, "external tool "+tool.Title+" icon")
+	}
+}
+
+func TestPublicFriendSeedImagesDoNotDependOnUserLibrary(t *testing.T) {
+	var friends []PublicFriend
+	readPublicAsset(t, filepath.Join("friends", "friends.json"), &friends)
+	for _, friend := range friends {
+		for _, image := range []string{friend.Avatar, friend.Cover} {
+			if image == "" || !strings.HasPrefix(image, "/") {
+				continue
+			}
+			if !strings.HasPrefix(image, "/uploads/admin/") {
+				t.Fatalf("public friend %s depends on private user library: %s", friend.Username, image)
+			}
+			if _, err := os.Stat(filepath.Join("..", "..", "static", filepath.FromSlash(strings.TrimPrefix(image, "/")))); err != nil {
+				t.Fatalf("missing public snapshot %s: %v", image, err)
+			}
+		}
 	}
 }

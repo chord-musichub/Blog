@@ -15,7 +15,7 @@ func (app *App) handleThemeSettings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Method == http.MethodGet {
-		app.render(w, "theme_settings.html", map[string]any{"User": u, "Theme": theme, "Flash": r.URL.Query().Get("msg")})
+		app.render(w, "theme_settings.html", map[string]any{"User": u, "Theme": theme, "Flash": r.URL.Query().Get("msg"), "SettingsSection": "theme"})
 		return
 	}
 	if r.Method != http.MethodPost {

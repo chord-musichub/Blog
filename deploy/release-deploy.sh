@@ -44,22 +44,29 @@ install -d -o blog -g blog -m 0700 "$SHARED_DIR/data"
 install -d -o blog -g blog -m 0755 \
   "$SHARED_DIR/content/posts" \
   "$SHARED_DIR/content/friends" \
-  "$SHARED_DIR/content/tags" \
-  "$SHARED_DIR/static/uploads" \
-  "$SHARED_DIR/static/md-source"
+  "$SHARED_DIR/content/tags"
 
 if [[ ! -r "$SHARED_DIR/blog-admin.env" ]]; then
   echo "找不到 $SHARED_DIR/blog-admin.env；请先按照部署文档创建私有环境文件。" >&2
   exit 1
 fi
 
-# 旧发布方案会在 static/ 下放运行时目录的符号链接，旧版 Hugo 会因此拒绝构建。
-# 新版本由后台直接读取 shared/static；只在尚未配置时补充默认值，不覆盖用户已有设置。
-if ! grep -q '^RUNTIME_STATIC_DIR=' "$SHARED_DIR/blog-admin.env"; then
+# 仅旧部署还保留 shared/static 时补充一次迁移来源。新版本全部写入 shared/data，
+# 因此新安装不再创建或配置 shared/static。
+if ! grep -q '^RUNTIME_STATIC_DIR=' "$SHARED_DIR/blog-admin.env" \
+  && { [[ -d "$SHARED_DIR/static/uploads" ]] || [[ -d "$SHARED_DIR/static/md-source" ]]; }; then
   printf '\nRUNTIME_STATIC_DIR=%s/static\n' "$SHARED_DIR" >> "$SHARED_DIR/blog-admin.env"
 fi
 
 git clone --quiet --branch "$RELEASE_REF" --depth 1 "$REPOSITORY_URL" "$WORK_DIR/source"
+# .gitignore cannot protect files that were already committed. Reject a release
+# containing private/runtime payloads before linking or touching shared data.
+runtime_payloads="$(git -C "$WORK_DIR/source" ls-files -- data content/posts content/friends content/tags static/md-source 'static/uploads/*' ':!static/uploads/admin/**')"
+if [[ -n "$runtime_payloads" ]]; then
+  echo "候选版本包含运行数据或用户媒体，已停止；请先从 Git 索引移除这些文件（保留磁盘原件）。" >&2
+  printf '%s\n' "$runtime_payloads" >&2
+  exit 1
+fi
 REVISION="$(git -C "$WORK_DIR/source" rev-parse --short HEAD)"
 RELEASE_DIR="$RELEASES_DIR/${STAMP}-${REVISION}"
 mv "$WORK_DIR/source" "$RELEASE_DIR"

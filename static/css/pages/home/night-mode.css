@@ -14,7 +14,7 @@ body.dark[data-page-kind="home"]{
 
 /* 夜景只替换深色模式背景，保留既有全屏定位和视差行为。 */
 body.dark[data-page-kind="home"] .site-bg-layer{
-  --site-bg-image:url('/uploads/admin/qiandai-background-black.png')!important;
+  --site-bg-image:url('/uploads/admin/background/qiandai-background-black.png')!important;
   background:#060d1e!important;
 }
 body.dark[data-page-kind="home"] .site-bg-layer::before{ background-position:center center!important; }

@@ -113,13 +113,21 @@ func (app *App) ensureCreatorContentData() error {
 
 func (app *App) handleCreatorProjects(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
+	if err := app.ensureCreatorContentData(); err != nil {
+		http.Error(w, "初始化项目资料失败: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := app.ensureCanonicalMediaLayout(); err != nil {
+		http.Error(w, "迁移项目媒体失败: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 	projects, err := app.loadProjects()
 	if err != nil {
 		http.Error(w, "读取项目失败: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if r.Method == http.MethodGet {
-		app.render(w, "creator_projects.html", map[string]any{"User": u, "Projects": projects, "Files": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Flash": r.URL.Query().Get("msg")})
+		app.render(w, "creator_projects.html", map[string]any{"User": u, "Projects": projects, "Files": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Flash": r.URL.Query().Get("msg"), "Workspace": "compose", "WorkspacePage": "project"})
 		return
 	}
 	if r.Method != http.MethodPost {
@@ -141,7 +149,7 @@ func (app *App) handleCreatorProjects(w http.ResponseWriter, r *http.Request) {
 	} else {
 		item := projectFromRequest(r)
 		if item.Title == "" {
-			app.render(w, "creator_projects.html", map[string]any{"User": u, "Projects": projects, "Files": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Error": "项目名称不能为空"})
+			app.render(w, "creator_projects.html", map[string]any{"User": u, "Projects": projects, "Files": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Error": "项目名称不能为空", "Workspace": "compose", "WorkspacePage": "project"})
 			return
 		}
 		if action == "update" {
@@ -177,13 +185,21 @@ func projectFromRequest(r *http.Request) Project {
 
 func (app *App) handleCreatorMemories(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
+	if err := app.ensureCreatorContentData(); err != nil {
+		http.Error(w, "初始化回忆资料失败: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := app.ensureCanonicalMediaLayout(); err != nil {
+		http.Error(w, "迁移回忆媒体失败: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 	memories, err := app.loadMemories()
 	if err != nil {
 		http.Error(w, "读取回忆失败: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if r.Method == http.MethodGet {
-		app.render(w, "creator_memories.html", map[string]any{"User": u, "Memories": memories, "Files": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Flash": r.URL.Query().Get("msg")})
+		app.render(w, "creator_memories.html", map[string]any{"User": u, "Memories": memories, "Files": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Flash": r.URL.Query().Get("msg"), "Workspace": "compose", "WorkspacePage": "memory"})
 		return
 	}
 	if r.Method != http.MethodPost {
@@ -205,7 +221,7 @@ func (app *App) handleCreatorMemories(w http.ResponseWriter, r *http.Request) {
 	} else {
 		item := memoryFromRequest(r)
 		if item.Date == "" || item.Title == "" {
-			app.render(w, "creator_memories.html", map[string]any{"User": u, "Memories": memories, "Files": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Error": "年月和标题不能为空"})
+			app.render(w, "creator_memories.html", map[string]any{"User": u, "Memories": memories, "Files": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Error": "年月和标题不能为空", "Workspace": "compose", "WorkspacePage": "memory"})
 			return
 		}
 		if action == "update" {

@@ -49,7 +49,9 @@ type Config struct {
 	MaxUploadBytes    int64
 	HTTPReadTimeout   time.Duration
 	HTTPWriteTimeout  time.Duration
-	RuntimeStaticDir  string
+	// 仅升级兼容：旧部署把运行时媒体和 Markdown 放在 shared/static。
+	// 新版本首次启动会迁入 data/，之后不再向该目录写入。
+	LegacyRuntimeStaticDir string
 }
 
 // App 保存 HTTP 服务运行所需的共享依赖和构建锁。

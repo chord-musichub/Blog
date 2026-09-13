@@ -24,12 +24,12 @@
     <section class="content-archive__panel is-active" id="archiveArticles" role="tabpanel" data-archive-panel="articles">
       <div class="content-archive__index" id="postList" data-archive-list>
         {{ range $index, $post := $posts }}
-          {{ $cover := $post.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}
+          {{ $cover := $post.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png" }}
           {{ $summary := $post.Summary | plainify }}{{ with $post.Params.summary }}{{ $summary = . | plainify }}{{ end }}
           <article class="archive-record post-search-item" data-archive-record data-archive-kind="article" data-date="{{ $post.Date.Unix }}" data-title="{{ $post.Title | plainify }}" data-author="{{ $post.Params.author_display | default $post.Params.author | plainify }} {{ $post.Params.author_username | default $post.Params.author | plainify }}" data-summary="{{ $summary }}" data-tags="{{ with $post.Params.tags }}{{ delimit . "," }}{{ end }}" data-search-text="{{ $post.Plain | plainify }}" tabindex="-1">
             <button class="archive-record__index" type="button" aria-expanded="false" aria-controls="archiveDrawer{{ $index }}" data-archive-trigger><span class="archive-record__number">{{ printf "%03d" (add $index 1) }}</span><span class="archive-record__title">{{ $post.Title }}</span><time datetime="{{ $post.Date.Format "2006-01-02" }}">{{ $post.Date.Format "2006.01.02" }}</time><span class="archive-record__arrow" aria-hidden="true">↵</span></button>
             <div class="archive-record__drawer" id="archiveDrawer{{ $index }}" data-archive-drawer><div class="archive-record__drawer-shell"><div class="archive-record__drawer-content">
-              <figure class="archive-record__cover"><img src="{{ $cover }}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/uploads/admin/article_default.png';"></figure>
+              <figure class="archive-record__cover"><img src="{{ $cover }}" alt="" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/uploads/admin/article/article_default.png';"></figure>
               <a class="archive-record__detail archive-record__detail--open" href="{{ $post.RelPermalink }}" aria-label="进入文章：{{ $post.Title }}"><h2>{{ $post.Title }}</h2>{{ with $summary }}<p class="archive-record__summary">{{ . }}</p>{{ end }}<div class="archive-record__meta"><time datetime="{{ $post.Date.Format "2006-01-02" }}">{{ $post.Date.Format "2006.01.02" }}</time>{{ with $post.Params.tags }}<span>{{ delimit . " / " }}</span>{{ end }}<span class="real-views" data-view-mode="get" data-view-path="{{ $post.RelPermalink }}">阅读 <b>0</b></span></div></a>
             </div></div></div>
           </article>

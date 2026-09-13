@@ -16,9 +16,10 @@ func (app *App) handleManuscriptSettings(w http.ResponseWriter, r *http.Request)
 	}
 	if r.Method == http.MethodGet {
 		app.render(w, "manuscript_settings.html", map[string]any{
-			"User":     u,
-			"Settings": settings,
-			"Flash":    r.URL.Query().Get("msg"),
+			"User":            u,
+			"Settings":        settings,
+			"Flash":           r.URL.Query().Get("msg"),
+			"SettingsSection": "manuscript",
 		})
 		return
 	}
@@ -52,7 +53,7 @@ func (app *App) handleSiteSettings(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method == http.MethodGet {
 		theme, _ := app.loadThemeSettings()
-		app.render(w, "site_settings.html", map[string]any{"User": u, "Settings": settings, "Theme": theme, "Flash": r.URL.Query().Get("msg")})
+		app.render(w, "site_settings.html", map[string]any{"User": u, "Settings": settings, "Theme": theme, "Flash": r.URL.Query().Get("msg"), "SettingsSection": "site"})
 		return
 	}
 	if r.Method != http.MethodPost {
@@ -75,46 +76,15 @@ func (app *App) handleSiteSettings(w http.ResponseWriter, r *http.Request) {
 	settings.Home.HeroImage = cleanPublicPath(r.FormValue("hero_image"))
 	settings.Home.FoundedAt = strings.TrimSpace(r.FormValue("founded_at"))
 	settings.Home.RecommendedCount = safeIntRange(r.FormValue("recommended_count"), 1, 12, 6)
-	settings.Home.IntroTitle = strings.TrimSpace(r.FormValue("intro_title"))
-	settings.Home.IntroBody = strings.TrimSpace(r.FormValue("intro_body"))
+	// Retired presentation fields remain untouched in stored configuration.
 	settings.Boot.WelcomeText = strings.TrimSpace(r.FormValue("boot_welcome_text"))
 	if settings.Boot.WelcomeText == "" {
 		settings.Boot.WelcomeText = defaultSiteSettings().Boot.WelcomeText
 	}
-	settings.Orbit.Title = strings.TrimSpace(r.FormValue("orbit_title"))
-	if settings.Orbit.Title == "" {
-		settings.Orbit.Title = defaultSiteSettings().Orbit.Title
-	}
-	orbitDefaults := defaultOrbitSettings()
-	readOrbit := func(prefix string, fallback OrbitEntry) OrbitEntry {
-		return OrbitEntry{
-			Label:       strings.TrimSpace(r.FormValue(prefix + "_label")),
-			Kicker:      strings.TrimSpace(r.FormValue(prefix + "_kicker")),
-			Title:       strings.TrimSpace(r.FormValue(prefix + "_title")),
-			Description: strings.TrimSpace(r.FormValue(prefix + "_desc")),
-			Href:        cleanOrbitHref(r.FormValue(prefix+"_href"), fallback.Href),
-			LinkText:    strings.TrimSpace(r.FormValue(prefix + "_link")),
-		}
-	}
-	settings.Orbit.Posts = readOrbit("orbit_posts", orbitDefaults.Posts)
-	fillOrbitEntry(&settings.Orbit.Posts, orbitDefaults.Posts)
-	settings.Orbit.Tags = readOrbit("orbit_tags", orbitDefaults.Tags)
-	fillOrbitEntry(&settings.Orbit.Tags, orbitDefaults.Tags)
-	settings.Orbit.Friends = readOrbit("orbit_friends", orbitDefaults.Friends)
-	fillOrbitEntry(&settings.Orbit.Friends, orbitDefaults.Friends)
-	settings.Orbit.Tools = readOrbit("orbit_tools", orbitDefaults.Tools)
-	fillOrbitEntry(&settings.Orbit.Tools, orbitDefaults.Tools)
-	settings.Orbit.Notice = readOrbit("orbit_notice", orbitDefaults.Notice)
-	fillOrbitEntry(&settings.Orbit.Notice, orbitDefaults.Notice)
-	settings.Orbit.About = readOrbit("orbit_about", orbitDefaults.About)
-	fillOrbitEntry(&settings.Orbit.About, orbitDefaults.About)
-	settings.Pages.PostsHeroTitle = strings.TrimSpace(r.FormValue("posts_hero_title"))
-	settings.Pages.PostsHeroImage = cleanPublicPath(r.FormValue("posts_hero_image"))
 	settings.Pages.TagsHeroTitle = strings.TrimSpace(r.FormValue("tags_hero_title"))
 	settings.Pages.TagsHeroImage = cleanPublicPath(r.FormValue("tags_hero_image"))
 	settings.Pages.FriendsHeroTitle = strings.TrimSpace(r.FormValue("friends_hero_title"))
 	settings.Pages.FriendsHeroImage = cleanPublicPath(r.FormValue("friends_hero_image"))
-	settings.Pages.ToolsHeroTitle = strings.TrimSpace(r.FormValue("tools_hero_title"))
 	settings.Pages.ArticleDefaultCover = cleanPublicPath(r.FormValue("article_default_cover"))
 	settings.Pages.TagDefaultCover = cleanPublicPath(r.FormValue("tag_default_cover"))
 	settings.Pages.FriendDefaultCover = cleanPublicPath(r.FormValue("friend_default_cover"))
@@ -122,11 +92,6 @@ func (app *App) handleSiteSettings(w http.ResponseWriter, r *http.Request) {
 	settings.Background.Height = safeCSSSize(r.FormValue("background_height"), "420px")
 	settings.Background.Blur = safeCSSSize(r.FormValue("background_blur"), "18px")
 	settings.Background.Opacity = safeCSSNumber(r.FormValue("background_opacity"), "0.38")
-	settings.AboutCard.Title = strings.TrimSpace(r.FormValue("about_title"))
-	settings.AboutCard.AvatarText = strings.TrimSpace(r.FormValue("about_avatar_text"))
-	settings.AboutCard.AvatarImage = cleanPublicPath(r.FormValue("about_avatar_image"))
-	settings.AboutCard.Name = strings.TrimSpace(r.FormValue("about_name"))
-	settings.AboutCard.Body = strings.TrimSpace(r.FormValue("about_body"))
 	settings.Social.GitHub = strings.TrimSpace(r.FormValue("github"))
 	settings.Social.Email = normalizeContactHref(strings.TrimSpace(r.FormValue("email")), "mailto")
 	settings.Social.Bilibili = strings.TrimSpace(r.FormValue("bilibili"))

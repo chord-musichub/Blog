@@ -1737,6 +1737,7 @@ html[data-admin-theme="dark"] .cover-crop-stage{background:rgba(3,11,24,.48)}
 .copy-media-path{
   width:100%;
 }
+.media-crop-status:empty{display:none}.media-crop-status{margin:0!important;font-size:12px!important}
 .table-wrap{
   border-radius:20px;
 }
@@ -3482,3 +3483,69 @@ html[data-admin-theme="light"] select{
 .admin-message-card p{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;flex:1;line-height:1.65}
 .admin-message-card form{align-self:flex-end}
 @media(max-width:760px){.admin-message-grid{grid-template-columns:1fr}.admin-author-group summary{padding:13px 14px}.admin-author-group summary small{display:none}}
+
+/* v20.23.0：后台设置的横向工作区与透明图标操作。 */
+.settings-workspace{display:grid;grid-template-columns:210px minmax(0,1fr);gap:26px;align-items:start}
+.settings-sidebar{position:sticky;top:92px;padding:8px 0;border-right:1px solid color-mix(in srgb,var(--admin-accent) 17%,transparent)}
+.settings-sidebar-title{padding:8px 14px 14px;color:var(--admin-muted);font-size:12px;font-weight:850;letter-spacing:.16em}
+.settings-tree-group{margin:0 0 4px}
+.settings-tree-group summary{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;color:var(--admin-text);font-weight:800;cursor:pointer;list-style:none;transition:background .16s ease,color .16s ease}
+.settings-tree-group summary::-webkit-details-marker{display:none}
+.settings-tree-group summary span{width:16px;text-align:center;color:var(--admin-accent)}
+.settings-tree-group summary:hover{background:color-mix(in srgb,var(--admin-accent) 10%,transparent);color:var(--admin-accent-2)}
+.settings-tree-leaves{display:grid;gap:2px;margin:1px 0 7px 40px;padding-left:12px;border-left:1px solid color-mix(in srgb,var(--admin-accent) 22%,transparent)}
+.settings-tree-leaves a{padding:7px 9px;border-radius:8px;color:var(--admin-muted);font-size:14px;font-weight:720;text-decoration:none!important;transition:background .16s ease,color .16s ease,transform .16s ease}
+.settings-tree-leaves a:hover,.settings-tree-leaves a.active{background:color-mix(in srgb,var(--admin-accent) 13%,transparent);color:var(--admin-accent-2);transform:translateX(2px)}
+.settings-detail{min-width:0}
+.settings-detail-header{display:flex;align-items:baseline;justify-content:space-between;gap:14px;min-height:44px;margin-bottom:12px;border-bottom:1px solid color-mix(in srgb,var(--admin-accent) 14%,transparent)}
+.settings-detail-header h1{margin:0 0 11px;font-size:28px;letter-spacing:-.035em}
+.settings-detail > form > .card:first-child,.settings-detail > .preview-layout:first-of-type{margin-top:0}
+.settings-detail > form > .card,.settings-detail > form.card{margin:0!important;padding:20px 0!important;border-width:0 0 1px!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.settings-detail > form > .card + .card{margin-top:0!important}
+.settings-detail .sticky-admin-actions{position:sticky!important;bottom:14px;margin-top:18px!important;padding:10px!important;border:1px solid color-mix(in srgb,var(--admin-accent) 17%,transparent)!important;border-radius:14px!important;background:color-mix(in srgb,var(--admin-panel-strong) 82%,transparent)!important;box-shadow:0 12px 30px rgba(15,23,42,.10)!important}
+.settings-overview-list{border-top:1px solid color-mix(in srgb,var(--admin-accent) 16%,transparent)}
+.settings-overview-list a{display:grid;grid-template-columns:30px 1fr 18px;align-items:center;gap:12px;min-height:58px;padding:0 14px;border-bottom:1px solid color-mix(in srgb,var(--admin-accent) 13%,transparent);color:var(--admin-text);text-decoration:none!important;transition:background .16s ease,color .16s ease,padding .16s ease}
+.settings-overview-list a span{color:var(--admin-accent);font-size:19px}.settings-overview-list a i{color:var(--admin-muted);font-size:22px;font-style:normal}.settings-overview-list a:hover{padding-left:19px;background:color-mix(in srgb,var(--admin-accent) 9%,transparent);color:var(--admin-accent-2)}
+
+.admin-client-nav a,.admin-client-nav button,.actions button,.actions .btn,.media-actions button,.media-actions .btn,.compact-nav a,.compact-nav button{transition:transform .16s ease,background .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease!important}
+.admin-client-nav a:hover,.admin-client-nav button:hover,.actions button:hover,.actions .btn:hover,.media-actions button:hover,.media-actions .btn:hover,.compact-nav a:hover,.compact-nav button:hover{transform:translateY(-1px);filter:none!important}
+button:not(:disabled),.btn{transition:transform .16s ease,background .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease!important}
+button:not(:disabled):hover,.btn:hover{transform:translateY(-1px);filter:none!important;box-shadow:0 10px 24px rgba(14,165,233,.14)}
+button:focus-visible,.btn:focus-visible,.settings-tree-group summary:focus-visible,.settings-tree-leaves a:focus-visible{outline:2px solid var(--admin-accent);outline-offset:3px}
+.admin-icon-only{width:38px!important;min-width:38px!important;height:38px!important;padding:8px!important;border:1px solid transparent!important;background:transparent!important;color:var(--admin-accent-2)!important;box-shadow:none!important}
+.admin-icon-only:hover{background:color-mix(in srgb,var(--admin-accent) 13%,transparent)!important;border-color:color-mix(in srgb,var(--admin-accent) 26%,transparent)!important}
+.admin-icon-only.danger{color:#dc2626!important}.admin-icon-only.danger:hover{background:rgba(220,38,38,.11)!important;border-color:rgba(220,38,38,.25)!important}
+.admin-icon-only .btn-text.optional{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important}
+@media(max-width:800px){.settings-workspace{grid-template-columns:1fr;gap:14px}.settings-sidebar{position:static;display:flex;gap:6px;overflow:auto;padding:0 0 9px;border-right:0;border-bottom:1px solid color-mix(in srgb,var(--admin-accent) 17%,transparent)}.settings-sidebar-title{display:none}.settings-tree-group{flex:0 0 auto;margin:0}.settings-tree-group summary{padding:8px 10px}.settings-tree-leaves{position:absolute;z-index:30;min-width:132px;margin:4px 0 0;padding:6px;border:1px solid color-mix(in srgb,var(--admin-accent) 18%,transparent);border-radius:12px;background:var(--admin-panel-strong);box-shadow:0 14px 32px rgba(15,23,42,.14)}.settings-detail-header h1{font-size:25px}.settings-overview-list a{min-height:54px}}
+
+/* v20.24.0：投稿、素材与管理页复用设置页的两栏工作区。 */
+.workspace-shell{display:grid;grid-template-columns:210px minmax(0,1fr);gap:26px;align-items:start}
+.workspace-shell > .flash,.workspace-shell > .error{grid-column:1/-1;margin-bottom:0}
+.workspace-sidebar{position:sticky;top:92px;padding:8px 0;border-right:1px solid color-mix(in srgb,var(--admin-accent) 17%,transparent)}
+.workspace-sidebar-title{padding:8px 14px 14px;color:var(--admin-muted);font-size:12px;font-weight:850;letter-spacing:.16em}
+.workspace-tree-group{margin:0 0 4px}
+.workspace-tree-group summary{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;color:var(--admin-text);font-weight:800;cursor:pointer;list-style:none;transition:background .16s ease,color .16s ease}
+.workspace-tree-group summary::-webkit-details-marker{display:none}
+.workspace-tree-group summary span{width:16px;text-align:center;color:var(--admin-accent)}
+.workspace-tree-group summary:hover{background:color-mix(in srgb,var(--admin-accent) 10%,transparent);color:var(--admin-accent-2)}
+.workspace-tree-leaves{display:grid;gap:2px;margin:1px 0 7px 40px;padding-left:12px;border-left:1px solid color-mix(in srgb,var(--admin-accent) 22%,transparent)}
+.workspace-tree-leaves a{padding:7px 9px;border-radius:8px;color:var(--admin-muted);font-size:14px;font-weight:720;text-decoration:none!important;transition:background .16s ease,color .16s ease,transform .16s ease}
+.workspace-tree-leaves a:hover,.workspace-tree-leaves a.active{background:color-mix(in srgb,var(--admin-accent) 13%,transparent);color:var(--admin-accent-2);transform:translateX(2px)}
+.workspace-detail{min-width:0}
+.workspace-detail-header{display:flex;align-items:baseline;justify-content:space-between;gap:14px;min-height:44px;margin-bottom:12px;border-bottom:1px solid color-mix(in srgb,var(--admin-accent) 14%,transparent)}
+.workspace-detail-header h1{margin:0 0 11px;font-size:28px;letter-spacing:-.035em}
+.workspace-list{border-top:1px solid color-mix(in srgb,var(--admin-accent) 16%,transparent)}
+.workspace-list a{display:grid;grid-template-columns:42px 1fr 24px;align-items:center;gap:12px;min-height:62px;padding:0 14px;border-bottom:1px solid color-mix(in srgb,var(--admin-accent) 13%,transparent);color:var(--admin-text);text-decoration:none!important;transition:background .16s ease,color .16s ease,padding .16s ease}
+.workspace-list a span{font-size:12px;font-weight:850;letter-spacing:.12em;color:var(--admin-accent)}.workspace-list a b{font-size:17px}.workspace-list a i{font-size:21px;font-style:normal;color:var(--admin-muted);text-align:right}.workspace-list a:hover{padding-left:19px;background:color-mix(in srgb,var(--admin-accent) 9%,transparent);color:var(--admin-accent-2)}
+.dashboard-article-list{margin-top:26px;border-top:1px solid color-mix(in srgb,var(--admin-accent) 16%,transparent)}
+.dashboard-article-list__header{display:flex;align-items:center;gap:10px;min-height:46px}.dashboard-article-list__header h2{margin:0;font-size:18px}.dashboard-article-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;min-height:68px;padding:10px 4px 10px 12px;border-top:1px solid color-mix(in srgb,var(--admin-accent) 13%,transparent)}
+.dashboard-article-row__main{display:grid;gap:5px;min-width:0;color:var(--admin-text);text-decoration:none!important}.dashboard-article-row__main strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px}.dashboard-article-row__main span{color:var(--admin-muted);font-size:13px}.dashboard-article-row__main em{font-style:normal;font-size:13px}.dashboard-article-row__main:hover strong{color:var(--admin-accent-2)}
+.dashboard-article-row__actions{display:flex;align-items:center;gap:4px}.dashboard-article-row__actions form{margin:0}.dashboard-article-list__empty{padding:20px 12px;border-top:1px solid color-mix(in srgb,var(--admin-accent) 13%,transparent);color:var(--admin-muted)}
+.workspace-section{margin:0!important;padding:18px 0!important;border-width:0 0 1px!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}.workspace-section:first-of-type{padding-top:0!important}
+.media-workspace .media-upload-form{margin-top:0}.media-workspace .media-grid{margin-top:14px}
+.media-upload-form .media-category-field{min-width:132px}.media-upload-form .media-category-field select{min-height:40px;margin-top:4px}
+.media-group{margin:22px 0 0}.media-group:first-of-type{margin-top:10px}.media-group h3{display:flex;align-items:center;gap:8px;margin:0;padding:0 0 9px;border-bottom:1px solid color-mix(in srgb,var(--admin-accent) 14%,transparent);font-size:15px;color:var(--admin-text)}.media-group h3 .soft-count{font-size:12px;color:var(--admin-muted);font-weight:700}
+.creator-manager .creator-entry,.creator-manager .creator-entry--saved{box-shadow:none!important}.creator-manager .creator-entry:not(.creator-entry--saved){margin-top:0!important}.creator-manager__list{margin-top:14px}
+.admin-management{max-width:1320px!important}.admin-management .admin-workspace-section:first-of-type{margin-top:0}.admin-management .workspace-detail>.admin-workspace-section{margin-top:22px}
+.editor-workspace .editor-import-card{margin-top:0}.editor-workspace .editor-hero{margin-top:14px}.editor-workspace .preview-layout{margin-top:22px}
+@media(max-width:800px){.workspace-shell{grid-template-columns:1fr;gap:14px}.workspace-sidebar{position:static;display:flex;gap:6px;overflow:auto;padding:0 0 9px;border-right:0;border-bottom:1px solid color-mix(in srgb,var(--admin-accent) 17%,transparent)}.workspace-sidebar-title{display:none}.workspace-tree-group{position:relative;flex:0 0 auto;margin:0}.workspace-tree-group summary{padding:8px 10px}.workspace-tree-leaves{position:absolute;z-index:30;min-width:132px;margin:4px 0 0;padding:6px;border:1px solid color-mix(in srgb,var(--admin-accent) 18%,transparent);border-radius:12px;background:var(--admin-panel-strong);box-shadow:0 14px 32px rgba(15,23,42,.14)}.workspace-detail-header h1{font-size:25px}.editor-workspace .preview-layout{grid-template-columns:1fr}.workspace-section{padding-block:14px!important}.dashboard-article-row{grid-template-columns:minmax(0,1fr) auto;padding-left:4px}.dashboard-article-row__actions{gap:0}.dashboard-article-row__main strong{font-size:15px}}

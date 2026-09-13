@@ -59,6 +59,7 @@ func newApp(cfg Config, store *Store) *App {
 		"canManageArticle": canManageArticles,
 		"canManageUser":    canManageUser,
 		"roleText":         roleText,
+		"userAvatar":       normalizeUserAvatar,
 		"userArticleCount": func(username string) int { return store.ArticleCountByAuthor(username) },
 		"canDeleteUser":    func(u User) bool { return !isOwner(u) && store.ArticleCountByAuthor(u.Username) == 0 },
 		"userDeleteReason": func(u User) string {

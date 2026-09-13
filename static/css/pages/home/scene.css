@@ -4,7 +4,7 @@ body[data-page-kind="home"]{
   background:#f3c3ad!important;
 }
 body[data-page-kind="home"] .site-bg-layer{
-  --site-bg-image:url('/uploads/admin/qiandai_background.png')!important;
+  --site-bg-image:url('/uploads/admin/background/qiandai_background.png')!important;
   --site-bg-height:100svh!important;
   --site-bg-blur:0px!important;
   --site-bg-opacity:1!important;
@@ -693,7 +693,7 @@ body[data-page-kind="home"] .songline-home-system{
   width:100%;
   height:100%;
   object-fit:cover;
-  background:#17283b url('/uploads/admin/article_default.png') center / cover no-repeat;
+  background:#17283b url('/uploads/admin/article/article_default.png') center / cover no-repeat;
   opacity:0;
   transform:scale(1.08);
   transition:opacity .42s ease, transform .65s cubic-bezier(.2,.7,.25,1), filter .45s ease;

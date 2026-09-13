@@ -97,7 +97,7 @@ func TestSaveCoverUploadStoresOwnedImage(t *testing.T) {
 	if !response.OK || response.Path == "" || filepath.Ext(response.Path) != ".png" {
 		t.Fatalf("unexpected upload response: %+v", response)
 	}
-	stored, err := os.ReadFile(filepath.Join(dir, filepath.Base(response.Path)))
+	stored, err := os.ReadFile(filepath.Join(dir, "general", filepath.Base(response.Path)))
 	if err != nil || string(stored) != "image-bytes" {
 		t.Fatalf("cover was not stored correctly: %q, %v", stored, err)
 	}
@@ -133,5 +133,43 @@ func TestImportLegacyMediaCopiesOnlyKnownStaticImage(t *testing.T) {
 	entries, err := os.ReadDir(mediaDir)
 	if err != nil || len(entries) != 1 {
 		t.Fatalf("expected one copied media file, entries=%v err=%v", entries, err)
+	}
+}
+
+func TestImportLegacyMediaAcceptsBrowserFormDataForMemoryImage(t *testing.T) {
+	root := t.TempDir()
+	previousDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(root); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(previousDir) })
+	if err := os.MkdirAll(filepath.Join("static", "media", "memories"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join("static", "media", "memories", "11.png"), []byte("old-memory"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	mediaDir := filepath.Join(root, "uploads", "songline")
+	if err := os.MkdirAll(mediaDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+	if err := writer.WriteField("source", "/media/memories/11.png"); err != nil {
+		t.Fatal(err)
+	}
+	if err := writer.Close(); err != nil {
+		t.Fatal(err)
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/media?action=media-import", &body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	res := httptest.NewRecorder()
+	(&App{}).importLegacyMedia(res, req, mediaLibraryContext{owner: "songline", dir: mediaDir})
+	if res.Code != http.StatusOK || !strings.Contains(res.Body.String(), `"ok":true`) {
+		t.Fatalf("multipart memory import failed: status=%d body=%s", res.Code, res.Body.String())
 	}
 }

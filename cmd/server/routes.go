@@ -2,16 +2,19 @@ package main
 
 import (
 	"net/http"
+	"os"
+	"path"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
 func (app *App) router() http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
-	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir(app.mediaRootDir()))))
+	mux.HandleFunc("/uploads/", app.handlePublicMedia)
 	// Markdown 源文件属于运行时数据，不能依赖公开站的静态目录或 SPA 兜底规则。
-	mux.Handle("/md-source/", http.StripPrefix("/md-source/", http.FileServer(http.Dir(filepath.Join(app.runtimeStaticDir(), "md-source")))))
+	mux.Handle("/md-source/", http.StripPrefix("/md-source/", http.FileServer(http.Dir(filepath.Join(app.cfg.DataDir, "md-source")))))
 	mux.HandleFunc("/api/views", app.handleViewsAPI)
 	mux.HandleFunc("/api/messages", app.handleMessagesAPI)
 
@@ -46,6 +49,41 @@ func (app *App) router() http.Handler {
 	mux.HandleFunc("/users/new", app.requireAdmin(app.handleNewUser))
 	mux.HandleFunc("/users/", app.requireAdmin(app.handleUserRoutes))
 	return mux
+}
+
+// handlePublicMedia serves the instance-owned media first. Repository-managed
+// public seeds are a read-only fallback so a clean clone (or a just-upgraded
+// deployment before its first rebuild) never loses its icons or backgrounds.
+// It also resolves historical admin-root URLs while old generated HTML is
+// still cached by a browser or reverse proxy.
+func (app *App) handlePublicMedia(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet && r.Method != http.MethodHead {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	publicPath := canonicalPublicMediaPath(r.URL.Path)
+	name := strings.TrimPrefix(publicPath, "/uploads/")
+	name = path.Clean(name)
+	if name == "." || name == "" || strings.HasPrefix(name, "../") || strings.Contains(name, "\\") {
+		http.NotFound(w, r)
+		return
+	}
+	for _, root := range []string{app.mediaRootDir(), filepath.Join("static", "uploads")} {
+		candidate := filepath.Join(root, filepath.FromSlash(name))
+		if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
+			http.ServeFile(w, r, candidate)
+			return
+		}
+	}
+	http.NotFound(w, r)
+}
+
+func canonicalPublicMediaPath(publicPath string) string {
+	result := publicPath
+	for _, replacement := range legacyMediaPathReplacements {
+		result = strings.ReplaceAll(result, replacement.old, replacement.new)
+	}
+	return result
 }
 
 func (app *App) registerScoreRoutes(mux *http.ServeMux, handler http.HandlerFunc, endpoint string) {

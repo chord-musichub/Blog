@@ -3,17 +3,11 @@
 {{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
 {{template "admin-client-nav" .}}
 
-<main class="wrap wide admin-management">
+<main class="wrap wide workspace-shell admin-management">
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
-
-  {{if isAdminUser .User}}
-  <section class="card admin-dashboard-card admin-management-hero">
-    <div class="admin-dashboard-copy"><h1>管理工作台</h1></div>
-    <div class="admin-dashboard-actions"><a class="btn secondary" href="#reviews">稿件审核</a><a class="btn secondary" href="#messages">留言</a><a class="btn secondary" href="#users">用户</a></div>
-  </section>
-  {{else}}
-  <section class="card admin-dashboard-card admin-management-hero"><div class="admin-dashboard-copy"><h1>成员文章</h1></div></section>
-  {{end}}
+  {{template "workspace-sidebar" .}}
+  <section class="workspace-detail">
+  <header class="workspace-detail-header"><h1>{{if isAdminUser .User}}管理{{else}}成员文章{{end}}</h1></header>
 
   <section id="reviews" class="admin-workspace-section">
     <div class="toolbar section-toolbar"><h2>{{if isAdminUser .User}}稿件审核{{else}}成员文章{{end}}</h2><span class="soft-count">{{len .ArticleGroups}} 位作者</span></div>
@@ -55,8 +49,9 @@
     </tbody></table></div>
   </section>
 
-  <section class="admin-workspace-section"><div class="toolbar section-toolbar"><h2>密码申请</h2></div><div class="card table-wrap"><table><thead><tr><th>用户</th><th>状态</th><th>提交时间</th><th>操作</th></tr></thead><tbody>{{range .PasswordResets}}<tr><td>{{.Username}}</td><td>{{resetStatusText .Status}}</td><td>{{fmtTime .CreatedAt}}</td><td>{{if eq .Status "pending"}}<details><summary>处理</summary><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/approve" .ID)}}" class="mini-form"><input name="password" type="password" minlength="8" required placeholder="临时密码"><button class="small">批准</button></form><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/reject" .ID)}}"><button class="small danger">拒绝</button></form></details>{{else}}<span class="meta">已处理</span>{{end}}</td></tr>{{else}}<tr><td colspan="4" class="meta">暂无申请。</td></tr>{{end}}</tbody></table></div></section>
+  <section id="password-requests" class="admin-workspace-section"><div class="toolbar section-toolbar"><h2>密码申请</h2></div><div class="card table-wrap"><table><thead><tr><th>用户</th><th>状态</th><th>提交时间</th><th>操作</th></tr></thead><tbody>{{range .PasswordResets}}<tr><td>{{.Username}}</td><td>{{resetStatusText .Status}}</td><td>{{fmtTime .CreatedAt}}</td><td>{{if eq .Status "pending"}}<details><summary>处理</summary><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/approve" .ID)}}" class="mini-form"><input name="password" type="password" minlength="8" required placeholder="临时密码"><button class="small">批准</button></form><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/reject" .ID)}}"><button class="small danger">拒绝</button></form></details>{{else}}<span class="meta">已处理</span>{{end}}</td></tr>{{else}}<tr><td colspan="4" class="meta">暂无申请。</td></tr>{{end}}</tbody></table></div></section>
   {{end}}
+  </section>
 </main>
 </body>
 </html>

@@ -137,10 +137,60 @@ func (app *App) ensureBuiltinContentPages() error {
 	return nil
 }
 
+// syncHugoPublicData creates Hugo's dedicated data namespace from the small
+// public subset of runtime state. DATA_DIR also contains accounts, messages and
+// downloadable Markdown files, none of which may be parsed by Hugo or copied
+// into the public build.
+func (app *App) syncHugoPublicData() error {
+	targetDir := filepath.Join(app.hugoRootDir(), ".hugo-data")
+	if err := os.MkdirAll(targetDir, 0755); err != nil {
+		return err
+	}
+
+	for _, name := range []string{"site.json", "theme.json", "projects.json", "memories.json", "friends.json", "tag_urls.json", "build.json"} {
+		source := filepath.Join(app.cfg.DataDir, name)
+		target := filepath.Join(targetDir, name)
+		data, err := os.ReadFile(source)
+		if errors.Is(err, os.ErrNotExist) {
+			if removeErr := os.Remove(target); removeErr != nil && !errors.Is(removeErr, os.ErrNotExist) {
+				return removeErr
+			}
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		if err := os.WriteFile(target, data, 0644); err != nil {
+			return err
+		}
+	}
+
+	// RSS only needs the published slug list. Draft bodies, review state and
+	// private editor fields must never become Hugo data.
+	type publicArticleRoute struct {
+		Slug   string `json:"slug"`
+		Status string `json:"status"`
+	}
+	routes := make([]publicArticleRoute, 0)
+	for _, article := range app.store.AllArticles() {
+		if article.Status == stPublished && strings.TrimSpace(article.Slug) != "" {
+			routes = append(routes, publicArticleRoute{Slug: article.Slug, Status: stPublished})
+		}
+	}
+	data, err := json.Marshal(routes)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(targetDir, "articles.json"), data, 0644)
+}
+
 func (app *App) runHugo(ctx context.Context) error {
 	app.buildMu.Lock()
 	defer app.buildMu.Unlock()
 
+	if err := app.ensurePublicSnapshotData(); err != nil {
+		return err
+	}
 	if err := app.ensureSiteDefaults(); err != nil {
 		return err
 	}
@@ -150,6 +200,9 @@ func (app *App) runHugo(ctx context.Context) error {
 	// 旧版项目/回忆存在 assets/data；首次运行时迁入持久 data 卷，
 	// 让后台编辑和 Hugo 公共页始终读取同一份数据。
 	if err := app.ensureCreatorContentData(); err != nil {
+		return err
+	}
+	if err := app.ensureCanonicalMediaLayout(); err != nil {
 		return err
 	}
 	if err := app.syncPublishedArticles(); err != nil {
@@ -164,6 +217,9 @@ func (app *App) runHugo(ctx context.Context) error {
 		return err
 	}
 	if err := app.writeRuntimeConfig(); err != nil {
+		return err
+	}
+	if err := app.syncHugoPublicData(); err != nil {
 		return err
 	}
 	if strings.TrimSpace(app.cfg.HugoCommand) == "" {

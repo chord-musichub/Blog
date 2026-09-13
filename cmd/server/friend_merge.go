@@ -11,6 +11,9 @@ func friendMergeKey(f PublicFriend) string {
 	if strings.TrimSpace(f.Username) != "" {
 		return "u:" + strings.ToLower(strings.TrimSpace(f.Username))
 	}
+	if strings.TrimSpace(f.ID) != "" {
+		return "i:" + strings.ToLower(strings.TrimSpace(f.ID))
+	}
 	if strings.TrimSpace(f.DisplayName) != "" {
 		return "n:" + strings.ToLower(strings.TrimSpace(f.DisplayName))
 	}
@@ -21,20 +24,25 @@ func friendMergeKey(f PublicFriend) string {
 }
 
 func normalizePublicFriend(f PublicFriend) PublicFriend {
+	f.ID = strings.TrimSpace(f.ID)
 	f.Username = strings.TrimSpace(f.Username)
 	f.DisplayName = strings.TrimSpace(f.DisplayName)
 	if f.DisplayName == "" {
 		f.DisplayName = f.Username
 	}
 	f.Slug = strings.TrimSpace(f.Slug)
-	if f.Slug == "" {
-		f.Slug = slugify(firstNonEmpty(f.DisplayName, f.Username))
+	if f.Username != "" {
+		if f.Slug == "" {
+			f.Slug = slugify(firstNonEmpty(f.DisplayName, f.Username))
+		}
+		if f.Slug == "" {
+			f.Slug = "friend"
+		}
+		// 仅本站用户拥有生成的朋友资料页；外部节点保留其原始链接或空链接。
+		f.URL = friendProfileURL(f.Slug)
+	} else if f.ID == "" {
+		f.ID = slugify(firstNonEmpty(f.Slug, f.DisplayName))
 	}
-	if f.Slug == "" {
-		f.Slug = "friend"
-	}
-	// 不信任历史 JSON 中的裸中文 URL；统一由 slug 重建为 UTF-8 编码路径。
-	f.URL = friendProfileURL(f.Slug)
 	f.Bio = strings.TrimSpace(f.Bio)
 	f.Homepage = strings.TrimSpace(f.Homepage)
 	f.Avatar = normalizeUserAvatar(f.Avatar)
@@ -66,6 +74,9 @@ func mergePublicFriends(existing []PublicFriend, generated []PublicFriend) []Pub
 			if strings.TrimSpace(f.Username) != "" {
 				old.Username = f.Username
 			}
+			if strings.TrimSpace(f.ID) != "" {
+				old.ID = f.ID
+			}
 			if strings.TrimSpace(f.DisplayName) != "" {
 				old.DisplayName = f.DisplayName
 			}
@@ -91,6 +102,9 @@ func mergePublicFriends(existing []PublicFriend, generated []PublicFriend) []Pub
 			old.PostTitles = f.PostTitles
 			old.UpdatedAt = f.UpdatedAt
 		} else {
+			if strings.TrimSpace(old.ID) == "" {
+				old.ID = f.ID
+			}
 			if strings.TrimSpace(old.Username) == "" {
 				old.Username = f.Username
 			}
@@ -123,18 +137,20 @@ func mergePublicFriends(existing []PublicFriend, generated []PublicFriend) []Pub
 	out := []PublicFriend{}
 	for _, key := range order {
 		f := normalizePublicFriend(merged[key])
-		base := slugify(firstNonEmpty(f.Slug, f.DisplayName, f.Username))
-		if base == "" {
-			base = "friend"
+		if f.Username != "" {
+			base := slugify(firstNonEmpty(f.Slug, f.DisplayName, f.Username))
+			if base == "" {
+				base = "friend"
+			}
+			if n := usedSlugs[base]; n > 0 {
+				usedSlugs[base] = n + 1
+				f.Slug = fmt.Sprintf("%s-%d", base, n+1)
+			} else {
+				usedSlugs[base] = 1
+				f.Slug = base
+			}
+			f.URL = friendProfileURL(f.Slug)
 		}
-		if n := usedSlugs[base]; n > 0 {
-			usedSlugs[base] = n + 1
-			f.Slug = fmt.Sprintf("%s-%d", base, n+1)
-		} else {
-			usedSlugs[base] = 1
-			f.Slug = base
-		}
-		f.URL = friendProfileURL(f.Slug)
 		out = append(out, f)
 	}
 	sort.SliceStable(out, func(i, j int) bool {

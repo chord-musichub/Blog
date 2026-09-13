@@ -13,7 +13,10 @@
 
   function setIfBlank(name, value) {
     var target = field(name);
-    if (target && !target.value.trim() && value) target.value = value;
+    if (target && !target.value.trim() && value) {
+      target.value = value;
+      target.dispatchEvent(new Event('input', { bubbles: true }));
+    }
   }
 
   function parseFrontMatter(text) {
@@ -74,6 +77,6 @@
 
   if (new URLSearchParams(window.location.search).get('import') === '1') {
     status.textContent = '请选择一个 Markdown 文件开始导入。';
-    input.closest('.editor-import-card').scrollIntoView({ block: 'center', behavior: 'smooth' });
+    input.closest('.writing-surface')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 }());

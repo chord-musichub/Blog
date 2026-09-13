@@ -4,8 +4,9 @@
 <button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
   <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg></button>
+<a class="auth-home-link" href="{{publicURL}}" data-document-transition>{{template "admin-icon" "back"}} 返回主页</a>
 <main class="wrap narrow auth-card-wrap">
-  <section class="auth-title admin-login-title"><h1>欢迎回来</h1><p class="meta">进入创作后台</p></section>
+  <section class="auth-title admin-login-title"><img class="auth-logo" src="{{default "/uploads/admin/logo/main_logo.png" .Settings.Site.LogoIcon}}" alt="网站标志"><h1>欢迎回来</h1><p class="meta">进入创作后台</p></section>
   {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
   {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
   <form method="post" class="card form">
@@ -16,11 +17,10 @@
         <button class="password-toggle" type="button" data-password-toggle="#login-password" aria-label="显示密码"></button>
       </span>
     </label>
-    <label class="remember-row"><input type="checkbox" name="remember" value="on" checked> <span>记住我</span></label>
-    <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span><span class="btn-text">进入后台</span></button>
+    <div class="login-options"><label class="remember-row"><input type="checkbox" name="remember" value="on" checked> <span>记住我</span></label><a href="{{adminURL "/password/request"}}" class="password-request-link">{{template "admin-icon" "key"}} 密码申请</a></div>
+    <button class="login-submit" type="submit">登录 {{template "admin-icon" "next"}}</button>
   </form>
-  <p class="meta"><a href="{{adminURL "/password/request"}}">忘记密码？提交修改申请</a></p>
-  <p class="meta"><a href="{{publicURL}}">← 返回主页</a></p>
+
 </main>
 </body>
 </html>

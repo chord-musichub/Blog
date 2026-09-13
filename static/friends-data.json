@@ -1,0 +1,142 @@
+[
+  {
+    "id": "songline",
+    "username": "songline",
+    "name": "Songline",
+    "display_name": "Songline",
+    "slug": "songline",
+    "url": "/friends/songline/",
+    "bio": "个人博客https://blog.songline-blog.com\r\n希望各位都能在这里安个家awa",
+    "homepage": "https://blog.songline-blog.com",
+    "avatar": "/uploads/songline/snowMan.png",
+    "cover": "/uploads/songline/myLogBackground02.png",
+    "post_count": 9,
+    "post_titles": [
+      "C语言学习笔记",
+      "SQL学习笔记",
+      "Go学习",
+      "C++学习笔记",
+      "Linux学习笔记",
+      "Markdown的食用指南",
+      "你的幸福在哪里",
+      "他与她"
+    ],
+    "updated_at": "2026-08-22T12:56:41.128656895+08:00",
+    "links": [],
+    "role": "",
+    "account_type": ""
+  },
+  {
+    "id": "梦汐笔谈",
+    "username": "mxbt",
+    "name": "梦汐笔谈",
+    "display_name": "梦汐笔谈",
+    "slug": "梦汐笔谈",
+    "url": "/friends/梦汐笔谈/",
+    "bio": "原创故事作者\r\n会分享自己的设定和剧情\r\n版权归个人所有哦",
+    "homepage": "https://space.bilibili.com/3546975960041769/dynamic?spm_id_from=333.1365.my-info.dyns.click",
+    "avatar": "/uploads/mxbt/2-1.png",
+    "cover": "/uploads/mxbt/ChatGPT-Image-2026-5-14--17_06_28.png",
+    "post_count": 7,
+    "post_titles": [
+      "作者的话",
+      "（一）前夜",
+      "（一）前夕",
+      "（二）第一场游戏",
+      "（三）名为傲慢",
+      "（五）他与她",
+      "（四）游戏后",
+      "道歉信"
+    ],
+    "updated_at": "2026-05-18T22:10:52.857652394+08:00",
+    "links": [],
+    "role": "",
+    "account_type": ""
+  },
+  {
+    "id": "很菜的流萤厨",
+    "username": "three",
+    "name": "很菜的流萤厨",
+    "display_name": "很菜的流萤厨",
+    "slug": "很菜的流萤厨",
+    "url": "/friends/很菜的流萤厨/",
+    "bio": "没人规定这个网站只能写跟学习有关的东西吧(ಡωಡ)",
+    "homepage": "",
+    "avatar": "/uploads/three/img-923660957_1765447334895.jpg",
+    "cover": "/uploads/three/3.png",
+    "post_count": 3,
+    "post_titles": [
+      "关于月亮在冰箱里进行哲学煎蛋的若干泡沫性研究",
+      "几位元老的猎奇小故事——第一话",
+      "SongLine和他的伙伴们——第零话",
+      "SongLine和他的伙伴们——第二话（后室篇）",
+      "SongLine和他的伙伴们"
+    ],
+    "updated_at": "2026-05-28T21:11:31.128284984+08:00",
+    "links": [],
+    "role": "",
+    "account_type": ""
+  },
+  {
+    "id": "mishi",
+    "username": "mishi_a",
+    "name": "mishi",
+    "display_name": "mishi",
+    "slug": "mishi",
+    "url": "/friends/mishi/",
+    "bio": "这个朋友还没有写简介。",
+    "homepage": "",
+    "avatar": "/uploads/mishi_a/avatar.jpg",
+    "cover": "/uploads/admin/article/article_default.png",
+    "post_count": 2,
+    "post_titles": [
+      "我要成为算法糕手！",
+      "無限进步"
+    ],
+    "updated_at": "2026-05-15T11:39:37.455126441+08:00",
+    "links": [],
+    "role": "",
+    "account_type": ""
+  },
+  {
+    "id": "scanf",
+    "username": "scanf",
+    "name": "scanf",
+    "display_name": "scanf",
+    "slug": "scanf",
+    "url": "/friends/scanf/",
+    "bio": "songline网站bug的重要提出者",
+    "homepage": "",
+    "avatar": "/uploads/scanf/CRABR.png",
+    "cover": "/uploads/scanf/beijing.png",
+    "post_count": 2,
+    "post_titles": [
+      "Python笔记(更新中...)",
+      "c++与Java面向对象部分对比"
+    ],
+    "updated_at": "2026-08-05T15:21:49.122241474+08:00",
+    "links": [],
+    "role": "",
+    "account_type": ""
+  },
+  {
+    "id": "萧冷云",
+    "username": "zxlyzq",
+    "name": "萧冷云",
+    "display_name": "萧冷云",
+    "slug": "萧冷云",
+    "url": "/friends/萧冷云/",
+    "bio": "这个朋友还没有写简介。",
+    "homepage": "",
+    "avatar": "/uploads/admin/logo/main_logo.png",
+    "cover": "/uploads/admin/article/article_default.png",
+    "post_count": 1,
+    "post_titles": [
+      "回音壁"
+    ],
+    "updated_at": "2026-06-10T20:27:17.146301365+08:00",
+    "links": [],
+    "role": "",
+    "account_type": ""
+  }
+]

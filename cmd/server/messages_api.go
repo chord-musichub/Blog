@@ -189,7 +189,7 @@ func newMessageRecord(req messageRequest) (MessageRecord, error) {
 		}
 	}
 	if qq == "" {
-		avatar = "/media/users/user-null.png"
+		avatar = defaultUserAvatar
 	}
 	now := time.Now().UTC()
 	return MessageRecord{

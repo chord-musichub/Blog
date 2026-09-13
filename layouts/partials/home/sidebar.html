@@ -1,10 +1,8 @@
 {{- $cfg := .Site.Data.site -}}
 {{- $posts := where .Site.RegularPages "Section" "posts" -}}
 {{- $tagTax := index .Site.Taxonomies "tags" -}}
-{{- $localFriends := .Site.Data.friends | default slice -}}
-{{- $externalFriends := slice -}}
-{{- with resources.Get "data/friends/external.json" }}{{ $externalFriends = . | transform.Unmarshal }}{{ end -}}
-{{- $publicFriends := $localFriends | append $externalFriends -}}
+{{- $publicFriends := .Site.Data.friends | default slice -}}
+{{- if eq (len $publicFriends) 0 }}{{ with resources.Get "data/friends/friends.json" }}{{ $publicFriends = . | transform.Unmarshal }}{{ end }}{{ end -}}
 {{- $lastPost := first 1 $posts -}}
 {{- $recommendable := where $posts ".Params.is_notice" "ne" true -}}
 {{- $featuredPosts := first 5 $recommendable -}}
@@ -22,9 +20,9 @@
         <div class="songline-terminal-heading"><span>推荐文章</span><i></i></div>
         <div class="songline-terminal-feature-stage">
           {{ range $index, $post := $featuredPosts }}
-            {{ $cover := $post.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article_default.png" }}
+            {{ $cover := $post.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png" }}
             <a class="songline-terminal-feature-card{{ if eq $index 0 }} is-active{{ end }}" href="{{ $post.RelPermalink }}" data-home-recommendation-card aria-hidden="{{ if eq $index 0 }}false{{ else }}true{{ end }}"{{ if ne $index 0 }} tabindex="-1"{{ end }}>
-              <img src="{{ $cover }}" alt="" loading="eager" fetchpriority="{{ if eq $index 0 }}high{{ else }}auto{{ end }}" decoding="async" onerror="this.onerror=null;this.src='/uploads/admin/article_default.png';">
+              <img src="{{ $cover }}" alt="" loading="eager" fetchpriority="{{ if eq $index 0 }}high{{ else }}auto{{ end }}" decoding="async" onerror="this.onerror=null;this.src='/uploads/admin/article/article_default.png';">
               <span class="songline-terminal-feature-wash" aria-hidden="true"></span>
               <span class="songline-terminal-feature-copy">
                 <time datetime="{{ $post.Date.Format "2006-01-02" }}">{{ $post.Date.Format "2006.01.02" }}</time>

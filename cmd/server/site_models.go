@@ -2,6 +2,7 @@ package main
 
 // PublicFriend 是构建公开朋友页时写出的最小资料集。
 type PublicFriend struct {
+	ID          string   `json:"id,omitempty"`
 	Username    string   `json:"username"`
 	DisplayName string   `json:"display_name"`
 	Slug        string   `json:"slug"`

@@ -1,138 +1,70 @@
-{{template "admin-head" (dict "Title" "编辑文章" "Data" . "Navigation" true)}}
-<body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
-{{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
-
+{{template "admin-head" (dict "Title" "文章创作" "Data" . "Navigation" true)}}
+<body>
 {{template "admin-client-nav" .}}
-
-<main class="wrap wide">
-  <nav class="nav compact-nav admin-glass-nav">
-    <strong class="admin-brand"><span class="admin-brand-mark">S</span><span>文章编辑器</span></strong>
-    <a class="btn small ghost admin-back-icon" href="{{adminURL "/compose"}}" data-admin-back aria-label="返回投稿" title="返回投稿"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></a>
-    <a class="btn small ghost" href="{{adminURL "/admin/media"}}">媒体库</a>
-    <a class="btn small ghost" href="{{publicURL}}tools/markdown-previewer/" target="_blank">MD 工具 ↗</a>
-    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-  <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg></button>
-  </nav>
-
-  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
-  {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
-
-  <section class="card editor-import-card" aria-labelledby="editorImportTitle">
-    <div>
-      <strong id="editorImportTitle">从 Markdown 开始</strong>
-      <p class="meta">导入内容后仍可在下方继续编辑；不会自动发布。</p>
+<main class="wrap wide workspace-shell editor-workspace">
+  {{template "workspace-sidebar" .}}
+  {{if .Flash}}<div class="flash" role="status">{{.Flash}}</div>{{end}}
+  {{if .Error}}<div class="error" role="alert">{{.Error}}</div>{{end}}
+  <header class="editor-heading">
+    <div><a class="back-link" href="{{if isAdminUser .User}}{{adminURL "/admin#reviews"}}{{else}}{{adminURL "/#manuscripts"}}{{end}}">‹ 稿件管理</a><h1>{{if isAdminUser .User}}审阅文章{{else if .Article.ID}}编辑文章{{else}}文章投稿{{end}}</h1></div>
+    <span class="badge {{statusClass .Article.Status}}">{{statusText .Article.Status}}</span>
+  </header>
+  {{if .Article.RejectNote}}<p class="warn">退回原因：{{.Article.RejectNote}}</p>{{end}}
+  {{if and (eq .Article.Status "published") (not (isAdminUser .User))}}<p class="warn">修改已发布文章会暂时下架，重新审核后再公开。</p>{{end}}
+  <form id="article-form" method="post" action="{{if .Article.ID}}{{adminURL (printf "/articles/%s/edit" .Article.ID)}}{{else}}{{adminURL "/articles/new"}}{{end}}" class="editor-form">
+    <div class="editor-columns">
+      <section class="card writing-surface">
+        <label class="sr-only" for="articleTitle">文章标题</label><input id="articleTitle" class="writing-title" name="title" value="{{.Article.Title}}" placeholder="请输入文章标题" required maxlength="200">
+        <div class="writing-toolbar">
+          <div class="actions"><button type="button" class="small ghost active" data-writing-mode="edit" aria-pressed="true">编辑</button><button type="button" class="small ghost" data-writing-mode="preview" aria-pressed="false">预览</button></div>
+          <label class="text-button import-label">导入 .md<input id="mdImport" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden></label>
+        </div>
+        <span id="mdImportStatus" class="meta inline-status" role="status" aria-live="polite"></span>
+        <div class="formatting-toolbar" aria-label="Markdown 格式工具">
+          <button type="button" data-md-insert="heading" title="标题">H</button><button type="button" data-md-insert="bold" title="加粗"><b>B</b></button><button type="button" data-md-insert="italic" title="斜体"><i>I</i></button><button type="button" data-md-insert="quote" title="引用">❞</button><button type="button" data-md-insert="list" title="列表">☷</button><button type="button" data-md-insert="link" title="链接">↗</button><button type="button" data-md-insert="code" title="代码">〈/〉</button><span>Markdown</span>
+        </div>
+        <label for="md" class="sr-only">Markdown 正文</label>
+        <textarea name="body" id="md" maxlength="204800" required placeholder="从这里开始，写下你的故事…">{{.Article.Body}}</textarea>
+        <article class="preview writing-preview" id="preview" hidden></article>
+        <div class="writing-footer"><span data-word-count>0 字</span><span data-editor-dirty aria-live="polite">未修改</span></div>
+      </section>
+      <aside class="editor-options">
+        <section class="card">
+          <h2>封面设置</h2>
+          <div class="cover-preview" data-cover-preview-for="#coverInput"><span>选择一张封面</span></div>
+          <input type="hidden" name="cover" id="coverInput" value="{{.Article.Cover}}">
+          <div class="cover-crop-launch" data-media-url="{{adminURL "/admin/media"}}" data-media-category="articles">
+            <label class="btn small cover-upload-button">上传封面<input id="coverUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden></label>
+            <button id="coverCropOpen" type="button" class="small secondary" data-crop-source="#coverInput" data-crop-target="#coverInput" data-crop-ratio="16x9" data-crop-label="文章封面" data-crop-mode="#coverModeInput" data-crop-status="#coverCropStatus">裁剪</button>
+          </div>
+          <p id="coverCropStatus" class="meta inline-status" role="status" aria-live="polite"></p>
+          <details class="media-picker-disclosure"><summary>从素材库选择</summary><div class="cover-grid">{{range .CoverFiles}}<button type="button" class="cover-option" data-cover="{{.Path}}" title="{{.Name}}"><img src="{{.Path}}" alt="{{.Name}}" loading="lazy"><span>{{.Name}}</span></button>{{else}}<p class="meta">暂无图片，请先上传封面。</p>{{end}}</div></details>
+        </section>
+        <section class="card form"><h2>发布设置</h2>
+          <label>摘要<textarea class="summary-input" name="summary" rows="3" placeholder="一句话介绍这篇文章（选填）">{{.Article.Summary}}</textarea></label>
+          <label>标签<input name="tags" value="{{joinTags .Article.Tags}}" placeholder="用逗号分隔"></label>
+          <details class="advanced-options"><summary>更多设置</summary>
+            <label>网址短名<input name="slug" value="{{.Article.Slug}}" placeholder="留空自动生成"></label>
+            <label>封面显示<select id="coverModeInput" name="cover_mode"><option value="cover" {{if ne .Article.CoverMode "contain"}}selected{{end}}>铺满 · 16:9</option><option value="contain" {{if eq .Article.CoverMode "contain"}}selected{{end}}>完整显示</option></select></label>
+            <label>封面链接<input data-cover-path-editor value="{{.Article.Cover}}" placeholder="图片 URL"></label>
+          </details>
+        </section>
+      </aside>
     </div>
-    <label class="btn secondary editor-import-button">导入 .md
-      <input id="mdImport" type="file" accept=".md,.markdown,text/markdown,text/plain" hidden>
-    </label>
-    <span id="mdImportStatus" class="meta" role="status" aria-live="polite"></span>
-  </section>
-
-  <section class="hero compact admin-hero editor-hero">
-    <div>
-<h1>{{if .Article.ID}}编辑文章{{else}}新建文章{{end}}</h1>
-      <p>当前状态：<span class="badge {{statusClass .Article.Status}}">{{statusText .Article.Status}}</span>{{if .Article.ID}} · ID：{{.Article.ID}}{{end}}</p>
-      {{if .Article.RejectNote}}<p class="warn">退回原因：{{.Article.RejectNote}}</p>{{end}}
-    </div>
-  </section>
-
-  <form id="article-form" method="post" action="{{if .Article.ID}}{{adminURL (printf "/articles/%s/edit" .Article.ID)}}{{else}}{{adminURL "/articles/new"}}{{end}}" class="card form editor-form">
-    <div class="grid two">
-      <label>标题 <input name="title" value="{{.Article.Title}}" placeholder="我的第一篇测试文章" required></label>
-      <label>Slug / 网址短名 <input name="slug" value="{{.Article.Slug}}" placeholder="my-first-post，可留空自动生成"></label>
-    </div>
-    <label>摘要 <input name="summary" value="{{.Article.Summary}}" placeholder="{{with .Settings.Manuscript.DefaultSummary}}{{.}}{{else}}一句话介绍这篇文章{{end}}">
-      <small>可留空。留空时公开站会显示管理员设置的默认简介；填写后优先使用你的自定义简介。</small>
-    </label>
-    <label>文章插画 / 封面图
-      <input name="cover" id="coverInput" value="{{.Article.Cover}}" placeholder="/uploads/{{.User.Username}}/article-cover.png；留空则使用站点默认插画">
-      <small>从「我的媒体库」复制路径，或者在下面选择。只建议使用你自己账号目录下的图片。</small>
-    </label>
-    <div class="cover-crop-launch" data-media-url="{{adminURL "/admin/media"}}">
-      <label class="btn small secondary cover-upload-button">上传封面
-        <input id="coverUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml" hidden>
-      </label>
-      <button id="coverCropOpen" type="button" class="btn small ghost" data-crop-source="#coverInput" data-crop-target="#coverInput" data-crop-ratio="16x9" data-crop-label="文章封面" data-crop-mode="#coverModeInput" data-crop-status="#coverCropStatus">裁剪为 16:9</button>
-      <a class="btn small ghost" href="{{adminURL "/admin/media"}}" target="_blank" rel="noopener">打开媒体库</a>
-      <span id="coverCropStatus" class="meta" role="status" aria-live="polite">上传后可直接使用；裁剪会保留原图并另存一张 16:9 WebP。</span>
-    </div>
-    <label>封面展示方式
-      <select id="coverModeInput" name="cover_mode">
-        <option value="cover" {{if ne .Article.CoverMode "contain"}}selected{{end}}>铺满裁切：更像封面，画面充满卡片</option>
-        <option value="contain" {{if eq .Article.CoverMode "contain"}}selected{{end}}>完整显示：适合 1:1 或不能裁切的图</option>
-      </select>
-      <small>推荐默认用「铺满裁切」。如果某张图是 1:1、角色或文字容易被切掉，再改成「完整显示」。</small>
-    </label>
-    <div class="cover-picker card soft-card">
-      <div class="toolbar"><b>从我的媒体库选择封面</b><a class="btn small secondary" href="{{adminURL "/admin/media"}}" target="_blank">打开媒体库</a></div>
-      <div class="cover-grid">
-        {{range .CoverFiles}}
-          <button type="button" class="cover-option" data-cover="{{.Path}}">
-            <img src="{{.Path}}" alt="{{.Name}}">
-            <span>{{.Name}}</span>
-          </button>
-        {{else}}
-          <p class="meta">你的媒体库还没有图片。先打开媒体库上传，再回来选择。</p>
-        {{end}}
+    <footer class="editor-publishbar">
+      <span class="meta">{{if isAdminUser .User}}审核后发布至网站{{else}}保存草稿后可随时继续{{end}}</span>
+      <div class="actions">
+        <button type="submit" name="intent" value="save" class="secondary">{{if eq .Article.Status "published"}}保存修改{{else}}保存草稿{{end}}</button>
+        {{if canModerateUser .User}}<button type="submit" name="intent" value="publish">{{if eq .Article.Status "pending"}}审核通过并发布{{else if eq .Article.Status "published"}}更新发布{{else}}发布文章{{end}}</button>
+        {{else}}{{if or (not .Article.ID) (canSubmit .Article)}}<button type="submit" name="intent" value="submit">提交审核</button>{{end}}{{end}}
       </div>
-    </div>
-    <label>标签，用英文逗号分隔 <input name="tags" value="{{joinTags .Article.Tags}}" placeholder="测试, Markdown, 博客"></label>
-    <label>Markdown 正文
-      <textarea name="body" id="md" maxlength="204800" required placeholder="# 标题&#10;&#10;从这里开始写 Markdown...">{{.Article.Body}}</textarea>
-    </label>
-    <div class="actions">
-      <button type="submit" name="intent" value="save" class="secondary"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">{{if and (canModerateUser .User) (eq .Article.Status "published")}}仅保存后台（不更新公开站）{{else}}保存到草稿箱{{end}}</span></button>
-      {{if canModerateUser .User}}
-        {{if or (not .Article.ID) (canSubmit .Article)}}<button type="submit" name="intent" value="submit" class="ghost"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text">放入审核队列（测试）</span></button>{{end}}
-        <button type="submit" name="intent" value="publish"><span class="btn-ico" aria-hidden="true">↗</span><span class="btn-text">{{if eq .Article.Status "pending"}}审核通过并发布{{else if eq .Article.Status "published"}}保存并更新公开站{{else}}直接发布到公开站{{end}}</span></button>
-      {{else}}
-        {{if or (not .Article.ID) (canSubmit .Article)}}<button type="submit" name="intent" value="submit"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text">提交给管理员审核</span></button>{{end}}
-      {{end}}
-      {{if .Article.ID}}{{if or (canModerateUser .User) (or (eq .Article.Status "draft") (eq .Article.Status "rejected"))}}<button type="submit" form="delete-form" class="danger"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span class="btn-text">删除</span></button>{{end}}{{end}}
-      <a class="btn ghost" href="{{adminURL "/"}}"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/></svg></span><span class="btn-text">返回</span></a>
-    </div>
-    <p class="meta form-hint">流程：草稿/后台保存不会更新公开站；提交审核会进入「审核后台」的待审核队列；只有管理员点击发布或更新公开站后，首页才会同步。</p>
+    </footer>
   </form>
-
   {{template "media-crop-dialog" .}}
-
-  {{if .Article.ID}}
-  <form id="delete-form" method="post" action="{{adminURL (printf "/articles/%s/delete" .Article.ID)}}" onsubmit="return confirm('确定删除这篇文章吗？已发布文章会同步从公开博客移除。')"></form>
-  {{end}}
-
-  <section class="preview-layout">
-    <div>
-      <h2>预览</h2>
-      <article class="card preview" id="preview"></article>
-    </div>
-    <aside class="card help">
-      <h3>怎么填？</h3>
-      <p><b>标题</b>：文章名。</p>
-      <p><b>Slug</b>：建议英文小写，比如 <code>my-first-post</code>。</p>
-      <p><b>动作区别</b>：草稿/后台保存不会重建前台；提交审核会进入待审核队列；发布/更新公开站才会重建首页。</p>
-      <p><b>图片引用</b>：从媒体库复制路径后，可在 Markdown 中使用 <code>![](/uploads/...)</code>。</p>
-      <p><b>公开工具</b>：需要临时查看本地文件时，可以打开前台 Markdown 预览器。</p>
-    </aside>
-  </section>
 </main>
-<script>
-(function(){
-  const input = document.getElementById('coverInput');
-  document.querySelectorAll('.cover-option[data-cover]').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      if(!input) return;
-      input.value = btn.getAttribute('data-cover') || '';
-      document.querySelectorAll('.cover-option').forEach(function(x){ x.classList.remove('active'); });
-      btn.classList.add('active');
-    });
-  });
-})();
-</script>
 <script src="/static/markdown-renderer.js?v=20.3.4"></script>
-<script src="/static/editor.js?v=20.3.4"></script>
-<script src="/static/cover-cropper.js?v=20.20.0"></script>
-<script src="/static/cover-uploader.js?v=20.19.0"></script>
+<script src="/static/editor.js?v=21.0.0"></script>
+<script src="/static/cover-cropper.js?v=21.0.0"></script>
+<script src="/static/cover-uploader.js?v=21.0.0"></script>
 <script src="/static/editor-import.js?v=20.19.0"></script>
-</body>
-</html>
+</body></html>

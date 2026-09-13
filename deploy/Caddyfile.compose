@@ -13,6 +13,11 @@
         reverse_proxy blog-admin:8080
     }
 
+    @uploadedMedia path /uploads/*
+    handle @uploadedMedia {
+        reverse_proxy blog-admin:8080
+    }
+
     @publicAPI path /api/*
     handle @publicAPI {
         reverse_proxy blog-admin:8080

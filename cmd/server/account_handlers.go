@@ -17,11 +17,12 @@ import (
 // administrator routes stay intact so old bookmarks and operational data keep
 // working, while the primary navigation no longer needs to expose each one.
 func (app *App) handleSettingsHub(w http.ResponseWriter, r *http.Request) {
-	u, _ := app.currentUser(r)
-	app.render(w, "settings_hub.html", map[string]any{
-		"User":  u,
-		"Flash": r.URL.Query().Get("msg"),
-	})
+	// Old bookmarks lead straight to the form, with no redundant overview step.
+	target := "/account"
+	if r.URL.RawQuery != "" {
+		target += "?" + r.URL.RawQuery
+	}
+	app.redirect(w, r, target, http.StatusSeeOther)
 }
 
 // handleComposeHub makes 投稿 a choice of creator tasks rather than silently
@@ -35,8 +36,10 @@ func (app *App) handleComposeHub(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.render(w, "compose_hub.html", map[string]any{
-		"User":  u,
-		"Flash": r.URL.Query().Get("msg"),
+		"User":          u,
+		"Flash":         r.URL.Query().Get("msg"),
+		"Workspace":     "compose",
+		"WorkspacePage": "overview",
 	})
 }
 
@@ -48,7 +51,7 @@ func (app *App) handleNewArticle(w http.ResponseWriter, r *http.Request) {
 	}
 	if r.Method == http.MethodGet {
 		a := Article{Author: u.Username, Status: stDraft}
-		app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "new", "CoverFiles": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username))})
+		app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "new", "CoverFiles": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Workspace": "editor", "WorkspacePage": "article"})
 		return
 	}
 	if r.Method != http.MethodPost {
@@ -76,7 +79,7 @@ func (app *App) saveAccountImageUpload(r *http.Request, username, field, prefix 
 	}
 
 	owner := mediaOwner(username)
-	dir := app.userMediaDir(owner)
+	dir := filepath.Join(app.userMediaDir(owner), "profile")
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return "", err
 	}
@@ -101,14 +104,14 @@ func (app *App) saveAccountImageUpload(r *http.Request, username, field, prefix 
 		_ = os.Remove(dstPath)
 		return "", fmt.Errorf("图片不能超过 3MB")
 	}
-	return userMediaPublicPath(owner, dstName), nil
+	return userMediaPublicPath(owner, filepath.Join("profile", dstName)), nil
 }
 
 func (app *App) handleAccount(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
 	coverFiles := listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username))
 	if r.Method == http.MethodGet {
-		app.render(w, "account.html", map[string]any{"User": u, "CoverFiles": coverFiles, "Flash": r.URL.Query().Get("msg")})
+		app.render(w, "account.html", map[string]any{"User": u, "CoverFiles": coverFiles, "Flash": r.URL.Query().Get("msg"), "SettingsSection": "account"})
 		return
 	}
 	if r.Method != http.MethodPost {

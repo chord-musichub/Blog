@@ -1,31 +1,28 @@
-# 私有运行数据：文章、用户、站点设置、成绩等
-/data/*
+# 每个部署实例独有的运行数据：账号、草稿、文章、留言、统计、排行榜、
+# 用户上传媒体与 Markdown 源文件。公开初始资料放在 assets/；
+# 站点构建素材统一放在 static/uploads/admin/。
+/data/
 
-# 本地文章和自动生成的内容页面
+# 后台生成的公开内容也是运行数据；服务器通过 shared/content 持久保存。
 /content/posts/
 /content/friends/
 /content/tags/
 
-# 文章图片、后台上传的媒体
+# 兼容旧版本尚未迁入 data 的用户上传目录，不把用户文件当作站点素材发布。
 /static/uploads/*
 !/static/uploads/admin/
-/static/uploads/admin/*
-!/static/uploads/admin/tools-archive-day-v1.png
-!/static/uploads/admin/tools-archive-night-v1.png
-!/static/uploads/admin/tools-archive-sunset-v2.png
-!/static/uploads/admin/tools-archive-sunset-v3.png
-!/static/uploads/admin/tools-archive-night-v3.png
-!/static/uploads/admin/under-ground.png
-!/static/uploads/admin/under-ground-black.png
-!/static/uploads/admin/tools-underground-soil-light-v1.png
-!/static/uploads/admin/tools-underground-soil-dark-v1.png
 /static/md-source/
+
+# 仅本机保存且绝不能通过站点 URL 访问的原图、备份与导出文件。
+/local-only/
+
+# 由服务启动时生成的运行时配置。
 /static/runtime-config.js
-/static/friends-data.json
 
 # Hugo 构建产物与本地二进制
 /published/
 /resources/
+.hugo-data/
 .hugo_build.lock
 /blog-admin
 

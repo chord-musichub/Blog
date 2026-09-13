@@ -83,8 +83,111 @@ func TestSettingsHubRendersForCreator(t *testing.T) {
 	if response.Code != http.StatusOK {
 		t.Fatalf("settings hub status = %d, body = %s", response.Code, response.Body.String())
 	}
-	if !strings.Contains(response.Body.String(), "账号与资料") {
+	if !strings.Contains(response.Body.String(), "账号资料") {
 		t.Fatalf("settings hub did not render creator actions: %s", response.Body.String())
+	}
+}
+
+func TestCreatorTopNavigationKeepsMediaInWorkspaceAndHomeUsesCompactDraftList(t *testing.T) {
+	previousDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(filepath.Join("..", "..")); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(previousDir) })
+
+	app := newApp(Config{}, &Store{})
+	response := httptest.NewRecorder()
+	app.render(response, "home.html", map[string]any{
+		"User":     User{Username: "creator", Role: roleUser},
+		"Settings": defaultSiteSettings(),
+		"Articles": []Article{{ID: "article-1", Title: "短稿", Status: stDraft}},
+	})
+	body := response.Body.String()
+	if response.Code != http.StatusOK {
+		t.Fatalf("home status = %d, body = %s", response.Code, body)
+	}
+	if strings.Contains(body, `data-admin-route="media"`) {
+		t.Fatalf("creator top navigation still exposes media library: %s", body)
+	}
+	for _, want := range []string{"dashboard-article-list", "稿件", "短稿"} {
+		if !strings.Contains(body, want) {
+			t.Fatalf("home compact list missing %q: %s", want, body)
+		}
+	}
+}
+
+func TestMediaLibraryOffersNonDestructiveCropForExistingRasterImages(t *testing.T) {
+	previousDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(filepath.Join("..", "..")); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(previousDir) })
+
+	app := newApp(Config{}, &Store{})
+	response := httptest.NewRecorder()
+	app.render(response, "media.html", map[string]any{
+		"User":      User{Username: "creator", Role: roleUser},
+		"Settings":  defaultSiteSettings(),
+		"Workspace": "media",
+		"Files": []MediaFile{
+			{Path: "/uploads/creator/old-photo.png", Name: "old-photo.png", Ext: "png"},
+			{Path: "/uploads/creator/notes.pdf", Name: "notes.pdf", Ext: "pdf"},
+		},
+		"Groups": []MediaGroup{{Key: "general", Label: "通用素材", Files: []MediaFile{
+			{Path: "/uploads/creator/old-photo.png", Name: "old-photo.png", Ext: "png"},
+			{Path: "/uploads/creator/notes.pdf", Name: "notes.pdf", Ext: "pdf"},
+		}}},
+	})
+	body := response.Body.String()
+	if response.Code != http.StatusOK {
+		t.Fatalf("media status = %d, body = %s", response.Code, body)
+	}
+	for _, want := range []string{"mediaCropSource0-0", "裁剪 16:9", "cover-cropper.js?v=20.25.0"} {
+		if !strings.Contains(body, want) {
+			t.Fatalf("media crop affordance missing %q: %s", want, body)
+		}
+	}
+	if strings.Contains(body, "mediaCropSource0-1") {
+		t.Fatalf("non-image media unexpectedly received crop control: %s", body)
+	}
+}
+
+func TestProjectAndMemoryEditorsUseCurrentCropperForLegacyImages(t *testing.T) {
+	previousDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(filepath.Join("..", "..")); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(previousDir) })
+
+	app := newApp(Config{}, &Store{})
+	data := map[string]any{
+		"User":          User{Username: "songline", Role: roleOwner},
+		"Settings":      defaultSiteSettings(),
+		"Workspace":     "compose",
+		"WorkspacePage": "project",
+		"Projects":      []Project{{Title: "旧项目", Cover: "/media/projects/old.png"}},
+		"Memories":      []Memory{{Date: "2026-09", Title: "旧回忆", Image: "/media/memories/old.jpg"}},
+		"Files":         []MediaFile{},
+	}
+	for _, name := range []string{"creator_projects.html", "creator_memories.html"} {
+		if name == "creator_memories.html" {
+			data["WorkspacePage"] = "memory"
+		}
+		response := httptest.NewRecorder()
+		app.render(response, name, data)
+		body := response.Body.String()
+		if response.Code != http.StatusOK || !strings.Contains(body, "cover-cropper.js?v=20.25.0") || !strings.Contains(body, "data-crop-source") {
+			t.Fatalf("%s did not provide the current cropper: status=%d body=%s", name, response.Code, body)
+		}
 	}
 }
 
@@ -166,6 +269,77 @@ func TestAdministratorNavigationUsesManagementWorkflow(t *testing.T) {
 	}
 	if strings.Contains(body, ">投稿<") || strings.Contains(body, "回主页 ↗") {
 		t.Fatalf("administrator navigation leaked creator-only link: %s", body)
+	}
+}
+
+func TestSettingsPagesRenderAsTwoPaneWorkspace(t *testing.T) {
+	previousDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(filepath.Join("..", "..")); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(previousDir) })
+
+	app := newApp(Config{}, &Store{})
+	data := map[string]any{
+		"User":     User{Username: "songline", Role: roleOwner},
+		"Settings": defaultSiteSettings(),
+		"Theme":    defaultThemeSettings(),
+	}
+	for _, name := range []string{"settings_hub.html", "site_settings.html", "theme_settings.html", "manuscript_settings.html", "account.html"} {
+		response := httptest.NewRecorder()
+		app.render(response, name, data)
+		body := response.Body.String()
+		if response.Code != http.StatusOK || !strings.Contains(body, "settings-workspace") || !strings.Contains(body, "settings-sidebar") {
+			t.Fatalf("%s did not render settings workspace: status=%d body=%s", name, response.Code, body)
+		}
+	}
+}
+
+func TestCreatorWorkspacesReuseTheTwoPaneShell(t *testing.T) {
+	previousDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(filepath.Join("..", "..")); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(previousDir) })
+
+	app := newApp(Config{}, &Store{})
+	data := map[string]any{
+		"User":           User{Username: "songline", Role: roleOwner},
+		"Settings":       defaultSiteSettings(),
+		"Workspace":      "compose",
+		"WorkspacePage":  "article",
+		"Article":        Article{Status: stDraft},
+		"Projects":       []Project{},
+		"Memories":       []Memory{},
+		"Files":          []MediaFile{},
+		"CoverFiles":     []MediaFile{},
+		"ArticleGroups":  []articleAuthorGroup{},
+		"Messages":       []MessageRecord{},
+		"Users":          []User{},
+		"PasswordResets": []PasswordResetRequest{},
+	}
+	for _, name := range []string{"compose_hub.html", "media.html", "creator_projects.html", "creator_memories.html", "editor.html", "admin.html"} {
+		if name == "media.html" {
+			data["Workspace"] = "media"
+		} else if name == "editor.html" {
+			data["Workspace"] = "editor"
+		} else if name == "admin.html" {
+			data["Workspace"] = "admin"
+		} else {
+			data["Workspace"] = "compose"
+		}
+		response := httptest.NewRecorder()
+		app.render(response, name, data)
+		body := response.Body.String()
+		if response.Code != http.StatusOK || !strings.Contains(body, "workspace-shell") || !strings.Contains(body, "workspace-sidebar") {
+			t.Fatalf("%s did not render creator workspace: status=%d body=%s", name, response.Code, body)
+		}
 	}
 }
 

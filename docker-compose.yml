@@ -5,7 +5,9 @@ services:
     restart: unless-stopped
     environment:
       ADDR: "${ADDR:-:8080}"
-      DATA_DIR: "/app/data"
+      # 运行时数据不能挂载到 /app/data：Hugo 会把该目录视作 data namespace，
+      # 而文章下载源中的 .md 不是 Hugo data 文件，会导致整站首次构建中断。
+      DATA_DIR: "/app/runtime"
       HUGO_CONTENT_DIR: "/app/content/posts"
       PUBLIC_DIR: "/app/published"
       HUGO_COMMAND: "hugo --minify --source . --destination /app/published"
@@ -20,9 +22,8 @@ services:
       HUGO_BUILD_TIMEOUT_SECONDS: "${HUGO_BUILD_TIMEOUT_SECONDS:-180}"
       MAX_UPLOAD_BYTES: "${MAX_UPLOAD_BYTES:-104857600}"
     volumes:
-      - ./data:/app/data
+      - ./data:/app/runtime
       - ./content:/app/content
-      - ./static/uploads:/app/static/uploads
       - ./published:/app/published
     expose:
       - "8080"

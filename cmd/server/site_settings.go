@@ -83,20 +83,20 @@ func cleanOrbitHref(raw string, fallback string) string {
 
 func defaultSiteSettings() SiteSettings {
 	return SiteSettings{
-		Site: SiteBasic{Title: "Songline Blog", DisplayName: "Blog", FooterText: "由热爱驱动，持续记录", ICP: "暂无", Logo: "Songline Blog", LogoIcon: "/uploads/admin/main_logo.png", Favicon: "/uploads/admin/main_logo.png", EnableDarkToggle: true},
-		Home: HomeSettings{HeroTitle: "欢迎来到 Blog", HeroSubtitle: "记录学习、创作与生活的每一段足迹，在文字中连接思想，在分享中共同成长。", HeroImage: "/uploads/admin/show.png", IntroTitle: "这个站是什么？", IntroBody: "Blog 是一个个人博客，专注于分享我在技术、创作、项目与生活中的所思所学。\n这里没有噱头与套路，只有真诚的记录与持续的输出。\n希望它能成为我的数字花园，也能为你带来一些启发与帮助。", FoundedAt: "2026/5/8", RecommendedCount: 6},
+		Site: SiteBasic{Title: "Songline Blog", DisplayName: "Blog", FooterText: "由热爱驱动，持续记录", ICP: "暂无", Logo: "Songline Blog", LogoIcon: "/uploads/admin/logo/main_logo.png", Favicon: "/uploads/admin/logo/main_logo.png", EnableDarkToggle: true},
+		Home: HomeSettings{HeroTitle: "欢迎来到 Blog", HeroSubtitle: "记录学习、创作与生活的每一段足迹，在文字中连接思想，在分享中共同成长。", HeroImage: "/uploads/admin/background/qiandai_background.png", IntroTitle: "这个站是什么？", IntroBody: "Blog 是一个个人博客，专注于分享我在技术、创作、项目与生活中的所思所学。\n这里没有噱头与套路，只有真诚的记录与持续的输出。\n希望它能成为我的数字花园，也能为你带来一些启发与帮助。", FoundedAt: "2026/5/8", RecommendedCount: 6},
 		Pages: PageSettings{
-			PostsHeroTitle: "文章", PostsHeroSubtitle: "记录思考，分享见解，探索技术与生活的更多可能。", PostsHeroImage: "/uploads/admin/article.png",
-			TagsHeroTitle: "标签", TagsHeroSubtitle: "按主题浏览，发现感兴趣的内容。", TagsHeroImage: "/uploads/admin/tag.png",
-			FriendsHeroTitle: "朋友", FriendsHeroSubtitle: "在这里，遇见一群热爱写作与分享的朋友。\n他们用文字记录生活，也温暖着彼此。", FriendsHeroImage: "/uploads/admin/friends.png",
-			ArticleDefaultCover: "/uploads/admin/article_default.png", TagDefaultCover: "/uploads/admin/article_default.png", FriendDefaultCover: "/uploads/admin/article_default.png", ToolsHeroTitle: "工具", ToolsHeroSubtitle: "一些轻量小工具。",
+			PostsHeroTitle: "文章", PostsHeroSubtitle: "记录思考，分享见解，探索技术与生活的更多可能。", PostsHeroImage: "/uploads/admin/background/ground-background.png",
+			TagsHeroTitle: "标签", TagsHeroSubtitle: "按主题浏览，发现感兴趣的内容。", TagsHeroImage: "/uploads/admin/background/ground-background.png",
+			FriendsHeroTitle: "朋友", FriendsHeroSubtitle: "在这里，遇见一群热爱写作与分享的朋友。\n他们用文字记录生活，也温暖着彼此。", FriendsHeroImage: "/uploads/admin/background/qiandai_background.png",
+			ArticleDefaultCover: "/uploads/admin/article/article_default.png", TagDefaultCover: "/uploads/admin/article/article_default.png", FriendDefaultCover: "/uploads/admin/article/article_default.png", ToolsHeroTitle: "工具", ToolsHeroSubtitle: "一些轻量小工具。",
 		},
 		Boot:       BootSettings{WelcomeText: "欢迎回来"},
 		Orbit:      defaultOrbitSettings(),
 		Manuscript: ManuscriptSettings{DefaultSummary: "这篇文章暂时还没有填写简介，先点进去看看正文吧。"},
 		Background: BackgroundSettings{Image: "", Height: "420px", Blur: "18px", Opacity: "0.38"},
 		AboutCard:  AboutCard{Title: "关于本站", AvatarText: "B", Name: "Blog", Body: "这是一个记录学习、创作与生活的个人博客。\n在这里，分享思考，沉淀成长，遇见更好的自己。"},
-		Social:     SocialSettings{GitHub: "https://github.com/", Email: "mailto:hello@example.com", Bilibili: "https://space.bilibili.com/", ShowGitHub: true, ShowEmail: true, ShowBilibili: true, BilibiliIcon: "/uploads/admin/bilibili.png"},
+		Social:     SocialSettings{GitHub: "https://github.com/", Email: "mailto:hello@example.com", Bilibili: "https://space.bilibili.com/", ShowGitHub: true, ShowEmail: true, ShowBilibili: true, BilibiliIcon: "/uploads/admin/logo/bilibili.png"},
 		ContentAreas: []ContentArea{
 			{Title: "技术笔记", Description: "记录开发过程中的知识、踩坑与解决方案。", Icon: "code", Link: "/tags/技术笔记/"},
 			{Title: "创作记录", Description: "设计、写作、摄影等创作过程与灵感。", Icon: "pen", Link: "/tags/创作记录/"},

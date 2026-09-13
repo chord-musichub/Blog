@@ -1,0 +1,10 @@
+{{define "settings-sidebar"}}
+{{if isOwnerUser .User}}
+<aside class="settings-sidebar" aria-label="设置分类">
+  <a href="{{adminURL "/account"}}" {{if eq .SettingsSection "account"}}class="active"{{end}}>{{template "admin-icon" "user"}}账号资料</a>
+  <a href="{{adminURL "/admin/site"}}" {{if eq .SettingsSection "site"}}class="active"{{end}}>{{template "admin-icon" "grid"}}站点信息</a>
+  <a href="{{adminURL "/admin/theme"}}" {{if eq .SettingsSection "theme"}}class="active"{{end}}>{{template "admin-icon" "settings"}}外观主题</a>
+  <a href="{{adminURL "/admin/manuscript"}}" {{if eq .SettingsSection "manuscript"}}class="active"{{end}}>{{template "admin-icon" "file"}}文章默认</a>
+</aside>
+{{end}}
+{{end}}

@@ -122,7 +122,7 @@
 
     function openFocus(message, trigger){
       if(!message) return;
-      var avatar = message.avatar || '/media/users/user-null.png';
+      var avatar = message.avatar || '/uploads/admin/friends/user-null.png';
       focus.querySelector('[data-home-message-focus-meta]').innerHTML = '<img src="' + escapeHTML(avatar) + '" alt="" referrerpolicy="no-referrer">' +
         '<div><b>' + escapeHTML(message.name || '匿名') + '</b><time>' + escapeHTML(formatTime(message.created_at)) + '</time></div>';
       focus.querySelector('[data-home-message-focus-content]').innerHTML = renderMarkdown(message.content);
@@ -164,7 +164,7 @@
       if(count) count.textContent = String(messages.length);
       if(!list) return;
       list.innerHTML = messages.map(function(message, index){
-        var avatar = message.avatar || '/media/users/user-null.png';
+        var avatar = message.avatar || '/uploads/admin/friends/user-null.png';
         var longMessage = Array.from(String(message.content || '')).length > 40;
         return '<article class="songline-home-message-entry' + (index % 2 ? ' is-offset' : '') + (longMessage ? ' is-collapsible' : '') + '" data-home-message-entry data-home-message-index="' + index + '" tabindex="0" role="button" aria-label="查看留言详情">' +
           '<span class="songline-home-message-entry-no">' + String(index + 1).padStart(3, '0') + '</span>' +

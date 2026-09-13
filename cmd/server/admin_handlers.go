@@ -59,6 +59,7 @@ func (app *App) handleAdmin(w http.ResponseWriter, r *http.Request) {
 		"Messages":       app.adminMessages(),
 		"PasswordResets": app.store.PasswordResetRequests(),
 		"Flash":          r.URL.Query().Get("msg"),
+		"Workspace":      "admin",
 	})
 }
 

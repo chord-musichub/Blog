@@ -4,24 +4,17 @@
 .env.*
 data/*
 !data/
+.hugo-data/
 content/posts/
 content/friends/
 content/tags/
 static/uploads/*
 !static/uploads/admin/
-static/uploads/admin/*
-!static/uploads/admin/tools-archive-day-v1.png
-!static/uploads/admin/tools-archive-night-v1.png
-!static/uploads/admin/tools-archive-sunset-v2.png
-!static/uploads/admin/tools-archive-sunset-v3.png
-!static/uploads/admin/tools-archive-night-v3.png
-!static/uploads/admin/under-ground.png
-!static/uploads/admin/under-ground-black.png
-!static/uploads/admin/tools-underground-soil-light-v1.png
-!static/uploads/admin/tools-underground-soil-dark-v1.png
 static/md-source/
+# The repository carries a public snapshot so a fresh clone renders the same
+# public site. Local-only source material and temporary media stay out of images.
+local-only/
 static/runtime-config.js
-static/friends-data.json
 published/
 resources/
 deploy/verify_v*.sh

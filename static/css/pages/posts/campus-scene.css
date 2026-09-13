@@ -27,7 +27,7 @@ body[data-page-section="posts"] .site-bg-layer{
 body[data-page-section="posts"] .site-bg-layer::before{
   inset:0;
   background-color:#d9edf9;
-  background-image:url('/uploads/admin/ground-background.png');
+background-image:url('/uploads/admin/background/ground-background.png');
   background-repeat:no-repeat;
   background-position:center center;
   background-size:cover;
@@ -37,7 +37,7 @@ body[data-page-section="posts"] .site-bg-layer::before{
 }
 body.dark[data-page-section="posts"] .site-bg-layer::before{
   background-color:#07122b;
-  background-image:url('/uploads/admin/ground-back-black.png');
+background-image:url('/uploads/admin/background/ground-back-black.png');
 }
 body[data-page-section="posts"] .site-bg-layer::after{
   inset:0;

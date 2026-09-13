@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -81,18 +82,11 @@ func mediaOwner(username string) string {
 	return u
 }
 
-// runtimeStaticDir 保存不会随发布版本替换的媒体和 Markdown 源文件。
-// 本地默认使用项目 static 目录，服务器由 RUNTIME_STATIC_DIR 指向 shared/static。
-func (app *App) runtimeStaticDir() string {
-	dir := strings.TrimSpace(app.cfg.RuntimeStaticDir)
-	if dir == "" {
-		return "static"
-	}
-	return filepath.Clean(dir)
-}
-
+// 媒体属于部署实例的可变数据，而 static/ 只保留可随仓库发布的种子素材。
+// /uploads 路径由 HTTP 服务从 data/media 提供，首次启动时再从 static/uploads
+// 补种公开快照，避免用户上传反向污染 Git 工作区。
 func (app *App) mediaRootDir() string {
-	return filepath.Join(app.runtimeStaticDir(), "uploads")
+	return filepath.Join(app.cfg.DataDir, "media")
 }
 
 func (app *App) userMediaDir(username string) string {
@@ -104,7 +98,7 @@ func userMediaPublicPrefix(username string) string {
 }
 
 func userMediaPublicPath(username, name string) string {
-	return userMediaPublicPrefix(username) + name
+	return userMediaPublicPrefix(username) + filepath.ToSlash(name)
 }
 
 func isMediaPathOwnedBy(username, publicPath string) (string, error) {
@@ -114,30 +108,110 @@ func isMediaPathOwnedBy(username, publicPath string) (string, error) {
 		return "", fmt.Errorf("not owned")
 	}
 	name := strings.TrimPrefix(v, prefix)
-	if name == "" || strings.Contains(name, "/") || strings.Contains(name, "\\") || strings.Contains(name, "..") {
+	name = path.Clean(name)
+	if name == "." || name == "" || strings.HasPrefix(name, "../") || strings.Contains(name, "\\") {
 		return "", fmt.Errorf("invalid media name")
 	}
-	return name, nil
+	return filepath.FromSlash(name), nil
 }
 
 type MediaFile struct {
-	Path string
-	Name string
-	Ext  string
+	Path     string
+	Name     string
+	Ext      string
+	Category string
 }
 
 func listMediaFiles(dir string, publicPrefix string) []MediaFile {
-	entries, _ := os.ReadDir(dir)
 	out := []MediaFile{}
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
+	_ = filepath.WalkDir(dir, func(filePath string, entry os.DirEntry, err error) error {
+		if err != nil || entry == nil || entry.IsDir() {
+			return nil
 		}
-		name := e.Name()
-		out = append(out, MediaFile{Path: publicPrefix + name, Name: name, Ext: strings.TrimPrefix(strings.ToLower(filepath.Ext(name)), ".")})
-	}
+		rel, err := filepath.Rel(dir, filePath)
+		if err != nil || rel == "." || strings.HasPrefix(rel, "..") {
+			return nil
+		}
+		name := filepath.ToSlash(rel)
+		category := "general"
+		if parts := strings.Split(name, "/"); len(parts) > 1 && parts[0] != "" {
+			category = parts[0]
+		}
+		out = append(out, MediaFile{
+			Path:     publicPrefix + name,
+			Name:     name,
+			Ext:      strings.TrimPrefix(strings.ToLower(filepath.Ext(name)), "."),
+			Category: category,
+		})
+		return nil
+	})
 	sort.Slice(out, func(i, j int) bool { return strings.ToLower(out[i].Name) < strings.ToLower(out[j].Name) })
 	return out
+}
+
+type MediaGroup struct {
+	Key   string
+	Label string
+	Files []MediaFile
+}
+
+var mediaCategoryLabels = map[string]string{
+	"general":     "通用素材",
+	"articles":    "文章",
+	"projects":    "项目",
+	"memories":    "回忆",
+	"profile":     "个人资料",
+	"friends":     "朋友",
+	"site":        "站点",
+	"backgrounds": "背景",
+	"tools":       "工具",
+}
+
+func normalizedMediaCategory(raw string) string {
+	key := strings.ToLower(strings.TrimSpace(raw))
+	if _, ok := mediaCategoryLabels[key]; ok {
+		return key
+	}
+	return "general"
+}
+
+func mediaGroups(files []MediaFile) []MediaGroup {
+	byKey := map[string][]MediaFile{}
+	for _, file := range files {
+		key := normalizedMediaCategory(file.Category)
+		byKey[key] = append(byKey[key], file)
+	}
+	keys := make([]string, 0, len(byKey))
+	for key := range byKey {
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		if keys[i] == "general" {
+			return true
+		}
+		if keys[j] == "general" {
+			return false
+		}
+		return keys[i] < keys[j]
+	})
+	groups := make([]MediaGroup, 0, len(keys))
+	for _, key := range keys {
+		groups = append(groups, MediaGroup{Key: key, Label: mediaCategoryLabels[key], Files: byKey[key]})
+	}
+	return groups
+}
+
+func mediaDirectoryForCategory(media mediaLibraryContext, category string) (string, string, error) {
+	category = normalizedMediaCategory(category)
+	dir := filepath.Join(media.dir, category)
+	root := filepath.Clean(media.dir)
+	if dir != root && !strings.HasPrefix(filepath.Clean(dir), root+string(os.PathSeparator)) {
+		return "", "", fmt.Errorf("invalid media category")
+	}
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", "", err
+	}
+	return dir, category, nil
 }
 
 func mediaNameFromPublicPath(p string) (string, error) {

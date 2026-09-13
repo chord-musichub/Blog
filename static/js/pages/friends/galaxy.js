@@ -60,7 +60,7 @@
         username:username,
         name:name,
         bio:clean(item.bio) || '这个朋友还没有写简介。',
-        avatar:url(item.avatar, '/media/users/user-null.png'),
+        avatar:url(item.avatar, '/uploads/admin/friends/user-null.png'),
         href:explicitHref ? profileURL(explicitHref) : '',
         count:Number(item.post_count || item.postCount || 0),
         updated:date(item.updated_at || item.updatedAt),
@@ -270,7 +270,7 @@
 
     function safeImage(image, source){
       if(!image) return;
-      image.onerror = function(){ if(image.src.indexOf('/media/users/user-null.png') < 0) image.src = '/media/users/user-null.png'; };
+      image.onerror = function(){ if(image.src.indexOf('/uploads/admin/friends/user-null.png') < 0) image.src = '/uploads/admin/friends/user-null.png'; };
       image.onload = settleLayout;
       image.src = source;
     }
