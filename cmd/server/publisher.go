@@ -253,7 +253,6 @@ func (app *App) runHugo(ctx context.Context) error {
 		parts = withoutHugoSourceAndDestination(parts)
 		parts = append(parts,
 			"--source", workspace,
-			"--config", filepath.Join(workspace, "config.toml"),
 			"--destination", publicDir,
 		)
 	}
@@ -275,10 +274,9 @@ func (app *App) runHugo(ctx context.Context) error {
 }
 
 // prepareHugoBuildWorkspace gives Hugo a source tree that contains no backend
-// runtime data.  Its data/ directory is a link to the filtered public snapshot
-// written by syncHugoPublicData.  Keeping this compatibility layer in the app,
-// rather than relying on Hugo's dataDir setting, makes the release work on both
-// the server's Hugo 0.92 and newer local Docker images.
+// runtime data. Its data/ directory is copied from the filtered public snapshot
+// written by syncHugoPublicData. Hugo 0.166 deliberately does not follow source
+// directory symlinks, so all Hugo inputs here must be real workspace files.
 func (app *App) prepareHugoBuildWorkspace() (string, error) {
 	root, err := filepath.Abs(app.hugoRootDir())
 	if err != nil {
@@ -292,11 +290,9 @@ func (app *App) prepareHugoBuildWorkspace() (string, error) {
 		return "", fmt.Errorf("create Hugo build workspace: %w", err)
 	}
 
-	// Hugo 0.92 does not reliably discover a configuration file through a
-	// symbolic link and may only probe the legacy config.toml name. Copy this
-	// small file under the legacy config.toml name and pass it explicitly to
-	// Hugo. The large source directories below remain links and are never
-	// duplicated.
+	// Hugo 0.92 only probes the legacy config.toml name, and its Ubuntu package
+	// panics if --config is passed. Keep a real config.toml in the workspace so
+	// both old and current Hugo versions discover it without command overrides.
 	configSource := filepath.Join(root, "hugo.toml")
 	config, err := os.ReadFile(configSource)
 	if err != nil {
@@ -314,8 +310,8 @@ func (app *App) prepareHugoBuildWorkspace() (string, error) {
 			}
 			return "", fmt.Errorf("prepare Hugo input %s: %w", name, err)
 		}
-		if err := os.Symlink(source, filepath.Join(workspace, name)); err != nil {
-			return "", fmt.Errorf("link Hugo input %s: %w", name, err)
+		if err := copyHugoWorkspaceTree(source, filepath.Join(workspace, name)); err != nil {
+			return "", fmt.Errorf("copy Hugo input %s: %w", name, err)
 		}
 	}
 
@@ -323,10 +319,48 @@ func (app *App) prepareHugoBuildWorkspace() (string, error) {
 	if _, err := os.Stat(publicData); err != nil {
 		return "", fmt.Errorf("Hugo public data snapshot is unavailable: %w", err)
 	}
-	if err := os.Symlink(publicData, filepath.Join(workspace, "data")); err != nil {
-		return "", fmt.Errorf("link Hugo public data: %w", err)
+	if err := copyHugoWorkspaceTree(publicData, filepath.Join(workspace, "data")); err != nil {
+		return "", fmt.Errorf("copy Hugo public data: %w", err)
 	}
 	return workspace, nil
+}
+
+// copyHugoWorkspaceTree follows the repository's content symlinks while
+// materializing a standalone Hugo source tree. It is intentionally separate
+// from copyMissingTree: each build starts with a fresh workspace and therefore
+// must replace every file, not merely fill missing paths.
+func copyHugoWorkspaceTree(source, target string) error {
+	info, err := os.Stat(source)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return copyHugoWorkspaceFile(source, target)
+	}
+	if err := os.MkdirAll(target, 0755); err != nil {
+		return err
+	}
+	entries, err := os.ReadDir(source)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		if err := copyHugoWorkspaceTree(filepath.Join(source, entry.Name()), filepath.Join(target, entry.Name())); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func copyHugoWorkspaceFile(source, target string) error {
+	data, err := os.ReadFile(source)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
+		return err
+	}
+	return os.WriteFile(target, data, 0644)
 }
 
 func (app *App) absolutePublicDir() (string, error) {
@@ -345,11 +379,11 @@ func withoutHugoSourceAndDestination(parts []string) []string {
 	for i := 0; i < len(parts); i++ {
 		part := parts[i]
 		switch part {
-		case "--source", "-s", "--destination", "-d", "--config", "-c":
+		case "--source", "-s", "--destination", "-d":
 			i++ // These flags consume exactly one path argument.
 			continue
 		}
-		if strings.HasPrefix(part, "--source=") || strings.HasPrefix(part, "--destination=") || strings.HasPrefix(part, "--config=") {
+		if strings.HasPrefix(part, "--source=") || strings.HasPrefix(part, "--destination=") {
 			continue
 		}
 		filtered = append(filtered, part)
