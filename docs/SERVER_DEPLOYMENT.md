@@ -109,7 +109,7 @@ sudo systemctl daemon-reload
 在 GitHub 克隆的源码目录中运行：
 
 ```bash
-sudo BLOG_REPOSITORY_URL=https://github.com/chord-musichub/Blog.git bash ./deploy/release-deploy.sh main
+sudo bash ./deploy/release-deploy.sh main
 sudo systemctl status blog-admin-next.service --no-pager
 curl -I http://127.0.0.1:8081/healthz
 ```
@@ -164,7 +164,7 @@ curl -I https://blog.songline-blog.com/write/login
 每次更新都从仓库最新源码启动候选版本：
 
 ```bash
-sudo BLOG_REPOSITORY_URL=https://github.com/chord-musichub/Blog.git bash ./deploy/release-deploy.sh main
+sudo bash ./deploy/release-deploy.sh main
 sudo bash /opt/songline-blog/next/deploy/release-promote.sh
 ```
 

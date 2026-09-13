@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # 在不触碰 current 稳定版本的前提下，拉取、构建并启动 next 预发布版本。
-# 运行方式：sudo BLOG_REPOSITORY_URL=https://github.com/chord-musichub/Blog.git ./deploy/release-deploy.sh [Git 引用]
+# 运行方式：sudo ./deploy/release-deploy.sh [Git 引用]
 
 if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
   echo "请使用 sudo 运行此脚本。" >&2
@@ -10,7 +10,9 @@ if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
 fi
 
 APP_ROOT="${BLOG_APP_ROOT:-/opt/songline-blog}"
-REPOSITORY_URL="${BLOG_REPOSITORY_URL:-https://github.com/chord-musichub/Blog.git}"
+REPOSITORY_URL="${BLOG_REPOSITORY_URL:-git@github.com:chord-musichub/Blog.git}"
+GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-ssh -i /root/.ssh/id_ed25519_blog_deploy -o IdentitiesOnly=yes}"
+export GIT_SSH_COMMAND
 RELEASE_REF="${1:-${BLOG_RELEASE_REF:-main}}"
 RELEASES_DIR="$APP_ROOT/releases"
 SHARED_DIR="$APP_ROOT/shared"
