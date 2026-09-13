@@ -22,7 +22,7 @@
 # Hugo 构建产物与本地二进制
 /published/
 /resources/
-.hugo-data/
+/hugo-data/
 .hugo_build.lock
 /blog-admin
 

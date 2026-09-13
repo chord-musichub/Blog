@@ -6,7 +6,7 @@ hasCJKLanguage = true
 enableRobotsTXT = true
 # Hugo 只读取构建前筛选出的公开快照。运行时数据（账号、留言、Markdown 下载源等）
 # 保留在 DATA_DIR，不能再被 Hugo 当作 data namespace 解析或发布。
-dataDir = '.hugo-data'
+dataDir = 'hugo-data'
 
 [outputs]
 home = ['HTML', 'RSS']

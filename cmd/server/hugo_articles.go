@@ -15,7 +15,7 @@ import (
 func (app *App) hugoRootDir() string {
 	// Hugo is executed with cmd.Dir = "." in runHugo. The content directory may
 	// deliberately point into the shared runtime volume on a server, so deriving
-	// the Hugo root from HugoContentDir would write .hugo-data outside the release
+	// the Hugo root from HugoContentDir would write hugo-data outside the release
 	// that Hugo actually builds.
 	workingDir, err := os.Getwd()
 	if err != nil {

@@ -142,7 +142,10 @@ func (app *App) ensureBuiltinContentPages() error {
 // downloadable Markdown files, none of which may be parsed by Hugo or copied
 // into the public build.
 func (app *App) syncHugoPublicData() error {
-	targetDir := filepath.Join(app.hugoRootDir(), ".hugo-data")
+	// Do not use a dot-prefixed directory here: Hugo may ignore it as a hidden
+	// source path. This directory is excluded from Git but remains visible to
+	// Hugo's configured dataDir during a release build.
+	targetDir := filepath.Join(app.hugoRootDir(), "hugo-data")
 	if err := os.MkdirAll(targetDir, 0755); err != nil {
 		return err
 	}
