@@ -51,6 +51,11 @@ install -d -o blog -g blog -m 0755 \
 tar -tzf "$BUNDLE" >/dev/null
 tar -C "$WORK_DIR" -xzf "$BUNDLE"
 
+# Windows-created archives can carry CRLF shell scripts. Normalize the release
+# scripts before candidate startup so Bash does not interpret `pipefail\r` as
+# an invalid option.
+find "$SOURCE_DIR/deploy" -maxdepth 1 -type f -name '*.sh' -exec sed -i 's/\r$//' {} +
+
 for path in \
   "$SOURCE_DIR/go.mod" \
   "$SOURCE_DIR/cmd/server" \

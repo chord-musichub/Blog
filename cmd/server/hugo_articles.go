@@ -13,9 +13,15 @@ import (
 // 文章发布文件与供前端阅读的 Markdown 源文件生成。
 
 func (app *App) hugoRootDir() string {
-	contentDir := filepath.Clean(app.cfg.HugoContentDir)
-	// 示例：/opt/gexian-blog-mvp/content/posts -> /opt/gexian-blog-mvp
-	return filepath.Dir(filepath.Dir(contentDir))
+	// Hugo is executed with cmd.Dir = "." in runHugo. The content directory may
+	// deliberately point into the shared runtime volume on a server, so deriving
+	// the Hugo root from HugoContentDir would write .hugo-data outside the release
+	// that Hugo actually builds.
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return "."
+	}
+	return workingDir
 }
 
 func (app *App) writeArticleSourceMarkdown(a Article, source string) (string, error) {

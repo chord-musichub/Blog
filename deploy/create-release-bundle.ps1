@@ -60,6 +60,7 @@ try {
     $env:SONGLINE_BUNDLE_SOURCE = $sourceArchive
     $env:SONGLINE_BUNDLE_OUTPUT = $bundlePath
     @'
+import io
 import os
 import tarfile
 from pathlib import Path
@@ -74,6 +75,10 @@ with tarfile.open(output_path, "w:gz", format=tarfile.PAX_FORMAT) as destination
         for member in source.getmembers():
             payload = source.extractfile(member) if member.isfile() else None
             member.name = f"source/{member.name}"
+            if payload is not None and member.name.endswith(".sh"):
+                data = payload.read().replace(b"\r\n", b"\n")
+                member.size = len(data)
+                payload = io.BytesIO(data)
             destination.addfile(member, payload)
     for relative in runtime_paths:
         destination.add(root / relative, arcname=f"runtime/{relative}")
