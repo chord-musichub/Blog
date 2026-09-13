@@ -251,7 +251,11 @@ func (app *App) runHugo(ctx context.Context) error {
 			return err
 		}
 		parts = withoutHugoSourceAndDestination(parts)
-		parts = append(parts, "--source", workspace, "--destination", publicDir)
+		parts = append(parts,
+			"--source", workspace,
+			"--config", filepath.Join(workspace, "config.toml"),
+			"--destination", publicDir,
+		)
 	}
 	if app.cfg.PublicSiteURL != "" && strings.EqualFold(filepath.Base(parts[0]), "hugo") {
 		parts = append(parts, "--baseURL", app.cfg.PublicSiteURL)
@@ -289,14 +293,16 @@ func (app *App) prepareHugoBuildWorkspace() (string, error) {
 	}
 
 	// Hugo 0.92 does not reliably discover a configuration file through a
-	// symbolic link, so this small file must be copied into the workspace.  The
-	// large source directories below remain links and are never duplicated.
+	// symbolic link and may only probe the legacy config.toml name. Copy this
+	// small file under the legacy config.toml name and pass it explicitly to
+	// Hugo. The large source directories below remain links and are never
+	// duplicated.
 	configSource := filepath.Join(root, "hugo.toml")
 	config, err := os.ReadFile(configSource)
 	if err != nil {
 		return "", fmt.Errorf("read Hugo config: %w", err)
 	}
-	if err := os.WriteFile(filepath.Join(workspace, "hugo.toml"), config, 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(workspace, "config.toml"), config, 0644); err != nil {
 		return "", fmt.Errorf("write Hugo workspace config: %w", err)
 	}
 
@@ -339,11 +345,11 @@ func withoutHugoSourceAndDestination(parts []string) []string {
 	for i := 0; i < len(parts); i++ {
 		part := parts[i]
 		switch part {
-		case "--source", "-s", "--destination", "-d":
+		case "--source", "-s", "--destination", "-d", "--config", "-c":
 			i++ // These flags consume exactly one path argument.
 			continue
 		}
-		if strings.HasPrefix(part, "--source=") || strings.HasPrefix(part, "--destination=") {
+		if strings.HasPrefix(part, "--source=") || strings.HasPrefix(part, "--destination=") || strings.HasPrefix(part, "--config=") {
 			continue
 		}
 		filtered = append(filtered, part)
