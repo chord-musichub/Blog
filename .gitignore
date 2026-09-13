@@ -23,6 +23,7 @@
 /published/
 /resources/
 /hugo-data/
+/.hugo-workspace/
 .hugo_build.lock
 /blog-admin
 

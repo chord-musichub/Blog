@@ -231,6 +231,28 @@ func (app *App) runHugo(ctx context.Context) error {
 	cctx, cancel := context.WithTimeout(ctx, app.cfg.HugoBuildTimeout)
 	defer cancel()
 	parts := strings.Fields(app.cfg.HugoCommand)
+	if len(parts) == 0 {
+		return nil
+	}
+	if strings.EqualFold(filepath.Base(parts[0]), "hugo") {
+		// Hugo 0.92 (the version on the production server) always inspects a
+		// source-root data/ directory.  The application's runtime data directory
+		// deliberately contains private JSON and Markdown source files, so giving
+		// Hugo the release root would make it try to decode data/md-source/*.md as
+		// Hugo data and abort the entire build.  Build from a small, isolated source
+		// tree instead: it links the public site inputs plus a data/ link that points
+		// only at the filtered hugo-data snapshot.
+		workspace, err := app.prepareHugoBuildWorkspace()
+		if err != nil {
+			return err
+		}
+		publicDir, err := app.absolutePublicDir()
+		if err != nil {
+			return err
+		}
+		parts = withoutHugoSourceAndDestination(parts)
+		parts = append(parts, "--source", workspace, "--destination", publicDir)
+	}
 	if app.cfg.PublicSiteURL != "" && strings.EqualFold(filepath.Base(parts[0]), "hugo") {
 		parts = append(parts, "--baseURL", app.cfg.PublicSiteURL)
 	}
@@ -240,12 +262,81 @@ func (app *App) runHugo(ctx context.Context) error {
 		parts = append(parts, "--cleanDestinationDir")
 	}
 	cmd := exec.CommandContext(cctx, parts[0], parts[1:]...)
-	cmd.Dir = "."
+	cmd.Dir = app.hugoRootDir()
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("%v\n%s", err, string(out))
 	}
 	return nil
+}
+
+// prepareHugoBuildWorkspace gives Hugo a source tree that contains no backend
+// runtime data.  Its data/ directory is a link to the filtered public snapshot
+// written by syncHugoPublicData.  Keeping this compatibility layer in the app,
+// rather than relying on Hugo's dataDir setting, makes the release work on both
+// the server's Hugo 0.92 and newer local Docker images.
+func (app *App) prepareHugoBuildWorkspace() (string, error) {
+	root, err := filepath.Abs(app.hugoRootDir())
+	if err != nil {
+		return "", err
+	}
+	workspace := filepath.Join(root, ".hugo-workspace")
+	if err := os.RemoveAll(workspace); err != nil {
+		return "", fmt.Errorf("reset Hugo build workspace: %w", err)
+	}
+	if err := os.MkdirAll(workspace, 0755); err != nil {
+		return "", fmt.Errorf("create Hugo build workspace: %w", err)
+	}
+
+	for _, name := range []string{"hugo.toml", "assets", "content", "layouts", "static"} {
+		source := filepath.Join(root, name)
+		if _, err := os.Lstat(source); err != nil {
+			if errors.Is(err, os.ErrNotExist) && name != "hugo.toml" {
+				continue
+			}
+			return "", fmt.Errorf("prepare Hugo input %s: %w", name, err)
+		}
+		if err := os.Symlink(source, filepath.Join(workspace, name)); err != nil {
+			return "", fmt.Errorf("link Hugo input %s: %w", name, err)
+		}
+	}
+
+	publicData := filepath.Join(root, "hugo-data")
+	if _, err := os.Stat(publicData); err != nil {
+		return "", fmt.Errorf("Hugo public data snapshot is unavailable: %w", err)
+	}
+	if err := os.Symlink(publicData, filepath.Join(workspace, "data")); err != nil {
+		return "", fmt.Errorf("link Hugo public data: %w", err)
+	}
+	return workspace, nil
+}
+
+func (app *App) absolutePublicDir() (string, error) {
+	if filepath.IsAbs(app.cfg.PublicDir) {
+		return filepath.Clean(app.cfg.PublicDir), nil
+	}
+	root, err := filepath.Abs(app.hugoRootDir())
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(root, app.cfg.PublicDir), nil
+}
+
+func withoutHugoSourceAndDestination(parts []string) []string {
+	filtered := make([]string, 0, len(parts))
+	for i := 0; i < len(parts); i++ {
+		part := parts[i]
+		switch part {
+		case "--source", "-s", "--destination", "-d":
+			i++ // These flags consume exactly one path argument.
+			continue
+		}
+		if strings.HasPrefix(part, "--source=") || strings.HasPrefix(part, "--destination=") {
+			continue
+		}
+		filtered = append(filtered, part)
+	}
+	return filtered
 }
 
 func hasHugoFlag(parts []string, flag string) bool {

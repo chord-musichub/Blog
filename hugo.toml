@@ -4,9 +4,8 @@ title = 'Songline Blog'
 summaryLength = 120
 hasCJKLanguage = true
 enableRobotsTXT = true
-# Hugo 只读取构建前筛选出的公开快照。运行时数据（账号、留言、Markdown 下载源等）
-# 保留在 DATA_DIR，不能再被 Hugo 当作 data namespace 解析或发布。
-dataDir = 'hugo-data'
+# 构建程序会在隔离的 Hugo 工作区中把公开快照挂载为 data/。运行时数据
+# （账号、留言、Markdown 下载源等）始终留在站点根目录的 DATA_DIR，不参与 Hugo。
 
 [outputs]
 home = ['HTML', 'RSS']
