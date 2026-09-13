@@ -11,7 +11,7 @@ import (
 // 本文件管理公开站全局设置、首页轨道配置与稿件默认设置。
 
 func (app *App) siteSettingsPath() string {
-	return filepath.Join(app.cfg.DataDir, "site.json")
+	return runtimeDataPath(app.cfg.DataDir, "site.json")
 }
 
 func normalizeContactHref(raw string, defaultScheme string) string {
@@ -183,7 +183,7 @@ func (app *App) loadSiteSettings() (SiteSettings, error) {
 }
 
 func (app *App) saveSiteSettings(s SiteSettings) error {
-	if err := os.MkdirAll(app.cfg.DataDir, 0700); err != nil {
+	if err := os.MkdirAll(filepath.Dir(app.siteSettingsPath()), 0700); err != nil {
 		return err
 	}
 	b, err := json.MarshalIndent(s, "", "  ")

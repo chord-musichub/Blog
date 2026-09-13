@@ -9,7 +9,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -38,7 +37,7 @@ type messageRequest struct {
 }
 
 func (app *App) messagesPath() string {
-	return filepath.Join(app.cfg.DataDir, "messages.json")
+	return runtimeDataPath(app.cfg.DataDir, "messages.json")
 }
 
 // 调用方必须持有 messagesMu。

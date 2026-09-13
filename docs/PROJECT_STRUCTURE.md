@@ -4,20 +4,21 @@
 
 ## `data/`：运行时私有 JSON
 
-这些文件由后台服务读写，Git 与 Docker 构建上下文都不会收录。JSON 继续使用 `data/*.json` 的稳定兼容路径，媒体和 Markdown 已不再和 `static/` 混放：
+这些文件由后台服务读写，Git 与 Docker 构建上下文都不会收录。业务 JSON 按职责放在分类目录；旧版本的 `data/*.json` 会在服务启动时一次性移动到下列最终位置，迁移完成后不保留旧副本。
 
 | 路径 | 内容 |
 | --- | --- |
-| `data/users.json`、`password_resets.json` | 账号、密码哈希与重置请求。 |
-| `data/articles.json` | 用户文章、草稿与投稿状态。 |
-| `data/friends.json` | 当前实例的可修改朋友资料；首次从公开种子补入。 |
-| `data/messages.json`、`views.json`、`*_scores.json` | 留言、统计和小游戏排行榜。 |
+| `data/auth/users.json`、`data/auth/password_resets.json` | 账号、密码哈希与重置请求。 |
+| `data/content/articles.json`、`projects.json`、`memories.json`、`tag_urls.json` | 用户内容、草稿、项目、回忆与标签链接。 |
+| `data/community/friends.json`、`messages.json` | 当前实例可修改的朋友资料与留言。 |
+| `data/settings/site.json`、`theme.json` | 本实例的站点和主题设置。 |
+| `data/metrics/views.json`、`data/games/*_scores.json` | 阅读统计和小游戏排行榜。 |
 | `data/media/<用户>/` | 所有运行时上传媒体，由 `/uploads/` 提供。 |
 | `data/md-source/` | Markdown 下载源文件。 |
 
 `data/build.json` 保留在根目录：它只提供 Hugo 的构建版本号，不是后台业务数据。
 
-站内朋友的星链由管理员维护 `assets/data/friends/links.json`：键为本站朋友的用户名或第三方朋友 ID，值为朋友用户名或第三方朋友 ID 的数组，例如 `"songline": ["mxbt", "shoper"]`。该文件随 Git 发布；关系线只需任一端配置。公开朋友基础资料维护在同目录的 `friends.json`；部署后的资料修改只写入 `data/friends.json`。
+站内朋友的星链由管理员维护 `assets/data/friends/links.json`：键为本站朋友的用户名或第三方朋友 ID，值为朋友用户名或第三方朋友 ID 的数组，例如 `"songline": ["mxbt", "shoper"]`。该文件随 Git 发布；关系线只需任一端配置。公开朋友基础资料维护在同目录的 `friends.json`；部署后的资料修改只写入 `data/community/friends.json`。
 
 ## `assets/data/`：随 Hugo 构建的公开配置
 
@@ -73,7 +74,7 @@
 
 ## 新增时的判断
 
-1. 当前后台会修改、部署后应持久化的 JSON：仍放现有 `data/*.json`；统一迁移完成后才改为 `data/<职责>/`。
+1. 当前后台会修改、部署后应持久化的 JSON：放 `data/<职责>/`；不要再新增根目录业务 JSON。
 2. 公开页面构建时读取的清单 JSON：放 `assets/data/<模块>/`。
 3. 代码库维护或后台配置指定的公开图片、音频和插图：放 `static/uploads/<归属或模块>/`。
 4. 用户上传的公开文件：运行时写入 `data/media/<用户>/`；需要作为新安装默认内容时，再人工挑选并加入 `static/uploads/<用户>/`。

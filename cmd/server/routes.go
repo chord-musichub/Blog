@@ -14,7 +14,7 @@ func (app *App) router() http.Handler {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 	mux.HandleFunc("/uploads/", app.handlePublicMedia)
 	// Markdown 源文件属于运行时数据，不能依赖公开站的静态目录或 SPA 兜底规则。
-	mux.Handle("/md-source/", http.StripPrefix("/md-source/", http.FileServer(http.Dir(filepath.Join(app.cfg.DataDir, "md-source")))))
+	mux.Handle("/md-source/", http.StripPrefix("/md-source/", http.FileServer(http.Dir(runtimeMarkdownDir(app.cfg.DataDir)))))
 	mux.HandleFunc("/api/views", app.handleViewsAPI)
 	mux.HandleFunc("/api/messages", app.handleMessagesAPI)
 

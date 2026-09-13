@@ -18,7 +18,7 @@ var (
 )
 
 func (app *App) themeSettingsPath() string {
-	return filepath.Join(app.cfg.DataDir, "theme.json")
+	return runtimeDataPath(app.cfg.DataDir, "theme.json")
 }
 
 func defaultThemeSettings() ThemeSettings {
@@ -59,7 +59,7 @@ func (app *App) loadThemeSettings() (ThemeSettings, error) {
 }
 
 func (app *App) saveThemeSettings(t ThemeSettings) error {
-	if err := os.MkdirAll(app.cfg.DataDir, 0700); err != nil {
+	if err := os.MkdirAll(filepath.Dir(app.themeSettingsPath()), 0700); err != nil {
 		return err
 	}
 	b, err := json.MarshalIndent(t, "", "  ")

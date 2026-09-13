@@ -35,7 +35,7 @@ type Memory struct {
 }
 
 func (app *App) creatorDataPath(name string) string {
-	return filepath.Join(app.cfg.DataDir, name+".json")
+	return runtimeDataPath(app.cfg.DataDir, name+".json")
 }
 
 // loadCreatorData reads the persistent data volume first. On an installation
@@ -54,7 +54,7 @@ func (app *App) loadCreatorData(name string, target any) error {
 				return seedErr
 			}
 		}
-		if err := os.MkdirAll(app.cfg.DataDir, 0700); err != nil {
+		if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
 			return err
 		}
 		if err := os.WriteFile(path, seed, 0600); err != nil {
@@ -71,7 +71,7 @@ func (app *App) loadCreatorData(name string, target any) error {
 }
 
 func (app *App) saveCreatorData(name string, value any) error {
-	if err := os.MkdirAll(app.cfg.DataDir, 0700); err != nil {
+	if err := os.MkdirAll(filepath.Dir(app.creatorDataPath(name)), 0700); err != nil {
 		return err
 	}
 	b, err := json.MarshalIndent(value, "", "  ")

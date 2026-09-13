@@ -13,7 +13,7 @@ import (
 // drafts, view counts, or game records from data/.
 func (app *App) ensurePublicSnapshotData() error {
 	for _, name := range []string{"site.json", "theme.json"} {
-		target := filepath.Join(app.cfg.DataDir, name)
+		target := runtimeDataPath(app.cfg.DataDir, name)
 		if _, err := os.Stat(target); err == nil {
 			continue
 		} else if !errors.Is(err, os.ErrNotExist) {
@@ -25,7 +25,7 @@ func (app *App) ensurePublicSnapshotData() error {
 		} else if err != nil {
 			return err
 		}
-		if err := os.MkdirAll(app.cfg.DataDir, 0700); err != nil {
+		if err := os.MkdirAll(filepath.Dir(target), 0700); err != nil {
 			return err
 		}
 		if err := copyFileExclusive(source, target); err != nil {
@@ -39,7 +39,7 @@ func (app *App) ensurePublicSnapshotData() error {
 // card fields. Runtime edits live in data/friends.json and never overwrite the
 // seed, so a fork has a usable star map while each deployment owns its state.
 func (app *App) ensurePublicFriendsData() error {
-	target := filepath.Join(app.cfg.DataDir, "friends.json")
+	target := runtimeDataPath(app.cfg.DataDir, "friends.json")
 	source := filepath.Join("assets", "data", "friends", "friends.json")
 	if _, err := os.Stat(source); errors.Is(err, os.ErrNotExist) {
 		return nil
@@ -50,7 +50,7 @@ func (app *App) ensurePublicFriendsData() error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(app.cfg.DataDir, 0700); err != nil {
+	if err := os.MkdirAll(filepath.Dir(target), 0700); err != nil {
 		return err
 	}
 	if _, err := os.Stat(target); errors.Is(err, os.ErrNotExist) {

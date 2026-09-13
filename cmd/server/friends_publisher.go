@@ -14,7 +14,7 @@ import (
 // 资料页。文件首次由 assets/data/friends/friends.json 补种；外部节点不生成
 // 本地资料页，也不会因本实例的账号变动而被覆盖。
 func (app *App) syncFriendContentPages() error {
-	dataPath := filepath.Join(app.cfg.DataDir, "friends.json")
+	dataPath := runtimeDataPath(app.cfg.DataDir, "friends.json")
 	if err := app.ensurePublicFriendsData(); err != nil {
 		return err
 	}

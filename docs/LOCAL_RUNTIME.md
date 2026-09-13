@@ -2,7 +2,7 @@
 
 这个仓库只保存程序源码。以下目录保留在本机或服务器备份中，不会提交到 GitHub：
 
-- `data/`：文章数据库、账号、站点设置和访问数据。
+- `data/`：运行时私有数据，按 `auth/`、`content/`、`community/`、`settings/`、`metrics/`、`games/` 分类保存；媒体与 Markdown 位于 `media/`、`md-source/`。
 - `content/posts/`、`content/friends/`、`content/tags/`：由后台数据生成的公开内容。
 - `static/uploads/`、`static/md-source/`：文章图片、附件和 Markdown 源文件。
 - `.env`：管理员密码、会话密钥和本机 URL 配置。
@@ -16,7 +16,7 @@ docker compose up --build -d
 
 脚本会创建未纳入 Git 的 `.env` 和运行目录，并显示一次随机生成的管理员密码。请把密码保存到密码管理器。
 
-`ADMIN_PASS` 是该管理员账号的唯一配置来源：每次服务启动时，程序都会将 `data/users.json` 中对应管理员的密码哈希同步为 `.env` 里的值。因此，修改 `.env` 后重启服务即可修改管理员密码；不要再从后台修改该管理员的密码。其他用户仍完全由 `data/users.json` 和后台用户管理处理。
+`ADMIN_PASS` 是该管理员账号的唯一配置来源：每次服务启动时，程序都会将 `data/auth/users.json` 中对应管理员的密码哈希同步为 `.env` 里的值。因此，修改 `.env` 后重启服务即可修改管理员密码；不要再从后台修改该管理员的密码。其他用户仍完全由 `data/auth/users.json` 和后台用户管理处理。
 
 `PUBLIC_SITE_URL` 是公开站完整 URL（例如 `https://blog.example.com`），`PUBLIC_API_URL` 是后台/API 完整 URL（例如 `https://write.example.com`）。它们用于 Hugo 生成链接、后台 CSP 和公开工具页的成绩接口；修改后重启服务会重建公开站。`PUBLIC_CORS_ORIGINS` 是允许调用成绩接口的网页来源，多个地址用英文逗号分隔；通常填写与 `PUBLIC_SITE_URL` 相同的地址。
 

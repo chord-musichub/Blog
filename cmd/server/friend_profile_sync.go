@@ -19,7 +19,7 @@ func (app *App) syncUserProfileToFriendsJSON(oldUser, newUser User) error {
 		return nil
 	}
 
-	dataPath := filepath.Join(app.cfg.DataDir, "friends.json")
+	dataPath := runtimeDataPath(app.cfg.DataDir, "friends.json")
 	if err := os.MkdirAll(filepath.Dir(dataPath), 0755); err != nil {
 		return err
 	}

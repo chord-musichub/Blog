@@ -17,8 +17,8 @@
 | `assets/data/friends/friends.json` | 朋友星图的公开基础节点：本站用户仅保留展示所需资料，第三方节点也在这里。 | 是 |
 | `assets/data/friends/links.json` | 朋友星链关系。 | 是 |
 | `static/uploads/` | 可随项目复刻的公开媒体种子；首次启动只补入缺失的 `data/media/` 文件。 | 是 |
-| `data/friends.json` | 当前部署实例中可编辑的朋友资料覆盖层。 | 否 |
-| `data/media/`、`data/articles.json`、`data/messages.json`、`data/*scores.json` | 用户上传、单用户内容、留言、统计与排行等易变运行数据。 | 否 |
+| `data/community/friends.json` | 当前部署实例中可编辑的朋友资料覆盖层。 | 否 |
+| `data/media/`、`data/content/articles.json`、`data/community/messages.json`、`data/games/*_scores.json` | 用户上传、单用户内容、留言、统计与排行等易变运行数据。 | 否 |
 
 因此，复刻者不需要先准备 `data/`：空目录也能显示仓库内的公开站。随后新增的账号、文章、媒体和互动数据只属于其自己的部署，不会污染项目仓库。
 
@@ -33,7 +33,7 @@ docker compose up --build
 
 ## 需要保密的文件
 
-- 不要把私密文章发布为公开文章；未发布草稿只存在于 `data/articles.json`，默认不会进入 Git。
+- 不要把私密文章发布为公开文章；未发布草稿只存在于 `data/content/articles.json`，默认不会进入 Git。
 - 不应公开的原图、导出文件或个人备份请放入仓库根目录 `local-only/`，该目录被 Git 与 Docker 构建忽略，也不属于静态资源目录。
 - `static/uploads/` 下的文件按设计会被浏览器请求，不能存放任何真正私密的内容。
 - 环境变量、`.env`、SSH 密钥和服务器运行数据继续保持忽略。

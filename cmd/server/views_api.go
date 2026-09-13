@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"path/filepath"
 	"strings"
 )
 
@@ -16,7 +15,7 @@ type viewAPIResponse struct {
 }
 
 func (app *App) viewsPath() string {
-	return filepath.Join(app.cfg.DataDir, "views.json")
+	return runtimeDataPath(app.cfg.DataDir, "views.json")
 }
 
 func cleanViewPath(raw string) string {

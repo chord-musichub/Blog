@@ -6,12 +6,20 @@
 
 ```text
 /opt/songline-blog/
-├── releases/                 # GitHub 每次拉取并构建出的不可变版本
+├── releases/                 # 每次从 Git 或本地发布包构建出的不可变版本
 ├── current -> releases/...   # 正在对外服务的稳定版本
 ├── next -> releases/...      # 仅监听 127.0.0.1:8081 的候选版本
 └── shared/                   # 永不提交、不会被发布覆盖的私有运行数据
 ├── blog-admin.env
     ├── data/                 # 账号、业务 JSON、媒体与 Markdown 源文件
+    │   ├── auth/             # users.json、password_resets.json
+    │   ├── content/          # articles.json、projects.json、memories.json、tag_urls.json
+    │   ├── community/        # friends.json、messages.json
+    │   ├── settings/         # site.json、theme.json
+    │   ├── metrics/          # views.json
+    │   ├── games/            # 各小游戏排行榜
+    │   ├── media/
+    │   └── md-source/
     ├── content/{posts,friends,tags}/
 ```
 
@@ -50,7 +58,7 @@ sudo chown -R blog:blog /opt/songline-blog/shared/data /opt/songline-blog/shared
 
 若其中某个旧目录不存在，先跳过对应的一行即可。
 
-旧服务器如果已经按更早的发布脚本保留了 `shared/static/`，也不必删除它。首次运行新版本时可以临时保留 `RUNTIME_STATIC_DIR=/opt/songline-blog/shared/static`，服务会只复制 `data/` 中缺失的媒体与 Markdown；确认迁移完成后即可删除该环境变量与旧目录。
+旧服务器如果已经按更早的发布脚本保留了 `shared/static/`，也不必删除它。首次运行新版本时可以临时保留 `RUNTIME_STATIC_DIR=/opt/songline-blog/shared/static`，服务会只复制 `data/` 中缺失的媒体与 Markdown；确认迁移完成后即可删除该环境变量与旧目录。旧版平铺的 `shared/data/*.json` 在启动时会被一次性移动到上面的分类目录；同名内容冲突时服务会停止迁移而不覆盖任何数据，需先人工处理冲突。
 
 ### 整理早期站点图标
 
@@ -171,3 +179,33 @@ sudo systemctl reload nginx
 ```
 
 运行数据位于 `shared/`，所以回滚程序版本不会回滚文章或用户数据。上线前仍建议打包一次 `/opt/songline-blog/shared/` 备份。
+
+## 本地完整发布包（不依赖 GitHub）
+
+当本机网络无法向 GitHub 推送，或希望把当前源码与运行数据作为一个版本整体替换时，使用完整发布包。发布包分为两部分：`source/` 是一个已提交的源码快照，`runtime/` 是 `data/` 与动态 `content/{posts,friends,tags}`。它不会包含 `.git`、`.env`、`local-only/`、Docker 构建产物或旧备份。
+
+先在本机提交希望发布的源码，并停止本地容器避免打包时继续写入数据：
+
+```powershell
+docker compose stop
+.\deploy\create-release-bundle.ps1
+docker compose start
+```
+
+脚本会在 `local-only/server-release/` 创建 `.tar.gz`，并输出 SHA256。将该文件上传到服务器：
+
+```powershell
+scp .\local-only\server-release\songline-blog-<时间>-<提交>.tar.gz root@<服务器IP>:/opt/songline-blog/backups/
+```
+
+在服务器执行包内的构建脚本。它会先编译，再停止旧服务、备份 `shared` 中当前数据、替换运行数据并启动仅本机可见的候选版本：
+
+```bash
+ARCHIVE=/opt/songline-blog/backups/songline-blog-<时间>-<提交>.tar.gz
+tar -xOzf "$ARCHIVE" source/deploy/release-from-bundle.sh | sudo bash -s -- "$ARCHIVE"
+curl -I http://127.0.0.1:8081/healthz
+sudo bash /opt/songline-blog/next/deploy/release-promote.sh
+sudo systemctl reload nginx
+```
+
+完整发布包会以本地 `runtime/` 为准，替换线上动态数据；服务器会在替换前生成 `runtime-before-bundle-*.tar.gz`。因此开始打包后不要再在公开站新增留言、上传或编辑内容，除非这些改动也已同步回本地。

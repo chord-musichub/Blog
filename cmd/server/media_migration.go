@@ -86,7 +86,7 @@ func (app *App) migrateLegacyRuntimeData() error {
 			return err
 		}
 	}
-	return copyMissingTree(filepath.Join(legacyRoot, "md-source"), filepath.Join(app.cfg.DataDir, "md-source"))
+	return copyMissingTree(filepath.Join(legacyRoot, "md-source"), runtimeMarkdownDir(app.cfg.DataDir))
 }
 
 func copyMissingTree(sourceRoot, targetRoot string) error {
@@ -224,7 +224,7 @@ func copyFileExclusive(source, target string) error {
 // immediately by this migration before the first Hugo build.
 func (app *App) migrateLegacyMediaReferences() error {
 	for _, name := range []string{"site.json", "projects.json", "memories.json", "friends.json", "users.json", "articles.json", "messages.json"} {
-		path := filepath.Join(app.cfg.DataDir, name)
+		path := runtimeDataPath(app.cfg.DataDir, name)
 		if err := rewriteLegacyMediaPaths(path); err != nil {
 			return err
 		}

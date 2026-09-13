@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"path/filepath"
 )
 
 // loadScoreRecords 从内存缓存读取积分榜；首次访问才读取磁盘。
@@ -43,5 +42,5 @@ func cloneScoreRecords(records []SnakeScoreRecord) []SnakeScoreRecord {
 }
 
 func (app *App) scoreDataPath(name string) string {
-	return filepath.Join(app.cfg.DataDir, name)
+	return runtimeDataPath(app.cfg.DataDir, name)
 }

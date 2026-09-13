@@ -148,7 +148,7 @@ func (app *App) syncHugoPublicData() error {
 	}
 
 	for _, name := range []string{"site.json", "theme.json", "projects.json", "memories.json", "friends.json", "tag_urls.json", "build.json"} {
-		source := filepath.Join(app.cfg.DataDir, name)
+		source := runtimeDataPath(app.cfg.DataDir, name)
 		target := filepath.Join(targetDir, name)
 		data, err := os.ReadFile(source)
 		if errors.Is(err, os.ErrNotExist) {

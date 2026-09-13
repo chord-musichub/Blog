@@ -28,10 +28,16 @@ func TestCanonicalMediaMigrationCopiesLegacyAssetsAndRewritesRuntimeData(t *test
 	if err := os.MkdirAll(dataDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dataDir, "projects.json"), []byte(`[{"cover":"/media/projects/cover.png"}]`), 0600); err != nil {
+	if err := os.MkdirAll(filepath.Dir(runtimeDataPath(dataDir, "projects.json")), 0700); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dataDir, "site.json"), []byte(`{"site":{"logo_icon":"/uploads/admin/main_logo.png"},"home":{"hero_image":"/uploads/admin/show.png"}}`), 0600); err != nil {
+	if err := os.WriteFile(runtimeDataPath(dataDir, "projects.json"), []byte(`[{"cover":"/media/projects/cover.png"}]`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Dir(runtimeDataPath(dataDir, "site.json")), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(runtimeDataPath(dataDir, "site.json"), []byte(`{"site":{"logo_icon":"/uploads/admin/main_logo.png"},"home":{"hero_image":"/uploads/admin/show.png"}}`), 0600); err != nil {
 		t.Fatal(err)
 	}
 	app := &App{cfg: Config{DataDir: dataDir}}
@@ -42,11 +48,11 @@ func TestCanonicalMediaMigrationCopiesLegacyAssetsAndRewritesRuntimeData(t *test
 	if got, err := os.ReadFile(target); err != nil || string(got) != "legacy" {
 		t.Fatalf("migrated asset = %q, %v", got, err)
 	}
-	updated, err := os.ReadFile(filepath.Join(dataDir, "projects.json"))
+	updated, err := os.ReadFile(runtimeDataPath(dataDir, "projects.json"))
 	if err != nil || !strings.Contains(string(updated), "/uploads/admin/projects/cover.png") {
 		t.Fatalf("runtime reference not migrated: %q, %v", updated, err)
 	}
-	site, err := os.ReadFile(filepath.Join(dataDir, "site.json"))
+	site, err := os.ReadFile(runtimeDataPath(dataDir, "site.json"))
 	if err != nil || !strings.Contains(string(site), "/uploads/admin/logo/main_logo.png") || !strings.Contains(string(site), "/uploads/admin/background/qiandai_background.png") {
 		t.Fatalf("admin asset references not migrated: %q, %v", site, err)
 	}
@@ -161,16 +167,16 @@ func TestPublicSnapshotSeedsOnlyMissingPublicData(t *testing.T) {
 	if err := app.ensurePublicSnapshotData(); err != nil {
 		t.Fatal(err)
 	}
-	if got, err := os.ReadFile(filepath.Join(dataDir, "site.json")); err != nil || string(got) != `{"site":"public"}` {
+	if got, err := os.ReadFile(runtimeDataPath(dataDir, "site.json")); err != nil || string(got) != `{"site":"public"}` {
 		t.Fatalf("public snapshot = %q, %v", got, err)
 	}
-	if err := os.WriteFile(filepath.Join(dataDir, "site.json"), []byte(`{"site":"server"}`), 0600); err != nil {
+	if err := os.WriteFile(runtimeDataPath(dataDir, "site.json"), []byte(`{"site":"server"}`), 0600); err != nil {
 		t.Fatal(err)
 	}
 	if err := app.ensurePublicSnapshotData(); err != nil {
 		t.Fatal(err)
 	}
-	if got, err := os.ReadFile(filepath.Join(dataDir, "site.json")); err != nil || string(got) != `{"site":"server"}` {
+	if got, err := os.ReadFile(runtimeDataPath(dataDir, "site.json")); err != nil || string(got) != `{"site":"server"}` {
 		t.Fatalf("existing runtime data was overwritten: %q, %v", got, err)
 	}
 }
@@ -193,17 +199,17 @@ func TestPublicFriendSeedMergesIntoExistingInstanceData(t *testing.T) {
 		t.Fatal(err)
 	}
 	dataDir := filepath.Join(root, "data")
-	if err := os.MkdirAll(dataDir, 0700); err != nil {
+	if err := os.MkdirAll(filepath.Dir(runtimeDataPath(dataDir, "friends.json")), 0700); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dataDir, "friends.json"), []byte(`[{"username":"writer","display_name":"Writer","bio":"runtime","avatar":"/uploads/writer/avatar.png"}]`), 0600); err != nil {
+	if err := os.WriteFile(runtimeDataPath(dataDir, "friends.json"), []byte(`[{"username":"writer","display_name":"Writer","bio":"runtime","avatar":"/uploads/writer/avatar.png"}]`), 0600); err != nil {
 		t.Fatal(err)
 	}
 	app := &App{cfg: Config{DataDir: dataDir}}
 	if err := app.ensurePublicFriendsData(); err != nil {
 		t.Fatal(err)
 	}
-	data, err := os.ReadFile(filepath.Join(dataDir, "friends.json"))
+	data, err := os.ReadFile(runtimeDataPath(dataDir, "friends.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
