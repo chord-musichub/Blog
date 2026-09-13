@@ -9,23 +9,23 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $projectRoot
 
 if (-not (Test-Path -LiteralPath $PythonPath -PathType Leaf)) {
-    throw "找不到 Python：$PythonPath。请通过 -PythonPath 指定可用的 Python。"
+    throw "Python not found: $PythonPath. Pass a valid path with -PythonPath."
 }
 
-# 发布包的源码来自一个已提交的本地提交：这样包内源码可复现，且不会把 .git、.env、
-# local-only、Docker 构建产物等工作目录杂项一并带到服务器。
+# Source comes from a committed local revision. This excludes .git, .env,
+# local-only, and Docker build artifacts from the server bundle.
 & git diff --quiet
 if ($LASTEXITCODE -ne 0) {
-    throw "存在未提交的工作区修改。请先检查、提交源码，再创建发布包。"
+    throw "Working tree has uncommitted changes. Commit source changes before creating a release bundle."
 }
 & git diff --cached --quiet
 if ($LASTEXITCODE -ne 0) {
-    throw "存在仅暂存但未提交的修改。请先提交源码，再创建发布包。"
+    throw "Index has staged but uncommitted changes. Commit source changes before creating a release bundle."
 }
 
 $trackedRuntime = & git ls-files -- data content/posts content/friends content/tags static/md-source
 if ($trackedRuntime) {
-    throw "以下运行时文件仍被 Git 跟踪，不能创建发布包：`n$($trackedRuntime -join "`n")"
+    throw "Tracked runtime files cannot be included in a release bundle:`n$($trackedRuntime -join "`n")"
 }
 
 $requiredRuntimePaths = @(
@@ -39,7 +39,7 @@ $requiredRuntimePaths = @(
 )
 foreach ($relativePath in $requiredRuntimePaths) {
     if (-not (Test-Path -LiteralPath (Join-Path $projectRoot $relativePath))) {
-        throw "运行数据不完整，缺少：$relativePath"
+        throw "Runtime data is incomplete. Missing: $relativePath"
     }
 }
 
@@ -53,7 +53,7 @@ $bundlePath = Join-Path $outputPath "songline-blog-$stamp-$revision.tar.gz"
 try {
     & git archive --format=tar --output=$sourceArchive HEAD
     if ($LASTEXITCODE -ne 0) {
-        throw "无法从当前提交创建源码归档。"
+        throw "Unable to create a source archive from HEAD."
     }
 
     $env:SONGLINE_BUNDLE_ROOT = $projectRoot
@@ -81,12 +81,12 @@ with tarfile.open(output_path, "w:gz", format=tarfile.PAX_FORMAT) as destination
 print(output_path)
 '@ | & $PythonPath -
     if ($LASTEXITCODE -ne 0) {
-        throw "无法创建发布包。"
+        throw "Unable to create the release bundle."
     }
 
     Get-FileHash -LiteralPath $bundlePath -Algorithm SHA256
-    Write-Host "发布包已创建：$bundlePath"
-    Write-Host "上传后在服务器执行：tar -tzf <发布包> >/dev/null"
+    Write-Host "Release bundle created: $bundlePath"
+    Write-Host "Verify it on the server with: tar -tzf ARCHIVE.tar.gz >/dev/null"
 }
 finally {
     Remove-Item -LiteralPath $sourceArchive -Force -ErrorAction SilentlyContinue
