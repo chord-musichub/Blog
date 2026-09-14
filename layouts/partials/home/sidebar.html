@@ -22,7 +22,7 @@
           {{ range $index, $post := $featuredPosts }}
             {{ $cover := $post.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png" }}
             <a class="songline-terminal-feature-card{{ if eq $index 0 }} is-active{{ end }}" href="{{ $post.RelPermalink }}" data-home-recommendation-card aria-hidden="{{ if eq $index 0 }}false{{ else }}true{{ end }}"{{ if ne $index 0 }} tabindex="-1"{{ end }}>
-              <img src="{{ $cover }}" alt="" loading="eager" fetchpriority="{{ if eq $index 0 }}high{{ else }}auto{{ end }}" decoding="async" onerror="this.onerror=null;this.src='/uploads/admin/article/article_default.png';">
+              <img src="{{ $cover }}" alt="" loading="{{ if eq $index 0 }}eager{{ else }}lazy{{ end }}" fetchpriority="{{ if eq $index 0 }}high{{ else }}low{{ end }}" decoding="async" onerror="this.onerror=null;this.src='/uploads/admin/article/article_default.png';">
               <span class="songline-terminal-feature-wash" aria-hidden="true"></span>
               <span class="songline-terminal-feature-copy">
                 <time datetime="{{ $post.Date.Format "2006-01-02" }}">{{ $post.Date.Format "2006.01.02" }}</time>
@@ -84,7 +84,7 @@
           <p class="songline-home-music-status" data-home-music-status aria-live="polite">未选择音乐来源</p>
           <input type="file" accept="audio/*,.mp3,.flac,.wav,.m4a,.aac,.ogg,.opus" data-home-music-file hidden>
           <input type="file" accept="audio/*,.mp3,.flac,.wav,.m4a,.aac,.ogg,.opus" data-home-music-folder webkitdirectory directory multiple hidden>
-          <audio data-home-music-audio preload="auto"></audio>
+          <audio data-home-music-audio preload="none"></audio>
         </section>
       </section>
     </div>

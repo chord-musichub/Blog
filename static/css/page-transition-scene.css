@@ -46,29 +46,29 @@ html.songline-page-transitioning .page-loading-orb{
 }
 .songline-page-transition-overlay.is-forward.is-covering{
   transform:translate3d(0,0,0);
-  transition:transform .72s cubic-bezier(.16,.82,.22,1);
+  transition:transform .42s cubic-bezier(.16,.82,.22,1);
 }
 .songline-page-transition-overlay.is-forward.is-leaving{
   transform:translate3d(0,-112svh,0);
-  transition:transform .66s cubic-bezier(.54,0,.86,.42);
+  transition:transform .42s cubic-bezier(.54,0,.86,.42);
 }
 .songline-page-transition-overlay.is-backward:not(.is-covering):not(.is-leaving){
   transform:translate3d(0,-112svh,0);
 }
 .songline-page-transition-overlay.is-backward.is-covering{
   transform:translate3d(0,0,0);
-  transition:transform .72s cubic-bezier(.16,.82,.22,1);
+  transition:transform .42s cubic-bezier(.16,.82,.22,1);
 }
 .songline-page-transition-overlay.is-backward.is-leaving{
   transform:translate3d(0,112svh,0);
-  transition:transform .66s cubic-bezier(.54,0,.86,.42);
+  transition:transform .42s cubic-bezier(.54,0,.86,.42);
 }
 .songline-page-transition-overlay.is-right:not(.is-covering):not(.is-leaving){transform:translate3d(112vw,0,0)}
-.songline-page-transition-overlay.is-right.is-covering{transform:translate3d(0,0,0);transition:transform .72s cubic-bezier(.16,.82,.22,1)}
-.songline-page-transition-overlay.is-right.is-leaving{transform:translate3d(-112vw,0,0);transition:transform .66s cubic-bezier(.54,0,.86,.42)}
+.songline-page-transition-overlay.is-right.is-covering{transform:translate3d(0,0,0);transition:transform .42s cubic-bezier(.16,.82,.22,1)}
+.songline-page-transition-overlay.is-right.is-leaving{transform:translate3d(-112vw,0,0);transition:transform .42s cubic-bezier(.54,0,.86,.42)}
 .songline-page-transition-overlay.is-left:not(.is-covering):not(.is-leaving){transform:translate3d(-112vw,0,0)}
-.songline-page-transition-overlay.is-left.is-covering{transform:translate3d(0,0,0);transition:transform .72s cubic-bezier(.16,.82,.22,1)}
-.songline-page-transition-overlay.is-left.is-leaving{transform:translate3d(112vw,0,0);transition:transform .66s cubic-bezier(.54,0,.86,.42)}
+.songline-page-transition-overlay.is-left.is-covering{transform:translate3d(0,0,0);transition:transform .42s cubic-bezier(.16,.82,.22,1)}
+.songline-page-transition-overlay.is-left.is-leaving{transform:translate3d(112vw,0,0);transition:transform .42s cubic-bezier(.54,0,.86,.42)}
 .songline-page-transition-overlay.is-same{opacity:0;transition:opacity .36s ease}
 .songline-page-transition-overlay.is-same.is-covering{opacity:1}
 .songline-page-transition-overlay.is-same.is-leaving{opacity:0;transition:opacity .44s ease}
@@ -137,7 +137,7 @@ main.container.songline-page-exit-backward,
 main.container.songline-page-exit-right,
 main.container.songline-page-exit-left,
 main.container.songline-page-exit-same{
-  transition:transform .66s cubic-bezier(.2,.7,.2,1), opacity .58s ease;
+  transition:transform .42s cubic-bezier(.2,.7,.2,1), opacity .58s ease;
   opacity:0;
 }
 main.container.songline-page-exit-forward{transform:translate3d(0,-126px,0) scale(.97)}

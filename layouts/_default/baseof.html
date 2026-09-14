@@ -10,7 +10,8 @@
   {{ $isToolsSurface := hasPrefix .RelPermalink "/tools/" }}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <script src="/static/document-transition.js?v=21.1.1"></script>
+  <script defer src="/static/resource-readiness.js?v=22.9.1"></script>
+  <script src="/static/document-transition.js?v=22.9.0"></script>
   <title>{{ if .IsHome }}{{ $siteTitle }}{{ else }}{{ .Title }} - {{ $siteTitle }}{{ end }}</title>
   <meta name="description" content="{{ with .Params.summary }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
   <script>

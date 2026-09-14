@@ -2,7 +2,7 @@
 <header class="site-header modern-site-header">
   <div class="navbar modern-navbar">
     <a class="logo" href="/">
-      {{ with $cfg.site.logo_icon }}<img class="logo-icon" src="{{ . }}" alt="" loading="lazy">{{ else }}<span class="logo-mark line-logo-mark">{{ partial "ui-icon.html" "logo" }}</span>{{ end }}
+      {{ with $cfg.site.logo_icon }}<img class="logo-icon" src="{{ . }}" alt="" loading="eager" decoding="async">{{ else }}<span class="logo-mark line-logo-mark">{{ partial "ui-icon.html" "logo" }}</span>{{ end }}
       <span class="logo-text">{{ default "Songline Blog" $cfg.site.logo }}</span>
     </a>
     <nav class="nav-links modern-nav-links songline-elevator-nav" aria-label="站点楼层导航" data-elevator-nav>

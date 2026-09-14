@@ -2,15 +2,15 @@
   'use strict';
 
   var CONFIG = Object.freeze({
-    minimumDuration:2200,
-    maximumWait:7600,
+    minimumDuration:800,
+    maximumWait:11000,
     leafCount:12,
     compactLeafCount:8,
     gatherHold:280,
-    recedeDelay:340,
-    logoDeparture:900,
-    revealStart:1220,
-    revealFinish:2040,
+    recedeDelay:100,
+    logoDeparture:300,
+    revealStart:520,
+    revealFinish:1100,
     logoFallback:'/uploads/admin/logo/main_logo.png'
   });
   var root = document.documentElement;
@@ -27,57 +27,12 @@
   function clamp(value, min, max){ return Math.max(min, Math.min(max, value)); }
   function easeInOut(value){ return value < .5 ? 2 * value * value : 1 - Math.pow(-2 * value + 2, 2) / 2; }
 
-  function normalizeUrl(value){
-    if(!value || value === 'none' || /^data:|^blob:/.test(value)) return '';
-    try{ return new URL(String(value).replace(/^['"]|['"]$/g, ''), window.location.href).href; }
-    catch(error){ return ''; }
-  }
-
-  function urlsFromCss(value){
-    var urls = [];
-    String(value || '').replace(/url\((['"]?)(.*?)\1\)/g, function(_, quote, raw){
-      var url = normalizeUrl(raw);
-      if(url) urls.push(url);
-      return _;
-    });
-    return urls;
-  }
-
-  function collectAssets(){
-    var urls = new Set();
-    document.querySelectorAll('img[src], .site-bg-layer, [style*="background-image"], [style*="--site-bg-image"]').forEach(function(node){
-      if(node.currentSrc) urls.add(normalizeUrl(node.currentSrc));
-      if(node.getAttribute){
-        var src = normalizeUrl(node.getAttribute('src'));
-        if(src) urls.add(src);
-        urlsFromCss(node.getAttribute('style')).forEach(function(url){ urls.add(url); });
-      }
-      try{ urlsFromCss(getComputedStyle(node).backgroundImage).forEach(function(url){ urls.add(url); }); }
-      catch(error){}
-    });
-    return Array.from(urls).filter(Boolean).slice(0, 36);
-  }
-
   function createTracker(){
-    var assets = collectAssets();
-    var state = { total:assets.length + 2, done:0, ready:false };
-    function mark(){ state.done = Math.min(state.total, state.done + 1); }
-    var imageTasks = assets.map(function(url){
-      return new Promise(function(resolve){
-        var image = new Image();
-        image.decoding = 'async';
-        image.onload = image.onerror = function(){ mark(); resolve(); };
-        image.src = url;
-      });
-    });
-    var fontTask = document.fonts && document.fonts.ready ? document.fonts.ready.catch(function(){}) : Promise.resolve();
-    fontTask.then(mark);
-    var loadTask = document.readyState === 'complete'
-      ? Promise.resolve()
-      : new Promise(function(resolve){ window.addEventListener('load', resolve, { once:true }); });
-    loadTask.then(mark);
-    state.promise = Promise.allSettled(imageTasks.concat([fontTask, loadTask])).then(function(){ state.ready = true; return state; });
-    state.ratio = function(){ return state.total ? state.done / state.total : 1; };
+    var state = {ready:false};
+    state.promise = (window.SonglineResources
+      ? window.SonglineResources.prepare(document)
+      : Promise.resolve()).then(function(){ state.ready = true; });
+    state.ratio = function(){ return state.ready ? 1 : .75; };
     return state;
   }
 
@@ -102,14 +57,6 @@
   }
 
   function hydrateHome(){
-    document.querySelectorAll('.lazy-bg[data-bg]').forEach(function(node){
-      if(node.dataset.bgLoaded === '1') return;
-      var background = node.getAttribute('data-bg');
-      if(!background) return;
-      node.dataset.bgLoaded = '1';
-      node.style.backgroundImage = "url('" + background.replace(/'/g, "\\'") + "')";
-      node.classList.add('lazy-bg-loaded');
-    });
     try{
       if(window.SonglinePageModules && typeof window.SonglinePageModules.scan === 'function') window.SonglinePageModules.scan(document);
       window.dispatchEvent(new Event('resize'));

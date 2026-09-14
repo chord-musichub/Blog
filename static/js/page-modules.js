@@ -343,9 +343,9 @@
   function loadScript(mod, root){
     if(loaded[mod.key]){
       mod.init(root || document);
-      return;
+      return Promise.resolve();
     }
-    if(loading[mod.key]) return;
+    if(loading[mod.key]) return loading[mod.key].then(function(){ mod.init(root || document); });
 
     // 服务端页级脚本在本调度器之前执行；直接复用它，避免额外监听和延迟兜底。
     var existing = document.querySelector('script[data-page-script="' + mod.key + '"], script[src*="' + mod.src.split('?')[0] + '"]');
@@ -355,10 +355,10 @@
     if(existing && friendGalaxyReady){
       loaded[mod.key] = true;
       mod.init(root || document);
-      return;
+      return Promise.resolve();
     }
 
-    loading[mod.key] = true;
+    loading[mod.key] = new Promise(function(resolve, reject){
     var script = document.createElement('script');
     // 站内换页时，存在依赖关系的工具脚本也要按插入顺序执行。
     script.async = false;
@@ -369,18 +369,23 @@
     script.onload = function(){
       loaded[mod.key] = true;
       loading[mod.key] = false;
-      mod.init(root || document);
+      try{ mod.init(root || document); resolve(); }
+      catch(error){ reject(error); }
     };
     script.onerror = function(){
       loading[mod.key] = false;
+      script.remove();
       console.warn('[page-modules] failed to load', mod.key, mod.src);
+      reject(new Error('Module failed: ' + mod.key));
     };
     document.head.appendChild(script);
+    });
+    return loading[mod.key];
   }
 
   var scanTimer = 0;
   var pendingRoot = null;
-  var lastScanAt = 0;
+  var activeScans = new WeakMap();
 
   function mergeRoot(root){
     if(!pendingRoot || root === document) pendingRoot = root || document;
@@ -389,22 +394,22 @@
   function scanNow(root){
     root = root || pendingRoot || document;
     pendingRoot = null;
+    if(activeScans.has(root)) return activeScans.get(root);
     var now = Date.now();
-    if(now - lastScanAt < 90 && root === document) return;
-    lastScanAt = now;
     if(window.SonglinePageModules) window.SonglinePageModules.lastScanAt = now;
-    syncPageStyles(root);
-    modules.forEach(function(mod){
-      if(mod.test(root)){
-        loadScript(mod, root);
-      }
+    var task = Promise.resolve().then(function(){
+      syncPageStyles(root);
+      return Promise.all(modules.filter(function(mod){ return mod.test(root); }).map(function(mod){ return loadScript(mod, root); }));
     });
+    activeScans.set(root, task);
+    task.then(function(){ activeScans.delete(root); }, function(){ activeScans.delete(root); });
+    return task;
   }
 
   function scan(root){
     mergeRoot(root || document);
     window.clearTimeout(scanTimer);
-    var run = function(){ scanNow(pendingRoot || document); };
+    var run = function(){ scanNow(pendingRoot || document).catch(function(error){ console.warn('[page-modules]', error); }); };
     if(window.SonglineRuntime && typeof window.SonglineRuntime.idle === 'function'){
       window.SonglineRuntime.idle('page-modules-scan', run, 260);
       return;
@@ -420,6 +425,7 @@
 
   window.SonglinePageModules = {
     scan: scan,
+    ready: scanNow,
     loaded: loaded,
     assetVersion: VERSION,
     lastScanAt: 0
@@ -427,15 +433,14 @@
 
   if(document.readyState === 'loading'){
     // 首次直开页面与旧的 defer 自启动保持同一时机；站内换页仍走空闲调度。
-    document.addEventListener('DOMContentLoaded', function(){ scanNow(document); });
+    document.addEventListener('DOMContentLoaded', function(){ scanNow(document).catch(function(error){ console.warn('[page-modules]', error); }); });
   }else{
-    scanNow(document);
+    scanNow(document).catch(function(error){ console.warn('[page-modules]', error); });
   }
 
-  window.addEventListener('pageshow', function(){ scan(document); });
+  window.addEventListener('pageshow', function(event){ if(event.persisted) scan(document); });
   window.addEventListener('songline:page-swap', function(event){
     var root = event.detail && event.detail.root ? event.detail.root : document;
-    window.setTimeout(function(){ scan(root); }, 0);
-    window.setTimeout(function(){ scan(document); }, 120);
+    if(!(event.detail && event.detail.modulesManaged)) scan(root);
   });
 })();

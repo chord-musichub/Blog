@@ -71,6 +71,8 @@ func (app *App) handlePublicMedia(w http.ResponseWriter, r *http.Request) {
 	for _, root := range []string{app.mediaRootDir(), filepath.Join("static", "uploads")} {
 		candidate := filepath.Join(root, filepath.FromSlash(name))
 		if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
+			// Mutable media URLs reuse browser bytes after Last-Modified validation.
+			w.Header().Set("Cache-Control", "public, no-cache")
 			http.ServeFile(w, r, candidate)
 			return
 		}

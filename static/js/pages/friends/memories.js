@@ -46,6 +46,7 @@
       if(!item || !lightbox) return;
       lightbox.hidden = false; lightbox.setAttribute('aria-hidden','false');
       lightbox.querySelector('[data-memory-lightbox-image]').src = item.image || '';
+      if(window.SonglineResources) window.SonglineResources.image(lightbox.querySelector('[data-memory-lightbox-image]'));
       lightbox.querySelector('[data-memory-lightbox-image]').alt = item.title || item.date || '';
       lightbox.querySelector('[data-memory-lightbox-date]').textContent = item.date || '';
       lightbox.querySelector('[data-memory-lightbox-title]').textContent = item.title || item.date || '';

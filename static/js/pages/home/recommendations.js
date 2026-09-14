@@ -21,6 +21,7 @@
     var leavingTimer = 0;
     var paused = false;
     var copyTipTimer = 0;
+    var switchRequest = 0;
 
     if(!cards.length) return;
     panel.dataset.recommendationsReady = '1';
@@ -54,9 +55,16 @@
       }, delay || 5200);
     }
 
-    function show(next, immediate){
+    async function show(next, immediate){
       next = Number(next);
       if(next === current || next < 0 || next >= cards.length) return;
+      var request = ++switchRequest;
+      var img = cards[next].querySelector('img');
+      if(img && window.SonglineResources){
+        var result = await window.SonglineResources.image(img);
+        if(result && result.failed) return;
+      }
+      if(request !== switchRequest || !panel.isConnected) return;
       var previous = cards[current];
       if(immediate) panel.classList.add('is-direct-switch');
       if(leavingTimer) window.clearTimeout(leavingTimer);
@@ -158,6 +166,7 @@
       else if(!paused) schedule(1400);
     }
     function cleanup(){
+      switchRequest++;
       clearTimer();
       if(releaseTimer) window.clearTimeout(releaseTimer);
       if(leavingTimer) window.clearTimeout(leavingTimer);

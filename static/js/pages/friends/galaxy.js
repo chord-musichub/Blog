@@ -271,7 +271,6 @@
     function safeImage(image, source){
       if(!image) return;
       image.onerror = function(){ if(image.src.indexOf('/uploads/admin/friends/user-null.png') < 0) image.src = '/uploads/admin/friends/user-null.png'; };
-      image.onload = settleLayout;
       image.src = source;
     }
     function setProfile(friend){
@@ -505,6 +504,8 @@
     createNodes();
     setHost();
     setProfile(host);
+    // Publish positions synchronously so the shared loader can identify visible avatars.
+    layout();
     settleLayout();
     if(window.ResizeObserver){
       stageObserver = new ResizeObserver(scheduleLayout);

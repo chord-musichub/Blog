@@ -18,7 +18,8 @@
   function scheduleIdle(key, fn, timeout){
     key = key || ('idle-' + Math.random());
     if(idleTasks[key]){
-      try{ window.clearTimeout(idleTasks[key]); }catch(e){}
+      if(window.cancelIdleCallback) window.cancelIdleCallback(idleTasks[key]);
+      else window.clearTimeout(idleTasks[key]);
     }
     var run = function(){
       idleTasks[key] = 0;
@@ -26,9 +27,7 @@
     };
     if(window.requestIdleCallback){
       try{
-        idleTasks[key] = window.setTimeout(function(){
-          window.requestIdleCallback(run, {timeout: timeout || 260});
-        }, 0);
+        idleTasks[key] = window.requestIdleCallback(run, {timeout: timeout || 260});
         return idleTasks[key];
       }catch(e){}
     }

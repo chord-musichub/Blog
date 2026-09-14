@@ -46,6 +46,14 @@
 
   async function reveal(){
     if(!incoming || reduced) return;
+    if(window.SonglineResources){
+      await window.SonglineResources.prepare(document);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{
+        root.classList.add('is-document-revealing');
+        setTimeout(clear,550);
+      }));
+      return;
+    }
     const ready = [];
     if(document.readyState !== 'complete') ready.push(new Promise(resolve => window.addEventListener('load', resolve, {once:true})));
     if(document.fonts) ready.push(document.fonts.ready);

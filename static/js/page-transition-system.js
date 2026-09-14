@@ -9,17 +9,8 @@
   var queuedPopState = null;
   var activePath = window.location.pathname || '/';
   var overlay = null;
-  var loaderStartedAt = 0;
 
-  var TIMELINE = {
-    curtainStart: 340,
-    loaderStart: 1080,
-    loaderRelease: 2220,
-    revealStart: 2390,
-    revealDuration: 680,
-    loaderCycle: 1140,
-    loaderClosePhase: 920
-  };
+  var TIMELINE = { coverDuration:480, revealDuration:480 };
 
   if(!priority) return;
 
@@ -27,9 +18,6 @@
     return new Promise(function(resolve){ window.setTimeout(resolve, reducedMotion ? 0 : ms); });
   }
 
-  function waitUntil(startedAt, targetAt){
-    return wait(Math.max(0, targetAt - (Date.now() - startedAt)));
-  }
 
   function mainContainer(){
     return document.querySelector('main.container');
@@ -59,30 +47,27 @@
     // 先提交屏幕外的起始位置；否则低帧率或刚恢复的页面会把两次 class
     // 变更合并，黑幕便直接以全屏黑色出现而没有纵向推进。
     node.getBoundingClientRect();
-    window.requestAnimationFrame(function(){
-      window.requestAnimationFrame(function(){
+    return new Promise(function(resolve){
+      var started = false;
+      var fallback;
+      function start(){
+        if(started) return;
+        started = true;
+        clearTimeout(fallback);
         if(node.classList.contains('is-visible')) node.classList.add('is-covering');
-      });
-    });
+        resolve();
+      }
+      fallback = setTimeout(start, 100);
+      window.requestAnimationFrame(function(){ window.requestAnimationFrame(start); });
+    }).then(function(){ return wait(TIMELINE.coverDuration); });
   }
 
   function startLoader(){
     if(!overlay) return;
-    loaderStartedAt = Date.now();
     overlay.classList.remove('is-loader-closing');
     overlay.classList.add('is-loader-visible');
   }
 
-  function waitForLoaderCloseNode(){
-    if(reducedMotion || !loaderStartedAt) return Promise.resolve();
-    var elapsed = Date.now() - loaderStartedAt;
-    var phase = elapsed % TIMELINE.loaderCycle;
-    // 接近完整循环的收束点时直接结束；其余情况再等到下一次收束，避免截断弧线。
-    var target = phase < 140 || phase > TIMELINE.loaderClosePhase
-      ? 0
-      : TIMELINE.loaderCycle - phase;
-    return wait(target);
-  }
 
   function closeLoader(){
     if(!overlay) return;
@@ -101,7 +86,6 @@
     // 收尾直接移除节点，不把旧遮罩的消失交给合成层，避免下一帧重新盖回页面。
     if(overlay.parentNode) overlay.parentNode.removeChild(overlay);
     overlay = null;
-    loaderStartedAt = 0;
   }
 
   function settleMain(main){
@@ -216,79 +200,23 @@
     if(!pendingStyles.length) return Promise.resolve();
     return Promise.all(pendingStyles.map(function(style){
       if(style.sheet) return Promise.resolve();
-      return new Promise(function(resolve){
+      return new Promise(function(resolve, reject){
         var done = false;
-        function finish(){
+        var timer;
+        function finish(event){
           if(done) return;
           done = true;
+          clearTimeout(timer);
           style.removeEventListener('load', finish);
           style.removeEventListener('error', finish);
-          resolve();
+          if(event && event.type === 'load') resolve();
+          else reject(new Error('Page stylesheet unavailable: ' + style.href));
         }
         style.addEventListener('load', finish, { once:true });
         style.addEventListener('error', finish, { once:true });
-        window.setTimeout(finish, 1600);
+        timer = window.setTimeout(finish, 8000);
       });
     }));
-  }
-
-  function normalizeAssetUrl(value){
-    value = String(value || '').trim().replace(/^['"]|['"]$/g, '');
-    if(!value || value === 'none' || value.indexOf('data:') === 0 || value.indexOf('blob:') === 0) return '';
-    try{ return new URL(value, window.location.href).href; }catch(e){ return ''; }
-  }
-
-  function cssAssetUrls(value){
-    var urls = [];
-    String(value || '').replace(/url\((['"]?)(.*?)\1\)/g, function(_, quote, raw){
-      var normalized = normalizeAssetUrl(raw);
-      if(normalized) urls.push(normalized);
-      return _;
-    });
-    return urls;
-  }
-
-  function collectIncomingAssets(doc){
-    var urls = Object.create(null);
-    function add(value){
-      var normalized = normalizeAssetUrl(value);
-      if(normalized) urls[normalized] = true;
-    }
-    function addCss(value){ cssAssetUrls(value).forEach(function(value){ urls[value] = true; }); }
-
-    doc.querySelectorAll('img[src], source[src], [data-bg], [style*="background"]').forEach(function(node){
-      add(node.getAttribute('src'));
-      add(node.getAttribute('data-bg'));
-      addCss(node.getAttribute('style'));
-      var srcset = node.getAttribute('srcset') || '';
-      srcset.split(',').forEach(function(part){ add(part.trim().split(/\s+/)[0]); });
-    });
-    // 工具页等场景的首屏背景来自刚载入的页面 CSS，而非 HTML 内联属性。
-    try{ addCss(window.getComputedStyle(document.body).backgroundImage); }catch(e){}
-    return Object.keys(urls).slice(0, 32);
-  }
-
-  function preloadIncomingAssets(urls){
-    if(!urls.length) return Promise.resolve();
-    var tasks = urls.map(function(url){
-      return new Promise(function(resolve){
-        var image = new Image();
-        var settled = false;
-        function finish(){
-          if(settled) return;
-          settled = true;
-          image.onload = null;
-          image.onerror = null;
-          resolve();
-        }
-        image.onload = finish;
-        image.onerror = finish;
-        image.src = url;
-        window.setTimeout(finish, 2400);
-      });
-    });
-    // 外部朋友头像等资源允许失败或慢速返回；它们不会无限阻塞全站导航。
-    return Promise.all(tasks).then(function(){});
   }
 
   async function syncDocumentShell(doc, url, pushState){
@@ -334,46 +262,24 @@
     }
   }
 
-  function hydrateDynamicBits(scope){
-    scope.querySelectorAll('[data-bg]').forEach(function(el){
-      var bg = el.getAttribute('data-bg');
-      if(bg) el.style.backgroundImage = 'url("' + bg.replace(/"/g, '\\"') + '")';
-    });
+  async function hydrateDynamicBits(scope){
+    var pending = [];
     scope.querySelectorAll('script').forEach(function(oldScript){
+      if(oldScript.type && !/^(text|application)\/javascript$/.test(oldScript.type)) return;
       var script = document.createElement('script');
       Array.prototype.slice.call(oldScript.attributes).forEach(function(attr){ script.setAttribute(attr.name, attr.value); });
-      if(!oldScript.src) script.textContent = oldScript.textContent || '';
+      if(oldScript.src){
+        script.async = false;
+        pending.push(new Promise(function(resolve, reject){
+          script.onload = resolve;
+          script.onerror = function(){ reject(new Error('Page script failed: ' + script.src)); };
+        }));
+      }else script.textContent = oldScript.textContent || '';
       oldScript.replaceWith(script);
     });
-    bindDirectNavigation(scope);
-    window.dispatchEvent(new CustomEvent('songline:page-swap', { detail:{ root:scope } }));
-  }
-
-  // 部分浏览器会让楼层导航的原生链接抢在 document 级委托前提交；
-  // 对现有和动态插入的链接补一层同一处理函数的直接绑定，确保始终由场景过场接管。
-  function bindDirectNavigation(scope){
-    var parent = scope || document;
-    parent.querySelectorAll('a[href]').forEach(function(link){
-      if(link.dataset.songlineTransitionBound === '1') return;
-      link.dataset.songlineTransitionBound = '1';
-      link.addEventListener('click', handleClick);
-    });
-
-    // 楼层导航属于全站主入口。将它设为最终兜底，避免任何旧导航脚本或浏览器
-    // 合成 click 绕过 document 级监听后直接整页跳转。
-    parent.querySelectorAll('[data-elevator-nav] a[href]').forEach(function(link){
-      if(link.dataset.songlineElevatorTransitionBound === '1') return;
-      link.dataset.songlineElevatorTransitionBound = '1';
-      link.onclick = function(event){
-        if(!shouldHandleLink(link)) return true;
-        if(event) event.preventDefault();
-        if(locked) return false;
-        var url = new URL(link.href, window.location.href);
-        saveCurrentHistoryState();
-        navigate(url, { pushState:true });
-        return false;
-      };
-    });
+    await Promise.all(pending);
+    window.dispatchEvent(new CustomEvent('songline:page-swap', {detail:{root:scope, modulesManaged:true}}));
+    if(window.SonglinePageModules) await window.SonglinePageModules.ready(scope);
   }
 
   function setEnterState(main, direction){
@@ -392,21 +298,24 @@
 
     var fromPath = activePath;
     var direction = priority.getTransitionDirection(fromPath, url.pathname);
-    var didSwapMain = false;
     var startedAt = Date.now();
+    var loaderTimer = 0;
+    var controller = new AbortController();
+    var requestTimer = setTimeout(function(){ controller.abort(); }, 15000);
     var request = fetch(url.href, {
+      signal:controller.signal,
       credentials:'same-origin',
       headers:{ 'X-Requested-With':'songline-page-transition' }
     });
 
+    request.catch(function(){});
     lockNavigation();
     try{
       window.dispatchEvent(new CustomEvent('songline:page-transition-start', { detail:{ from:fromPath, to:url.pathname, direction:direction } }));
       main.classList.add('songline-page-exit-' + direction);
-      await waitUntil(startedAt, TIMELINE.curtainStart);
-      showOverlay(direction);
-      await waitUntil(startedAt, TIMELINE.loaderStart);
-      startLoader();
+      await showOverlay(direction);
+      // Cached pages need no flashing spinner; show it only for a genuine wait.
+      loaderTimer = setTimeout(startLoader, 180);
 
       var response = await request;
       if(!response.ok) throw new Error('request failed: ' + response.status);
@@ -415,38 +324,41 @@
       var nextMain = doc.querySelector('main.container');
       if(!nextMain) throw new Error('next page main container missing');
 
-      await waitUntil(startedAt, TIMELINE.loaderRelease);
       // 幕布下先切换页面壳与专属样式，并预热首屏图片；此前在这里直接替换
       // main，慢网速时会先露出无背景/未定位的页面，再陆续加载场景资源。
       await syncDocumentShell(doc, url, options.pushState === true);
-      await preloadIncomingAssets(collectIncomingAssets(doc));
-      await waitForLoaderCloseNode();
-      closeLoader();
-      await wait(160);
       main.innerHTML = nextMain.innerHTML;
-      didSwapMain = true;
-      hydrateDynamicBits(main);
+      // Measure the next scene in its final position, not the old exit transform.
+      settleMain(main);
+      window.scrollTo({ top:0, behavior:'auto' });
+      var hydration = hydrateDynamicBits(main);
+      if(window.SonglineResources){
+        var hydrated = await window.SonglineResources.bounded(hydration, 12000);
+        if(hydrated && (hydrated.timedOut || hydrated.failed)) throw new Error('Page initialization unavailable');
+      }else await hydration;
       activePath = url.pathname;
 
       var targetY = typeof options.scrollY === 'number' ? options.scrollY : 0;
       window.scrollTo({ top:targetY, behavior:'auto' });
+      if(window.SonglineResources) await window.SonglineResources.prepare(document, {modules:false});
+      clearTimeout(loaderTimer);
+      closeLoader();
       setEnterState(main, direction);
-      await waitUntil(startedAt, TIMELINE.revealStart);
       // 不依赖下一帧回调：幕布开始离场时内容必须已经可见，避免低帧率设备露出黑底。
       main.classList.add('songline-page-enter-active');
       sweepOverlayOut(direction);
       // 请求慢于既定节奏时，仍完整播放黑幕离场与内容进入，不能提前清理成黑屏。
       await wait(TIMELINE.revealDuration);
       settleMain(main);
-      window.dispatchEvent(new CustomEvent('songline:page-transition-end', { detail:{ path:activePath, direction:direction } }));
+      window.dispatchEvent(new CustomEvent('songline:page-transition-end', { detail:{ path:activePath, direction:direction, duration:Date.now() - startedAt } }));
     }catch(error){
-      // 仅在内容尚未替换时回退整页导航；替换后继续揭示，避免新页短暂出现后又进入启动黑屏。
-      if(!didSwapMain){
-        window.location.assign(url.href);
-        return;
-      }
-      console.warn('[page-transition] post-swap recovery', error);
+      // A failed module/style must not silently expose an unusable partial page.
+      // Native navigation retries the complete document without another AJAX loop.
+      console.warn('[page-transition] document fallback', error);
+      window.location.assign(url.href);
     }finally{
+      clearTimeout(requestTimer);
+      clearTimeout(loaderTimer);
       if(!locked) return;
       hideOverlay();
       settleMain(main);
@@ -489,7 +401,6 @@
       navigation.updateNavIndicator(true);
     }
     document.addEventListener('click', handleClick, true);
-    bindDirectNavigation(document);
     window.addEventListener('popstate', handlePopState);
     root.classList.add('songline-page-transition-ready');
   }

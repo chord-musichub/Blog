@@ -85,4 +85,18 @@ func TestRouterServesSeedMediaAndLegacyAdminPaths(t *testing.T) {
 	if response.Code != http.StatusOK || response.Body.String() != "runtime-logo" {
 		t.Fatalf("runtime logo = status %d, body %q", response.Code, response.Body.String())
 	}
+	if got := response.Header().Get("Cache-Control"); got != "public, no-cache" {
+		t.Fatalf("mutable media cache policy = %q", got)
+	}
+	modified := response.Header().Get("Last-Modified")
+	if modified == "" {
+		t.Fatal("media must support conditional revalidation")
+	}
+	request := httptest.NewRequest(http.MethodGet, "/uploads/admin/logo/main_logo.png", nil)
+	request.Header.Set("If-Modified-Since", modified)
+	cached := httptest.NewRecorder()
+	handler.ServeHTTP(cached, request)
+	if cached.Code != http.StatusNotModified || cached.Body.Len() != 0 {
+		t.Fatalf("unchanged media must not resend bytes: status %d, bytes %d", cached.Code, cached.Body.Len())
+	}
 }
