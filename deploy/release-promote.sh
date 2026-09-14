@@ -34,6 +34,11 @@ if [[ ! -x "$NEXT_LINK/blog-admin" ]]; then
   exit 1
 fi
 
+if [[ ! -s "$NEXT_LINK/published/index.html" ]]; then
+  echo "next 版本尚未生成公开首页，拒绝切换。" >&2
+  exit 1
+fi
+
 if ! wait_for_health http://127.0.0.1:8081/healthz; then
   echo "next 版本健康检查失败，未切换。" >&2
   exit 1

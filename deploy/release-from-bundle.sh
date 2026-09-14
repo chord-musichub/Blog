@@ -110,7 +110,8 @@ ln -sfn "$RELEASE_DIR" "$APP_ROOT/next"
 systemctl restart blog-admin-next.service
 
 for ((attempt = 1; attempt <= HEALTH_WAIT_SECONDS; attempt++)); do
-  if curl --fail --silent --show-error http://127.0.0.1:8081/healthz >/dev/null; then
+  if curl --fail --silent --show-error http://127.0.0.1:8081/healthz >/dev/null \
+    && [[ -s "$RELEASE_DIR/published/index.html" ]]; then
     echo "候选版本已就绪：$RELEASE_DIR"
     echo "线上数据备份：$BACKUP_PATH"
     echo "确认后执行：sudo bash $RELEASE_DIR/deploy/release-promote.sh"
@@ -121,5 +122,5 @@ for ((attempt = 1; attempt <= HEALTH_WAIT_SECONDS; attempt++)); do
   sleep 1
 done
 
-echo "候选版本未通过健康检查；运行数据已保留在 $BACKUP_PATH，可据此恢复。" >&2
+echo "候选版本未通过健康检查或未生成公开首页；运行数据已保留在 $BACKUP_PATH，可据此恢复。" >&2
 exit 1

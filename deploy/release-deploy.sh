@@ -106,7 +106,8 @@ ln -sfn "$RELEASE_DIR" "$APP_ROOT/next"
 systemctl restart blog-admin-next.service
 
 for ((attempt = 1; attempt <= HEALTH_WAIT_SECONDS; attempt++)); do
-  if curl --fail --silent --show-error http://127.0.0.1:8081/healthz >/dev/null; then
+  if curl --fail --silent --show-error http://127.0.0.1:8081/healthz >/dev/null \
+    && [[ -s "$RELEASE_DIR/published/index.html" ]]; then
     echo
     echo "候选版本已就绪：$RELEASE_DIR"
     echo "请在服务器本机检查：curl -I http://127.0.0.1:8081/healthz"
@@ -117,5 +118,5 @@ for ((attempt = 1; attempt <= HEALTH_WAIT_SECONDS; attempt++)); do
   sleep 1
 done
 
-echo "候选版本未在 ${HEALTH_WAIT_SECONDS} 秒内通过健康检查。请查看：journalctl -u blog-admin-next.service -n 100 --no-pager" >&2
+echo "候选版本未在 ${HEALTH_WAIT_SECONDS} 秒内通过健康检查并生成公开首页。请查看：journalctl -u blog-admin-next.service -n 100 --no-pager" >&2
 exit 1

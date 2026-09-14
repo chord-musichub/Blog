@@ -13,10 +13,34 @@ type mediaLibraryContext struct {
 	dir   string
 }
 
+const siteMediaOwner = "admin"
+
+// mediaLibraryForRequest chooses the library being managed, rather than
+// treating a logged-in username as the only possible media owner. The site
+// owner's project, memory, background and other shared assets deliberately
+// live under the stable admin library. Ordinary accounts must remain confined
+// to their personal directory.
+func (app *App) mediaLibraryForRequest(user User, r *http.Request) mediaLibraryContext {
+	owner := mediaOwner(user.Username)
+	if isOwner(user) && strings.EqualFold(strings.TrimSpace(r.URL.Query().Get("library")), siteMediaOwner) {
+		owner = siteMediaOwner
+	}
+	return mediaLibraryContext{
+		user:  user,
+		owner: owner,
+		dir:   app.userMediaDir(owner),
+	}
+}
+
 func (app *App) renderMediaLibrary(w http.ResponseWriter, r *http.Request, media mediaLibraryContext, extra map[string]any) {
+	mediaURL := app.adminURL("/admin/media")
+	if media.owner == siteMediaOwner {
+		mediaURL += "?library=" + siteMediaOwner
+	}
 	data := map[string]any{
 		"User":      media.user,
 		"Owner":     media.owner,
+		"MediaURL":  mediaURL,
 		"Files":     listMediaFiles(media.dir, userMediaPublicPrefix(media.owner)),
 		"Flash":     r.URL.Query().Get("msg"),
 		"Workspace": "media",
@@ -31,11 +55,7 @@ func (app *App) renderMediaLibrary(w http.ResponseWriter, r *http.Request, media
 // 后台媒体库的路由入口：页面展示与动作分发。
 func (app *App) handleMediaLibrary(w http.ResponseWriter, r *http.Request) {
 	user, _ := app.currentUser(r)
-	media := mediaLibraryContext{
-		user:  user,
-		owner: mediaOwner(user.Username),
-		dir:   app.userMediaDir(user.Username),
-	}
+	media := app.mediaLibraryForRequest(user, r)
 	if err := os.MkdirAll(media.dir, 0755); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

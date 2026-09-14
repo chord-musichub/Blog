@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"testing"
@@ -38,6 +40,21 @@ func TestMediaOwnershipAllowsCategorizedFilesOnlyInsideOwnerRoot(t *testing.T) {
 	}
 	if _, err := isMediaPathOwnedBy("alice", "/uploads/alice/../bob/cover.png"); err == nil {
 		t.Fatal("parent traversal must be rejected")
+	}
+}
+
+func TestOnlySiteOwnerCanSelectAdminMediaLibrary(t *testing.T) {
+	app := &App{cfg: Config{DataDir: t.TempDir()}}
+	request := httptest.NewRequest(http.MethodGet, "/admin/media?library=admin", nil)
+
+	ownerMedia := app.mediaLibraryForRequest(User{Username: "songline", Role: roleOwner}, request)
+	if ownerMedia.owner != siteMediaOwner || ownerMedia.dir != app.userMediaDir(siteMediaOwner) {
+		t.Fatalf("site owner admin library = %+v", ownerMedia)
+	}
+
+	memberMedia := app.mediaLibraryForRequest(User{Username: "alice", Role: roleUser}, request)
+	if memberMedia.owner != "alice" || memberMedia.dir != app.userMediaDir("alice") {
+		t.Fatalf("member escaped personal library: %+v", memberMedia)
 	}
 }
 
