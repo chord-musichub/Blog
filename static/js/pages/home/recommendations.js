@@ -8,6 +8,28 @@
     // 首页通过过场离开时不会触发 pagehide；主动撤销旧轮播的全局监听和定时器。
     if(typeof window.__songlineHomeRecommendationsCleanup === 'function') window.__songlineHomeRecommendationsCleanup();
 
+    // Keep the newest story, then sample older stories without replacement.
+    var poolNode = panel.querySelector('[data-home-recommendation-pool]');
+    var fallbackCards = Array.from(panel.querySelectorAll('[data-home-recommendation-card]'));
+    try{
+      var pool = poolNode ? JSON.parse(poolNode.textContent) : [];
+      var remaining = pool.slice(1);
+      for(var i = remaining.length - 1; i > 0; i--){
+        var j = Math.floor(Math.random() * (i + 1));
+        var swap = remaining[i]; remaining[i] = remaining[j]; remaining[j] = swap;
+      }
+      var choices = pool.length ? [pool[0]].concat(remaining.slice(0, 4)) : [];
+      fallbackCards.forEach(function(card, index){
+        var item = choices[index];
+        if(!item) return;
+        card.href = item.url;
+        card.querySelector('strong').textContent = item.title;
+        var date = card.querySelector('time');
+        date.dateTime = item.date; date.textContent = item.displayDate;
+        var image = card.querySelector('img');
+        image.src = item.cover;
+      });
+    }catch(error){ console.warn('[recommendations] using server selection', error); }
     var cards = Array.prototype.slice.call(panel.querySelectorAll('[data-home-recommendation-card]'));
     var indicators = Array.prototype.slice.call(panel.querySelectorAll('[data-home-recommend-indicator]'));
     var previous = panel.querySelector('[data-home-recommend-previous]');

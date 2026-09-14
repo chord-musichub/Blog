@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  var mq = window.matchMedia ? window.matchMedia('(max-width: 820px)') : null;
+  var mq = window.matchMedia ? window.matchMedia('(max-width: 820px), (max-width:980px) and (hover:none)') : null;
   var drawerId = 'songline-mobile-toc-drawer';
   var fabId = 'songline-mobile-toc-fab';
   var backdropId = 'songline-mobile-toc-backdrop';

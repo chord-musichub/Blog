@@ -283,7 +283,7 @@ html.nav-enter-from-left.is-nav-enter-ready body > :not(.site-boot-overlay):not(
 }
 /* 窄桌面窗口仍使用电梯导航；仅触屏设备（或真正小屏）切换成底部导航。 */
 @media (max-width:760px), (max-width:980px) and (hover:none){
-  html body .modern-site-header .songline-elevator-nav a:not(.active) .songline-elevator-name{ display:none!important; }
+  html body .modern-site-header .songline-elevator-nav a:not(.active) .songline-elevator-name{ display:block!important; }
   html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name{ display:block!important; }
 }
 

@@ -4,6 +4,7 @@
 {{ $projects := slice }}
 {{ with .Site.Data.projects }}{{ $projects = . }}{{ else }}{{ with resources.Get "data/projects.json" }}{{ $projects = . | transform.Unmarshal }}{{ end }}{{ end }}
 {{ $searchTerms := slice }}{{ range $posts }}{{ range .Params.tags }}{{ $searchTerms = $searchTerms | append . }}{{ end }}{{ end }}
+{{ range $projects }}{{ range .stack }}{{ $searchTerms = $searchTerms | append . }}{{ end }}{{ end }}
 <section class="content-archive" data-content-archive aria-label="内容归档">
   <header class="content-archive__header">
     <div class="content-archive__controls">
@@ -13,7 +14,7 @@
       </div>
       <div class="content-archive__search" data-archive-search>
         <button class="content-archive__search-trigger" type="button" aria-expanded="false" aria-controls="archiveSearchInput" data-archive-search-trigger><span>搜索</span><i aria-hidden="true">+</i></button>
-        <div class="content-archive__search-field" data-archive-search-field hidden><div class="content-archive__search-input-row"><input id="archiveSearchInput" type="search" autocomplete="off" placeholder="搜索文章或项目…" data-archive-search-input><button type="button" aria-label="清除搜索" data-archive-search-clear hidden>×</button></div><div class="content-archive__search-terms" aria-label="常用搜索词">{{ range first 10 ($searchTerms | uniq) }}<button type="button" data-archive-search-term="{{ . }}">{{ . }}</button>{{ end }}</div></div>
+        <div class="content-archive__search-field" data-archive-search-field hidden><div class="content-archive__search-input-row"><input id="archiveSearchInput" type="search" autocomplete="off" placeholder="搜索文章或项目…" data-archive-search-input><button type="button" aria-label="清除搜索" data-archive-search-clear hidden>×</button></div><div class="content-archive__search-terms" aria-label="标签与技术词条">{{ range sort ($searchTerms | uniq) }}<button type="button" data-archive-search-term="{{ . }}">{{ . }}</button>{{ end }}</div></div>
       </div>
     </div>
     <div class="content-archive__status content-archive__status--sr" aria-live="polite" data-archive-status>文章 / {{ len $posts }} 篇</div>

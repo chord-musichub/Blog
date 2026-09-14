@@ -4,7 +4,7 @@
 {{- $publicFriends := .Site.Data.friends | default slice -}}
 {{- if eq (len $publicFriends) 0 }}{{ with resources.Get "data/friends/friends.json" }}{{ $publicFriends = . | transform.Unmarshal }}{{ end }}{{ end -}}
 {{- $lastPost := first 1 $posts -}}
-{{- $recommendable := where $posts ".Params.is_notice" "ne" true -}}
+{{- $recommendable := sort (where $posts ".Params.is_notice" "ne" true) "Date" "desc" -}}
 {{- $featuredPosts := first 5 $recommendable -}}
 <aside class="sidebar songline-home-system" aria-label="站点信息终端" data-home-parallax="system" data-home-panel data-home-panel-state="system">
   <div class="songline-terminal-frame">
@@ -17,6 +17,8 @@
 
     <div class="songline-terminal-main">
       <section class="songline-terminal-feature" aria-label="精选文章" data-home-recommendations>
+        {{ $pool := slice }}{{ range $recommendable }}{{ $pool = $pool | append (dict "url" .RelPermalink "title" .Title "cover" (.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png") "date" (.Date.Format "2006-01-02") "displayDate" (.Date.Format "2006.01.02")) }}{{ end }}
+        <script type="application/json" data-home-recommendation-pool>{{ $pool | jsonify | safeJS }}</script>
         <div class="songline-terminal-heading"><span>推荐文章</span><i></i></div>
         <div class="songline-terminal-feature-stage">
           {{ range $index, $post := $featuredPosts }}

@@ -628,7 +628,8 @@ body[data-page-kind="home"] .songline-home-system{
 .songline-terminal-heading i{ flex:1; height:1px; background:rgba(232,243,255,.22); }
 .songline-terminal-feature-stage{
   position:relative;
-  min-height:clamp(262px, 34vh, 370px);
+  aspect-ratio:16 / 9;
+  min-height:0;
   overflow:hidden;
   background:rgba(12,22,36,.22);
 }
@@ -878,7 +879,7 @@ body[data-page-kind="home"] .songline-home-system{
   .songline-terminal-frame{ min-height:368px; padding:16px; transform:perspective(1050px) rotateY(-4deg); }
   .songline-terminal-feature{ padding-right:14px; }
   .songline-terminal-stats{ padding-left:14px; }
-  .songline-terminal-feature-stage{ min-height:205px; }
+  .songline-terminal-feature-stage{ min-height:0; }
   .songline-terminal-stat-grid div{ min-height:87px; }
 }
 /* 浏览器缩放或非全屏桌面窗口：保留首页的左右终端构图，只压缩间距和面板尺寸。 */
@@ -902,7 +903,7 @@ body[data-page-kind="home"] .songline-home-system{
   .songline-terminal-main{ gap:clamp(12px, 1.8vw, 18px); }
   .songline-terminal-feature{ padding-right:12px; }
   .songline-terminal-stats{ padding-left:12px; }
-  .songline-terminal-feature-stage{ min-height:clamp(178px, 28vw, 230px); }
+  .songline-terminal-feature-stage{ min-height:0; }
   .songline-terminal-stat-grid div{ min-height:72px; }
 }
 @media (max-width:760px), (max-width:980px) and (hover:none){
@@ -912,7 +913,7 @@ body[data-page-kind="home"] .songline-home-system{
   .songline-terminal-feature{ padding-right:0; }
   .songline-terminal-feature::after{ display:none; }
   .songline-terminal-stats{ padding:21px 0 0; border-top:1px solid rgba(232,243,255,.22); }
-  .songline-terminal-feature-stage{ min-height:clamp(230px, 50vw, 340px); }
+  .songline-terminal-feature-stage{ min-height:0; }
   .songline-terminal-feature-switch{ opacity:.78; }
 }
 @media(max-width:500px){

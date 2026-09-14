@@ -189,6 +189,7 @@
       return queryMatch && tagMatch;
     }
     function runSearch(){
+      searchTerms.forEach(function(term){ term.setAttribute('aria-pressed', text(query) === text(term.dataset.archiveSearchTerm) ? 'true' : 'false'); });
       ['articles','projects'].forEach(function(mode){
         var count = 0;
         records(mode).forEach(function(record){ var show = matches(record); record.hidden = !show; if(!show && activeRecord === record) closeRecord(record); if(show) count++; });

@@ -240,3 +240,16 @@ body.dark .content-archive{border-color:rgba(171,207,239,.24);background:linear-
 
 /* 搜索展开后直接提供可点击的已有词条，避免空白输入框没有起点。 */
 .content-archive__search-field{display:grid;gap:12px}.content-archive__search-input-row{display:flex;align-items:center;gap:8px}.content-archive__search-input-row input{width:100%;min-width:0}.content-archive__search-terms{display:flex;flex-wrap:wrap;gap:7px}.content-archive__search-terms button{border:1px solid rgba(220,239,255,.38);border-radius:999px;padding:5px 9px;background:rgba(18,47,79,.18);color:var(--text);font:600 11px/1.2 inherit;cursor:pointer}.content-archive__search-terms button:hover,.content-archive__search-terms button:focus-visible{border-color:var(--accent);background:rgba(117,191,255,.2);outline:0}.content-archive__mode{font-size:19px;gap:11px;padding-bottom:18px}.content-archive__mode b{font-size:13px}.content-archive__modes{gap:34px}.archive-record__arrow{font-size:22px;font-weight:700;line-height:1}.archive-record__drawer-content--open{cursor:pointer}.archive-record__drawer-content--open:hover h2{color:var(--accent)}.archive-record__drawer-content{background:linear-gradient(90deg,rgba(5,14,28,.1),transparent 88%)}
+
+/* Three clear controls, with the complete vocabulary in a full-width second row. */
+.content-archive .content-archive__controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:14px}
+.content-archive .content-archive__modes,.content-archive .content-archive__search{display:contents}
+.content-archive .content-archive__mode,.content-archive .content-archive__search-trigger{display:flex;justify-content:center;align-items:center;gap:12px;min-height:52px;padding:10px 16px;border:1px solid rgba(220,239,255,.36);border-radius:12px;background:rgba(12,28,46,.3);color:#f4f8ff;font-size:22px;font-weight:700;line-height:1.4;cursor:pointer}
+.content-archive .content-archive__mode:is(:hover,:focus-visible,.is-active),.content-archive .content-archive__search-trigger:is(:hover,:focus-visible,.is-open){background:rgba(129,189,235,.22);border-color:#bcdfff;outline-offset:3px}
+.content-archive .content-archive__mode i{display:none}
+.content-archive .content-archive__search-field{grid-column:1/-1;min-width:0;padding:16px;border-radius:12px;background:rgba(8,23,40,.65)}
+.content-archive .content-archive__search-field[hidden]{display:none}
+.content-archive .content-archive__search-input-row input{min-height:44px;font-size:16px}
+.content-archive .content-archive__search-terms{max-height:240px;overflow:auto;align-content:start;gap:8px;padding:3px;scrollbar-width:thin;overscroll-behavior:contain}
+.content-archive .content-archive__search-terms button{min-height:40px;padding:8px 13px;font-size:14px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;text-align:left}
+.content-archive .content-archive__search-terms button[aria-pressed="true"]{background:rgba(145,204,255,.28);border-color:#bcdfff}

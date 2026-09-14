@@ -62,6 +62,25 @@
         if(!isDesktopElevator()) return null;
         return elevatorLinks().find(function(link){ return isInside(virtualHitRect(link), x, y); }) || null;
       }
+      // A drag ending over navigation is not an activation, even when click bubbles
+      // from the canvas to document. Keep keyboard/programmatic clicks accessible.
+      var press = null;
+      document.addEventListener('pointerdown', function(event){
+        press = {x:event.clientX,y:event.clientY,moved:false};
+      }, true);
+      function trackPress(event){
+        if(press && Math.hypot(event.clientX-press.x,event.clientY-press.y)>8) press.moved=true;
+      }
+      document.addEventListener('pointermove', trackPress, {capture:true,passive:true});
+      document.addEventListener('pointerup', trackPress, true);
+      document.addEventListener('pointercancel', function(){ if(press) press.moved=true; }, true);
+      document.addEventListener('click', function(event){
+        if(event.detail===0 || !press || !press.moved) return;
+        var target = event.target.closest && event.target.closest('[data-elevator-nav], [data-site-map]');
+        if(target || virtualLinkAt(event.clientX,event.clientY)){
+          event.preventDefault(); event.stopImmediatePropagation();
+        }
+      }, true);
       function setYieldingLink(link){
         if(yieldingLink === link) return;
         if(yieldingLink) yieldingLink.classList.remove('is-elevator-yielding');

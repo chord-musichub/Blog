@@ -118,7 +118,7 @@
     document.documentElement.classList.add('has-reading-float-tools');
     document.documentElement.classList.toggle(
       'has-mobile-reading-tools',
-      !!(window.matchMedia && window.matchMedia('(max-width: 820px)').matches)
+      !!(window.matchMedia && window.matchMedia('(max-width: 820px), (max-width:980px) and (hover:none)').matches)
     );
     updateVisibility(topButton, bottomButton);
   }
