@@ -62,25 +62,51 @@
         if(!isDesktopElevator()) return null;
         return elevatorLinks().find(function(link){ return isInside(virtualHitRect(link), x, y); }) || null;
       }
-      // A drag ending over navigation is not an activation, even when click bubbles
-      // from the canvas to document. Keep keyboard/programmatic clicks accessible.
+      // Activation needs the same target at press and release. Distance alone misses
+      // short drags crossing a virtual hit boundary; synthetic click has detail=0.
       var press = null;
-      document.addEventListener('pointerdown', function(event){
-        press = {x:event.clientX,y:event.clientY,moved:false};
-      }, true);
-      function trackPress(event){
-        if(press && Math.hypot(event.clientX-press.x,event.clientY-press.y)>8) press.moved=true;
+      var forwardingClick = false;
+      var keyboardTarget = null;
+      function navigationTarget(event){
+        var actual = event.target.closest && event.target.closest('[data-elevator-nav] a[data-page-key], [data-site-map] a[data-page-key], [data-site-map-toggle]');
+        if(actual) return actual;
+        if(event.type === 'click' && event.detail === 0) return null;
+        var virtual = virtualLinkAt(event.clientX, event.clientY);
+        return virtual && !underlyingControlAt(event.clientX, event.clientY) ? virtual : null;
       }
-      document.addEventListener('pointermove', trackPress, {capture:true,passive:true});
-      document.addEventListener('pointerup', trackPress, true);
-      document.addEventListener('pointercancel', function(){ if(press) press.moved=true; }, true);
-      document.addEventListener('click', function(event){
-        if(event.detail===0 || !press || !press.moved) return;
-        var target = event.target.closest && event.target.closest('[data-elevator-nav], [data-site-map]');
-        if(target || virtualLinkAt(event.clientX,event.clientY)){
+      window.addEventListener('pointerdown', function(event){
+        keyboardTarget = null;
+        press = {id:event.pointerId,x:event.clientX,y:event.clientY,target:navigationTarget(event),moved:false,released:false,cancelled:event.button!==0};
+      }, {capture:true,passive:true});
+      function trackPress(event){
+        if(press && event.pointerId===press.id && !press.released && Math.hypot(event.clientX-press.x,event.clientY-press.y)>3) press.moved=true;
+      }
+      window.addEventListener('pointermove', trackPress, {capture:true,passive:true});
+      window.addEventListener('pointerup', function(event){
+        trackPress(event);
+        if(press && event.pointerId===press.id){ press.released=true; press.releasedAt=performance.now(); }
+      }, {capture:true,passive:true});
+      function cancelPress(){ if(press) press.cancelled=true; }
+      window.addEventListener('pointercancel', cancelPress, true);
+      window.addEventListener('dragstart', cancelPress, true);
+      window.addEventListener('blur', cancelPress);
+      window.addEventListener('keydown', function(event){
+        if(event.key==='Enter'||event.key===' ') keyboardTarget=event.target;
+      }, true);
+      // Window capture runs before all document-level navigation/forwarding handlers.
+      window.addEventListener('click', function(event){
+        var target = navigationTarget(event);
+        if(!target || forwardingClick) return;
+        if(event.detail===0 && (event.isTrusted || keyboardTarget===target)){ keyboardTarget=null; return; }
+        var intentional = press && press.released && !press.moved && !press.cancelled && press.target===target && performance.now()-press.releasedAt<1000;
+        if(!intentional){
           event.preventDefault(); event.stopImmediatePropagation();
         }
       }, true);
+      function forwardClick(control){
+        forwardingClick=true;
+        try{ control.click(); }finally{ forwardingClick=false; }
+      }
       function setYieldingLink(link){
         if(yieldingLink === link) return;
         if(yieldingLink) yieldingLink.classList.remove('is-elevator-yielding');
@@ -130,14 +156,16 @@
           if(navLink){
             event.preventDefault();
             event.stopImmediatePropagation();
-            if(typeof underlying.click === 'function') underlying.click();
+            if(typeof underlying.click === 'function') forwardClick(underlying);
           }
           return;
         }
-        // 点击已命中楼层数字时保留正常 a 行为及页面过渡逻辑。
-        if(nav.contains(event.target)) return;
+        // 只有真正命中楼层锚点时保留原生行为；感应带本身落在 nav
+        // 容器上，没有子锚点，必须继续由这里转发。
+        var actualNavLink = event.target.closest && event.target.closest('[data-elevator-nav] a[data-page-key]');
+        if(actualNavLink) return;
         event.preventDefault();
-        link.click();
+        forwardClick(link);
       }, true);
       nav.addEventListener('focusin', function(event){
         var link = event.target.closest && event.target.closest('a[data-page-key]');
@@ -196,7 +224,7 @@
           if(!underlying) return;
           event.preventDefault();
           event.stopImmediatePropagation();
-          if(typeof underlying.click === 'function') underlying.click();
+          if(typeof underlying.click === 'function') forwardClick(underlying);
         }, true);
         document.addEventListener('pointerdown', function(event){ if(siteMap.classList.contains('is-map-open') && !siteMap.contains(event.target)) setMapOpen(false); });
         document.addEventListener('keydown', function(event){ if(event.key === 'Escape') setMapOpen(false); });

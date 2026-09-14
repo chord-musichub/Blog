@@ -8,7 +8,9 @@
 
 档案搜索词由全部文章标签及项目技术栈生成，不再截取前十项。文章、项目和搜索占三个明确入口，展开词条区支持换行和独立滚动。
 
-电梯及地图根据完整 pointer 手势判断点击。离按下位置移动超过 8 CSS 像素则忽略随后的导航 click；键盘激活保留。该判断不改变原有底层控件优先机制。
+电梯及地图根据完整 pointer 手势判断点击。只有在同一导航目标上按下并在 3 CSS 像素内松开才会触发导航；跨出目标、拖拽或 pointercancel 后产生的 click 会被拦截，键盘激活保留。该判断不改变原有底层控件优先机制。
+
+朋友页星图在真实节点和 SVG 连线之上使用同一坐标投影实现中心放大镜：中心头像轻微放大，边缘内容通过遮罩和 `backdrop-filter` 柔焦；拖动/缩放时焦点有轻微位移与动态模糊，停止后回到稳定状态。不会克隆图片或额外发起资源请求，系统减少动态效果时会降低动画强度。
 
 ## 触屏布局边界
 
@@ -27,6 +29,8 @@
 ```powershell
 node tests/ui-layout.browser.cjs
 node tests/navigation-intent.browser.cjs
+node tests/navigation-origin.browser.cjs
+node tests/galaxy-lens.browser.cjs
 node tests/theme-layout.browser.cjs
 node tests/resource-readiness.browser.cjs
 ```

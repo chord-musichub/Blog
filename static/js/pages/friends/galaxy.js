@@ -2,9 +2,12 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.8.0';
+  var VERSION = '22.10.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
-  var DESKTOP_POSITIONS = [[24,30],[38,18],[57,22],[76,30],[80,51],[72,72],[54,82],[31,77],[19,61],[19,43],[38,44],[62,44],[43,63],[57,62],[30,27],[70,18],[83,68],[17,75]];
+  // A wide outer ring plus a loose inner ring keeps the growing friend list
+  // readable.  The old presets clustered around the core (especially the
+  // 38/44, 43/63 and 57/62 points), which made portraits and links stack up.
+  var DESKTOP_POSITIONS = [[20,20],[37,14],[56,14],[74,21],[82,37],[84,56],[78,74],[64,86],[46,88],[28,82],[18,68],[17,47],[31,34],[43,28],[61,29],[72,48],[63,68],[37,68]];
   var MOBILE_POSITIONS = [[27,30],[49,19],[70,25],[75,46],[67,70],[50,80],[30,72],[23,52],[38,44],[61,47],[43,61],[58,62]];
   // 历史默认关系只用于尚未在公开 links.json 配置星链的旧数据；
   // 一旦配置了关系图，连线完全由 JSON 驱动，避免前端写死的线无法修改。
@@ -150,6 +153,46 @@
     var stageObserver = null;
     // 工作区比视窗更大；只平移这个世界层，背景、回忆入口和 hover 卡片保持固定。
     var pan = { x:0, y:0, targetX:0, targetY:0, zoom:1, inertiaFrame:0, inertiaLast:0, inertiaX:0, inertiaY:0, dragFrame:0, drag:null, nextX:0, nextY:0, suppressUntil:0 };
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var lens = {items:[],edges:[],width:0,height:0,worldWidth:0,worldHeight:0,left:0,top:0,lastX:0,lastY:0,lastZoom:1,motion:0};
+
+    // One coordinate projection for the real hit targets and SVG edges. No cloned
+    // scene or per-frame DOM measurements; only the resize/layout pass reads geometry.
+    function paintLens(settled){
+      if(!lens.width || !lens.items.length) return;
+      var dx=pan.x-lens.lastX, dy=pan.y-lens.lastY;
+      var speed=Math.min(1,(Math.hypot(dx,dy)+Math.abs(pan.zoom-lens.lastZoom)*400)/22);
+      lens.lastX=pan.x; lens.lastY=pan.y; lens.lastZoom=pan.zoom;
+      lens.motion=settled||reducedMotion ? 0 : lens.motion*.7+speed*.3;
+      var focusX=lens.width*(.5-Math.max(-.016,Math.min(.016,dx*.0005)));
+      var focusY=lens.height*(.5-Math.max(-.016,Math.min(.016,dy*.0005)));
+      if(settled||reducedMotion){ focusX=lens.width/2; focusY=lens.height/2; }
+      stage.style.setProperty('--galaxy-focus-x',(focusX/lens.width*100).toFixed(2)+'%');
+      stage.style.setProperty('--galaxy-focus-y',(focusY/lens.height*100).toFixed(2)+'%');
+      stage.style.setProperty('--galaxy-edge-blur',(2.5+lens.motion*3).toFixed(2)+'px');
+      var centers=Object.create(null);
+      lens.items.forEach(function(item){
+        var screenX=lens.left+lens.worldWidth/2+(item.x-lens.worldWidth/2)*pan.zoom+pan.x;
+        var screenY=lens.top+lens.worldHeight/2+(item.y-lens.worldHeight/2)*pan.zoom+pan.y;
+        var vx=screenX-focusX, vy=screenY-focusY;
+        var distance=Math.hypot(vx/(lens.width*.54),vy/(lens.height*.54));
+        var influence=Math.pow(Math.max(0,1-distance*distance),2);
+        // Make the lens unmistakable without changing the world geometry:
+        // the avatar at the focus reaches roughly 1.48x, while the reduced
+        // motion path still provides a quieter but visible 1.28x emphasis.
+        var gain=reducedMotion ? .28 : .48;
+        var ox=vx*influence*.16/pan.zoom, oy=vy*influence*.16/pan.zoom;
+        item.element.style.setProperty('--lens-x',ox.toFixed(2)+'px');
+        item.element.style.setProperty('--lens-y',oy.toFixed(2)+'px');
+        item.element.style.setProperty('--lens-scale',(1+gain*influence).toFixed(3));
+        centers[item.id]={x:item.x+ox,y:item.y+oy};
+      });
+      lens.edges.forEach(function(edge){
+        var a=centers[edge.a],b=centers[edge.b];
+        edge.line.setAttribute('x1',a.x.toFixed(2));edge.line.setAttribute('y1',a.y.toFixed(2));
+        edge.line.setAttribute('x2',b.x.toFixed(2));edge.line.setAttribute('y2',b.y.toFixed(2));
+      });
+    }
 
     // 星图通过百分比定位，但图片、字体和移动端可视视口会在首帧后继续稳定。
     // 统一收敛到同一轮布局，保证 SVG 线端永远读取头像的最终圆心。
@@ -174,7 +217,7 @@
       var bounds = panBounds();
       return { x:Math.max(-bounds.x, Math.min(bounds.x, x)), y:Math.max(-bounds.y, Math.min(bounds.y, y)) };
     }
-    function paintPan(){ world.style.transform = 'translate3d(' + Math.round(pan.x) + 'px,' + Math.round(pan.y) + 'px,0) scale(' + pan.zoom.toFixed(3) + ')'; }
+    function paintPan(){ world.style.transform = 'translate3d(' + pan.x.toFixed(2) + 'px,' + pan.y.toFixed(2) + 'px,0) scale(' + pan.zoom.toFixed(3) + ')'; paintLens(false); }
     function movePan(x, y){
       var next = clampPan(x, y);
       pan.targetX = next.x; pan.targetY = next.y;
@@ -183,6 +226,7 @@
     function stopInertia(){
       if(pan.inertiaFrame) window.cancelAnimationFrame(pan.inertiaFrame);
       pan.inertiaFrame = 0; pan.inertiaLast = 0; pan.inertiaX = 0; pan.inertiaY = 0;
+      paintLens(true);
     }
     function coastPan(now){
       var elapsed = Math.min(32, Math.max(8, now - pan.inertiaLast));
@@ -199,7 +243,7 @@
     }
     function startInertia(velocityX, velocityY){
       stopInertia();
-      if(Math.abs(velocityX) + Math.abs(velocityY) < .05) return;
+      if(reducedMotion || Math.abs(velocityX) + Math.abs(velocityY) < .05) return;
       pan.inertiaX = velocityX; pan.inertiaY = velocityY;
       pan.inertiaLast = performance.now();
       pan.inertiaFrame = window.requestAnimationFrame(coastPan);
@@ -393,6 +437,11 @@
       });
     }
     function drawLines(){
+      lens.items=[];lens.edges=[];
+      var elements=[{id:host.id,element:core}].concat(visibleFriends.map(function(friend){return {id:friend.id,element:nodeById[friend.id]};}));
+      elements.forEach(function(item){
+        item.element.style.setProperty('--lens-x','0px');item.element.style.setProperty('--lens-y','0px');item.element.style.setProperty('--lens-scale','1');
+      });
       var worldRect = world.getBoundingClientRect();
       // 过场期间 main 会缩放；getBoundingClientRect 会得到缩放后的视觉尺寸，
       // 而 SVG viewBox 必须使用未缩放的布局尺寸。否则过场结束后节点已回到
@@ -405,6 +454,21 @@
       var centers = Object.create(null);
       centers[host.id] = centerOf(core, worldRect, layoutWidth, layoutHeight);
       visibleFriends.forEach(function(friend){ centers[friend.id] = centerOf(nodeById[friend.id], worldRect, layoutWidth, layoutHeight); });
+      lens.width=stage.clientWidth;lens.height=stage.clientHeight;
+      lens.worldWidth=layoutWidth;lens.worldHeight=layoutHeight;lens.left=world.offsetLeft;lens.top=world.offsetTop;
+      elements.forEach(function(item){
+        var img=item.element.querySelector('img');
+        // The node's transform is centered on the avatar, not on the full
+        // button (which also contains the name).  offsetTop is relative to
+        // the image's own offset parent and was therefore wrong for the
+        // absolutely-positioned core.  Use the two visual boxes while the
+        // lens transform is reset so the scale keeps the avatar center fixed.
+        var elementRect=item.element.getBoundingClientRect();
+        var imageRect=img && img.getBoundingClientRect();
+        var originY=imageRect ? imageRect.top + imageRect.height/2 - elementRect.top : elementRect.height/2;
+        item.element.style.setProperty('--lens-origin-y',originY.toFixed(2)+'px');
+        lens.items.push({id:item.id,element:item.element,x:centers[item.id].x,y:centers[item.id].y});
+      });
       edges.forEach(function(edge){
         var from = centers[edge[0].id], to = centers[edge[1].id];
         if(!from || !to) return;
@@ -414,7 +478,9 @@
         line.setAttribute('data-edge', edgeFor(edge[0], edge[1]));
         line.setAttribute('class', 'friends-constellation__line');
         lines.appendChild(line);
+        lens.edges.push({line:line,a:edge[0].id,b:edge[1].id});
       });
+      paintLens(true);
       updateLineState(focused);
     }
     function centerOf(element, container, layoutWidth, layoutHeight){

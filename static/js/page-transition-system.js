@@ -372,7 +372,7 @@
   }
 
   function handleClick(event){
-    if(locked || !isPlainLeftClick(event)) return;
+    if(event.defaultPrevented || locked || !isPlainLeftClick(event)) return;
     var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
     if(!shouldHandleLink(link)) return;
     var url;
