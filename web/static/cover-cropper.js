@@ -26,6 +26,9 @@
     status.textContent = message;
     status.classList.toggle('error', !!isError);
   }
+  function mediaActionURL(mediaURL, action){
+    return mediaURL + (mediaURL.indexOf('?') === -1 ? '?' : '&') + 'action=' + encodeURIComponent(action);
+  }
   function currentSize(){ return ratios[variant] || ratios['16x9']; }
   function configureCanvas(){
     var size = currentSize();
@@ -92,7 +95,7 @@
     var holder = button.closest('[data-media-url]');
     var mediaURL = button.getAttribute('data-media-url') || (holder && holder.getAttribute('data-media-url')) || '/admin/media';
     var form = new FormData(); form.append('source', legacyPath);
-    fetch(mediaURL + '?action=media-import', {method:'POST', credentials:'same-origin', body:form})
+    fetch(mediaActionURL(mediaURL, 'media-import'), {method:'POST', credentials:'same-origin', body:form})
       .then(function(response){ return response.json().catch(function(){ return {ok:false,error:'迁移服务返回了无效响应'}; }); })
       .then(function(result){
         if(!result || !result.ok || !result.path) throw new Error((result && result.error) || '迁移旧图片失败');
@@ -139,7 +142,7 @@
       form.append('source', sourcePath); form.append('variant', variant); form.append('crop', new File([blob], 'crop-'+variant+'.webp', {type:'image/webp'}));
       var holder = activeButton.closest('[data-media-url]');
       var mediaURL = activeButton.getAttribute('data-media-url') || (holder && holder.getAttribute('data-media-url'));
-      fetch((mediaURL || '/admin/media') + '?action=media-crop', {method:'POST', credentials:'same-origin', body:form})
+      fetch(mediaActionURL(mediaURL || '/admin/media', 'media-crop'), {method:'POST', credentials:'same-origin', body:form})
         .then(function(response){ return response.json().catch(function(){ return {ok:false,error:'裁剪服务返回了无效响应'}; }); })
         .then(function(result){
           if(!result || !result.ok || !result.path) throw new Error((result && result.error) || '保存裁剪图片失败');

@@ -4,6 +4,10 @@
   var inputs = Array.prototype.slice.call(document.querySelectorAll('[data-cover-upload], #coverUpload'));
   if (!inputs.length) return;
 
+  function mediaActionURL(mediaURL, action) {
+    return mediaURL + (mediaURL.indexOf('?') === -1 ? '?' : '&') + 'action=' + encodeURIComponent(action);
+  }
+
   inputs.forEach(function (input) {
     var targetSelector = input.getAttribute('data-cover-target') || '#coverInput';
     var cover = document.querySelector(targetSelector);
@@ -42,7 +46,7 @@
     var category = launch.getAttribute('data-media-category') || '';
     if (category) form.append('category', category);
     setStatus('正在上传封面…');
-    fetch(launch.getAttribute('data-media-url') + '?action=cover-upload', {
+    fetch(mediaActionURL(launch.getAttribute('data-media-url'), 'cover-upload'), {
       method: 'POST', credentials: 'same-origin', body: form
     })
       .then(function (response) {

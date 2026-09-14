@@ -133,6 +133,7 @@ func TestMediaLibraryOffersNonDestructiveCropForExistingRasterImages(t *testing.
 	response := httptest.NewRecorder()
 	app.render(response, "media.html", map[string]any{
 		"User":      User{Username: "creator", Role: roleUser},
+		"MediaURL":  "/admin/media",
 		"Settings":  defaultSiteSettings(),
 		"Workspace": "media",
 		"Files": []MediaFile{
@@ -148,7 +149,7 @@ func TestMediaLibraryOffersNonDestructiveCropForExistingRasterImages(t *testing.
 	if response.Code != http.StatusOK {
 		t.Fatalf("media status = %d, body = %s", response.Code, body)
 	}
-	for _, want := range []string{"mediaCropSource0-0", "裁剪 16:9", "cover-cropper.js?v=20.25.0"} {
+	for _, want := range []string{"mediaCropSource0-0", "裁剪 16:9", "cover-cropper.js?v=20.25.1"} {
 		if !strings.Contains(body, want) {
 			t.Fatalf("media crop affordance missing %q: %s", want, body)
 		}
@@ -185,7 +186,7 @@ func TestProjectAndMemoryEditorsUseCurrentCropperForLegacyImages(t *testing.T) {
 		response := httptest.NewRecorder()
 		app.render(response, name, data)
 		body := response.Body.String()
-		if response.Code != http.StatusOK || !strings.Contains(body, "cover-cropper.js?v=20.25.0") || !strings.Contains(body, "data-crop-source") {
+		if response.Code != http.StatusOK || !strings.Contains(body, "cover-cropper.js?v=20.25.1") || !strings.Contains(body, "data-crop-source") {
 			t.Fatalf("%s did not provide the current cropper: status=%d body=%s", name, response.Code, body)
 		}
 	}
