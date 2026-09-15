@@ -122,10 +122,13 @@ body.dark[data-page-kind="home"] .songline-terminal-indicators button.is-active 
 
 /* 同一块 HUD 内的 2×2 数据，不追加独立卡片边框。 */
 body.dark[data-page-kind="home"] .songline-terminal-stat-grid{ border-color:var(--night-line)!important; }
-body.dark[data-page-kind="home"] .songline-terminal-stat-grid div:nth-child(odd),
-body.dark[data-page-kind="home"] .songline-terminal-stat-grid div:nth-child(-n+2){ border-color:var(--night-line)!important; }
-body.dark[data-page-kind="home"] .songline-terminal-stat-grid dt{ color:#8b9ab8!important; }
-body.dark[data-page-kind="home"] .songline-terminal-stat-grid dd{ color:#edf3ff!important; text-shadow:0 0 18px rgba(170,200,255,.08)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat:nth-child(odd),
+body.dark[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat:nth-child(-n+2){ border-color:var(--night-line)!important; }
+body.dark[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat-label{ color:#8b9ab8!important; }
+body.dark[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat-value{ color:#edf3ff!important; text-shadow:0 0 18px rgba(170,200,255,.08)!important; }
+body.dark[data-page-kind="home"] .songline-home-message-ticker{ color:rgba(205,220,245,.7)!important; }
+body.dark[data-page-kind="home"] .songline-home-message-ticker:hover,
+body.dark[data-page-kind="home"] .songline-home-message-ticker:focus-visible{ color:#f5f8ff!important; }
 
 /* 右下音乐带沿用 HUD 的冷白文字和蓝灰细线。 */
 body.dark[data-page-kind="home"] .songline-home-music{ border-top-color:var(--night-line)!important; color:#dce7fa!important; }

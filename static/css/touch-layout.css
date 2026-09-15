@@ -34,9 +34,9 @@
   html body[data-page-kind="home"] .songline-terminal-feature-copy strong{font-size:20px!important;line-height:1.3}
   html body[data-page-kind="home"] .songline-terminal-stats{padding:16px 0 0!important}
   html body[data-page-kind="home"] .songline-terminal-stat-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
-  html body[data-page-kind="home"] .songline-terminal-stat-grid div{min-height:70px!important;padding:8px!important}
-  html body[data-page-kind="home"] .songline-terminal-stat-grid dt{font-size:12px!important}
-  html body[data-page-kind="home"] .songline-terminal-stat-grid dd{font-size:25px!important}
+  html body[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat{min-height:70px!important;padding:8px!important}
+  html body[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat-label{font-size:12px!important}
+  html body[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat-value{font-size:25px!important}
   html body[data-page-kind="home"] .songline-home-music-actions button{min-width:40px;min-height:44px}
   html body[data-page-kind="home"] .songline-terminal-links{flex-wrap:wrap;gap:12px;min-height:44px}
   html body[data-page-kind="home"] .songline-desktop-pet{top:auto!important;bottom:0;right:0!important;width:76px!important;height:92px!important}

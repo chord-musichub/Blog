@@ -150,7 +150,7 @@ body.dark .site-header{
   background:rgba(12,24,40,.88) !important;
   border-bottom-color:rgba(116,151,188,.28);
 }
-body.dark footer,
+body.dark > footer,
 body.dark .site-footer{
   background:#0d1728;
   color:#d3e2f3;

@@ -11,6 +11,8 @@
     var board = panel.querySelector('[data-home-message-board]');
     var goto = panel.querySelector('[data-home-panel-goto]');
     var back = panel.querySelector('[data-home-panel-return]');
+    var ticker = panel.querySelector('[data-home-message-ticker]');
+    var tickerText = ticker && ticker.querySelector('[data-home-message-ticker-text]');
     var openCompose = panel.querySelector('[data-home-message-compose-open]');
     var cancelCompose = panel.querySelector('[data-home-message-compose-cancel]');
     var form = panel.querySelector('[data-home-message-form]');
@@ -23,13 +25,74 @@
     var messageInput = form && form.querySelector('textarea[name="content"]');
     if(!board || !goto || !back) return;
 
+    var tickerMessages = [];
+    var tickerTimer = 0;
+    var tickerFrame = 0;
+    var disposed = false;
+    var requestController = new AbortController();
+    var pendingMessages = null;
+    var tickerObserver = ticker && typeof ResizeObserver === 'function' ? new ResizeObserver(function(){
+      if(tickerMessages.length && !ticker.hidden) renderMessageTicker(tickerMessages);
+    }) : null;
+    if(tickerObserver) tickerObserver.observe(ticker);
+    function messageSummary(value){
+      return String(value || '').replace(/^\s*(?:#{1,6}\s+|>\s?|[-*+]\s+)/gm, '')
+        .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[`*_~]/g, '')
+        .replace(/\s+/g, ' ').trim();
+    }
+    function renderMessageTicker(messages){
+      tickerMessages = (Array.isArray(messages) ? messages : []).filter(function(message){
+        return message && String(message.content || '').trim();
+      });
+      if(!ticker || !tickerText) return;
+      window.clearTimeout(tickerTimer);
+      window.cancelAnimationFrame(tickerFrame);
+      if(!tickerMessages.length){
+        ticker.hidden = true;
+        tickerText.textContent = '';
+        return;
+      }
+      var lastIndex = -1;
+      function showNext(){
+        if(disposed || !tickerMessages.length) return;
+        if(document.hidden || panel.dataset.homePanelState !== 'system' || ticker.matches(':hover, :focus')){
+          tickerTimer = window.setTimeout(showNext, 1000);
+          return;
+        }
+        var index = Math.floor(Math.random() * tickerMessages.length);
+        if(tickerMessages.length > 1 && index === lastIndex) index = (index + 1) % tickerMessages.length;
+        lastIndex = index;
+        var message = tickerMessages[index];
+        var summary = Array.from(messageSummary(message.content));
+        var text = summary.slice(0, 64).join('') + (summary.length > 64 ? '…' : '');
+        tickerText.textContent = (message.name || '匿名') + '：' + text;
+        ticker.setAttribute('aria-label', '打开留言板：' + tickerText.textContent);
+        ticker.classList.remove('is-switching', 'is-scrolling');
+        ticker.hidden = false;
+        tickerFrame = window.requestAnimationFrame(function(){
+          if(disposed) return;
+          var travel = Math.max(0, tickerText.scrollWidth - ticker.clientWidth);
+          var duration = Math.max(6500, Math.min(16000, travel / 30 * 1000 + 3000));
+          ticker.style.setProperty('--ticker-travel', -travel + 'px');
+          ticker.style.setProperty('--ticker-duration', duration + 'ms');
+          ticker.classList.add('is-switching');
+          if(travel > 0) ticker.classList.add('is-scrolling');
+          tickerTimer = window.setTimeout(showNext, duration + 500);
+        });
+      }
+      showNext();
+    }
+
     function setState(state, focusTarget){
       panel.dataset.homePanelState = state;
       board.setAttribute('aria-hidden', state === 'system' ? 'true' : 'false');
       if(form) form.hidden = state !== 'compose';
+      var system = panel.querySelector('[data-home-panel-system]');
+      if(system) system.inert = state !== 'system';
+      board.inert = state === 'system';
       window.dispatchEvent(new CustomEvent('songline:home-panel-state', { detail:{ state:state } }));
       if(focusTarget){
-        window.setTimeout(function(){ focusTarget.focus(); }, 260);
+        window.setTimeout(function(){ if(!disposed && focusTarget.isConnected) focusTarget.focus(); }, 260);
       }
     }
 
@@ -49,7 +112,7 @@
         if(index >= tries.length) return Promise.reject(lastError || new Error('request failed'));
         var url = tries[index++];
         var absolute = /^https?:\/\//i.test(url);
-        var requestOptions = Object.assign(absolute ? {mode:'cors', credentials:'omit'} : {credentials:'same-origin'}, options || {});
+        var requestOptions = Object.assign(absolute ? {mode:'cors', credentials:'omit'} : {credentials:'same-origin'}, {signal:requestController.signal}, options || {});
         return fetch(url, requestOptions).then(function(response){
           return response.json().catch(function(){ return {}; }).then(function(data){
             if(!response.ok){
@@ -60,7 +123,7 @@
             }
             return data;
           });
-        }).catch(function(error){ return error && error.noFallback ? Promise.reject(error) : next(error); });
+        }).catch(function(error){ return disposed || (error && (error.noFallback || error.name === 'AbortError')) ? Promise.reject(error) : next(error); });
       }
       return next();
     }
@@ -141,16 +204,25 @@
     document.addEventListener('keydown', onFocusKeydown);
 
     function cleanup(){
+      disposed = true;
+      requestController.abort();
       closeFocus();
+      window.clearTimeout(tickerTimer);
+      window.cancelAnimationFrame(tickerFrame);
+      tickerTimer = 0;
+      if(tickerObserver) tickerObserver.disconnect();
       focus.removeEventListener('click', onFocusLayerClick);
       closeFocusButton.removeEventListener('click', closeFocus);
       document.removeEventListener('keydown', onFocusKeydown);
-      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      if(ticker) ticker.removeEventListener('click', openMessageBoard);
+      goto.removeEventListener('click', openMessageBoard);
+      back.removeEventListener('click', closeMessageBoard);
+      window.removeEventListener('songline:page-swap', onPageSwap);
       if(focus.parentNode) focus.parentNode.removeChild(focus);
       if(window.__songlineHomeMessageBoardCleanup === cleanup) window.__songlineHomeMessageBoardCleanup = null;
     }
-    function onTransitionStart(event){ if((event.detail && event.detail.from) === '/') cleanup(); }
-    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    function onPageSwap(){ if(!panel.isConnected) cleanup(); }
+    window.addEventListener('songline:page-swap', onPageSwap);
     window.__songlineHomeMessageBoardCleanup = cleanup;
 
     function updatePreview(){
@@ -159,9 +231,11 @@
     }
 
     function renderMessages(messages){
+      if(disposed) return;
       messages = Array.isArray(messages) ? messages : [];
       var currentMessages = messages;
       if(count) count.textContent = String(messages.length);
+      renderMessageTicker(messages);
       if(!list) return;
       list.innerHTML = messages.map(function(message, index){
         var avatar = message.avatar || '/uploads/admin/friends/user-null.png';
@@ -180,14 +254,20 @@
     }
 
     function loadMessages(){
-      return requestAny({method:'GET'}).then(function(data){ renderMessages(data.messages); return data.messages || []; });
+      if(pendingMessages) return pendingMessages;
+      pendingMessages = requestAny({method:'GET'}).then(function(data){ renderMessages(data.messages); return data.messages || []; })
+        .finally(function(){ pendingMessages = null; });
+      return pendingMessages;
     }
 
-    goto.addEventListener('click', function(){
+    function openMessageBoard(){
       setState('message', back);
       loadMessages().catch(function(){});
-    });
-    back.addEventListener('click', function(){ setState('system', goto); });
+    }
+    function closeMessageBoard(){ setState('system', goto); }
+    goto.addEventListener('click', openMessageBoard);
+    if(ticker) ticker.addEventListener('click', openMessageBoard);
+    back.addEventListener('click', closeMessageBoard);
     if(openCompose){
       openCompose.addEventListener('click', function(){
         if(status) status.textContent = '';
@@ -232,6 +312,7 @@
         }).finally(function(){ if(submit) submit.disabled = false; });
       });
     }
+    board.inert = true;
     loadMessages().catch(function(){});
   }
 

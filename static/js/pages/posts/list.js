@@ -136,7 +136,10 @@
     var status = archive.querySelector('[data-archive-status]');
     var projectHint = archive.querySelector('[data-archive-project-hint]');
     var activeMode = 'articles', activeRecord = null, pinnedRecord = null, closeTimer = 0, query = '';
-    var tagFilter = new URLSearchParams(window.location.search).get('tag') || '';
+    var archiveParams = new URLSearchParams(window.location.search);
+    var tagFilter = archiveParams.get('tag') || '';
+    // 首页“标签”入口直接打开档案页的搜索抽屉，并保留词条按钮。
+    var shouldOpenSearch = /^(1|true|open)$/i.test(archiveParams.get('search') || '');
     function records(mode){ var panel = archive.querySelector('[data-archive-panel="' + mode + '"]'); return panel ? Array.prototype.slice.call(panel.querySelectorAll('[data-archive-record]')) : []; }
     function closeRecord(record){
       if(!record) return;
@@ -213,6 +216,11 @@
     if(input){ input.addEventListener('input', function(){ query = input.value || ''; if(clear) clear.hidden = !query; runSearch(); }); input.addEventListener('keydown', function(event){ if(event.key === 'Escape'){ input.value = ''; query = ''; if(clear) clear.hidden = true; runSearch(); input.blur(); } }); }
     searchTerms.forEach(function(term){ term.addEventListener('click', function(){ query = term.dataset.archiveSearchTerm || ''; if(input) input.value = query; if(clear) clear.hidden = !query; runSearch(); if(input) input.focus(); }); });
     if(clear) clear.addEventListener('click', function(){ if(!input) return; input.value = ''; query = ''; clear.hidden = true; runSearch(); input.focus(); });
+    if(shouldOpenSearch && searchField && searchTrigger){
+      searchField.hidden = false;
+      searchTrigger.setAttribute('aria-expanded', 'true');
+      searchTrigger.classList.add('is-open');
+    }
     runSearch();
   }
   window.SonglineInitPostsListFlat = init;

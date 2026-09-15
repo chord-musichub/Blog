@@ -1,0 +1,11 @@
+{{- $directory := . -}}
+{{- $hashes := slice -}}
+{{- range readDir $directory -}}
+  {{- $file := printf "%s/%s" $directory .Name -}}
+  {{- if .IsDir -}}
+    {{- $hashes = $hashes | append (partial "asset-content-version.html" $file) -}}
+  {{- else if in (slice ".css" ".js") (path.Ext .Name) -}}
+    {{- $hashes = $hashes | append (printf "%s:%s" $file (readFile $file | sha256)) -}}
+  {{- end -}}
+{{- end -}}
+{{- return (sha256 (delimit $hashes "\n")) -}}

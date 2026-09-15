@@ -1,9 +1,8 @@
 {{- /*
-统一公开站静态资源的缓存版本。
-发布脚本会把当前 Git 提交写入 data/build.json；本地开发没有该文件时使用 dev。
+资源内容参与缓存版本：导入的 build.json 或未提交的本地修改不能让新页面继续使用旧 CSS/JS。
+目录摘要在单次 Hugo 构建内缓存，避免每个页面重复读取资源。
 */ -}}
-{{- with .Site.Data.build.asset_version -}}
-{{ . }}
-{{- else -}}
-{{ printf "dev-%d" now.Unix }}
-{{- end -}}
+{{- $css := partialCached "asset-content-version.html" "static/css" "static/css" -}}
+{{- $js := partialCached "asset-content-version.html" "static/js" "static/js" -}}
+{{- $digest := printf "%s:%s" $css $js | sha256 -}}
+{{- return (printf "%s-%s" (.Site.Data.build.asset_version | default "dev") (substr $digest 0 16)) -}}

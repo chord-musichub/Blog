@@ -1,5 +1,5 @@
 {{- $cfg := .Site.Data.site -}}
-{{- $posts := where .Site.RegularPages "Section" "posts" -}}
+{{- $posts := sort (where .Site.RegularPages "Section" "posts") "Date" "desc" -}}
 {{- $tagTax := index .Site.Taxonomies "tags" -}}
 {{- $publicFriends := .Site.Data.friends | default slice -}}
 {{- if eq (len $publicFriends) 0 }}{{ with resources.Get "data/friends/friends.json" }}{{ $publicFriends = . | transform.Unmarshal }}{{ end }}{{ end -}}
@@ -10,8 +10,13 @@
   <div class="songline-terminal-frame">
     <div class="songline-home-system-panel" data-home-panel-system>
     <header class="songline-terminal-status" aria-label="系统在线">
-      <span class="songline-terminal-online"><i></i> 在线</span>
-      <h1 class="songline-terminal-brand" id="songline-home-title">Songline</h1>
+      <div class="songline-terminal-live">
+        <span class="songline-terminal-online"><i></i> 在线</span>
+        <button class="songline-home-message-ticker" type="button" data-home-message-ticker hidden aria-label="查看留言">
+          <span data-home-message-ticker-text></span>
+        </button>
+      </div>
+      <h1 class="songline-terminal-brand" id="songline-home-title"><a class="songline-terminal-brand-link" href="/friends/songline/" aria-label="进入 Songline 站内主页">Songline</a></h1>
       {{ partial "desktop-pet.html" . }}
     </header>
 
@@ -50,12 +55,12 @@
 
       <section class="songline-terminal-stats" aria-label="站点统计">
         <div class="songline-terminal-heading"><span>站点数据</span><i></i></div>
-        <dl class="songline-terminal-stat-grid">
-          <div style="--stat-delay:80ms"><dt>文章</dt><dd>{{ len $posts }}</dd></div>
-          <div style="--stat-delay:150ms"><dt>标签</dt><dd>{{ if $tagTax }}{{ len $tagTax }}{{ else }}0{{ end }}</dd></div>
-          <div style="--stat-delay:220ms"><dt>朋友</dt><dd>{{ len $publicFriends }}</dd></div>
-          <div style="--stat-delay:290ms"><dt>更新</dt><dd>{{ with $lastPost }}{{ (index . 0).Date.Format "01.02" }}{{ else }}--.--{{ end }}</dd></div>
-        </dl>
+        <nav class="songline-terminal-stat-grid" aria-label="站点数据入口">
+          <a class="songline-terminal-stat" style="--stat-delay:80ms" href="/posts/" aria-label="查看文章归档" title="查看文章归档"><span class="songline-terminal-stat-label">文章</span><span class="songline-terminal-stat-value">{{ len $posts }}</span></a>
+          <a class="songline-terminal-stat" style="--stat-delay:150ms" href="/posts/?search=1" aria-label="打开档案搜索" title="打开档案搜索"><span class="songline-terminal-stat-label">标签</span><span class="songline-terminal-stat-value">{{ if $tagTax }}{{ len $tagTax }}{{ else }}0{{ end }}</span></a>
+          <a class="songline-terminal-stat" style="--stat-delay:220ms" href="/friends/" aria-label="查看朋友星图" title="查看朋友星图"><span class="songline-terminal-stat-label">朋友</span><span class="songline-terminal-stat-value">{{ len $publicFriends }}</span></a>
+          <a class="songline-terminal-stat" style="--stat-delay:290ms" href="{{ with $lastPost }}{{ (index . 0).RelPermalink }}{{ else }}/posts/{{ end }}" aria-label="查看最近更新" title="查看最近更新"><span class="songline-terminal-stat-label">更新</span><span class="songline-terminal-stat-value">{{ with $lastPost }}{{ (index . 0).Date.Format "01.02" }}{{ else }}--.--{{ end }}</span></a>
+        </nav>
 
         <section class="songline-home-music" aria-label="本地音乐" data-home-music>
           <div class="songline-home-music-main">
