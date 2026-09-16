@@ -166,6 +166,20 @@ main.container.songline-page-enter-active{
   main.container.songline-page-enter-right{transform:translate3d(90px,0,0) scale(.978)}
   main.container.songline-page-enter-left{transform:translate3d(-90px,0,0) scale(.978)}
 }
+/* 手机端由黑幕承接场景变化，内容只淡入淡出，避免新页面先偏移一帧再归位。 */
+@media(max-width:980px){
+  main.container.songline-page-exit-forward,
+  main.container.songline-page-exit-backward,
+  main.container.songline-page-exit-right,
+  main.container.songline-page-exit-left,
+  main.container.songline-page-exit-same,
+  main.container.songline-page-enter-forward,
+  main.container.songline-page-enter-backward,
+  main.container.songline-page-enter-right,
+  main.container.songline-page-enter-left,
+  main.container.songline-page-enter-same,
+  main.container.songline-page-enter-active{transform:none!important}
+}
 @media(prefers-reduced-motion: reduce){
   .songline-page-transition-overlay{
     top:0;

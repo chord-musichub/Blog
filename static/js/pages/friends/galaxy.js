@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.10.0';
+  var VERSION = '22.11.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   // A wide outer ring plus a loose inner ring keeps the growing friend list
   // readable.  The old presets clustered around the core (especially the
@@ -251,13 +251,14 @@
     }
     function onPointerDown(event){
       if(event.button !== undefined && event.button !== 0) return;
-      // Touch may start on an avatar. Delay capture until a real drag so taps still open profiles.
+      // 头像也是画布的一部分：先记录起点，跨过阈值才接管为拖动；
+      // 因此密集头像不会抢走拖拽，轻点仍保留为查看资料。
       if(pan.drag || event.isPrimary === false) return;
-      if(event.target.closest && event.target.closest('a, button, input, textarea, select') &&
-        !(event.pointerType === 'touch' && event.target.closest('.friends-constellation__node, .friends-constellation__core'))) return;
+      var isGalaxyAvatar = event.target.closest && event.target.closest('.friends-constellation__node, .friends-constellation__core');
+      if(event.target.closest && event.target.closest('a, button, input, textarea, select') && !isGalaxyAvatar) return;
       stopInertia();
       hideHoverCard();
-      pan.drag = { id:event.pointerId, threshold:event.pointerType === 'touch' ? 8 : 3, x:event.clientX, y:event.clientY, originX:pan.targetX, originY:pan.targetY, lastX:event.clientX, lastY:event.clientY, lastAt:performance.now(), velocityX:0, velocityY:0, moved:false };
+      pan.drag = { id:event.pointerId, threshold:event.pointerType === 'touch' ? 10 : 5, x:event.clientX, y:event.clientY, originX:pan.targetX, originY:pan.targetY, lastX:event.clientX, lastY:event.clientY, lastAt:performance.now(), velocityX:0, velocityY:0, moved:false };
       if(event.pointerType !== 'touch' && stage.setPointerCapture) stage.setPointerCapture(event.pointerId);
     }
     function onPointerMove(event){
@@ -268,6 +269,7 @@
         pan.drag.moved = true;
         stage.setPointerCapture && stage.setPointerCapture(event.pointerId);
         stage.classList.add('is-dragging'); world.classList.add('is-dragging');
+        event.preventDefault();
         hideHoverCard();
       }
       // 记录最近一段手势速度；松开后将其折算成有限距离的惯性目标。
@@ -294,7 +296,7 @@
       pan.drag = null;
       stage.classList.remove('is-dragging'); world.classList.remove('is-dragging');
       if(event && stage.releasePointerCapture && event.pointerId != null){ try{ stage.releasePointerCapture(event.pointerId); }catch(error){} }
-      if(moved) pan.suppressUntil = Date.now() + 320;
+      if(moved) pan.suppressUntil = Date.now() + 450;
       if(moved && (!event || event.type !== 'pointercancel')) startInertia(velocityX, velocityY);
     }
     function blockDragClick(event){
@@ -417,10 +419,10 @@
         safeImage(node.querySelector('img'), friend.avatar);
         node.querySelector('.friends-constellation__node-name').textContent = friend.name;
         // 不以 hover media query 判断设备：二合一设备也可能连接鼠标。
-        node.addEventListener('pointerenter', function(event){ if(event.pointerType !== 'touch'){ setProfile(friend); showHoverCard(friend, node); } });
+        node.addEventListener('pointerenter', function(event){ if(event.pointerType !== 'touch' && !isCompact()){ setProfile(friend); showHoverCard(friend, node); } });
         node.addEventListener('pointerleave', function(){ setProfile(selected); hideHoverCard(); });
         node.addEventListener('focus', function(){ setProfile(friend); showHoverCard(friend, node); });
-        node.addEventListener('blur', function(){ if(!isTouch()){ setProfile(selected); hideHoverCard(); } });
+        node.addEventListener('blur', function(){ if(!isTouch() && !isCompact()){ setProfile(selected); hideHoverCard(); } });
         node.addEventListener('click', function(event){
           event.preventDefault();
           // 已选中节点只有在明确配置了地址时才可跳转；未填第三方连接的
@@ -437,6 +439,7 @@
       });
     }
     function isTouch(){ return window.matchMedia && window.matchMedia('(hover: none)').matches; }
+    function isCompact(){ return window.matchMedia && window.matchMedia('(max-width: 980px)').matches; }
     function presetFor(index){
       var presets = window.matchMedia && window.matchMedia('(max-width: 760px)').matches ? MOBILE_POSITIONS : DESKTOP_POSITIONS;
       if(index < presets.length) return presets[index];

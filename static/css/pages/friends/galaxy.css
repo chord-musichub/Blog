@@ -382,8 +382,20 @@ body:has(.friends-constellation) .modern-site-header .header-icons .icon-btn{ co
 .friends-constellation__hover-card h2{margin:2px 0 6px;font-size:16px;font-weight:650;line-height:1.15;letter-spacing:.02em;}
 .friends-constellation__hover-card p{display:-webkit-box;margin:0;overflow:hidden;color:rgba(222,237,250,.72);font-size:12px;line-height:1.5;-webkit-box-orient:vertical;-webkit-line-clamp:2;}
 @keyframes friendsHoverCardIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:980px){
+  /* 触屏没有可靠 hover：资料仅由一次明确点按打开，避免拖图时误显。 */
+  .friends-constellation__node:hover:not(.is-selected) .friends-constellation__node-name{opacity:0!important;}
+  .friends-constellation__hover-card{
+    width:min(280px,calc(100% - 32px));
+    grid-template-columns:56px minmax(0,1fr);
+    gap:10px;
+    padding:10px;
+  }
+  .friends-constellation__hover-card img{width:56px;height:56px;}
+  .friends-constellation__hover-card h2{font-size:15px;}
+  .friends-constellation__hover-card p{font-size:12px;}
+}
 @media(max-width:760px){
-  .friends-constellation__hover-card{display:none!important;}
   .friends-constellation__core{left:50%;top:50%;}
   .friends-constellation__sky{min-height:100svh!important;}
 }
