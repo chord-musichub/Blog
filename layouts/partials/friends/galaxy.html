@@ -16,6 +16,11 @@
   data/friends.json。外部朋友仅作为星图节点，不参与本地资料页生成。
 */}}
 <section class="friends-constellation" data-friend-galaxy>
+  <div class="friends-constellation__zoom" role="group" aria-label="星图缩放" hidden>
+    <button type="button" data-galaxy-zoom="out" aria-label="缩小星图">−</button>
+    <button type="button" data-galaxy-zoom="reset" aria-label="星图回到中心">⌖</button>
+    <button type="button" data-galaxy-zoom="in" aria-label="放大星图">＋</button>
+  </div>
   <a class="friends-constellation__memory-door" href="/friends/memories/" aria-label="进入回忆室"><span>回忆</span><i aria-hidden="true">&gt;</i></a>
   <div class="friends-constellation__sky" data-galaxy-stage>
     <div class="friends-constellation__nebula" aria-hidden="true"></div>

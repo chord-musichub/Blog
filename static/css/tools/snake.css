@@ -180,7 +180,7 @@ body.dark .snake-sound-toggle{
 
 /* v15.3：贪吃蛇交互细节与手机适配 */
 .snake-stage-wrap{
-  touch-action:none;
+  touch-action:pan-y pinch-zoom;
 }
 .snake-canvas,
 .snake-overlay{
@@ -302,7 +302,7 @@ body.dark .snake-sound-toggle:hover{
   .snake-stats{width:100%;display:grid!important;grid-template-columns:repeat(3,1fr);gap:8px!important}
   .snake-stats span{justify-content:center;padding:8px 7px!important;font-size:12.5px}
   .snake-stage-wrap{width:100%;max-width:min(92vw, 430px);margin:0 auto}
-  .snake-canvas{width:100%!important;height:auto!important;aspect-ratio:1 / 1;touch-action:none}
+  .snake-canvas{width:100%!important;height:auto!important;aspect-ratio:1 / 1;touch-action:pan-y pinch-zoom}
   .snake-controls{display:grid!important;grid-template-columns:1fr 1fr;gap:10px!important}
   .snake-controls .btn{min-height:48px;padding:12px 10px;font-size:15px}
   .snake-sound-toggle{grid-column:1 / -1;justify-content:center;min-height:46px}

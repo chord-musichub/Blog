@@ -67,7 +67,7 @@
   }
 
   function onPointerMove(event){
-    if(!layers.length) return;
+    if(!layers.length || event.pointerType === 'touch' || window.matchMedia('(max-width:980px)').matches) return;
     targetX = ((event.clientX / Math.max(1, window.innerWidth)) - 0.5) * 2;
     targetY = ((event.clientY / Math.max(1, window.innerHeight)) - 0.5) * 2;
     queue();

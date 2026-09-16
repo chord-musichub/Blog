@@ -298,6 +298,23 @@ td .actions{gap:8px}
 @media(max-width:900px){.editor-columns{grid-template-columns:1fr}.editor-options{display:grid;grid-template-columns:1fr 1fr;gap:18px}.dashboard-shortcuts{grid-template-columns:1fr}.settings-workspace{grid-template-columns:1fr}.settings-sidebar{position:static;display:flex;gap:10px;flex-wrap:wrap}.settings-sidebar-title{display:none}.workspace-list{grid-template-columns:1fr}}
 @media(max-width:700px){
   :root{--rail-width:204px;--header-height:60px}
+  html,body{overflow-x:clip;scroll-padding-top:76px}
+  input,textarea,select{font-size:16px}
+  .btn,button,.icon-button,.admin-theme-icon-button,.password-toggle{min-height:44px}
+  .icon-button,.admin-theme-icon-button,.password-toggle{width:44px;height:44px;flex-shrink:0}
+  .admin-client-brand{min-width:0}.admin-client-brand span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .creator-rail{padding-bottom:calc(20px + env(safe-area-inset-bottom));overscroll-behavior-y:contain}
+  .creator-rail-backdrop{position:fixed;inset:var(--header-height) 0 0;z-index:65;background:rgba(6,15,28,.4);border:0;border-radius:0;padding:0;width:100%;touch-action:manipulation}
+  .creator-rail-backdrop[hidden]{display:none}
+  .wrap,.wrap.wide,.card,.editor-columns,.editor-options,.workspace-detail,.writing-surface{min-width:0;max-width:100%}
+  .status-tabs{overflow-x:auto;flex-wrap:nowrap;max-width:100%;padding-bottom:4px}
+  .status-tabs button{flex-shrink:0}
+  .profile-images{grid-template-columns:minmax(0,1fr)}
+  .settings-sidebar{flex-wrap:nowrap;overflow-x:auto}.settings-sidebar>*{flex-shrink:0}
+  .table-wrap,.admin-mobile-table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+  .formatting-toolbar{overflow-x:auto;flex-wrap:nowrap}.formatting-toolbar button{flex-shrink:0}
+  .editor-publishbar{position:static;flex-wrap:wrap;padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+  .cover-crop-dialog{max-height:calc(100dvh - 24px)}
   .admin-client-nav{padding:0 14px;gap:10px}.admin-client-brand{font-size:16px;gap:8px}.creator-brand-mark{width:27px;height:27px;font-size:16px}
   .rail-toggle{display:inline-flex}.admin-client-actions{gap:8px}.admin-client-identity>span,.admin-client-home{display:none}
   .creator-rail{transform:translateX(-100%);transition:transform .2s;box-shadow:12px 0 35px #0001}.rail-open .creator-rail{transform:translateX(0)}

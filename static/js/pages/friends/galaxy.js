@@ -112,6 +112,7 @@
 
   function build(shell, friends){
     var stage = shell.querySelector('[data-galaxy-stage], .friends-constellation__sky');
+    var zoomControls = shell.querySelector('.friends-constellation__zoom');
     var world = shell.querySelector('[data-galaxy-world], .friends-constellation__world');
     // 线上旧版 Hugo 的 HTML 压缩器会移除 SVG 上的空 data-* 属性，
     // 但 class 会完整保留；这里以 class 作为兼容回退，不能再只依赖 data 属性。
@@ -250,19 +251,25 @@
     }
     function onPointerDown(event){
       if(event.button !== undefined && event.button !== 0) return;
-      // 头像及主星仍优先承担原有点击交互；从周围空白处拖动画布。
-      if(event.target.closest && event.target.closest('.friends-constellation__node, .friends-constellation__core, a, button, input, textarea, select')) return;
+      // Touch may start on an avatar. Delay capture until a real drag so taps still open profiles.
+      if(pan.drag || event.isPrimary === false) return;
+      if(event.target.closest && event.target.closest('a, button, input, textarea, select') &&
+        !(event.pointerType === 'touch' && event.target.closest('.friends-constellation__node, .friends-constellation__core'))) return;
       stopInertia();
       hideHoverCard();
-      pan.drag = { x:event.clientX, y:event.clientY, originX:pan.targetX, originY:pan.targetY, lastX:event.clientX, lastY:event.clientY, lastAt:performance.now(), velocityX:0, velocityY:0, moved:false };
-      stage.setPointerCapture && stage.setPointerCapture(event.pointerId);
-      stage.classList.add('is-dragging'); world.classList.add('is-dragging');
-      event.preventDefault();
+      pan.drag = { id:event.pointerId, threshold:event.pointerType === 'touch' ? 8 : 3, x:event.clientX, y:event.clientY, originX:pan.targetX, originY:pan.targetY, lastX:event.clientX, lastY:event.clientY, lastAt:performance.now(), velocityX:0, velocityY:0, moved:false };
+      if(event.pointerType !== 'touch' && stage.setPointerCapture) stage.setPointerCapture(event.pointerId);
     }
     function onPointerMove(event){
-      if(!pan.drag) return;
+      if(!pan.drag || event.pointerId !== pan.drag.id) return;
       var dx = event.clientX - pan.drag.x, dy = event.clientY - pan.drag.y;
-      if(Math.abs(dx) > 3 || Math.abs(dy) > 3) pan.drag.moved = true;
+      if(!pan.drag.moved){
+        if(Math.hypot(dx,dy) < pan.drag.threshold) return;
+        pan.drag.moved = true;
+        stage.setPointerCapture && stage.setPointerCapture(event.pointerId);
+        stage.classList.add('is-dragging'); world.classList.add('is-dragging');
+        hideHoverCard();
+      }
       // 记录最近一段手势速度；松开后将其折算成有限距离的惯性目标。
       var now = performance.now();
       var elapsed = Math.max(8, now - pan.drag.lastAt);
@@ -279,7 +286,7 @@
       });
     }
     function stopPan(event){
-      if(!pan.drag) return;
+      if(!pan.drag || event && event.pointerId !== pan.drag.id) return;
       var moved = pan.drag.moved;
       var velocityX = Math.max(-1.8, Math.min(1.8, pan.drag.velocityX));
       var velocityY = Math.max(-1.8, Math.min(1.8, pan.drag.velocityY));
@@ -288,10 +295,20 @@
       stage.classList.remove('is-dragging'); world.classList.remove('is-dragging');
       if(event && stage.releasePointerCapture && event.pointerId != null){ try{ stage.releasePointerCapture(event.pointerId); }catch(error){} }
       if(moved) pan.suppressUntil = Date.now() + 320;
-      startInertia(velocityX, velocityY);
+      if(moved && (!event || event.type !== 'pointercancel')) startInertia(velocityX, velocityY);
     }
     function blockDragClick(event){
       if(Date.now() < pan.suppressUntil){ event.preventDefault(); event.stopPropagation(); }
+    }
+    function onZoomControl(event){
+      var button = event.target.closest('[data-galaxy-zoom]');
+      if(!button) return;
+      stopInertia(); hideHoverCard();
+      var action = button.dataset.galaxyZoom;
+      var zoom = action === 'reset' ? 1 : Math.max(.72, Math.min(1.58, pan.zoom * (action === 'in' ? 1.15 : 1/1.15)));
+      var ratio = zoom / pan.zoom;
+      pan.zoom = zoom;
+      movePan(action === 'reset' ? 0 : pan.x * ratio, action === 'reset' ? 0 : pan.y * ratio);
     }
     function onWheel(event){
       var delta = event.deltaY || event.deltaX;
@@ -352,7 +369,7 @@
       safeImage(coreImage, host.avatar);
       if(coreName) coreName.textContent = host.name;
       core.onclick = function(){ window.location.href = host.href; };
-      core.addEventListener('pointerenter', function(){ showHoverCard(host, core); });
+      core.addEventListener('pointerenter', function(event){ if(event.pointerType !== 'touch') showHoverCard(host, core); });
       core.addEventListener('pointerleave', hideHoverCard);
       core.addEventListener('focus', function(){ showHoverCard(host, core); });
       core.addEventListener('blur', hideHoverCard);
@@ -400,7 +417,7 @@
         safeImage(node.querySelector('img'), friend.avatar);
         node.querySelector('.friends-constellation__node-name').textContent = friend.name;
         // 不以 hover media query 判断设备：二合一设备也可能连接鼠标。
-        node.addEventListener('pointerenter', function(){ setProfile(friend); showHoverCard(friend, node); });
+        node.addEventListener('pointerenter', function(event){ if(event.pointerType !== 'touch'){ setProfile(friend); showHoverCard(friend, node); } });
         node.addEventListener('pointerleave', function(){ setProfile(selected); hideHoverCard(); });
         node.addEventListener('focus', function(){ setProfile(friend); showHoverCard(friend, node); });
         node.addEventListener('blur', function(){ if(!isTouch()){ setProfile(selected); hideHoverCard(); } });
@@ -560,6 +577,7 @@
       stage.removeEventListener('pointercancel', stopPan);
       stage.removeEventListener('click', blockDragClick, true);
       stage.removeEventListener('wheel', onWheel);
+      if(zoomControls) zoomControls.removeEventListener('click', onZoomControl);
       if(window.__songlineFriendGalaxyCleanup === cleanup) window.__songlineFriendGalaxyCleanup = null;
     }
     function onTransitionStart(event){
@@ -591,6 +609,7 @@
     stage.addEventListener('pointercancel', stopPan);
     stage.addEventListener('click', blockDragClick, true);
     stage.addEventListener('wheel', onWheel, {passive:false});
+    if(zoomControls){ zoomControls.hidden = false; zoomControls.addEventListener('click', onZoomControl); }
     window.__songlineFriendGalaxyCleanup = cleanup;
     if(submit) submit.addEventListener('click', renderSearch);
     if(input){ input.addEventListener('input', renderSearch); input.addEventListener('keydown', function(event){ if(event.key === 'Enter') renderSearch(); }); }

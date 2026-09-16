@@ -1,6 +1,10 @@
 /* Touch layout owns the compact screen composition, not a scaled desktop canvas. */
-@media (max-width:760px), (max-width:980px) and (hover:none){
-  html{--touch-dock:76px;scroll-padding-top:76px;scroll-padding-bottom:90px}
+.friends-constellation__zoom{display:none}
+.friends-constellation__zoom[hidden]{display:none!important}
+@media (max-width:980px){
+  html{--touch-dock:76px;scroll-padding-top:76px;scroll-padding-bottom:90px;scroll-behavior:auto}
+  html,html body{overflow-x:clip}
+  html body :is(input,textarea,select){font-size:16px}
   html:root.has-fixed-mobile-nav body{padding-top:0!important}
   html body{padding-bottom:calc(var(--touch-dock) + env(safe-area-inset-bottom))!important}
   html body .modern-site-header{position:fixed!important;top:0!important;left:0!important;right:0!important;padding:0!important;z-index:1000}
@@ -33,13 +37,13 @@
   html body[data-page-kind="home"] .songline-terminal-feature-copy{padding:12px!important}
   html body[data-page-kind="home"] .songline-terminal-feature-copy strong{font-size:20px!important;line-height:1.3}
   html body[data-page-kind="home"] .songline-terminal-stats{padding:16px 0 0!important}
-  html body[data-page-kind="home"] .songline-terminal-stat-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  html body[data-page-kind="home"] .songline-terminal-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   html body[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat{min-height:70px!important;padding:8px!important}
   html body[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat-label{font-size:12px!important}
   html body[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat-value{font-size:25px!important}
   html body[data-page-kind="home"] .songline-home-music-actions button{min-width:40px;min-height:44px}
   html body[data-page-kind="home"] .songline-terminal-links{flex-wrap:wrap;gap:12px;min-height:44px}
-  html body[data-page-kind="home"] .songline-desktop-pet{top:auto!important;bottom:0;right:0!important;width:76px!important;height:92px!important}
+  html body[data-page-kind="home"] .songline-desktop-pet{top:auto!important;bottom:0;right:0!important;width:76px!important;height:92px!important;touch-action:pan-y pinch-zoom}
   html:root body[data-page-kind="home"] .songline-terminal-status .songline-desktop-pet__image{left:0!important;width:72px!important;height:78px!important}
   html body[data-page-kind="home"] .songline-desktop-pet__stake{left:34px;width:6px;height:28px}
   html body[data-page-kind="home"] .songline-terminal-status .songline-terminal-brand{font-size:26px;margin-right:78px}
@@ -50,11 +54,25 @@
   html body[data-page-kind="home"] .songline-home-music-actions{display:flex!important;justify-content:space-between;transform:none!important;margin:0!important;gap:2px}
   html body[data-page-kind="home"] .songline-home-music-actions .ui-icon{--ui-icon-size:18px}
   html body[data-page-kind="home"] .songline-home-music-status{position:static!important;margin:6px 0!important}
-  html body[data-page-kind="home"] .songline-home-message-goto{min-height:44px}
+  html body[data-page-kind="home"] .songline-home-message-goto{position:static;justify-self:end;min-height:44px}
+  /* Mobile panels participate in document flow: a swipe never gets trapped in a tiny list. */
+  html body[data-page-kind="home"] .songline-home-message-board{display:none;position:relative;inset:auto;min-height:0;padding:14px;grid-template-rows:auto auto auto}
+  html body[data-page-kind="home"] [data-home-panel-state="message"] .songline-home-system-panel,
+  html body[data-page-kind="home"] [data-home-panel-state="compose"] .songline-home-system-panel{display:none}
+  html body[data-page-kind="home"] [data-home-panel-state="message"] .songline-home-message-board,
+  html body[data-page-kind="home"] [data-home-panel-state="compose"] .songline-home-message-board{display:grid;animation:touch-panel-enter .22s ease-out}
+  html body[data-page-kind="home"] .songline-home-message-scroll{overflow:visible;max-height:none;overscroll-behavior:auto;padding-inline:0}
+  html body[data-page-kind="home"] .songline-home-message-compose{position:relative;inset:auto;padding:12px;margin-top:12px;min-width:0}
+  html body[data-page-kind="home"] [data-home-panel-state="compose"] :is(.songline-home-message-scroll,.songline-home-message-footer){display:none}
+  html body[data-page-kind="home"] .songline-home-message-board button{min-height:44px;min-width:44px}
+  html body[data-page-kind="home"] .songline-home-message-head{gap:10px}
+  html body[data-page-kind="home"] .songline-home-message-compose textarea{min-height:160px}
   html body .content-archive{width:100%!important;max-width:none!important;margin:0!important;padding:16px 12px!important;box-sizing:border-box}
   html body .content-archive .content-archive__controls{gap:8px}
   html body .content-archive .content-archive__mode,html body .content-archive .content-archive__search-trigger{font-size:18px;min-height:48px;padding:8px;gap:6px}
   html body .content-archive__mode b{display:none}
+  html body .content-archive .content-archive__search-terms{overscroll-behavior-y:auto;scroll-snap-type:none;max-height:150px;mask-image:none;-webkit-mask-image:none}
+  html body .content-archive__search-terms button{min-height:40px}
   html body .archive-record__index{grid-template-columns:28px minmax(0,1fr) 20px!important;gap:8px!important;min-height:78px!important;padding:16px 0!important}
   html body .archive-record__index time{display:none}
   html body .archive-record__title{font-size:18px!important;line-height:1.5!important;white-space:normal!important;overflow-wrap:anywhere}
@@ -86,9 +104,22 @@
   html:root body:has(.memory-room) .memory-room__back{position:absolute!important;top:12px!important;left:12px!important}
   html body .memory-room__back{top:12px!important;left:12px!important;width:44px;height:44px}
   html body .friends-constellation__memory-door{right:8px!important;padding:10px!important;min-height:44px}
+  html body .friends-constellation__zoom{position:absolute;z-index:15;right:12px;bottom:12px;display:flex;gap:4px;padding:4px;border-radius:14px;background:rgba(12,25,43,.85)}
+  html body .friends-constellation__zoom button{width:44px;height:44px;padding:0;border:0;border-radius:10px;background:transparent;color:#edf6ff;font-size:24px;touch-action:manipulation}
+  html body .friends-constellation__zoom button:is(:hover,:focus-visible){background:rgba(173,198,226,.2)}
+  html body .friends-constellation__zoom button:disabled{opacity:.35}
+  html body .friends-constellation__sky.is-dragging .friends-constellation__edge-vignette{opacity:.5}
+  html body .memory-room__viewport{overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;touch-action:pan-y pinch-zoom}
+  html body .memory-room__track{position:relative;top:auto;bottom:auto;height:max(100%,var(--memory-mobile-height,100%))}
+  html body .memory-room__memory:nth-child(n){--memory-rise:48px;--memory-stack-offset:calc(var(--memory-slot,0) * 148px);--memory-card-h:92px;--memory-card-w:138px}
+  html body .memory-room__caption{bottom:calc(var(--memory-rise) + var(--memory-stack-offset) + var(--memory-card-h) + 68px);left:50%;width:190px;text-align:center;transform:translateX(-50%)}
+  html body .memory-room__memory:hover .memory-room__caption,html body .memory-room__image-button:is(:hover,:focus-visible) + .memory-room__caption{transform:translateX(-50%)}
+  html body .memory-room__caption h1{font-size:14px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  html body .memory-room__caption p{display:none!important}
+  html body .memory-room__image-button:is(:hover,:focus-visible){transform:translateX(-50%)}
   html body .memory-lightbox__panel{width:calc(100vw - 24px)!important;max-height:calc(100dvh - 24px)!important;overflow:auto}
   html body .memory-lightbox__panel img{max-height:60dvh;object-fit:contain}
-  html body .article-shell{width:100%!important;max-width:none!important;display:block!important;padding:14px!important;box-sizing:border-box}
+  html body .article-shell{width:100%!important;max-width:none!important;display:block!important;padding:8px!important;box-sizing:border-box}
   html body .article-reader{padding:18px 14px!important;min-width:0!important}
   html body .article-intro h1{font-size:30px!important;line-height:1.25!important;overflow-wrap:anywhere}
   html body .songline-site-map__toggle span{width:auto!important;font-size:12px!important;white-space:nowrap;letter-spacing:0}
@@ -101,3 +132,5 @@
   html:root body > .mobile-toc-drawer{bottom:calc(86px + env(safe-area-inset-bottom))!important;max-height:calc(100dvh - 162px)!important}
   html:root.mobile-toc-open body > [data-songline-float-portal]{visibility:hidden!important}
 }
+@keyframes touch-panel-enter{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+@media(prefers-reduced-motion:reduce){html body[data-page-kind="home"] .songline-home-message-board{animation:none!important}}

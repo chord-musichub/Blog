@@ -120,7 +120,7 @@
   var VERSION = '23.0.0';
   function text(value){ return String(value == null ? '' : value).trim().toLowerCase(); }
   function terms(value){ return text(value).split(/[\s,，;；|]+/).filter(Boolean); }
-  function isMobile(){ return window.matchMedia && window.matchMedia('(max-width: 760px)').matches; }
+  function isMobile(){ return window.matchMedia && window.matchMedia('(max-width:980px), (hover:none)').matches; }
   function init(root){
     root = root || document;
     var archive = root.querySelector ? root.querySelector('[data-content-archive]') : null;

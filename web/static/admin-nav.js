@@ -32,10 +32,17 @@
   const toggle = document.querySelector('.rail-toggle');
   const rail = document.querySelector('.creator-rail');
   const mobile = window.matchMedia('(max-width:700px)');
+  const backdrop = document.createElement('button');
+  backdrop.className = 'creator-rail-backdrop';
+  backdrop.type = 'button';
+  backdrop.setAttribute('aria-label','关闭导航');
+  backdrop.hidden = true;
+  document.body.appendChild(backdrop);
   function setOpen(open){
     document.body.classList.toggle('rail-open',open);
     toggle?.setAttribute('aria-expanded',String(open));
     if(rail) rail.inert = mobile.matches && !open;
+    backdrop.hidden = !mobile.matches || !open;
   }
   setOpen(false);
   mobile.addEventListener('change',()=>setOpen(false));

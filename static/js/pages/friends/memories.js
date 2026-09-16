@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  var VERSION = '2.3.0';
+  var VERSION = '2.4.0';
   function parseData(root){
     var node = root.querySelector('#memory-room-data');
     try{return node ? JSON.parse(node.textContent || '[]') : [];}catch(e){return [];}
@@ -21,10 +21,18 @@
     if((!data.length && !cards.length) || !viewport || !track) return;
     var monthCount = Math.max(1, Number(track.dataset.memoryCount) || data.length);
     var step = 0, position = 0, target = 0, minimum = 0, drag = null, frame = 0, dragFrame = 0, dragNext = 0;
+    var suppressUntil = 0, measured = false;
+    var compact = window.matchMedia('(max-width:980px)');
+    var stackCount = cards.reduce(function(count, card){ return Math.max(count, 1 + Number(card.style.getPropertyValue('--memory-slot') || 0)); }, 1);
     function reduced(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
     function measure(){
+      var bottom = measured ? viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop : 0;
       step = Math.round(Math.min(390, Math.max(218, window.innerWidth * .27)));
       track.style.setProperty('--memory-step', step + 'px');
+      // A tall same-month stack must remain reachable on a phone, not clipped above the screen.
+      track.style.setProperty('--memory-mobile-height', (stackCount * 148 + 144) + 'px');
+      if(compact.matches) viewport.scrollTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight - bottom);
+      measured = true;
       minimum = -Math.max(0, (monthCount - 1) * step);
     }
     function clamp(value){ return Math.max(minimum, Math.min(0, value)); }
@@ -64,27 +72,32 @@
       };
     }
     function onCardClick(event){
+      if(Date.now() < suppressUntil){ event.preventDefault(); return; }
       var card = event.currentTarget.closest('[data-memory-card]');
       if(card) open(itemFromCard(card));
     }
     cards.forEach(function(card){
       var button = card.querySelector('[data-memory-open]');
       if(button) button.addEventListener('click', onCardClick);
+      card.querySelectorAll('img').forEach(function(image){ image.draggable = false; });
     });
     function onPointerDown(event){
       if(event.button !== undefined && event.button !== 0) return;
-      // 卡片自身只负责预览/放大；横向拖动从轨道空白处开始，避免捕获按钮的 click。
-      if(event.target.closest && event.target.closest('[data-memory-open]')) return;
-      // 防止横向拖动时浏览器选中标题、导航等页面文字。
-      event.preventDefault();
+      if(drag || event.isPrimary === false) return;
       if(frame){ window.cancelAnimationFrame(frame); frame = 0; }
-      drag = { x:event.clientX, position:target };
-      viewport.setPointerCapture && viewport.setPointerCapture(event.pointerId);
-      viewport.classList.add('is-dragging'); track.classList.add('is-dragging');
+      drag = { id:event.pointerId, x:event.clientX, y:event.clientY, position:position, moved:false };
     }
     function onPointerMove(event){
-      if(!drag) return;
+      if(!drag || event.pointerId !== drag.id) return;
       var delta = event.clientX - drag.x;
+      if(!drag.moved){
+        if(Math.abs(delta) < 8) return;
+        // Let the browser handle vertical scrolling and pinch zoom without cancellation.
+        if(event.pointerType === 'touch' && Math.abs(event.clientY - drag.y) > Math.abs(delta)) return;
+        drag.moved = true;
+        viewport.setPointerCapture && viewport.setPointerCapture(event.pointerId);
+        viewport.classList.add('is-dragging'); track.classList.add('is-dragging');
+      }
       dragNext = drag.position + delta;
       // 高频 pointermove 合并至每个动画帧，避免图片很多时反复重排造成卡顿。
       if(!dragFrame) dragFrame = window.requestAnimationFrame(function(){
@@ -92,12 +105,15 @@
         if(drag) moveTo(dragNext, true);
       });
     }
-    function stopDrag(){
-      if(!drag) return;
+    function stopDrag(event){
+      if(!drag || event && event.pointerId !== drag.id) return;
       if(dragFrame){ window.cancelAnimationFrame(dragFrame); dragFrame = 0; moveTo(dragNext, true); }
+      if(drag.moved) suppressUntil = Date.now() + 400;
+      if(viewport.hasPointerCapture && viewport.hasPointerCapture(drag.id)) viewport.releasePointerCapture(drag.id);
       drag = null; viewport.classList.remove('is-dragging'); track.classList.remove('is-dragging'); moveTo(target, false);
     }
     function onWheel(event){
+      if(compact.matches && viewport.scrollHeight > viewport.clientHeight && !event.shiftKey && Math.abs(event.deltaY) > Math.abs(event.deltaX)) return;
       var delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
       if(!delta) return;
       event.preventDefault(); moveTo(target - delta * .62, false);

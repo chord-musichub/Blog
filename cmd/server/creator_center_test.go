@@ -45,7 +45,7 @@ func TestCreatorCenterRoleShellAndPages(t *testing.T) {
 				t.Fatalf("%s / %s: %v", role, page, err)
 			}
 			html := body.String()
-			if !strings.Contains(html, "creator-center.css?v=21.1.0") || strings.Contains(html, "href=\"/static/style.css") {
+			if !strings.Contains(html, "creator-center.css?v=22.9.2") || strings.Contains(html, "href=\"/static/style.css") {
 				t.Fatalf("%s must use exactly the new style entry", page)
 			}
 			if !strings.Contains(html, `data-base="/write/"`) {

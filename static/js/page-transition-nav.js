@@ -76,10 +76,10 @@
       }
       window.addEventListener('pointerdown', function(event){
         keyboardTarget = null;
-        press = {id:event.pointerId,x:event.clientX,y:event.clientY,target:navigationTarget(event),moved:false,released:false,cancelled:event.button!==0};
+        press = {id:event.pointerId,x:event.clientX,y:event.clientY,threshold:event.pointerType==='touch'?8:3,target:navigationTarget(event),moved:false,released:false,cancelled:event.button!==0};
       }, {capture:true,passive:true});
       function trackPress(event){
-        if(press && event.pointerId===press.id && !press.released && Math.hypot(event.clientX-press.x,event.clientY-press.y)>3) press.moved=true;
+        if(press && event.pointerId===press.id && !press.released && Math.hypot(event.clientX-press.x,event.clientY-press.y)>press.threshold) press.moved=true;
       }
       window.addEventListener('pointermove', trackPress, {capture:true,passive:true});
       window.addEventListener('pointerup', function(event){
