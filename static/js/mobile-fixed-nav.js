@@ -7,6 +7,7 @@
   var resizeObserver = null;
   var raf = 0;
   var dockedNodes = [];
+  var observedHeader = null;
 
   function isMobile(){
     return !mq || mq.matches;
@@ -32,7 +33,7 @@
           dockedNodes.push(record);
         }
         if(node.parentNode !== document.body) document.body.appendChild(node);
-        node.setAttribute('data-mobile-bottom-dock', 'true');
+        if(!node.hasAttribute('data-mobile-bottom-dock')) node.setAttribute('data-mobile-bottom-dock', 'true');
       }else if(record){
         if(record.next && record.next.parentNode === record.parent) record.parent.insertBefore(node, record.next);
         else record.parent.appendChild(node);
@@ -44,8 +45,9 @@
   }
 
   function measure(){
-    window.cancelAnimationFrame(raf);
+    if(raf) return;
     raf = window.requestAnimationFrame(function(){
+      raf = 0;
       var h = header();
       syncBottomDock();
       if(!h || !isMobile()){
@@ -57,15 +59,19 @@
       // fixed 后 offsetHeight 依然可读；加一点余量避免内容贴住导航底边。
       var rect = h.getBoundingClientRect();
       var height = Math.max(h.offsetHeight || 0, rect.height || 0, 86);
-      document.documentElement.style.setProperty('--songline-mobile-nav-height', Math.ceil(height + 10) + 'px');
+      var value = Math.ceil(height + 10) + 'px';
+      if(document.documentElement.style.getPropertyValue('--songline-mobile-nav-height') !== value){
+        document.documentElement.style.setProperty('--songline-mobile-nav-height', value);
+      }
       document.documentElement.classList.add('has-fixed-mobile-nav');
     });
   }
 
   function bindObserver(){
     var h = header();
-    if(!h || !window.ResizeObserver) return;
+    if(!h || !window.ResizeObserver || h === observedHeader) return;
     if(resizeObserver) resizeObserver.disconnect();
+    observedHeader = h;
     resizeObserver = new ResizeObserver(measure);
     resizeObserver.observe(h);
   }
@@ -73,9 +79,6 @@
   function init(){
     measure();
     bindObserver();
-    window.setTimeout(measure, 60);
-    window.setTimeout(measure, 260);
-    window.setTimeout(measure, 780);
   }
 
   window.SonglineMeasureMobileNav = init;
@@ -86,13 +89,12 @@
     init();
   }
 
-  window.addEventListener('resize', init, {passive:true});
+  window.addEventListener('resize', measure, {passive:true});
   window.addEventListener('orientationchange', function(){ window.setTimeout(init, 160); }, {passive:true});
   window.addEventListener('pageshow', init);
   // 新页面挂入时立刻重算，保证黑幕退出前顶栏和底部 Dock 已在最终位置。
   window.addEventListener('songline:page-swap', function(){
     init();
-    window.requestAnimationFrame(init);
   });
 
   if(mq && mq.addEventListener){

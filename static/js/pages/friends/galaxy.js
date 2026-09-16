@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.11.0';
+  var VERSION = '22.12.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   // A wide outer ring plus a loose inner ring keeps the growing friend list
   // readable.  The old presets clustered around the core (especially the
@@ -154,6 +154,8 @@
     var resizeFrame = 0;
     var settleTimer = 0;
     var stageObserver = null;
+    var lineFrame = 0;
+    var compactQuery = window.matchMedia('(max-width: 980px)');
     // 工作区比视窗更大；只平移这个世界层，背景、回忆入口和 hover 卡片保持固定。
     var pan = { x:0, y:0, targetX:0, targetY:0, zoom:1, inertiaFrame:0, inertiaLast:0, inertiaX:0, inertiaY:0, dragFrame:0, drag:null, nextX:0, nextY:0, suppressUntil:0 };
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -170,9 +172,10 @@
       var focusX=lens.width*(.5-Math.max(-.016,Math.min(.016,dx*.0005)));
       var focusY=lens.height*(.5-Math.max(-.016,Math.min(.016,dy*.0005)));
       if(settled||reducedMotion){ focusX=lens.width/2; focusY=lens.height/2; }
-      stage.style.setProperty('--galaxy-focus-x',(focusX/lens.width*100).toFixed(2)+'%');
-      stage.style.setProperty('--galaxy-focus-y',(focusY/lens.height*100).toFixed(2)+'%');
-      stage.style.setProperty('--galaxy-edge-blur',(2.5+lens.motion*3).toFixed(2)+'px');
+      // 手机柔焦遮罩保持固定，头像透镜仍实时计算；避免整屏遮罩每帧失效。
+      setStyle(stage, '--galaxy-focus-x', (isCompact() ? '50' : (focusX/lens.width*100).toFixed(2))+'%');
+      setStyle(stage, '--galaxy-focus-y', (isCompact() ? '50' : (focusY/lens.height*100).toFixed(2))+'%');
+      setStyle(stage, '--galaxy-edge-blur', isCompact() ? '2px' : (2.5+lens.motion*3).toFixed(2)+'px');
       var centers=Object.create(null);
       lens.items.forEach(function(item){
         var screenX=lens.left+lens.worldWidth/2+(item.x-lens.worldWidth/2)*pan.zoom+pan.x;
@@ -185,24 +188,32 @@
         // motion path still provides a quieter but visible 1.28x emphasis.
         var gain=reducedMotion ? .28 : .48;
         var ox=vx*influence*.16/pan.zoom, oy=vy*influence*.16/pan.zoom;
-        item.element.style.setProperty('--lens-x',ox.toFixed(2)+'px');
-        item.element.style.setProperty('--lens-y',oy.toFixed(2)+'px');
-        item.element.style.setProperty('--lens-scale',(1+gain*influence).toFixed(3));
+        setStyle(item.element, '--lens-x',ox.toFixed(2)+'px');
+        setStyle(item.element, '--lens-y',oy.toFixed(2)+'px');
+        setStyle(item.element, '--lens-scale',(1+gain*influence).toFixed(3));
         centers[item.id]={x:item.x+ox,y:item.y+oy};
       });
       lens.edges.forEach(function(edge){
         var a=centers[edge.a],b=centers[edge.b];
-        edge.line.setAttribute('x1',a.x.toFixed(2));edge.line.setAttribute('y1',a.y.toFixed(2));
-        edge.line.setAttribute('x2',b.x.toFixed(2));edge.line.setAttribute('y2',b.y.toFixed(2));
+        setCoordinate(edge, 'x1',a.x);setCoordinate(edge, 'y1',a.y);
+        setCoordinate(edge, 'x2',b.x);setCoordinate(edge, 'y2',b.y);
       });
+    }
+    function setStyle(element, name, value){
+      if(element.style.getPropertyValue(name) !== value) element.style.setProperty(name, value);
+    }
+    function setCoordinate(edge, name, value){
+      value = value.toFixed(2);
+      if(edge[name] === value) return;
+      edge[name] = value;
+      edge.line.setAttribute(name, value);
     }
 
     // 星图通过百分比定位，但图片、字体和移动端可视视口会在首帧后继续稳定。
     // 统一收敛到同一轮布局，保证 SVG 线端永远读取头像的最终圆心。
     function scheduleLayout(){
-      if(!stage.isConnected) return;
-      window.cancelAnimationFrame(resizeFrame);
-      resizeFrame = window.requestAnimationFrame(layout);
+      if(!stage.isConnected || resizeFrame) return;
+      resizeFrame = window.requestAnimationFrame(function(){ resizeFrame = 0; layout(); });
     }
     function settleLayout(){
       if(!stage.isConnected) return;
@@ -212,8 +223,8 @@
 
     function panBounds(){
       return {
-        x:Math.max(0, (world.offsetWidth * pan.zoom - stage.clientWidth) / 2),
-        y:Math.max(0, (world.offsetHeight * pan.zoom - stage.clientHeight) / 2)
+        x:Math.max(0, (lens.worldWidth * pan.zoom - lens.width) / 2),
+        y:Math.max(0, (lens.worldHeight * pan.zoom - lens.height) / 2)
       };
     }
     function clampPan(x, y){
@@ -266,7 +277,7 @@
       stopInertia();
       hideHoverCard();
       pan.drag = { id:event.pointerId, threshold:event.pointerType === 'touch' ? 10 : 5, x:event.clientX, y:event.clientY, originX:pan.targetX, originY:pan.targetY, lastX:event.clientX, lastY:event.clientY, lastAt:performance.now(), velocityX:0, velocityY:0, moved:false };
-      if(event.pointerType !== 'touch' && stage.setPointerCapture) stage.setPointerCapture(event.pointerId);
+      // 所有指针都在跨过拖动阈值后捕获，保留头像的原生点击目标。
     }
     function onPointerMove(event){
       if(!pan.drag || event.pointerId !== pan.drag.id) return;
@@ -446,7 +457,7 @@
       });
     }
     function isTouch(){ return window.matchMedia && window.matchMedia('(hover: none)').matches; }
-    function isCompact(){ return window.matchMedia && window.matchMedia('(max-width: 980px)').matches; }
+    function isCompact(){ return compactQuery.matches; }
     function presetFor(index){
       var presets = window.matchMedia && window.matchMedia('(max-width: 760px)').matches ? MOBILE_POSITIONS : DESKTOP_POSITIONS;
       if(index < presets.length) return presets[index];
@@ -464,8 +475,11 @@
       });
     }
     function drawLines(){
+      lineFrame = 0;
+      if(!stage.isConnected) return;
       lens.items=[];lens.edges=[];
       var elements=[{id:host.id,element:core}].concat(visibleFriends.map(function(friend){return {id:friend.id,element:nodeById[friend.id]};}));
+      // 先批量读取图片与按钮位置，再写入 transform-origin，避免读写交错。
       elements.forEach(function(item){
         item.element.style.setProperty('--lens-x','0px');item.element.style.setProperty('--lens-y','0px');item.element.style.setProperty('--lens-scale','1');
       });
@@ -493,9 +507,10 @@
         var elementRect=item.element.getBoundingClientRect();
         var imageRect=img && img.getBoundingClientRect();
         var originY=imageRect ? imageRect.top + imageRect.height/2 - elementRect.top : elementRect.height/2;
-        item.element.style.setProperty('--lens-origin-y',originY.toFixed(2)+'px');
+        item.originY = originY;
         lens.items.push({id:item.id,element:item.element,x:centers[item.id].x,y:centers[item.id].y});
       });
+      elements.forEach(function(item){ setStyle(item.element, '--lens-origin-y',item.originY.toFixed(2)+'px'); });
       edges.forEach(function(edge){
         var from = centers[edge[0].id], to = centers[edge[1].id];
         if(!from || !to) return;
@@ -529,9 +544,13 @@
     }
     function layout(){
       if(!stage.isConnected) return;
+      lens.width=stage.clientWidth;lens.height=stage.clientHeight;
+      lens.worldWidth=world.clientWidth;lens.worldHeight=world.clientHeight;
+      lens.left=world.offsetLeft;lens.top=world.offsetTop;
       movePan(pan.targetX, pan.targetY);
       positionNodes();
-      window.requestAnimationFrame(drawLines);
+      window.cancelAnimationFrame(lineFrame);
+      lineFrame = window.requestAnimationFrame(drawLines);
     }
     function renderSearch(){
       var query = clean(input && input.value).toLowerCase();
@@ -570,6 +589,7 @@
     }
     function cleanup(){
       window.cancelAnimationFrame(resizeFrame);
+      window.cancelAnimationFrame(lineFrame);
       window.clearTimeout(settleTimer);
       stopInertia();
       if(pan.dragFrame) window.cancelAnimationFrame(pan.dragFrame);

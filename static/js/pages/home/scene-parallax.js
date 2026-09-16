@@ -2,6 +2,7 @@
   'use strict';
 
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var compactQuery = window.matchMedia('(max-width:980px)');
   var targetX = 0;
   var targetY = 0;
   var currentX = 0;
@@ -21,6 +22,7 @@
       layer.style.removeProperty('transform');
       layer.style.removeProperty('--home-parallax-x');
       layer.style.removeProperty('--home-parallax-y');
+      layer.style.removeProperty('will-change');
     });
     layers = [];
     backgroundLayer = null;
@@ -28,7 +30,7 @@
 
   function collect(){
     clearLayers();
-    if(reduced || !document.body || document.body.dataset.pageKind !== 'home') return;
+    if(reduced || compactQuery.matches || !document.body || document.body.dataset.pageKind !== 'home') return;
     layers = Array.prototype.slice.call(document.querySelectorAll('[data-home-parallax]'));
     backgroundLayer = document.querySelector('.site-bg-layer');
     if(backgroundLayer){
@@ -91,6 +93,7 @@
   document.addEventListener('pointerleave', onPointerLeave, { passive:true });
   window.addEventListener('songline:page-swap', function(){ window.setTimeout(initialize, 30); });
   window.addEventListener('pageshow', initialize);
+  if(compactQuery.addEventListener) compactQuery.addEventListener('change', initialize);
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once:true });
   else initialize();
 })();

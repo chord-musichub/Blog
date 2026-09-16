@@ -1,5 +1,12 @@
 /* 全站固定导航、飘带与星轨背景效果。 */
 
+/* 手机端保留星轨构图；不启动 SVG 变形与流动描边动画。 */
+.songline-starstream-layer.is-static-starstream :is(.starstream-morph-group,.starstream-path){
+  animation:none!important;
+  filter:none!important;
+  will-change:auto!important;
+}
+
 /* v20.18.5：手机端导航改为真正 fixed + 背景飘带增强 */
 .songline-ribbon-layer{
   z-index:1!important;

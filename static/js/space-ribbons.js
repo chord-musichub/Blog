@@ -12,8 +12,9 @@
   var SVG_NS = 'http://www.w3.org/2000/svg';
   var isAdmin = document.documentElement.hasAttribute('data-admin-theme') || location.pathname.indexOf('/admin') === 0 || location.pathname.indexOf('/articles') === 0;
   var isMobile = false;
+  var mobileQuery = window.matchMedia && window.matchMedia('(max-width: 980px)');
   try{
-    isMobile = window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+    isMobile = mobileQuery && mobileQuery.matches;
   }catch(e){}
 
   // v20.18.5：星轨渐入 + 轨迹缓慢变形。
@@ -231,7 +232,7 @@
     base.setAttribute('class', 'starstream-path starstream-base starstream-morph-base');
     base.style.strokeWidth = String(def.width);
     base.style.stroke = 'rgba(255,255,255,' + def.base + ')';
-    appendAnimateD(base, values, def.morph, -index * 3100);
+    if(!isMobile) appendAnimateD(base, values, def.morph, -index * 3100);
 
     var flow = document.createElementNS(SVG_NS, 'path');
     flow.setAttribute('d', d0);
@@ -243,7 +244,7 @@
     flow.style.setProperty('--starstream-distance', '-' + (def.dash + def.gap));
     flow.style.setProperty('--starstream-duration', def.duration + 'ms');
     flow.style.animationDelay = def.delay + 'ms';
-    appendAnimateD(flow, values, def.morph, -index * 3100);
+    if(!isMobile) appendAnimateD(flow, values, def.morph, -index * 3100);
 
     group.appendChild(base);
     group.appendChild(flow);
@@ -293,8 +294,11 @@
   }
 
   function render(force){
+    var compact = !!(mobileQuery && mobileQuery.matches);
+    if(compact !== isMobile){ isMobile = compact; force = true; }
     createLayer();
     if(!svg) return;
+    layer.classList.toggle('is-static-starstream', isMobile);
 
     var box = viewport();
     var sizeChanged = Math.abs(box.w - lastW) > 120 || Math.abs(box.h - lastH) > 160;
@@ -352,6 +356,7 @@
 
   window.addEventListener('resize', scheduleResize);
   window.addEventListener('orientationchange', scheduleResize);
+  if(mobileQuery && mobileQuery.addEventListener) mobileQuery.addEventListener('change', function(){ render(true); });
   window.addEventListener('pageshow', function(event){
     start();
     if(event && event.persisted) window.setTimeout(resumeSvgAnimations, 60);

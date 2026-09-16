@@ -32,12 +32,16 @@ fs.mkdirSync('local-only/galaxy-lens',{recursive:true});
     return {maxError,coreScale:Number(world.querySelector('.friends-constellation__core').style.getPropertyValue('--lens-scale')),scales:nodes.map(n=>Number(n.style.getPropertyValue('--lens-scale'))),blur:document.querySelector('[data-galaxy-stage]').style.getPropertyValue('--galaxy-edge-blur')};
    });
    const initial=await inspect(); console.log(width,'initial',initial);
+   assert.ok(initial.coreScale > 1.4,`${width}: center magnification remains visible`);
+   const starAnimations=await page.locator('.songline-starstream-layer animate').count();
+   assert.ok(width<981 ? starAnimations===0 : starAnimations>0,`${width}: mobile star trails are static, desktop trails remain animated`);
    assert.ok(initial.maxError < 2.5,`${width}: initial SVG endpoints drift ${initial.maxError}px`);
    await page.screenshot({path:`local-only/galaxy-lens/${width}-still.png`});
    const count=await page.locator('[data-friend-id]').count();
    await page.mouse.move(width*.57,240);await page.mouse.down();
    await page.mouse.move(width*.75,370,{steps:15});await page.waitForTimeout(80);
    const dragging=await inspect(); console.log(width,'dragging',dragging);
+   assert.notDeepEqual(dragging.scales,initial.scales,`${width}: lens must update while dragging, not freeze for mobile performance`);
    assert.ok(dragging.maxError < 2.5,`${width}: dragging SVG endpoints drift ${dragging.maxError}px`);
    assert.ok(Number.parseFloat(dragging.blur) >= Number.parseFloat(initial.blur),`${width}: lens blur did not react to motion`);
    await page.screenshot({path:`local-only/galaxy-lens/${width}-drag.png`});
@@ -45,6 +49,10 @@ fs.mkdirSync('local-only/galaxy-lens',{recursive:true});
    assert.equal(await page.locator('[data-friend-id]').count(),count,'no duplicate scene nodes');
    const settled=await inspect(); console.log(width,'settled',settled);
    assert.ok(settled.maxError < 2.5,`${width}: settled SVG endpoints drift ${settled.maxError}px`);
+   await page.setViewportSize({width:width<981?1440:390,height:900});
+   await page.waitForTimeout(600);
+   const resizedAnimations=await page.locator('.songline-starstream-layer animate').count();
+   assert.ok(width<981 ? resizedAnimations>0 : resizedAnimations===0,'star trail mode follows the viewport breakpoint');
    assert.deepEqual(errors,[]);await page.close();
   }
  }finally{await browser.close()}
