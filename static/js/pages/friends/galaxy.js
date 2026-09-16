@@ -8,7 +8,9 @@
   // readable.  The old presets clustered around the core (especially the
   // 38/44, 43/63 and 57/62 points), which made portraits and links stack up.
   var DESKTOP_POSITIONS = [[20,20],[37,14],[56,14],[74,21],[82,37],[84,56],[78,74],[64,86],[46,88],[28,82],[18,68],[17,47],[31,34],[43,28],[61,29],[72,48],[63,68],[37,68]];
-  var MOBILE_POSITIONS = [[27,30],[49,19],[70,25],[75,46],[67,70],[50,80],[30,72],[23,52],[38,44],[61,47],[43,61],[58,62]];
+  // 手机星图本身比视窗更大；把预设铺满一整圈，初始视野保持清爽，
+  // 其余星位仍可以通过拖动到达，避免头像和点击区相互挤压。
+  var MOBILE_POSITIONS = [[20,24],[40,14],[60,16],[78,25],[84,43],[80,62],[70,80],[52,87],[32,82],[17,68],[14,48],[20,35],[35,31],[50,38],[65,48],[59,68],[45,76],[30,59]];
   // 历史默认关系只用于尚未在公开 links.json 配置星链的旧数据；
   // 一旦配置了关系图，连线完全由 JSON 驱动，避免前端写死的线无法修改。
   var DEFAULT_CONSTELLATION_EDGES = [
@@ -218,7 +220,12 @@
       var bounds = panBounds();
       return { x:Math.max(-bounds.x, Math.min(bounds.x, x)), y:Math.max(-bounds.y, Math.min(bounds.y, y)) };
     }
-    function paintPan(){ world.style.transform = 'translate3d(' + pan.x.toFixed(2) + 'px,' + pan.y.toFixed(2) + 'px,0) scale(' + pan.zoom.toFixed(3) + ')'; paintLens(false); }
+    function paintPan(){
+      world.style.transform = 'translate3d(' + pan.x.toFixed(2) + 'px,' + pan.y.toFixed(2) + 'px,0) scale(' + pan.zoom.toFixed(3) + ')';
+      // 透镜必须随画布平移实时更新，否则手机端经过中心的头像不会被放大。
+      // 性能削减改由移动端关闭流星、星云漂移与高强度模糊承担。
+      paintLens(false);
+    }
     function movePan(x, y){
       var next = clampPan(x, y);
       pan.targetX = next.x; pan.targetY = next.y;

@@ -2,11 +2,12 @@
 .friends-constellation__zoom{display:none}
 .friends-constellation__zoom[hidden]{display:none!important}
 @media (max-width:980px){
-  html{--touch-dock:76px;scroll-padding-top:76px;scroll-padding-bottom:90px;scroll-behavior:auto}
+  /* 浏览器地址栏收起时，动态视口露出的安全区固定为夜空底色，避免主题不同而闪白。 */
+  html{--touch-dock:76px;scroll-padding-top:76px;scroll-padding-bottom:90px;scroll-behavior:auto;background:#050b15!important;}
   html,html body{overflow-x:clip}
   html body :is(input,textarea,select){font-size:16px}
   html:root.has-fixed-mobile-nav body{padding-top:0!important}
-  html body{padding-bottom:calc(var(--touch-dock) + env(safe-area-inset-bottom))!important}
+  html body{min-height:100dvh!important;padding-bottom:calc(var(--touch-dock) + env(safe-area-inset-bottom))!important;background-color:#050b15!important}
   /* 顶栏以原首页为基准：一整条玻璃，不让历史规则额外叠出亮白渐变和内缩空边。 */
   html.has-fixed-mobile-nav body .modern-site-header,
   html body .modern-site-header{position:fixed!important;top:0!important;left:0!important;right:0!important;height:60px!important;padding:0!important;background:rgba(10,22,38,.62)!important;border:0!important;border-bottom:1px solid rgba(195,213,236,.16)!important;box-shadow:none!important;backdrop-filter:blur(14px) saturate(104%)!important;-webkit-backdrop-filter:blur(14px) saturate(104%)!important;z-index:12000!important}
