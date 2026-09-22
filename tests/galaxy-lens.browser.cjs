@@ -29,7 +29,7 @@ fs.mkdirSync('local-only/galaxy-lens',{recursive:true});
      const reverse=Math.hypot(ends[0].x-targetB.x,ends[0].y-targetB.y)+Math.hypot(ends[1].x-targetA.x,ends[1].y-targetA.y);
      maxError=Math.max(maxError,Math.min(direct,reverse)/2);
     }
-    return {maxError,coreScale:Number(world.querySelector('.friends-constellation__core').style.getPropertyValue('--lens-scale')),scales:nodes.map(n=>Number(n.style.getPropertyValue('--lens-scale'))),blur:document.querySelector('[data-galaxy-stage]').style.getPropertyValue('--galaxy-edge-blur')};
+    return {maxError,coreScale:Number(world.querySelector('.friends-constellation__core').style.getPropertyValue('--lens-scale')),scales:nodes.map(n=>Number(n.style.getPropertyValue('--lens-scale'))),blur:getComputedStyle(document.querySelector('.friends-constellation__edge-vignette'),'::before').backdropFilter};
    });
    const initial=await inspect(); console.log(width,'initial',initial);
    assert.ok(initial.coreScale > 1.4,`${width}: center magnification remains visible`);
@@ -43,7 +43,7 @@ fs.mkdirSync('local-only/galaxy-lens',{recursive:true});
    const dragging=await inspect(); console.log(width,'dragging',dragging);
    assert.notDeepEqual(dragging.scales,initial.scales,`${width}: lens must update while dragging, not freeze for mobile performance`);
    assert.ok(dragging.maxError < 2.5,`${width}: dragging SVG endpoints drift ${dragging.maxError}px`);
-   assert.ok(Number.parseFloat(dragging.blur) >= Number.parseFloat(initial.blur),`${width}: lens blur did not react to motion`);
+   assert.equal(dragging.blur,initial.blur,`${width}: backdrop blur must stay stable during motion`);
    await page.screenshot({path:`local-only/galaxy-lens/${width}-drag.png`});
    await page.mouse.up();await page.waitForTimeout(1600);
    assert.equal(await page.locator('[data-friend-id]').count(),count,'no duplicate scene nodes');

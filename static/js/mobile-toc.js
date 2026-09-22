@@ -1,7 +1,7 @@
 (function(){
   'use strict';
 
-  var mq = window.matchMedia ? window.matchMedia('(max-width: 820px), (max-width:980px) and (hover:none)') : null;
+  var mq = window.matchMedia ? window.matchMedia('(max-width:980px)') : null;
   var drawerId = 'songline-mobile-toc-drawer';
   var fabId = 'songline-mobile-toc-fab';
   var backdropId = 'songline-mobile-toc-backdrop';
@@ -61,16 +61,17 @@
   }
 
   function getDepth(link){
-    var depth = 1;
+    var depth = 0;
     var li = link.closest ? link.closest('li') : null;
-    if(!li) return depth;
+    if(!li) return 1;
+    if(li.dataset.tocDepth) return Math.max(1, Math.min(Number(li.dataset.tocDepth) || 1, 6));
     var parent = li.parentElement;
     while(parent){
       if(parent.matches && (parent.matches('ul') || parent.matches('ol'))) depth++;
       parent = parent.parentElement;
       if(parent && parent.matches && parent.matches('.toc-card, .article-toc, .post-toc, .reading-toc, aside.toc, #TableOfContents')) break;
     }
-    return Math.max(1, Math.min(depth, 4));
+    return Math.max(1, Math.min(depth, 6));
   }
 
   function removeUi(){
@@ -130,6 +131,7 @@
     drawer.dataset.mobileTocUi = '1';
     drawer.setAttribute('aria-label', '文章目录');
     drawer.setAttribute('aria-hidden', 'true');
+    drawer.inert = true;
     drawer.innerHTML = [
       '<div class="mobile-toc-drawer-head">',
       '  <div>',
@@ -175,6 +177,7 @@
     var ui = ensureUi();
     document.documentElement.classList.add('mobile-toc-open');
     ui.drawer.setAttribute('aria-hidden', 'false');
+    ui.drawer.inert = false;
     ui.fab.setAttribute('aria-expanded', 'true');
     var input = ui.drawer.querySelector('[data-mobile-toc-search]');
     if(input){
@@ -188,7 +191,11 @@
     var fab = document.getElementById(fabId);
     var drawer = document.getElementById(drawerId);
     document.documentElement.classList.remove('mobile-toc-open');
-    if(drawer) drawer.setAttribute('aria-hidden', 'true');
+    if(drawer){
+      if(drawer.contains(document.activeElement) && fab) fab.focus({preventScroll:true});
+      drawer.setAttribute('aria-hidden', 'true');
+      drawer.inert = true;
+    }
     if(fab) fab.setAttribute('aria-expanded', 'false');
   }
 
@@ -218,12 +225,16 @@
     list.querySelectorAll('a[href^="#"]').forEach(function(a){
       a.addEventListener('click', function(event){
         var href = a.getAttribute('href');
-        var target = href && document.querySelector(cssEscapeHash(href));
+        var id = (href || '').slice(1);
+        try{ id = decodeURIComponent(id); }catch(error){}
+        var target = id && document.getElementById(id);
         if(target){
           event.preventDefault();
           closeDrawer();
           window.setTimeout(function(){
-            target.scrollIntoView({behavior:'smooth', block:'start'});
+            if(!target.isConnected) return;
+            if(window.SonglineScrollToArticleHeading) window.SonglineScrollToArticleHeading(href, false);
+            else target.scrollIntoView({behavior:'smooth', block:'start'});
             history.replaceState(null, '', href);
           }, 80);
         }else{
@@ -231,13 +242,6 @@
         }
       });
     });
-  }
-
-  function cssEscapeHash(hash){
-    if(!hash || hash.charAt(0) !== '#') return hash;
-    var id = decodeURIComponent(hash.slice(1));
-    if(window.CSS && CSS.escape) return '#' + CSS.escape(id);
-    return '#' + id.replace(/([ #;?%&,.+*~\':"!^$[\]()=>|/@])/g, '\\$1');
   }
 
   function escapeHtml(str){
@@ -318,4 +322,5 @@
     mq.addEventListener('change', function(){ init(document); });
   }
   window.addEventListener('songline:page-transition-start', removeUi);
+  window.addEventListener('songline:article-toc-ready', function(){ init(document); });
 })();

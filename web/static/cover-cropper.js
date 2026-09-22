@@ -13,7 +13,7 @@
   var ratios = {'1x1':[1200,1200], '3x2':[1500,1000], '4x3':[1600,1200], '16x9':[1600,900]};
   var ctx = canvas.getContext('2d');
   var image = null, sourcePath = '', sourceInput = null, targetInput = null, activeButton = null;
-  var variant = '16x9', baseScale = 1, x = 0, y = 0, dragging = null;
+  var variant = '16x9', baseScale = 1, currentZoom = 1, x = 0, y = 0, dragging = null;
 
   function activeStatus(){
     if(!activeButton) return null;
@@ -38,7 +38,7 @@
   }
   function draw(){
     if(!image || !image.naturalWidth || !image.naturalHeight) return;
-    var zoom = Number(zoomInput.value) || 1;
+    var zoom = currentZoom;
     var width = image.naturalWidth * baseScale * zoom;
     var height = image.naturalHeight * baseScale * zoom;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -47,7 +47,7 @@
   }
   function clampPosition(){
     if(!image) return;
-    var zoom = Number(zoomInput.value) || 1;
+    var zoom = currentZoom;
     var width = image.naturalWidth * baseScale * zoom;
     var height = image.naturalHeight * baseScale * zoom;
     x = Math.min(0, Math.max(canvas.width - width, x));
@@ -56,21 +56,23 @@
   function resetCrop(){
     if(!image) return;
     baseScale = Math.max(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
-    zoomInput.value = '1';
+    currentZoom = 1; zoomInput.value = '1';
     x = (canvas.width - image.naturalWidth * baseScale) / 2;
     y = (canvas.height - image.naturalHeight * baseScale) / 2;
     clampPosition(); draw();
   }
   function setZoom(next){
     if(!image) return;
-    var oldZoom = Number(zoomInput.value) || 1;
+    // Range input events arrive after the control's value has changed.
+    // Keep the last painted zoom separately to preserve the crop's center.
+    var oldZoom = currentZoom;
     next = Math.max(Number(zoomInput.min) || 1, Math.min(Number(zoomInput.max) || 3, next));
     if(next === oldZoom) return;
     var oldWidth = image.naturalWidth * baseScale * oldZoom;
     var oldHeight = image.naturalHeight * baseScale * oldZoom;
     var focusX = (canvas.width / 2 - x) / oldWidth;
     var focusY = (canvas.height / 2 - y) / oldHeight;
-    zoomInput.value = String(next);
+    currentZoom = next; zoomInput.value = String(next);
     x = canvas.width / 2 - focusX * image.naturalWidth * baseScale * next;
     y = canvas.height / 2 - focusY * image.naturalHeight * baseScale * next;
     clampPosition(); draw();
@@ -109,20 +111,25 @@
     if(title) title.textContent = '裁剪' + (activeButton.getAttribute('data-crop-label') || '图片') + '（' + variant.replace('x', ':') + '）';
     saveButton.textContent = '保存 ' + variant.replace('x', ':') + ' 图片';
     setStatus('正在读取原图…');
-    image = new Image(); image.decoding = 'async';
-    image.onload = function(){
+    var requestedImage = new Image(); requestedImage.decoding = 'async';
+    image = requestedImage;
+    requestedImage.onload = function(){
+      if(image !== requestedImage) return;
       resetCrop();
       if(typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
       setStatus('拖动或缩放后保存，原图会保留。');
     };
-    image.onerror = function(){ image = null; setStatus('图片无法读取。请确认它位于自己的媒体库，且是 JPG、PNG 或 WebP。', true); };
-    image.src = sourcePath;
+    requestedImage.onerror = function(){
+      if(image !== requestedImage) return;
+      image = null; setStatus('图片无法读取。请确认它位于自己的媒体库，且是 JPG、PNG 或 WebP。', true);
+    };
+    requestedImage.src = sourcePath;
   }
 
   buttons.forEach(function(button){ button.addEventListener('click', function(){ openCropper(button); }); });
   zoomInput.addEventListener('input', function(){ setZoom(Number(zoomInput.value)); });
   canvas.addEventListener('wheel', function(event){ if(!image) return; event.preventDefault(); setZoom((Number(zoomInput.value) || 1) + (event.deltaY < 0 ? .08 : -.08)); }, {passive:false});
-  canvas.addEventListener('pointerdown', function(event){ if(!image) return; dragging = {id:event.pointerId,x:event.clientX,y:event.clientY,imageX:x,imageY:y}; canvas.classList.add('is-dragging'); canvas.setPointerCapture(event.pointerId); });
+  canvas.addEventListener('pointerdown', function(event){ if(!image || dragging || event.button !== 0) return; dragging = {id:event.pointerId,x:event.clientX,y:event.clientY,imageX:x,imageY:y}; canvas.classList.add('is-dragging'); canvas.setPointerCapture(event.pointerId); });
   canvas.addEventListener('pointermove', function(event){
     if(!dragging || dragging.id !== event.pointerId || !image) return;
     var rect = canvas.getBoundingClientRect();
@@ -132,6 +139,8 @@
   });
   function stopDrag(event){ if(!dragging || (event && event.pointerId !== dragging.id)) return; dragging = null; canvas.classList.remove('is-dragging'); }
   canvas.addEventListener('pointerup', stopDrag); canvas.addEventListener('pointercancel', stopDrag);
+  canvas.addEventListener('lostpointercapture', stopDrag);
+  dialog.addEventListener('close', function(){ stopDrag(); });
 
   saveButton.addEventListener('click', function(){
     if(!image || !sourcePath || !targetInput || !activeButton) return;

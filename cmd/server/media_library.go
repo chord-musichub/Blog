@@ -93,6 +93,73 @@ func (app *App) userMediaDir(username string) string {
 	return filepath.Join(app.mediaRootDir(), mediaOwner(username))
 }
 
+// A bundled file is copied from static/uploads into the runtime media directory
+// on first use.  A plain os.Remove therefore cannot represent a user's choice
+// to delete one: the next library request would seed it again.  Tombstones keep
+// that choice in runtime data without ever modifying the repository seed.
+func (app *App) mediaTombstonePath(owner, name string) string {
+	return filepath.Join(app.mediaRootDir(), ".deleted", mediaOwner(owner), filepath.Clean(name))
+}
+
+func (app *App) isMediaTombstoned(owner, name string) bool {
+	info, err := os.Stat(app.mediaTombstonePath(owner, name))
+	return err == nil && !info.IsDir()
+}
+
+func (app *App) isMediaTombstonedRelative(relative string) bool {
+	name := filepath.Clean(filepath.FromSlash(relative))
+	parts := strings.Split(filepath.ToSlash(name), "/")
+	if len(parts) < 2 || parts[0] == "." || strings.HasPrefix(parts[0], "..") {
+		return false
+	}
+	return app.isMediaTombstoned(parts[0], filepath.Join(parts[1:]...))
+}
+
+func (app *App) markMediaTombstone(owner, name string) error {
+	marker := app.mediaTombstonePath(owner, name)
+	if err := os.MkdirAll(filepath.Dir(marker), 0755); err != nil {
+		return err
+	}
+	file, err := os.OpenFile(marker, os.O_CREATE|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+	return file.Close()
+}
+
+func (app *App) clearMediaTombstone(owner, name string) error {
+	err := os.Remove(app.mediaTombstonePath(owner, name))
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	return err
+}
+
+// Persist the removal before touching bytes, and serialize it with seed/migration
+// passes. A failed operation must leave the original file publicly available.
+func (app *App) removeMediaName(media mediaLibraryContext, name string, change func() error) error {
+	app.mediaMu.Lock()
+	defer app.mediaMu.Unlock()
+	info, err := os.Lstat(filepath.Join(media.dir, name))
+	if err != nil {
+		return err
+	}
+	if !info.Mode().IsRegular() {
+		return fmt.Errorf("只能操作普通媒体文件")
+	}
+	marked := app.isMediaTombstoned(media.owner, name)
+	if err := app.markMediaTombstone(media.owner, name); err != nil {
+		return err
+	}
+	if err := change(); err != nil {
+		if !marked {
+			return errors.Join(err, app.clearMediaTombstone(media.owner, name))
+		}
+		return err
+	}
+	return nil
+}
+
 func userMediaPublicPrefix(username string) string {
 	return "/uploads/" + mediaOwner(username) + "/"
 }
@@ -108,11 +175,26 @@ func isMediaPathOwnedBy(username, publicPath string) (string, error) {
 		return "", fmt.Errorf("not owned")
 	}
 	name := strings.TrimPrefix(v, prefix)
+	if !validMediaRelativeName(name) {
+		return "", fmt.Errorf("invalid media name")
+	}
 	name = path.Clean(name)
 	if name == "." || name == "" || strings.HasPrefix(name, "../") || strings.Contains(name, "\\") {
 		return "", fmt.Errorf("invalid media name")
 	}
 	return filepath.FromSlash(name), nil
+}
+
+func validMediaRelativeName(name string) bool {
+	if name == "" || strings.Contains(name, "\\") {
+		return false
+	}
+	for _, part := range strings.Split(name, "/") {
+		if part == "" || strings.HasPrefix(part, ".") {
+			return false
+		}
+	}
+	return true
 }
 
 type MediaFile struct {
@@ -125,7 +207,14 @@ type MediaFile struct {
 func listMediaFiles(dir string, publicPrefix string) []MediaFile {
 	out := []MediaFile{}
 	_ = filepath.WalkDir(dir, func(filePath string, entry os.DirEntry, err error) error {
-		if err != nil || entry == nil || entry.IsDir() {
+		if err != nil || entry == nil {
+			return nil
+		}
+		if entry.IsDir() {
+			rel, relErr := filepath.Rel(dir, filePath)
+			if relErr == nil && filepath.Clean(rel) == ".deleted" {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		rel, err := filepath.Rel(dir, filePath)

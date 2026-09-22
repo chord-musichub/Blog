@@ -10,7 +10,9 @@
 
 电梯及地图根据完整 pointer 手势判断点击。只有在同一导航目标上按下并在 3 CSS 像素内松开才会触发导航；跨出目标、拖拽或 pointercancel 后产生的 click 会被拦截，键盘激活保留。该判断不改变原有底层控件优先机制。
 
-朋友页星图在真实节点和 SVG 连线之上使用同一坐标投影实现中心放大镜：中心头像轻微放大，边缘内容通过遮罩和 `backdrop-filter` 柔焦；拖动/缩放时焦点有轻微位移与动态模糊，停止后回到稳定状态。不会克隆图片或额外发起资源请求，系统减少动态效果时会降低动画强度。
+朋友页星图在真实节点和 SVG 连线之上使用同一坐标投影实现中心放大镜：中心头像轻微放大，边缘内容通过遮罩和 `backdrop-filter` 柔焦。拖动/缩放时仅更新节点与连线的投影，柔焦遮罩的中心和半径保持不变，减少全屏模糊纹理的重建。不会克隆图片或额外发起资源请求，系统减少动态效果时会降低动画强度。
+
+透镜中心固定于画布中心，不随每帧手势速度摆动，同一位置的头像和线端在拖动、停住、松手时使用相同投影。拖动、惯性和缩放过程中暂停悬停高亮切换，保留已选中状态。滚轮与缩放/复位按钮使用 260ms ease-out 插值，头像与 SVG 线端在同一帧更新；连续输入从当前帧接续，拖动、失焦或离开页面会取消未完成的缩放。启用系统减少动态效果时直接到达目标。
 
 ## 触屏布局边界
 
@@ -31,10 +33,17 @@ node tests/ui-layout.browser.cjs
 node tests/navigation-intent.browser.cjs
 node tests/navigation-origin.browser.cjs
 node tests/galaxy-lens.browser.cjs
+node tests/galaxy-motion.browser.cjs
 node tests/theme-layout.browser.cjs
 node tests/resource-readiness.browser.cjs
+node tests/visual-bugs.browser.cjs
+node tests/cover-cropper.browser.cjs
 ```
 
 默认验证 `http://127.0.0.1:8080`，可通过 `BLOG_TEST_URL` 修改。布局测试使用 360、390、900、1440 像素视口，截图写入被忽略的 `local-only/ui-layout/`。`UI_SOURCE_CSS=1` 仅供开发迭代时拦截本地样式，正式回归不要设置，确保验证的是构建产物。
 
 浏览器触屏模拟不等于 iOS/Android 真机验证；软键盘、系统安全区和设备手势仍需真机体验确认。
+
+`visual-bugs.browser.cjs` 检查嵌套标题完整显示、延迟渲染后的手机目录、目录收起状态恢复，以及星图拖动/取消时的交互与柔焦一致性。开发时可设 `BLOG_TEST_SOURCE=1`，用源码中的 CSS/JS 覆盖预览服务器的旧资源；正式发布回归请去掉此选项。
+
+`cover-cropper.browser.cjs` 使用独立页面与合成图片验证裁剪滑块重绘、缩放中心、拖动取消和重新打开时的状态重置，不读取或修改真实媒体库。

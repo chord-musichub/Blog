@@ -90,8 +90,10 @@ async function fits(page,label){
    assert.equal(new URL(page.url()).pathname,'/friends/','avatar swipe does not navigate');
    const moved=await world.evaluate(e=>e.style.transform);
    await page.locator('[data-galaxy-zoom="in"]').tap();
+   await page.waitForTimeout(320);
    assert.notEqual(await world.evaluate(e=>e.style.transform),moved,'touch zoom works');
    await page.locator('[data-galaxy-zoom="reset"]').tap();
+   await page.waitForTimeout(320);
    await page.screenshot({path:`${out}/${width}-friends.png`});
    await go('/friends/memories/');
    const viewport=page.locator('[data-memory-viewport]');

@@ -842,3 +842,14 @@ body[data-page-section="posts"] .article-intro{
   background:var(--page-bg, transparent);
   content:"";
 }
+
+/* 嵌套 ul 已提供每层树枝缩进；旧版平铺目录的 li 外边距不能再次叠加。
+   仅作用于阅读页目录树，保留卡片尺寸、字重和原有树枝间距。 */
+html body .article-toc .toc-tree li{
+  margin-left:0!important;
+}
+html body .article-toc .toc-tree li > a{
+  white-space:normal;
+  overflow-wrap:anywhere;
+  text-overflow:clip;
+}

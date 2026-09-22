@@ -13,6 +13,12 @@
         reverse_proxy blog-admin:8080
     }
 
+    # Markdown 下载和阅读源来自持久运行目录，而不是 Hugo 输出目录。
+    @markdownSources path /md-source/*
+    handle @markdownSources {
+        reverse_proxy blog-admin:8080
+    }
+
     @uploadedMedia path /uploads/*
     handle @uploadedMedia {
         reverse_proxy blog-admin:8080

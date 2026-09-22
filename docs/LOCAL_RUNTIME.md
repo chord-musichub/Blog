@@ -30,6 +30,8 @@ Docker Compose 通过 Caddy 在 `http://127.0.0.1:8080` 提供唯一入口：公
 
 迁移或重装时，先恢复上述私有目录和 `.env`，再执行 `docker compose up --build -d`。只有源码仓库不足以恢复已有文章和用户。
 
+媒体删除与重命名会在 `data/media/.deleted/` 保存旧路径的删除标记，防止下次启动、构建或历史素材迁移时从仓库补回。此目录必须随运行数据一起备份，不要当作缓存清空；它不会通过 `/uploads/` 对外提供。同一路径重新上传的新文件仍可正常访问，标记只阻止旧素材回填。
+
 如果部署到 GitHub Pages 的仓库子路径，请在 `.env` 中设置正确的 `PUBLIC_BASE_URL`，并按实际部署地址调整 `hugo.toml` 的 `baseURL`。
 
 使用 systemd 部署时，将 `deploy/blog-admin.env.example` 复制为服务器上的 `/opt/songline-blog/shared/blog-admin.env`，填入真实值后执行 `chown root:blog` 和 `chmod 640`。该文件位于仓库外，不应提交。

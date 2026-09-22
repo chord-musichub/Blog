@@ -66,7 +66,7 @@
   function rebuildToc(){
     const tocBody = document.querySelector('.article-toc .toc-body');
     if(!tocBody) return;
-    const headings = Array.from(reader.querySelectorAll('h1,h2,h3,h4'));
+    const headings = Array.from(reader.querySelectorAll('h1,h2,h3,h4,h5,h6'));
     if(!headings.length){
       tocBody.innerHTML = '<nav><ul><li><span class="meta">暂无目录</span></li></ul></nav>';
       return;
@@ -77,7 +77,8 @@
     const root = {level:0, children:[]};
     const stack = [root];
     headings.forEach(function(heading){
-      if(!heading.id) heading.id = slugify(heading.textContent, used);
+      if(!heading.id || used[heading.id]) heading.id = slugify(heading.textContent, used);
+      else used[heading.id] = true;
       const rawLevel = Number(heading.tagName.slice(1)) || baseLevel;
       const relativeLevel = Math.min(6, Math.max(1, rawLevel - baseLevel + 1));
       while(stack.length > 1 && relativeLevel <= stack[stack.length - 1].level) stack.pop();
@@ -159,10 +160,12 @@
   }
 
   getMarkdown().then(function(markdown){
-    if(!markdown) return;
+    if(!reader.isConnected || !sourceElement.isConnected) return;
+    if(!markdown){ rebuildToc(); window.dispatchEvent(new Event('songline:article-toc-ready')); return; }
     reader.innerHTML = window.SonglineMarkdown.render(markdown);
     if(window.SonglineEnhanceMarkdown) window.SonglineEnhanceMarkdown(reader);
     rebuildToc();
+    window.dispatchEvent(new Event('songline:article-toc-ready'));
     if(window.location.hash) window.setTimeout(function(){ scrollToArticleHeading(window.location.hash, true); }, 90);
   });
 })();

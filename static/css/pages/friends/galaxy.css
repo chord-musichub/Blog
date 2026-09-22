@@ -179,16 +179,16 @@ body:has(.friends-constellation){overflow-x:hidden;}
   white-space:nowrap;
   transition:color .28s ease;
 }
-.friends-constellation__node:hover,
+:where(.friends-constellation__sky:not(.is-moving)) .friends-constellation__node:hover,
 .friends-constellation__node:focus-visible,
 .friends-constellation__node.is-selected{transform:translate(-50%,-50%) scale(1.06);outline:0;}
-.friends-constellation__node:hover img,
+:where(.friends-constellation__sky:not(.is-moving)) .friends-constellation__node:hover img,
 .friends-constellation__node:focus-visible img,
 .friends-constellation__node.is-selected img{border-color:rgba(239,247,255,.92);box-shadow:0 0 0 5px rgba(159,199,239,.09),0 0 22px rgba(159,199,239,.12);}
-.friends-constellation__node:hover .friends-constellation__node-halo,
+:where(.friends-constellation__sky:not(.is-moving)) .friends-constellation__node:hover .friends-constellation__node-halo,
 .friends-constellation__node:focus-visible .friends-constellation__node-halo,
 .friends-constellation__node.is-selected .friends-constellation__node-halo{opacity:.88;transform:translate(-50%,-50%) scale(1);border-color:rgba(208,231,252,.6);}
-.friends-constellation__node:hover .friends-constellation__node-name,
+:where(.friends-constellation__sky:not(.is-moving)) .friends-constellation__node:hover .friends-constellation__node-name,
 .friends-constellation__node:focus-visible .friends-constellation__node-name,
 .friends-constellation__node.is-selected .friends-constellation__node-name{color:#f5f9ff;}
 .friends-constellation__core{
@@ -224,7 +224,7 @@ body:has(.friends-constellation){overflow-x:hidden;}
 .friends-constellation__core-orbit{z-index:1;transform:scaleX(1.18) rotate(-24deg);}
 .friends-constellation__core-orbit::after{inset:10px;border-color:rgba(187,218,247,.15);transform:rotate(72deg) scaleX(.9);}
 .friends-constellation__core-name{display:block;margin-top:11px;color:rgba(244,248,255,.93);font-size:13px;letter-spacing:.1em;text-shadow:0 1px 18px rgba(0,0,0,.7);}
-.friends-constellation__core:hover img,.friends-constellation__core:focus-visible img{border-color:#fff;box-shadow:0 0 0 8px rgba(169,207,245,.09),0 0 38px rgba(156,199,241,.18);}
+:where(.friends-constellation__sky:not(.is-moving)) .friends-constellation__core:hover img,.friends-constellation__core:focus-visible img{border-color:#fff;box-shadow:0 0 0 8px rgba(169,207,245,.09),0 0 38px rgba(156,199,241,.18);}
 .friends-constellation__core:focus-visible{outline:0;}
 .friends-constellation__annotation{
   position:absolute;
@@ -316,10 +316,10 @@ html.has-desktop-fixed-nav:has(body .friends-constellation) body{
   opacity:0;
   transition:opacity .2s ease;
 }
-.friends-constellation__node:hover .friends-constellation__node-name,
+:where(.friends-constellation__sky:not(.is-moving)) .friends-constellation__node:hover .friends-constellation__node-name,
 .friends-constellation__node:focus-visible .friends-constellation__node-name,
 .friends-constellation__node.is-selected .friends-constellation__node-name,
-.friends-constellation__core:hover .friends-constellation__core-name,
+:where(.friends-constellation__sky:not(.is-moving)) .friends-constellation__core:hover .friends-constellation__core-name,
 .friends-constellation__core:focus-visible .friends-constellation__core-name{opacity:1;}
 @media (max-width:760px){
   html:has(body .friends-constellation) main.container{min-height:calc(100svh - 118px);}
@@ -442,6 +442,9 @@ body:has(.friends-constellation) .modern-site-header .header-icons .icon-btn{ co
   transform:translate(calc(-50% + var(--lens-x,0px)),calc(-50% + var(--lens-y,0px))) scale(var(--lens-scale,1));
   transform-origin:50% var(--lens-origin-y,50%);
   transition:filter .2s ease;
+  /* Keep each small portrait texture stable while its lens scale changes. */
+  will-change:transform;
+  backface-visibility:hidden;
 }
 .friends-constellation__edge-vignette{position:absolute;z-index:6;inset:0;overflow:hidden;pointer-events:none;box-shadow:inset 0 0 clamp(68px,9vw,172px) rgba(2,9,21,.36);}
 .friends-constellation__edge-vignette::before{
@@ -451,6 +454,8 @@ body:has(.friends-constellation) .modern-site-header .header-icons .icon-btn{ co
   -webkit-mask-image:radial-gradient(ellipse 62% 64% at var(--galaxy-focus-x,50%) var(--galaxy-focus-y,50%),transparent 28%,rgba(0,0,0,.3) 52%,#000 85%);
 }
 .friends-constellation__edge-vignette::after{position:absolute;inset:0;content:"";background:radial-gradient(ellipse 65% 65% at var(--galaxy-focus-x,50%) var(--galaxy-focus-y,50%),rgba(164,209,255,.045),transparent 35%,rgba(3,10,24,.13) 65%,rgba(2,8,19,.42));}
+/* 固定柔焦层的合成边界；拖动时仍保留相同的背景、遮罩和模糊。 */
+.friends-constellation__edge-vignette{transform:translateZ(0);backface-visibility:hidden;}
 @media(prefers-reduced-motion:reduce){.friends-constellation__edge-vignette::before{backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}}
 @media(max-width:760px){
   /* 更大的可拖动世界换取更宽松的头像间距；初始窗口仍对准中心主星。 */
@@ -461,7 +466,6 @@ body:has(.friends-constellation) .modern-site-header .header-icons .icon-btn{ co
   /* 手机端只保留静态星空和柔焦；流星与漂移会让连续拖图产生额外重绘。 */
   .friends-constellation__sky::before,
   .friends-constellation__meteor{display:none!important;animation:none!important;}
-  .friends-constellation__world :is(.friends-constellation__node,.friends-constellation__core){will-change:auto;}
   .friends-constellation__edge-vignette::before{
     backdrop-filter:blur(2px)!important;
     -webkit-backdrop-filter:blur(2px)!important;

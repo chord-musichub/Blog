@@ -59,6 +59,8 @@ var legacyMediaPathReplacements = []struct{ old, new string }{
 // ensureCanonicalMediaLayout is intentionally idempotent. It is safe to run
 // before every public rebuild: existing target files are never overwritten.
 func (app *App) ensureCanonicalMediaLayout() error {
+	app.mediaMu.Lock()
+	defer app.mediaMu.Unlock()
 	if err := app.migrateLegacyRuntimeData(); err != nil {
 		return err
 	}
@@ -82,14 +84,14 @@ func (app *App) migrateLegacyRuntimeData() error {
 	}
 	legacyRoot = filepath.Clean(legacyRoot)
 	if filepath.Clean(filepath.Join(legacyRoot, "uploads")) != filepath.Clean(app.mediaRootDir()) {
-		if err := copyMissingTree(filepath.Join(legacyRoot, "uploads"), app.mediaRootDir()); err != nil {
+		if err := copyMissingTree(filepath.Join(legacyRoot, "uploads"), app.mediaRootDir(), app.isMediaTombstonedRelative); err != nil {
 			return err
 		}
 	}
-	return copyMissingTree(filepath.Join(legacyRoot, "md-source"), runtimeMarkdownDir(app.cfg.DataDir))
+	return copyMissingTree(filepath.Join(legacyRoot, "md-source"), runtimeMarkdownDir(app.cfg.DataDir), nil)
 }
 
-func copyMissingTree(sourceRoot, targetRoot string) error {
+func copyMissingTree(sourceRoot, targetRoot string, skip func(string) bool) error {
 	if _, err := os.Stat(sourceRoot); errors.Is(err, os.ErrNotExist) {
 		return nil
 	} else if err != nil {
@@ -108,6 +110,9 @@ func copyMissingTree(sourceRoot, targetRoot string) error {
 			return os.MkdirAll(target, 0755)
 		}
 		if !entry.Type().IsRegular() {
+			return nil
+		}
+		if skip != nil && skip(rel) {
 			return nil
 		}
 		if _, err := os.Stat(target); err == nil {
@@ -151,6 +156,9 @@ func (app *App) seedBundledMediaFiles() error {
 		if !entry.Type().IsRegular() {
 			return nil
 		}
+		if app.isMediaTombstonedRelative(rel) {
+			return nil
+		}
 		if _, err := os.Stat(target); err == nil {
 			return nil
 		} else if !errors.Is(err, os.ErrNotExist) {
@@ -180,6 +188,9 @@ func (app *App) migrateLegacyMediaFiles() error {
 		}
 		for _, entry := range entries {
 			if entry.IsDir() || !isAllowedMediaExtension(filepath.Ext(entry.Name())) {
+				continue
+			}
+			if app.isMediaTombstoned("admin", filepath.Join(mapping.category, entry.Name())) {
 				continue
 			}
 			source := filepath.Join(sourceDir, entry.Name())

@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -92,6 +94,49 @@ func TestCanonicalMediaSeedAddsBundledFilesWithoutOverwritingRuntimeUpload(t *te
 	}
 	if got, err := os.ReadFile(target); err != nil || string(got) != "server-upload" {
 		t.Fatalf("existing runtime media was overwritten: %q, %v", got, err)
+	}
+}
+
+func TestBundledMediaTombstonePreventsReseedAndPublicFallback(t *testing.T) {
+	root := t.TempDir()
+	previousDir, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(root); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chdir(previousDir) })
+
+	bundled := filepath.Join(root, "static", "uploads", "admin", "projects", "cover.png")
+	if err := os.MkdirAll(filepath.Dir(bundled), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(bundled, []byte("repository"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	app := &App{cfg: Config{DataDir: filepath.Join(root, "data")}}
+	if err := app.ensureCanonicalMediaLayout(); err != nil {
+		t.Fatal(err)
+	}
+	target := filepath.Join(app.mediaRootDir(), "admin", "projects", "cover.png")
+	if err := os.Remove(target); err != nil {
+		t.Fatal(err)
+	}
+	if err := app.markMediaTombstone("admin", filepath.Join("projects", "cover.png")); err != nil {
+		t.Fatal(err)
+	}
+	if err := app.ensureCanonicalMediaLayout(); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(target); !os.IsNotExist(err) {
+		t.Fatalf("deleted bundled media was seeded again: %v", err)
+	}
+
+	response := httptest.NewRecorder()
+	app.handlePublicMedia(response, httptest.NewRequest(http.MethodGet, "/uploads/admin/projects/cover.png", nil))
+	if response.Code != http.StatusNotFound {
+		t.Fatalf("tombstoned bundled media status = %d, want %d", response.Code, http.StatusNotFound)
 	}
 }
 

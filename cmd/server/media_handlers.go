@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -14,6 +15,20 @@ type mediaLibraryContext struct {
 }
 
 const siteMediaOwner = "admin"
+
+func mediaLibraryURL(media mediaLibraryContext, message string) string {
+	query := url.Values{}
+	if media.owner == siteMediaOwner {
+		query.Set("library", siteMediaOwner)
+	}
+	if message != "" {
+		query.Set("msg", message)
+	}
+	if len(query) == 0 {
+		return "/admin/media"
+	}
+	return "/admin/media?" + query.Encode()
+}
 
 // mediaLibraryForRequest chooses the library being managed, rather than
 // treating a logged-in username as the only possible media owner. The site
@@ -33,10 +48,7 @@ func (app *App) mediaLibraryForRequest(user User, r *http.Request) mediaLibraryC
 }
 
 func (app *App) renderMediaLibrary(w http.ResponseWriter, r *http.Request, media mediaLibraryContext, extra map[string]any) {
-	mediaURL := app.adminURL("/admin/media")
-	if media.owner == siteMediaOwner {
-		mediaURL += "?library=" + siteMediaOwner
-	}
+	mediaURL := app.adminURL(mediaLibraryURL(media, ""))
 	data := map[string]any{
 		"User":      media.user,
 		"Owner":     media.owner,
@@ -69,9 +81,26 @@ func (app *App) handleMediaLibrary(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		app.renderMediaLibrary(w, r, media, nil)
 	case http.MethodPost:
+		limit := app.cfg.MaxUploadBytes
+		if limit <= 0 {
+			limit = 512 * 1024 * 1024
+		}
+		r.Body = http.MaxBytesReader(w, r.Body, limit)
+		defer func() {
+			if r.MultipartForm != nil {
+				_ = r.MultipartForm.RemoveAll()
+			}
+		}()
 		// 裁剪器通过 query 传递 action，避免在读取动作前提前解析整张 Canvas 图片。
 		action := strings.TrimSpace(r.URL.Query().Get("action"))
-		if action == "" {
+		// 普通上传没有 action 字段。FormValue 会提前解析整个 multipart，
+		// 导致上传处理器的大小限制失效，还会吞掉解析错误。
+		if action == "" && !strings.HasPrefix(strings.ToLower(r.Header.Get("Content-Type")), "multipart/form-data") {
+			r.Body = http.MaxBytesReader(w, r.Body, 64*1024)
+			if err := r.ParseForm(); err != nil {
+				http.Error(w, "无效的媒体操作表单", http.StatusBadRequest)
+				return
+			}
 			action = strings.TrimSpace(r.FormValue("action"))
 		}
 		switch action {
@@ -85,8 +114,10 @@ func (app *App) handleMediaLibrary(w http.ResponseWriter, r *http.Request) {
 			app.saveCoverUpload(w, r, media)
 		case "media-import":
 			app.importLegacyMedia(w, r, media)
-		default:
+		case "", "upload":
 			app.uploadMediaFile(w, r, media)
+		default:
+			http.Error(w, "未知媒体操作", http.StatusBadRequest)
 		}
 	default:
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)

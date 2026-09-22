@@ -63,21 +63,48 @@ func (app *App) handlePublicMedia(w http.ResponseWriter, r *http.Request) {
 	}
 	publicPath := canonicalPublicMediaPath(r.URL.Path)
 	name := strings.TrimPrefix(publicPath, "/uploads/")
+	if !strings.HasPrefix(publicPath, "/uploads/") || !validMediaRelativeName(name) {
+		http.NotFound(w, r)
+		return
+	}
 	name = path.Clean(name)
 	if name == "." || name == "" || strings.HasPrefix(name, "../") || strings.Contains(name, "\\") {
 		http.NotFound(w, r)
 		return
 	}
-	for _, root := range []string{app.mediaRootDir(), filepath.Join("static", "uploads")} {
-		candidate := filepath.Join(root, filepath.FromSlash(name))
-		if info, err := os.Stat(candidate); err == nil && !info.IsDir() {
-			// Mutable media URLs reuse browser bytes after Last-Modified validation.
-			w.Header().Set("Cache-Control", "public, no-cache")
-			http.ServeFile(w, r, candidate)
-			return
-		}
+	file, info, err := app.openPublicMedia(name)
+	if err != nil {
+		http.NotFound(w, r)
+		return
 	}
-	http.NotFound(w, r)
+	defer file.Close()
+	w.Header().Set("Cache-Control", "public, no-cache")
+	http.ServeContent(w, r, info.Name(), info.ModTime(), file)
+}
+
+func (app *App) openPublicMedia(name string) (*os.File, os.FileInfo, error) {
+	app.mediaMu.RLock()
+	defer app.mediaMu.RUnlock()
+	for index, root := range []string{app.mediaRootDir(), filepath.Join("static", "uploads")} {
+		// A new upload at the same URL wins; the marker only suppresses the
+		// bundled fallback, including editor uploads/crops/imports.
+		if index > 0 && app.isMediaTombstonedRelative(name) {
+			break
+		}
+		candidate := filepath.Join(root, filepath.FromSlash(name))
+		file, err := os.Open(candidate)
+		if err != nil {
+			continue
+		}
+		info, err := file.Stat()
+		if err == nil && info.Mode().IsRegular() {
+			// Open under the lock, then stream without it: video downloads must
+			// not hold up library mutations or Hugo builds.
+			return file, info, nil
+		}
+		_ = file.Close()
+	}
+	return nil, nil, os.ErrNotExist
 }
 
 func canonicalPublicMediaPath(publicPath string) string {

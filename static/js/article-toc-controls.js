@@ -6,7 +6,10 @@
   shell.dataset.songlineTocBound = '1';
 
   const storageKey = 'songline-toc-state';
-  if(localStorage.getItem(storageKey) === 'expanded') shell.dataset.tocState = 'expanded';
+  try{
+    const saved = localStorage.getItem(storageKey);
+    if(saved === 'expanded' || saved === 'collapsed') shell.dataset.tocState = saved;
+  }catch(error){}
 
   function syncAria(){
     toc.setAttribute('aria-expanded', shell.dataset.tocState === 'expanded' ? 'true' : 'false');
@@ -15,7 +18,7 @@
   function toggle(){
     const next = shell.dataset.tocState === 'expanded' ? 'collapsed' : 'expanded';
     shell.dataset.tocState = next;
-    localStorage.setItem(storageKey, next);
+    try{ localStorage.setItem(storageKey, next); }catch(error){}
     syncAria();
   }
 

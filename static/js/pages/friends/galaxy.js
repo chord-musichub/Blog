@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.12.0';
+  var VERSION = '22.14.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   // A wide outer ring plus a loose inner ring keeps the growing friend list
   // readable.  The old presets clustered around the core (especially the
@@ -153,29 +153,25 @@
     var nodeById = Object.create(null);
     var resizeFrame = 0;
     var settleTimer = 0;
+    var zoomFrame = 0;
+    var zoomAnimation = null;
     var stageObserver = null;
     var lineFrame = 0;
     var compactQuery = window.matchMedia('(max-width: 980px)');
     // 工作区比视窗更大；只平移这个世界层，背景、回忆入口和 hover 卡片保持固定。
     var pan = { x:0, y:0, targetX:0, targetY:0, zoom:1, inertiaFrame:0, inertiaLast:0, inertiaX:0, inertiaY:0, dragFrame:0, drag:null, nextX:0, nextY:0, suppressUntil:0 };
     var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var lens = {items:[],edges:[],width:0,height:0,worldWidth:0,worldHeight:0,left:0,top:0,lastX:0,lastY:0,lastZoom:1,motion:0};
+    var lens = {items:[],edges:[],width:0,height:0,worldWidth:0,worldHeight:0,left:0,top:0};
 
     // One coordinate projection for the real hit targets and SVG edges. No cloned
     // scene or per-frame DOM measurements; only the resize/layout pass reads geometry.
-    function paintLens(settled){
+    function paintLens(){
       if(!lens.width || !lens.items.length) return;
-      var dx=pan.x-lens.lastX, dy=pan.y-lens.lastY;
-      var speed=Math.min(1,(Math.hypot(dx,dy)+Math.abs(pan.zoom-lens.lastZoom)*400)/22);
-      lens.lastX=pan.x; lens.lastY=pan.y; lens.lastZoom=pan.zoom;
-      lens.motion=settled||reducedMotion ? 0 : lens.motion*.7+speed*.3;
-      var focusX=lens.width*(.5-Math.max(-.016,Math.min(.016,dx*.0005)));
-      var focusY=lens.height*(.5-Math.max(-.016,Math.min(.016,dy*.0005)));
-      if(settled||reducedMotion){ focusX=lens.width/2; focusY=lens.height/2; }
-      // 手机柔焦遮罩保持固定，头像透镜仍实时计算；避免整屏遮罩每帧失效。
-      setStyle(stage, '--galaxy-focus-x', (isCompact() ? '50' : (focusX/lens.width*100).toFixed(2))+'%');
-      setStyle(stage, '--galaxy-focus-y', (isCompact() ? '50' : (focusY/lens.height*100).toFixed(2))+'%');
-      setStyle(stage, '--galaxy-edge-blur', isCompact() ? '2px' : (2.5+lens.motion*3).toFixed(2)+'px');
+      // Focus is a position, not a velocity: tying it to per-frame dx/dy made
+      // identical positions alternate in size as pointer events sped up/slowed.
+      var focusX=lens.width/2, focusY=lens.height/2;
+      // 遮罩使用 CSS 中原来的固定中心和模糊半径。只投影头像和连线，
+      // 避免拖动/惯性期间每帧改变全屏 backdrop-filter 与 mask 的纹理。
       var centers=Object.create(null);
       lens.items.forEach(function(item){
         var screenX=lens.left+lens.worldWidth/2+(item.x-lens.worldWidth/2)*pan.zoom+pan.x;
@@ -235,8 +231,10 @@
       world.style.transform = 'translate3d(' + pan.x.toFixed(2) + 'px,' + pan.y.toFixed(2) + 'px,0) scale(' + pan.zoom.toFixed(3) + ')';
       // 透镜必须随画布平移实时更新，否则手机端经过中心的头像不会被放大。
       // 性能削减改由移动端关闭流星、星云漂移与高强度模糊承担。
-      paintLens(false);
+      paintLens();
     }
+    function isMoving(){ return !!(pan.drag || pan.inertiaFrame || zoomAnimation); }
+    function syncMotionState(){ stage.classList.toggle('is-moving', isMoving()); }
     function movePan(x, y){
       var next = clampPan(x, y);
       pan.targetX = next.x; pan.targetY = next.y;
@@ -245,7 +243,8 @@
     function stopInertia(){
       if(pan.inertiaFrame) window.cancelAnimationFrame(pan.inertiaFrame);
       pan.inertiaFrame = 0; pan.inertiaLast = 0; pan.inertiaX = 0; pan.inertiaY = 0;
-      paintLens(true);
+      paintLens();
+      syncMotionState();
     }
     function coastPan(now){
       var elapsed = Math.min(32, Math.max(8, now - pan.inertiaLast));
@@ -266,6 +265,7 @@
       pan.inertiaX = velocityX; pan.inertiaY = velocityY;
       pan.inertiaLast = performance.now();
       pan.inertiaFrame = window.requestAnimationFrame(coastPan);
+      syncMotionState();
     }
     function onPointerDown(event){
       if(event.button !== undefined && event.button !== 0) return;
@@ -274,9 +274,10 @@
       if(pan.drag || event.isPrimary === false) return;
       var isGalaxyAvatar = event.target.closest && event.target.closest('.friends-constellation__node, .friends-constellation__core');
       if(event.target.closest && event.target.closest('a, button, input, textarea, select') && !isGalaxyAvatar) return;
-      stopInertia();
-      hideHoverCard();
+      stopZoom(); stopInertia();
+      hideHoverCard(); setProfile(selected);
       pan.drag = { id:event.pointerId, threshold:event.pointerType === 'touch' ? 10 : 5, x:event.clientX, y:event.clientY, originX:pan.targetX, originY:pan.targetY, lastX:event.clientX, lastY:event.clientY, lastAt:performance.now(), velocityX:0, velocityY:0, moved:false };
+      syncMotionState();
       // 所有指针都在跨过拖动阈值后捕获，保留头像的原生点击目标。
     }
     function onPointerMove(event){
@@ -308,36 +309,74 @@
     function stopPan(event){
       if(!pan.drag || event && event.pointerId !== pan.drag.id) return;
       var moved = pan.drag.moved;
-      var velocityX = Math.max(-1.8, Math.min(1.8, pan.drag.velocityX));
-      var velocityY = Math.max(-1.8, Math.min(1.8, pan.drag.velocityY));
+      var recent = performance.now() - pan.drag.lastAt < 100;
+      var velocityX = recent ? Math.max(-1.8, Math.min(1.8, pan.drag.velocityX)) : 0;
+      var velocityY = recent ? Math.max(-1.8, Math.min(1.8, pan.drag.velocityY)) : 0;
       if(pan.dragFrame){ window.cancelAnimationFrame(pan.dragFrame); pan.dragFrame = 0; movePan(pan.nextX, pan.nextY); }
       pan.drag = null;
       stage.classList.remove('is-dragging'); world.classList.remove('is-dragging');
       if(event && stage.releasePointerCapture && event.pointerId != null){ try{ stage.releasePointerCapture(event.pointerId); }catch(error){} }
       if(moved) pan.suppressUntil = Date.now() + 450;
-      if(moved && (!event || event.type !== 'pointercancel')) startInertia(velocityX, velocityY);
+      if(moved && (!event || event.type === 'pointerup')) startInertia(velocityX, velocityY);
+      else paintLens();
+      syncMotionState();
+    }
+    function preventNativeDrag(event){ event.preventDefault(); }
+    function cancelPan(){
+      if(pan.drag) stopPan({type:'pointercancel', pointerId:pan.drag.id});
+      stopZoom();
+      stopInertia();
     }
     function blockDragClick(event){
       if(Date.now() < pan.suppressUntil){ event.preventDefault(); event.stopPropagation(); }
     }
+    function stopZoom(){
+      if(zoomFrame) window.cancelAnimationFrame(zoomFrame);
+      zoomFrame = 0; zoomAnimation = null;
+      syncMotionState();
+    }
+    function animateZoom(zoom, x, y){
+      stopZoom();
+      if(reducedMotion){ pan.zoom = zoom; movePan(x, y); return; }
+      zoomAnimation = {start:performance.now(), zoom:pan.zoom, x:pan.x, y:pan.y, toZoom:zoom, toX:x, toY:y};
+      function step(now){
+        if(!stage.isConnected){ stopZoom(); return; }
+        var motion = zoomAnimation;
+        var progress = Math.min(1, Math.max(0, (now - motion.start) / 260));
+        var eased = 1 - Math.pow(1 - progress, 3);
+        pan.zoom = motion.zoom + (motion.toZoom - motion.zoom) * eased;
+        movePan(motion.x + (motion.toX - motion.x) * eased, motion.y + (motion.toY - motion.y) * eased);
+        if(progress < 1) zoomFrame = window.requestAnimationFrame(step);
+        else { zoomFrame = 0; zoomAnimation = null; syncMotionState(); }
+      }
+      zoomFrame = window.requestAnimationFrame(step);
+      syncMotionState();
+    }
     function onZoomControl(event){
       var button = event.target.closest('[data-galaxy-zoom]');
       if(!button) return;
-      stopInertia(); hideHoverCard();
+      if(pan.drag) return;
+      stopInertia(); hideHoverCard(); setProfile(selected);
       var action = button.dataset.galaxyZoom;
-      var zoom = action === 'reset' ? 1 : Math.max(.72, Math.min(1.58, pan.zoom * (action === 'in' ? 1.15 : 1/1.15)));
+      var targetZoom = zoomAnimation ? zoomAnimation.toZoom : pan.zoom;
+      var zoom = action === 'reset' ? 1 : Math.max(.72, Math.min(1.58, targetZoom * (action === 'in' ? 1.15 : 1/1.15)));
       var ratio = zoom / pan.zoom;
-      pan.zoom = zoom;
-      movePan(action === 'reset' ? 0 : pan.x * ratio, action === 'reset' ? 0 : pan.y * ratio);
+      animateZoom(zoom, action === 'reset' ? 0 : pan.x * ratio, action === 'reset' ? 0 : pan.y * ratio);
     }
     function onWheel(event){
       var delta = event.deltaY || event.deltaX;
       if(!delta) return;
       // Friends 是全屏画布，没有页面内纵向阅读内容；滚轮专门用于地图缩放。
       event.preventDefault();
-      stopInertia();
-      var nextZoom = Math.max(.72, Math.min(1.58, pan.zoom * Math.exp(-delta * .0015)));
-      if(Math.abs(nextZoom - pan.zoom) < .001) return;
+      if(pan.drag) return;
+      stopInertia(); hideHoverCard(); setProfile(selected);
+      if(event.deltaMode === 1) delta *= 16;
+      else if(event.deltaMode === 2) delta *= stage.clientHeight;
+      var targetZoom = zoomAnimation ? zoomAnimation.toZoom : pan.zoom;
+      var nextZoom = Math.max(.72, Math.min(1.58, targetZoom * Math.exp(-delta * .0015)));
+      // Compare with the pending target, not the current frame: an opposite
+      // wheel tick may cancel a zoom before its first animation frame runs.
+      if(Math.abs(nextZoom - targetZoom) < .00001) return;
       // 在鼠标所在处缩放：计算缩放前该点相对世界中心的位置，并补偿平移。
       var stageRect = stage.getBoundingClientRect();
       var pointX = event.clientX - stageRect.left - stage.clientWidth / 2;
@@ -345,8 +384,7 @@
       var ratio = nextZoom / pan.zoom;
       var nextX = pointX - (pointX - pan.x) * ratio;
       var nextY = pointY - (pointY - pan.y) * ratio;
-      pan.zoom = nextZoom;
-      movePan(nextX, nextY);
+      animateZoom(nextZoom, nextX, nextY);
     }
 
     function safeImage(image, source){
@@ -366,7 +404,7 @@
       updateLineState(friend);
     }
     function showHoverCard(friend, anchor){
-      if(!hoverCard || !anchor) return;
+      if(!hoverCard || !anchor || isMoving()) return;
       safeImage(hoverAvatar, friend.avatar);
       hoverAvatar.alt = friend.name;
       hoverName.textContent = friend.name;
@@ -437,10 +475,10 @@
         safeImage(node.querySelector('img'), friend.avatar);
         node.querySelector('.friends-constellation__node-name').textContent = friend.name;
         // 不以 hover media query 判断设备：二合一设备也可能连接鼠标。
-        node.addEventListener('pointerenter', function(event){ if(event.pointerType !== 'touch' && !isCompact()){ setProfile(friend); showHoverCard(friend, node); } });
-        node.addEventListener('pointerleave', function(){ setProfile(selected); hideHoverCard(); });
-        node.addEventListener('focus', function(){ setProfile(friend); showHoverCard(friend, node); });
-        node.addEventListener('blur', function(){ if(!isTouch() && !isCompact()){ setProfile(selected); hideHoverCard(); } });
+        node.addEventListener('pointerenter', function(event){ if(!isMoving() && event.pointerType !== 'touch' && !isCompact()){ setProfile(friend); showHoverCard(friend, node); } });
+        node.addEventListener('pointerleave', function(){ if(!isMoving()) setProfile(selected); hideHoverCard(); });
+        node.addEventListener('focus', function(){ if(!isMoving()){ setProfile(friend); showHoverCard(friend, node); } });
+        node.addEventListener('blur', function(){ if(!isMoving() && !isTouch() && !isCompact()){ setProfile(selected); hideHoverCard(); } });
         node.addEventListener('click', function(event){
           event.preventDefault();
           // 已选中节点只有在明确配置了地址时才可跳转；未填第三方连接的
@@ -506,7 +544,8 @@
         // lens transform is reset so the scale keeps the avatar center fixed.
         var elementRect=item.element.getBoundingClientRect();
         var imageRect=img && img.getBoundingClientRect();
-        var originY=imageRect ? imageRect.top + imageRect.height/2 - elementRect.top : elementRect.height/2;
+        var visualScale = worldRect.height / layoutHeight;
+        var originY=(imageRect ? imageRect.top + imageRect.height/2 - elementRect.top : elementRect.height/2) / visualScale;
         item.originY = originY;
         lens.items.push({id:item.id,element:item.element,x:centers[item.id].x,y:centers[item.id].y});
       });
@@ -522,7 +561,7 @@
         lines.appendChild(line);
         lens.edges.push({line:line,a:edge[0].id,b:edge[1].id});
       });
-      paintLens(true);
+      paintLens();
       updateLineState(focused);
     }
     function centerOf(element, container, layoutWidth, layoutHeight){
@@ -591,9 +630,11 @@
       window.cancelAnimationFrame(resizeFrame);
       window.cancelAnimationFrame(lineFrame);
       window.clearTimeout(settleTimer);
+      stopZoom();
       stopInertia();
       if(pan.dragFrame) window.cancelAnimationFrame(pan.dragFrame);
       pan.dragFrame = 0; pan.drag = null;
+      syncMotionState();
       stage.classList.remove('is-dragging'); world.classList.remove('is-dragging');
       if(stageObserver) stageObserver.disconnect();
       window.removeEventListener('resize', scheduleLayout);
@@ -603,8 +644,11 @@
       window.removeEventListener('songline:page-transition-start', onTransitionStart);
       stage.removeEventListener('pointerdown', onPointerDown);
       stage.removeEventListener('pointermove', onPointerMove);
-      stage.removeEventListener('pointerup', stopPan);
-      stage.removeEventListener('pointercancel', stopPan);
+      window.removeEventListener('pointerup', stopPan, true);
+      window.removeEventListener('pointercancel', stopPan, true);
+      window.removeEventListener('blur', cancelPan);
+      stage.removeEventListener('lostpointercapture', stopPan);
+      stage.removeEventListener('dragstart', preventNativeDrag);
       stage.removeEventListener('click', blockDragClick, true);
       stage.removeEventListener('wheel', onWheel);
       if(zoomControls) zoomControls.removeEventListener('click', onZoomControl);
@@ -635,8 +679,13 @@
     window.addEventListener('songline:page-transition-start', onTransitionStart);
     stage.addEventListener('pointerdown', onPointerDown);
     stage.addEventListener('pointermove', onPointerMove);
-    stage.addEventListener('pointerup', stopPan);
-    stage.addEventListener('pointercancel', stopPan);
+    // Before crossing the drag threshold the stage does not capture pointers;
+    // releases elsewhere (including controls that stop bubbling) still end it.
+    window.addEventListener('pointerup', stopPan, true);
+    window.addEventListener('pointercancel', stopPan, true);
+    window.addEventListener('blur', cancelPan);
+    stage.addEventListener('lostpointercapture', stopPan);
+    stage.addEventListener('dragstart', preventNativeDrag);
     stage.addEventListener('click', blockDragClick, true);
     stage.addEventListener('wheel', onWheel, {passive:false});
     if(zoomControls){ zoomControls.hidden = false; zoomControls.addEventListener('click', onZoomControl); }

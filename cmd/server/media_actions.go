@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -44,21 +43,31 @@ func (app *App) renameMediaFile(w http.ResponseWriter, r *http.Request, media me
 	}
 	newFile := filepath.Join(media.dir, newName)
 	if oldFile == newFile {
-		app.redirect(w, r, "/admin/media?msg="+url.QueryEscape("文件名没有变化："+userMediaPublicPath(media.owner, oldName)), http.StatusSeeOther)
+		app.redirect(w, r, mediaLibraryURL(media, "文件名没有变化："+userMediaPublicPath(media.owner, oldName)), http.StatusSeeOther)
 		return
 	}
 	if _, err := os.Stat(newFile); err == nil {
 		app.renderMediaLibrary(w, r, media, map[string]any{"Error": "重命名失败：新文件名已存在"})
 		return
 	}
-	if err := os.Rename(oldFile, newFile); err != nil {
+	if err := app.removeMediaName(media, oldName, func() error {
+		// Same-directory hard link + unlink cannot overwrite a concurrently
+		// uploaded destination, unlike os.Rename on Unix.
+		if err := os.Link(oldFile, newFile); err != nil {
+			return err
+		}
+		if err := os.Remove(oldFile); err != nil {
+			return errors.Join(err, os.Remove(newFile))
+		}
+		return nil
+	}); err != nil {
 		app.renderMediaLibrary(w, r, media, map[string]any{"Error": "重命名失败：" + err.Error()})
 		return
 	}
 	if err := app.runHugo(r.Context()); err != nil {
 		log.Printf("hugo build after media rename error: %v", err)
 	}
-	app.redirect(w, r, "/admin/media?msg="+url.QueryEscape("已重命名为："+userMediaPublicPath(media.owner, newName)), http.StatusSeeOther)
+	app.redirect(w, r, mediaLibraryURL(media, "已重命名为："+userMediaPublicPath(media.owner, newName)), http.StatusSeeOther)
 }
 
 func (app *App) deleteMediaFile(w http.ResponseWriter, r *http.Request, media mediaLibraryContext) {
@@ -68,14 +77,14 @@ func (app *App) deleteMediaFile(w http.ResponseWriter, r *http.Request, media me
 		app.renderMediaLibrary(w, r, media, map[string]any{"Error": "删除失败：只能删除你自己媒体库里的文件"})
 		return
 	}
-	if err := os.Remove(filepath.Join(media.dir, oldName)); err != nil {
+	if err := app.removeMediaName(media, oldName, func() error { return os.Remove(filepath.Join(media.dir, oldName)) }); err != nil {
 		app.renderMediaLibrary(w, r, media, map[string]any{"Error": "删除失败：" + err.Error()})
 		return
 	}
 	if err := app.runHugo(r.Context()); err != nil {
 		log.Printf("hugo build after media delete error: %v", err)
 	}
-	app.redirect(w, r, "/admin/media?msg="+url.QueryEscape("已删除："+userMediaPublicPath(media.owner, oldName)), http.StatusSeeOther)
+	app.redirect(w, r, mediaLibraryURL(media, "已删除："+userMediaPublicPath(media.owner, oldName)), http.StatusSeeOther)
 }
 
 func (app *App) uploadMediaFile(w http.ResponseWriter, r *http.Request, media mediaLibraryContext) {
@@ -130,15 +139,17 @@ func (app *App) uploadMediaFile(w http.ResponseWriter, r *http.Request, media me
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer out.Close()
-	if _, err := io.Copy(out, file); err != nil {
+	_, copyErr := io.Copy(out, file)
+	closeErr := out.Close()
+	if err := errors.Join(copyErr, closeErr); err != nil {
+		_ = os.Remove(filepath.Join(categoryDir, name))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if err := app.runHugo(r.Context()); err != nil {
 		log.Printf("hugo build after media upload error: %v", err)
 	}
-	app.redirect(w, r, "/admin/media?msg=已上传："+url.QueryEscape(userMediaPublicPath(media.owner, filepath.Join(category, name))), http.StatusSeeOther)
+	app.redirect(w, r, mediaLibraryURL(media, "已上传："+userMediaPublicPath(media.owner, filepath.Join(category, name))), http.StatusSeeOther)
 }
 
 // saveCoverUpload is the lightweight editor-side upload path. Unlike a general
@@ -349,11 +360,9 @@ func (app *App) saveCoverCrop(w http.ResponseWriter, r *http.Request, media medi
 		writeError(http.StatusInternalServerError, "无法保存裁剪封面")
 		return
 	}
-	defer out.Close()
-
-	n, err := io.Copy(out, io.LimitReader(io.MultiReader(bytes.NewReader(header), file), maxCropBytes+1))
-	if err != nil || n > maxCropBytes {
-		_ = out.Close()
+	n, copyErr := io.Copy(out, io.LimitReader(io.MultiReader(bytes.NewReader(header), file), maxCropBytes+1))
+	closeErr := out.Close()
+	if copyErr != nil || closeErr != nil || n > maxCropBytes {
 		_ = os.Remove(outputPath)
 		writeError(http.StatusBadRequest, "裁剪封面超过 16MB 或保存失败")
 		return
