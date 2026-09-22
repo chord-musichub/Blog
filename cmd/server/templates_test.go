@@ -132,10 +132,11 @@ func TestMediaLibraryOffersNonDestructiveCropForExistingRasterImages(t *testing.
 	app := newApp(Config{}, &Store{})
 	response := httptest.NewRecorder()
 	app.render(response, "media.html", map[string]any{
-		"User":      User{Username: "creator", Role: roleUser},
-		"MediaURL":  "/admin/media",
-		"Settings":  defaultSiteSettings(),
-		"Workspace": "media",
+		"User":       User{Username: "creator", Role: roleUser},
+		"MediaURL":   "/admin/media",
+		"Categories": mediaCategoryOptions(mediaLibraryContext{user: User{Role: roleUser}, owner: "creator"}),
+		"Settings":   defaultSiteSettings(),
+		"Workspace":  "media",
 		"Files": []MediaFile{
 			{Path: "/uploads/creator/old-photo.png", Name: "old-photo.png", Ext: "png"},
 			{Path: "/uploads/creator/notes.pdf", Name: "notes.pdf", Ext: "pdf"},
@@ -149,7 +150,7 @@ func TestMediaLibraryOffersNonDestructiveCropForExistingRasterImages(t *testing.
 	if response.Code != http.StatusOK {
 		t.Fatalf("media status = %d, body = %s", response.Code, body)
 	}
-	for _, want := range []string{"mediaCropSource0-0", "裁剪 16:9", "cover-cropper.js?v=21.0.1"} {
+	for _, want := range []string{"mediaCropSource0-0", "裁剪 16:9", "cover-cropper.js?v=21.0.1", `name="action" value="categorize"`, `value="articles"`, "修改分类", "不改变图片路径"} {
 		if !strings.Contains(body, want) {
 			t.Fatalf("media crop affordance missing %q: %s", want, body)
 		}

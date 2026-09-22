@@ -1,4 +1,4 @@
-{{template "admin-head" (dict "Title" "媒体库" "Data" . "Navigation" true "ExtraScript" "/static/media-admin.js")}}
+{{template "admin-head" (dict "Title" "媒体库" "Data" . "Navigation" true "ExtraScript" "/static/media-admin.js?v=22.16.0")}}
 <body{{with .Settings.Background.Image}} class="admin-has-site-bg" style="--admin-site-bg-image:url('{{.}}');--admin-site-bg-height:{{default "420px" $.Settings.Background.Height}};--admin-site-bg-blur:{{default "18px" $.Settings.Background.Blur}};--admin-site-bg-opacity:{{default "0.38" $.Settings.Background.Opacity}};"{{end}}>
 {{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
 
@@ -20,11 +20,7 @@
       </label>
       <label class="media-category-field">归类
         <select name="category">
-          <option value="general">通用素材</option>
-          <option value="articles">文章</option>
-          {{if isOwnerUser .User}}<option value="projects">项目</option><option value="memories">回忆</option>{{end}}
-          <option value="profile">个人资料</option>
-          {{if eq .Owner "admin"}}<option value="friends">朋友</option><option value="site">站点</option><option value="backgrounds">背景</option><option value="tools">工具</option>{{end}}
+          {{range .Categories}}<option value="{{.Key}}">{{.Label}}</option>{{end}}
         </select>
       </label>
       <button><span class="btn-ico" aria-hidden="true">⇧</span><span class="btn-text">上传素材</span></button>
@@ -41,7 +37,7 @@
       <h3>{{$group.Label}} <span class="soft-count">{{len $group.Files}}</span></h3>
       <div class="media-grid">
     {{range $index, $file := $group.Files}}
-      <div class="media-item" data-media-item>
+      <div class="media-item" data-media-item data-media-search="{{$file.Name}} {{$group.Label}}">
         <a href="{{$file.Path}}" target="_blank" class="media-preview">
           {{if or (eq $file.Ext "jpg") (or (eq $file.Ext "jpeg") (or (eq $file.Ext "png") (or (eq $file.Ext "webp") (or (eq $file.Ext "svg") (or (eq $file.Ext "gif") (eq $file.Ext "ico"))))))}}
             <img src="{{$file.Path}}" alt="{{$file.Name}}" loading="lazy" decoding="async">
@@ -58,6 +54,13 @@
           <span id="mediaCropStatus{{$groupIndex}}-{{$index}}" class="meta media-crop-status" role="status" aria-live="polite"></span>
           {{end}}
           <details class="media-more"><summary>管理</summary><code>{{$file.Path}}</code>
+          <form method="post" action="{{$.MediaURL}}" class="media-rename-form media-category-form">
+            <input type="hidden" name="action" value="categorize">
+            <input type="hidden" name="old_path" value="{{$file.Path}}">
+            <label>分类 <select name="category" aria-label="素材分类">{{range $.Categories}}<option value="{{.Key}}"{{if eq .Key $file.Category}} selected{{end}}>{{.Label}}</option>{{end}}</select></label>
+            <button class="btn small" type="submit">修改分类</button>
+            <small class="meta">只调整分组，不改变图片路径。</small>
+          </form>
           <form method="post" action="{{$.MediaURL}}" class="media-rename-form">
             <input type="hidden" name="action" value="rename">
             <input type="hidden" name="old_path" value="{{$file.Path}}">

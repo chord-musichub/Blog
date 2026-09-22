@@ -50,12 +50,13 @@ func (app *App) mediaLibraryForRequest(user User, r *http.Request) mediaLibraryC
 func (app *App) renderMediaLibrary(w http.ResponseWriter, r *http.Request, media mediaLibraryContext, extra map[string]any) {
 	mediaURL := app.adminURL(mediaLibraryURL(media, ""))
 	data := map[string]any{
-		"User":      media.user,
-		"Owner":     media.owner,
-		"MediaURL":  mediaURL,
-		"Files":     listMediaFiles(media.dir, userMediaPublicPrefix(media.owner)),
-		"Flash":     r.URL.Query().Get("msg"),
-		"Workspace": "media",
+		"User":       media.user,
+		"Owner":      media.owner,
+		"MediaURL":   mediaURL,
+		"Files":      app.categorizedMediaFiles(media.owner),
+		"Categories": mediaCategoryOptions(media),
+		"Flash":      r.URL.Query().Get("msg"),
+		"Workspace":  "media",
 	}
 	data["Groups"] = mediaGroups(data["Files"].([]MediaFile))
 	for k, v := range extra {
@@ -108,6 +109,8 @@ func (app *App) handleMediaLibrary(w http.ResponseWriter, r *http.Request) {
 			app.renameMediaFile(w, r, media)
 		case "delete":
 			app.deleteMediaFile(w, r, media)
+		case "categorize":
+			app.categorizeMediaFile(w, r, media)
 		case "cover-crop", "media-crop":
 			app.saveCoverCrop(w, r, media)
 		case "cover-upload":

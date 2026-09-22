@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.14.0';
+  var VERSION = '22.15.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   // A wide outer ring plus a loose inner ring keeps the growing friend list
   // readable.  The old presets clustered around the core (especially the

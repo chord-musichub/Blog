@@ -75,3 +75,19 @@ body:has(.memory-room) .memory-room__back{position:fixed!important;top:98px!impo
 
 /* 简介控制为短阅读行宽：完整显示，但不会在大屏变成过长的一行。 */
 .memory-room__caption p{inline-size:min(16em,100%)}
+
+/* 同日卡片共用一个起点，以实际图片高度加留白向上排列。保留各日期间的高低错位。 */
+.memory-room__memory:nth-child(n){--memory-rise:clamp(118px,17vh,204px);--memory-stack-offset:calc(var(--memory-slot,0) * (var(--memory-card-h) + 28px))}
+.memory-room__memory[data-memory-lane="1"]{--memory-rise:clamp(176px,25vh,286px)}
+.memory-room__memory[data-memory-lane="2"]{--memory-rise:clamp(136px,20vh,236px)}
+.memory-room__viewport{overflow-y:auto;overscroll-behavior-y:contain;touch-action:pan-y pinch-zoom}
+.memory-room__caption{bottom:calc(var(--memory-rise) + var(--memory-stack-offset) + 58px + var(--memory-card-h)/2)}
+@media(max-width:760px){
+  .memory-room__memory:nth-child(n){--memory-rise:128px}
+  .memory-room__memory[data-memory-lane="1"]{--memory-rise:190px}
+  .memory-room__memory[data-memory-lane="2"]{--memory-rise:148px}
+}
+@media(max-width:640px){
+  .memory-room__memory:nth-child(n){--memory-stack-offset:calc(var(--memory-slot,0) * (var(--memory-card-h) + 76px))}
+  .memory-room__caption{bottom:calc(var(--memory-rise) + var(--memory-stack-offset) + var(--memory-card-h) + 76px)}
+}

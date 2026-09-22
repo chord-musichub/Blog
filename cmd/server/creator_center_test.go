@@ -16,13 +16,14 @@ import (
 func creatorCenterFixture(role string) map[string]any {
 	user := User{Username: "demo_creator", DisplayName: "示例创作者", Role: role}
 	cover := "/uploads/songline/markdown.png"
-	files := []MediaFile{{Path: cover, Name: "markdown.png", Ext: "png"}}
+	files := []MediaFile{{Path: cover, Name: "markdown.png", Ext: "png", Category: "general"}}
 	articles := make([]Article, 12)
 	for i := range articles {
 		articles[i] = Article{ID: fmt.Sprintf("demo-%d", i), Title: fmt.Sprintf("创作记录 %02d · 记录生活中的灵感", i+1), Author: user.Username, Status: []string{stDraft, stPublished, stPending, stRejected}[i%4], UpdatedAt: time.Date(2026, 9, 12, 10, 0, 0, 0, time.UTC), Body: "## 新的开始\n\n这是一篇 **示例文章**。\n\n> 记录灵感，也记录生活。", Summary: "记录生活中的灵感。"}
 	}
 	articles[0].Cover = cover
 	return map[string]any{"User": user, "Settings": defaultSiteSettings(), "Theme": defaultThemeSettings(), "Articles": articles, "Article": articles[0], "IsDashboard": true,
+		"Owner": user.Username, "MediaURL": "/write/admin/media", "Categories": mediaCategoryOptions(mediaLibraryContext{user: user, owner: user.Username}),
 		"ArticleGroups": []map[string]any{{"DisplayName": user.DisplayName, "Username": user.Username, "Articles": articles}},
 		"Files":         files, "CoverFiles": files, "Groups": []MediaGroup{{Key: "general", Label: "通用素材", Files: files}}, "Messages": []MessageRecord{},
 		"Users": []User{user}, "Projects": []Project{{Title: "个人网站", Year: "2026", Description: "记录与分享", Stack: []string{"Go", "Hugo"}}},

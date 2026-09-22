@@ -37,7 +37,10 @@
       var query = search.value.trim().toLowerCase();
       var shown = 0;
       items.forEach(function(item){
-        var match = !query || item.textContent.toLowerCase().indexOf(query) !== -1;
+        // Do not search every option in the category editor: only this file's
+        // name and current category should make the card match.
+        var text = item.getAttribute('data-media-search') || item.textContent;
+        var match = !query || text.toLowerCase().indexOf(query) !== -1;
         item.hidden = !match;
         if(match) shown += 1;
       });

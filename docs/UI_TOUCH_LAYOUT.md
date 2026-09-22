@@ -14,6 +14,8 @@
 
 透镜中心固定于画布中心，不随每帧手势速度摆动，同一位置的头像和线端在拖动、停住、松手时使用相同投影。拖动、惯性和缩放过程中暂停悬停高亮切换，保留已选中状态。滚轮与缩放/复位按钮使用 260ms ease-out 插值，头像与 SVG 线端在同一帧更新；连续输入从当前帧接续，拖动、失焦或离开页面会取消未完成的缩放。启用系统减少动态效果时直接到达目标。
 
+v22.15 合成兼容调整：只对整个星图工作区保留 `will-change:transform`，不再为每个头像或柔焦容器强制增加 3D 合成层、背面剔除。运动层使用布局/样式隔离，固定柔焦层使用独立绘制边界；不裁切运动层的边缘头像与光晕，不修改模糊半径、遮罩、阴影或缩放缓动。这是兼容性调整，不代表已经排除所有 GPU/驱动上的消失帧。
+
 ## 触屏布局边界
 
 `static/css/touch-layout.css` 是公开站紧凑布局的最终入口，位于页面样式末尾。宽度不超过 760px，或不超过 980px 的无悬浮触屏设备使用该布局；较宽桌面保留原构图。
@@ -21,7 +23,7 @@
 - 顶部保留标识与主题/投稿入口，底部常驻楼层名称，右侧独立地图开关。
 - 首页直接展示信息终端，推荐、统计、音乐操作纵向组织；雪人继续保留。
 - 工具列表单列；图标与方向提示没有额外填充、阴影或毛玻璃底。
-- 朋友与回忆操作区位于页头和底部导航之间；回忆页不产生纵向滚动。
+- 朋友与回忆操作区位于页头和底部导航之间；回忆页的外层不滚动，同日图片过多时在时间线操作区内纵向滚动。
 - 文章目录使用独立抽屉，阅读浮动按钮避开底部导航；触屏平板使用同一规则。
 
 ## 回归
@@ -34,16 +36,30 @@ node tests/navigation-intent.browser.cjs
 node tests/navigation-origin.browser.cjs
 node tests/galaxy-lens.browser.cjs
 node tests/galaxy-motion.browser.cjs
+node tests/galaxy-compositing.browser.cjs
 node tests/theme-layout.browser.cjs
 node tests/resource-readiness.browser.cjs
 node tests/visual-bugs.browser.cjs
 node tests/cover-cropper.browser.cjs
+node tests/memories-stack.browser.cjs
 ```
 
 默认验证 `http://127.0.0.1:8080`，可通过 `BLOG_TEST_URL` 修改。布局测试使用 360、390、900、1440 像素视口，截图写入被忽略的 `local-only/ui-layout/`。`UI_SOURCE_CSS=1` 仅供开发迭代时拦截本地样式，正式回归不要设置，确保验证的是构建产物。
 
 浏览器触屏模拟不等于 iOS/Android 真机验证；软键盘、系统安全区和设备手势仍需真机体验确认。
 
+`galaxy-compositing.browser.cjs` 另需 `sharp` 与 Playwright 的 ffmpeg 录像依赖，使用 `--enable-gpu` 并检查实际硬件合成状态；软件合成不能替代这项测试。测试记录拖动/惯性/缩放录像，检查运动期间节点未隐藏、柔焦参数未切换，并将冻结后的画面与旧合成配置比较，允许少量栅格化差异但不允许头像几何尺寸变化。产物位于 `local-only/galaxy-compositing/`。帧时间与 DOM 检查通过不等于证明不存在 GPU 消失帧，录像及目标设备验证仍有必要。
+
 `visual-bugs.browser.cjs` 检查嵌套标题完整显示、延迟渲染后的手机目录、目录收起状态恢复，以及星图拖动/取消时的交互与柔焦一致性。开发时可设 `BLOG_TEST_SOURCE=1`，用源码中的 CSS/JS 覆盖预览服务器的旧资源；正式发布回归请去掉此选项。
 
 `cover-cropper.browser.cjs` 使用独立页面与合成图片验证裁剪滑块重绘、缩放中心、拖动取消和重新打开时的状态重置，不读取或修改真实媒体库。
+
+## 同日回忆与媒体分类
+
+同日回忆共享日期列的高度基准，以图片高度加留白竖向排列，不再混用单张卡片的 `nth-child` 错位。时间线根据当前断点的图片和标题边界计算高度；超出屏幕时保留纵向滚动，横向拖动仍切换日期。`memories-stack.browser.cjs` 使用合成数据验证每日期 3/5 张图片、短屏、手机、平板以及释放拖动。
+
+已上传素材可在“管理 → 修改分类”中调整分组，原图路径与字节保持不变。分类保存到运行时 `DATA_DIR/media-categories/<owner>.json`（备份时应包含整个运行时数据目录），不进入公开媒体目录。记录绑定文件大小和修改时间，避免同名重新上传继承旧分类；重命名与裁剪副本继承有效分类。
+
+裁剪依据原图路径匹配登录者的个人素材库；站主还可裁剪站点素材库的图片，不再把编辑页的上传目标库误当作原图归属。其他用户的图片仍拒绝操作。分类修改只允许在当前管理的库内进行。
+
+后端回归：`go test ./...`。分类表单的浏览器回归先启动只读合成预览 `CREATOR_CENTER_PREVIEW=1 go test ./cmd/server -run '^TestCreatorCenterVisualPreview$' -timeout 15m`，再运行 `node tests/media-library.browser.cjs`；该测试拦截全部 POST，不修改真实数据。

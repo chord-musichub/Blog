@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  var VERSION = '2.4.0';
+  var VERSION = '2.5.0';
   function parseData(root){
     var node = root.querySelector('#memory-room-data');
     try{return node ? JSON.parse(node.textContent || '[]') : [];}catch(e){return [];}
@@ -22,16 +22,26 @@
     var monthCount = Math.max(1, Number(track.dataset.memoryCount) || data.length);
     var step = 0, position = 0, target = 0, minimum = 0, drag = null, frame = 0, dragFrame = 0, dragNext = 0;
     var suppressUntil = 0, measured = false;
-    var compact = window.matchMedia('(max-width:980px)');
-    var stackCount = cards.reduce(function(count, card){ return Math.max(count, 1 + Number(card.style.getPropertyValue('--memory-slot') || 0)); }, 1);
+    // Stagger dates, not individual cards: every card on a date shares a base.
+    cards.forEach(function(card){ card.dataset.memoryLane = String((Number(card.dataset.memoryMonthIndex) || 0) % 3); });
     function reduced(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
     function measure(){
       var bottom = measured ? viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop : 0;
       step = Math.round(Math.min(390, Math.max(218, window.innerWidth * .27)));
       track.style.setProperty('--memory-step', step + 'px');
-      // A tall same-month stack must remain reachable on a phone, not clipped above the screen.
-      track.style.setProperty('--memory-mobile-height', (stackCount * 148 + 144) + 'px');
-      if(compact.matches) viewport.scrollTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight - bottom);
+      // Measure actual card/title bounds at this breakpoint. Tall stacks must
+      // remain reachable on desktops too, including short or zoomed viewports.
+      var requiredHeight = viewport.clientHeight;
+      cards.forEach(function(card){
+        var button = card.querySelector('[data-memory-open]');
+        var caption = card.querySelector('.memory-room__caption');
+        if(!button) return;
+        var imageTop = parseFloat(getComputedStyle(button).bottom) + button.offsetHeight;
+        var titleTop = caption ? parseFloat(getComputedStyle(caption).bottom) + caption.offsetHeight : 0;
+        requiredHeight = Math.max(requiredHeight, imageTop + 120, titleTop + 120);
+      });
+      track.style.height = Math.ceil(requiredHeight) + 'px';
+      viewport.scrollTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight - bottom);
       measured = true;
       minimum = -Math.max(0, (monthCount - 1) * step);
     }
@@ -44,7 +54,10 @@
     }
     function moveTo(value, immediate){
       target = clamp(value);
-      if(immediate){ position = target; paint(); return; }
+      if(immediate || reduced()){
+        if(frame) window.cancelAnimationFrame(frame);
+        frame = 0; position = target; paint(); return;
+      }
       if(!frame) frame = window.requestAnimationFrame(glide);
     }
     function focusMemory(index){
@@ -85,6 +98,7 @@
       if(event.button !== undefined && event.button !== 0) return;
       if(drag || event.isPrimary === false) return;
       if(frame){ window.cancelAnimationFrame(frame); frame = 0; }
+      target = position;
       drag = { id:event.pointerId, x:event.clientX, y:event.clientY, position:position, moved:false };
     }
     function onPointerMove(event){
@@ -109,11 +123,13 @@
       if(!drag || event && event.pointerId !== drag.id) return;
       if(dragFrame){ window.cancelAnimationFrame(dragFrame); dragFrame = 0; moveTo(dragNext, true); }
       if(drag.moved) suppressUntil = Date.now() + 400;
-      if(viewport.hasPointerCapture && viewport.hasPointerCapture(drag.id)) viewport.releasePointerCapture(drag.id);
-      drag = null; viewport.classList.remove('is-dragging'); track.classList.remove('is-dragging'); moveTo(target, false);
+      var pointerId = drag.id;
+      drag = null;
+      if(viewport.hasPointerCapture && viewport.hasPointerCapture(pointerId)) viewport.releasePointerCapture(pointerId);
+      viewport.classList.remove('is-dragging'); track.classList.remove('is-dragging');
     }
     function onWheel(event){
-      if(compact.matches && viewport.scrollHeight > viewport.clientHeight && !event.shiftKey && Math.abs(event.deltaY) > Math.abs(event.deltaX)) return;
+      if(viewport.scrollHeight > viewport.clientHeight + 1 && !event.shiftKey && Math.abs(event.deltaY) > Math.abs(event.deltaX)) return;
       var delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
       if(!delta) return;
       event.preventDefault(); moveTo(target - delta * .62, false);
@@ -132,8 +148,9 @@
       });
       viewport.removeEventListener('pointerdown', onPointerDown);
       viewport.removeEventListener('pointermove', onPointerMove);
-      viewport.removeEventListener('pointerup', stopDrag);
-      viewport.removeEventListener('pointercancel', stopDrag);
+      window.removeEventListener('pointerup', stopDrag);
+      window.removeEventListener('pointercancel', stopDrag);
+      viewport.removeEventListener('lostpointercapture', stopDrag);
       viewport.removeEventListener('wheel', onWheel);
       if(lightbox){
         lightbox.removeEventListener('click', onLightboxClick);
@@ -152,7 +169,8 @@
     }
     viewport.addEventListener('pointerdown', onPointerDown);
     viewport.addEventListener('pointermove', onPointerMove);
-    viewport.addEventListener('pointerup', stopDrag); viewport.addEventListener('pointercancel', stopDrag);
+    window.addEventListener('pointerup', stopDrag); window.addEventListener('pointercancel', stopDrag);
+    viewport.addEventListener('lostpointercapture', stopDrag);
     viewport.addEventListener('wheel', onWheel, {passive:false});
     if(lightbox){
       lightbox.addEventListener('click', onLightboxClick);

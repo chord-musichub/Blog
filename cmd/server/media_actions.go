@@ -56,6 +56,9 @@ func (app *App) renameMediaFile(w http.ResponseWriter, r *http.Request, media me
 		if err := os.Link(oldFile, newFile); err != nil {
 			return err
 		}
+		if err := app.copyMediaCategory(media, oldName, newName); err != nil {
+			return errors.Join(err, os.Remove(newFile))
+		}
 		if err := os.Remove(oldFile); err != nil {
 			return errors.Join(err, os.Remove(newFile))
 		}
@@ -315,12 +318,29 @@ func (app *App) saveCoverCrop(w http.ResponseWriter, r *http.Request, media medi
 		writeError(http.StatusBadRequest, "裁剪图过大或表单格式错误")
 		return
 	}
-	sourceName, err := isMediaPathOwnedBy(media.owner, strings.TrimSpace(r.FormValue("source")))
+	source := strings.TrimSpace(r.FormValue("source"))
+	// Creator forms upload site assets to admin, but can also reference the
+	// owner's personal media. Resolve only those authorized libraries from the
+	// source, rather than mistaking the form's upload destination for ownership.
+	if media.user.Username != "" {
+		for _, owner := range []string{mediaOwner(media.user.Username), siteMediaOwner} {
+			if owner == siteMediaOwner && !isOwner(media.user) && mediaOwner(media.user.Username) != siteMediaOwner {
+				continue
+			}
+			if _, err := isMediaPathOwnedBy(owner, source); err == nil {
+				media.owner, media.dir = owner, app.userMediaDir(owner)
+				break
+			}
+		}
+	}
+	sourceName, err := isMediaPathOwnedBy(media.owner, source)
 	if err != nil {
 		writeError(http.StatusForbidden, "只能裁剪自己媒体库中的图片")
 		return
 	}
-	if _, err := os.Stat(filepath.Join(media.dir, sourceName)); err != nil {
+	app.mediaMu.Lock()
+	defer app.mediaMu.Unlock()
+	if info, err := os.Lstat(filepath.Join(media.dir, sourceName)); err != nil || !info.Mode().IsRegular() {
 		writeError(http.StatusNotFound, "找不到用于裁剪的原图")
 		return
 	}
@@ -365,6 +385,11 @@ func (app *App) saveCoverCrop(w http.ResponseWriter, r *http.Request, media medi
 	if copyErr != nil || closeErr != nil || n > maxCropBytes {
 		_ = os.Remove(outputPath)
 		writeError(http.StatusBadRequest, "裁剪封面超过 16MB 或保存失败")
+		return
+	}
+	if err := app.copyMediaCategory(media, sourceName, name); err != nil {
+		_ = os.Remove(outputPath)
+		writeError(http.StatusInternalServerError, "无法保留原图分类，请重试")
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
