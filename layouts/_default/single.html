@@ -3,13 +3,16 @@
 {{ $cfg := .Site.Data.site }}
 {{ $cover := .Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png" }}
 {{ $coverMode := .Params.cover_mode | default "cover" }}
-<section class="page-hero article-cover-hero article-cover-actual-image cover-mode-{{ $coverMode }}" style="background-image:url('{{ $cover }}')" aria-label="文章封面">
-  <img class="article-cover-img" src="{{ $cover }}" alt="" loading="eager" decoding="async" fetchpriority="high">
-</section>
-<section class="card article-intro" style="padding:30px 34px;margin-top:-34px;position:relative;z-index:2">
-  {{ if .Params.is_notice }}<div class="notice-badge large">站点公告</div>{{ end }}
-<h1 style="font-size:42px;line-height:1.15;margin:0 0 12px">{{ .Title }}</h1>
-  <p style="color:var(--muted);margin:0 0 20px">{{ with .Params.summary }}{{ . }}{{ else }}{{ .Summary }}{{ end }}</p>
+<section class="card article-intro article-heading" aria-label="文章信息">
+  <figure class="article-heading__cover cover-mode-{{ $coverMode }}">
+    <img src="{{ $cover }}" alt="" width="320" height="200" loading="eager" decoding="async" fetchpriority="high">
+  </figure>
+  <div class="article-heading__main">
+  <div class="article-heading__title">
+    {{ if .Params.is_notice }}<span class="article-heading__eyebrow">站点公告</span>{{ end }}
+    <h1>{{ .Title }}</h1>
+  </div>
+  <p class="article-heading__summary">{{ with .Params.summary }}{{ . }}{{ else }}{{ .Summary | plainify }}{{ end }}</p>
   <div class="meta-row">
     <span class="meta-icon-item">{{ partial "ui-icon.html" "calendar" }} {{ .Date.Format "2006-01-02" }}</span>
     {{ $authorName := .Params.author_display | default .Params.author }}
@@ -25,12 +28,14 @@
     <span class="views real-views article-view-counter meta-icon-item" data-view-mode="post" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span>
   </div>
   <button class="article-intro-download" type="button" data-md-download aria-label="下载本文 Markdown 源文件">下载 .md</button>
+  </div>
 </section>
 
 <div class="article-shell section" data-toc-state="expanded">
   <article class="card article-reader markdown-body" data-article-renderer="songline-markdown" data-article-title="{{ .Title }}">
     {{ .Content }}
   </article>
+  <div class="article-toc-rail">
   <aside class="card article-toc" data-toc-toggle-card role="button" tabindex="0" aria-label="展开或收起目录" title="点击展开 / 收起目录">
     <div class="toc-head">
       <h3>{{ partial "ui-icon.html" "menu" }} 目录</h3>
@@ -39,6 +44,7 @@
       {{ .TableOfContents }}
     </div>
   </aside>
+  </div>
 </div>
 
 <script defer src="/js/article-hard-breaks.js?v={{ partial "asset-version.html" . }}"></script>

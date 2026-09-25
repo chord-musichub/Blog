@@ -16,6 +16,8 @@
 
 v22.15 合成兼容调整：只对整个星图工作区保留 `will-change:transform`，不再为每个头像或柔焦容器强制增加 3D 合成层、背面剔除。运动层使用布局/样式隔离，固定柔焦层使用独立绘制边界；不裁切运动层的边缘头像与光晕，不修改模糊半径、遮罩、阴影或缩放缓动。这是兼容性调整，不代表已经排除所有 GPU/驱动上的消失帧。
 
+文章按钮、链接、原生折叠标题与表单标签优先于电梯真实锚点及扩展感应带；禁用控件区域也不会意外触发换页。已经命中页面控件的原生点击不再由电梯坐标探测重新判定。`article-navigation-priority.browser.cjs` 覆盖两类重叠区域，并验证无控件遮挡时电梯仍可正常导航。
+
 ## 触屏布局边界
 
 `static/css/touch-layout.css` 是公开站紧凑布局的最终入口，位于页面样式末尾。宽度不超过 760px，或不超过 980px 的无悬浮触屏设备使用该布局；较宽桌面保留原构图。
@@ -33,6 +35,7 @@ v22.15 合成兼容调整：只对整个星图工作区保留 `will-change:trans
 ```powershell
 node tests/ui-layout.browser.cjs
 node tests/navigation-intent.browser.cjs
+node tests/article-navigation-priority.browser.cjs
 node tests/navigation-origin.browser.cjs
 node tests/galaxy-lens.browser.cjs
 node tests/galaxy-motion.browser.cjs
@@ -41,6 +44,7 @@ node tests/theme-layout.browser.cjs
 node tests/resource-readiness.browser.cjs
 node tests/visual-bugs.browser.cjs
 node tests/cover-cropper.browser.cjs
+node tests/reader-layout.browser.cjs
 node tests/memories-stack.browser.cjs
 ```
 
@@ -53,6 +57,10 @@ node tests/memories-stack.browser.cjs
 `visual-bugs.browser.cjs` 检查嵌套标题完整显示、延迟渲染后的手机目录、目录收起状态恢复，以及星图拖动/取消时的交互与柔焦一致性。开发时可设 `BLOG_TEST_SOURCE=1`，用源码中的 CSS/JS 覆盖预览服务器的旧资源；正式发布回归请去掉此选项。
 
 `cover-cropper.browser.cjs` 使用独立页面与合成图片验证裁剪滑块重绘、缩放中心、拖动取消和重新打开时的状态重置，不读取或修改真实媒体库。
+
+文章头部将封面、标题、摘要、作者和下载入口合为紧凑信息卡；桌面封面不超过 240 × 150px，手机采用 88px 缩略图，`cover_mode: contain` 仍保留完整显示。桌面目录在正文等高的右侧轨道内吸顶，距离视口顶部 96px；长目录仅滚动内容区，折叠入口保持可见，到正文末尾停止跟随。手机沿用浮动目录抽屉。
+
+`reader-layout.browser.cjs` 验证明暗主题、手机/平板/桌面/短屏、55 个标题的内部滚动、目录收起与锚点跳转，以及极宽/极高封面不撑大头部。测试拦截阅读计数请求；`BLOG_READER_BUILD=/path/to/public` 可指定隔离构建产物的文章 HTML，配合本地源码资源验证尚未部署的模板。
 
 ## 同日回忆与媒体分类
 

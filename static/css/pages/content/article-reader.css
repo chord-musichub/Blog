@@ -853,3 +853,54 @@ html body .article-toc .toc-tree li > a{
   overflow-wrap:anywhere;
   text-overflow:clip;
 }
+
+/* 阅读头部：缩略封面与文章资料合为一张轻量信息卡，不再铺满首屏。 */
+html body[data-page-section="posts"] .article-intro.article-heading{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) clamp(150px,20vw,240px);
+  align-items:start;
+  gap:24px;
+  margin:18px 0 0;
+  padding:26px!important;
+  position:relative;
+}
+.article-heading__cover{
+  grid-column:2;grid-row:1;
+  width:100%;aspect-ratio:8/5;margin:0;
+  border-radius:16px;overflow:hidden;
+  background:rgba(100,130,156,.12);
+}
+.article-heading__cover img{display:block;width:100%;height:100%;object-fit:cover}
+.article-heading__cover.cover-mode-contain img{object-fit:contain}
+.article-heading__main{grid-column:1;grid-row:1;min-width:0}
+.article-heading__eyebrow{display:block;margin-bottom:10px;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.16em}
+html body .article-intro.article-heading h1{margin:0;font-size:clamp(26px,2.6vw,36px)!important;line-height:1.3;overflow-wrap:anywhere}
+.article-heading__summary{margin:12px 0 16px;color:var(--muted);font-size:14px;line-height:1.75;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.article-heading .meta-row{display:flex;flex-wrap:wrap;gap:8px 12px;font-size:12px;line-height:1.6}
+.article-heading .article-intro-download{position:static;display:inline-flex;align-items:center;margin-top:16px;min-height:36px;font-size:12px}
+@media(max-width:600px){
+  html body[data-page-section="posts"] .article-intro.article-heading{grid-template-columns:minmax(0,1fr) 88px;gap:14px;padding:18px!important}
+  .article-heading__main{display:contents}
+  .article-heading__title{grid-column:1;grid-row:1;align-self:center;min-width:0}
+  .article-heading__cover{aspect-ratio:1;border-radius:12px}
+  html body .article-intro.article-heading h1{font-size:24px!important}
+  .article-heading__eyebrow{font-size:10px;margin-bottom:7px}
+  .article-heading__summary,.article-heading .meta-row,.article-heading .article-intro-download{grid-column:1/-1;margin:0}
+  .article-heading .article-intro-download{justify-self:start;min-height:40px}
+}
+
+/* 右侧轨道与正文等高，目录在轨道内吸顶，到正文末尾停止，不遮挡后续阅读。 */
+@media(min-width:981px){
+  html:has(.article-toc-rail),body:has(.article-toc-rail){overflow-x:clip}
+  body[data-page-section="posts"] main.container:has(.article-toc-rail){overflow:visible!important}
+  .article-toc-rail{position:absolute;top:18px;bottom:0;left:calc(100% + clamp(52px,4vw,68px));width:210px}
+  html body .article-toc-rail > .article-toc{
+    position:sticky!important;top:96px;left:auto;margin:0;
+    display:flex;flex-direction:column;
+    max-height:calc(100dvh - 120px);min-height:0;box-sizing:border-box;
+    overflow:hidden;
+  }
+  .article-toc-rail .toc-head{flex:0 0 auto}
+  .article-toc-rail .toc-body{min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:thin}
+}
+@media(max-width:980px){.article-toc-rail{display:none}}

@@ -39,7 +39,14 @@
       var yieldingLink = null;
       // 视觉暗幕不建立点击层。扩大的操作范围由 document 上的坐标判断实现，
       // 所以星图节点、卡片按钮等位于同一点时仍然会先收到原生指针事件。
-      var interactiveSelector = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[role="button"],[tabindex]:not([tabindex="-1"])';
+      // Disabled controls still occupy their interaction area: clicking one
+      // must not unexpectedly navigate. Native disclosure/label/media controls
+      // (also used inside articles) need the same priority as buttons and links.
+      var interactiveSelector = 'a[href],button,input,select,textarea,summary,label,audio[controls],video[controls],[role="button"],[tabindex]:not([tabindex="-1"])';
+      function pageControl(target){
+        var control = target && target.closest && target.closest(interactiveSelector);
+        return control && !control.closest('[data-elevator-nav], [data-site-map]') ? control : null;
+      }
       function isInside(rect, x, y){
         return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
       }
@@ -68,6 +75,8 @@
       var forwardingClick = false;
       var keyboardTarget = null;
       function navigationTarget(event){
+        // Trust the native control target before consulting the virtual strip.
+        if(pageControl(event.target)) return null;
         var actual = event.target.closest && event.target.closest('[data-elevator-nav] a[data-page-key], [data-site-map] a[data-page-key], [data-site-map-toggle]');
         if(actual) return actual;
         if(event.type === 'click' && event.detail === 0) return null;
@@ -120,7 +129,7 @@
         var target = document.elementFromPoint(x, y);
         nav.classList.remove('is-elevator-probing');
         if(!target || nav.contains(target) || !target.closest) return null;
-        return target.closest(interactiveSelector);
+        return pageControl(target);
       }
       function updateVirtualElevator(event){
         if(!event || !isDesktopElevator()){
@@ -148,6 +157,7 @@
       // 感应带本身没有元素，因此空白处点击由这里补上；有下层控件时绝不拦截。
       document.addEventListener('click', function(event){
         if(!isDesktopElevator() || event.defaultPrevented) return;
+        if(pageControl(event.target)) return;
         var link = virtualLinkAt(event.clientX, event.clientY);
         if(!link) return;
         var underlying = underlyingControlAt(event.clientX, event.clientY);
