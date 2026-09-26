@@ -29,11 +29,15 @@
       if(!nav || nav.dataset.elevatorReady === '1') return;
       nav.dataset.elevatorReady = '1';
       var desktopQuery = window.matchMedia ? window.matchMedia('(min-width: 981px)') : null;
+      var hoveredLink = null;
       function setHoveredLink(link){
-        elevatorLinks().forEach(function(item){ item.classList.toggle('is-elevator-hovered', item === link); });
+        if(hoveredLink === link) return;
+        if(hoveredLink) hoveredLink.classList.remove('is-elevator-hovered');
+        hoveredLink = link;
+        if(link) link.classList.add('is-elevator-hovered');
       }
       function clearHoveredLink(){
-        nav.classList.remove('is-elevator-hovering');
+        if(nav.classList.contains('is-elevator-hovering')) nav.classList.remove('is-elevator-hovering');
         setHoveredLink(null);
       }
       var yieldingLink = null;
@@ -51,23 +55,35 @@
         return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
       }
       function isDesktopElevator(){ return !desktopQuery || desktopQuery.matches; }
-      function virtualHitRect(link){
-        var rect = link.getBoundingClientRect();
+      var hitRegions = null;
+      var geometryFrame = 0;
+      function invalidateHitRegions(){ hitRegions = null; }
+      window.addEventListener('resize', invalidateHitRegions, {passive:true});
+      window.addEventListener('scroll', invalidateHitRegions, {capture:true,passive:true});
+      function readHitRegions(){
+        if(hitRegions) return hitRegions;
+        // Share geometry within one frame, not across animated layout changes.
+        if(!geometryFrame) geometryFrame = window.requestAnimationFrame(function(){ geometryFrame=0; invalidateHitRegions(); });
         var navRect = nav.getBoundingClientRect();
         // 直接读取 ::before 的实际右侧外延，避免视觉暗幕改宽后感应带仍停在旧尺寸。
         var veilRight = Math.abs(Number.parseFloat(window.getComputedStyle(nav, '::before').right) || 0);
         // 锚点本身只保留在楼层数字旁；此处是无形的扩展感应带。
-        return {
+        hitRegions = elevatorLinks().map(function(link){
+          var rect = link.getBoundingClientRect();
+          return {link:link, rect:{
           left:rect.left - 18,
           right:navRect.right + veilRight,
           // 相邻楼层间距很小，纵向仅补 2px，避免两个楼层的感应带重叠。
           top:rect.top - 2,
           bottom:rect.bottom + 2
-        };
+          }};
+        });
+        return hitRegions;
       }
       function virtualLinkAt(x, y){
         if(!isDesktopElevator()) return null;
-        return elevatorLinks().find(function(link){ return isInside(virtualHitRect(link), x, y); }) || null;
+        var region = readHitRegions().find(function(item){ return isInside(item.rect, x, y); });
+        return region ? region.link : null;
       }
       // Activation needs the same target at press and release. Distance alone misses
       // short drags crossing a virtual hit boundary; synthetic click has detail=0.
@@ -75,6 +91,7 @@
       var forwardingClick = false;
       var keyboardTarget = null;
       function navigationTarget(event){
+        invalidateHitRegions();
         // Trust the native control target before consulting the virtual strip.
         if(pageControl(event.target)) return null;
         var actual = event.target.closest && event.target.closest('[data-elevator-nav] a[data-page-key], [data-site-map] a[data-page-key], [data-site-map-toggle]');
@@ -158,6 +175,7 @@
       document.addEventListener('click', function(event){
         if(!isDesktopElevator() || event.defaultPrevented) return;
         if(pageControl(event.target)) return;
+        invalidateHitRegions();
         var link = virtualLinkAt(event.clientX, event.clientY);
         if(!link) return;
         var underlying = underlyingControlAt(event.clientX, event.clientY);
@@ -212,12 +230,17 @@
           if(mapToggle) mapToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
         }
         // 桌面端让缩略地图有一圈无形的感应范围：靠近就放大，但不占用下层控件的点击。
+        var mapRect = null;
+        function clearMapRect(){ mapRect = null; }
+        window.addEventListener('resize', clearMapRect, {passive:true});
+        window.addEventListener('scroll', clearMapRect, {capture:true,passive:true});
         function updateMapProximity(event){
           if(!window.matchMedia || !window.matchMedia('(min-width:981px)').matches) {
             siteMap.classList.remove('is-site-map-expanded');
             return;
           }
-          var rect = siteMap.getBoundingClientRect();
+          if(!mapRect){ mapRect = siteMap.getBoundingClientRect(); window.requestAnimationFrame(clearMapRect); }
+          var rect = mapRect;
           var reach = 28;
           var close = event.clientX >= rect.left - reach && event.clientX <= rect.right + reach && event.clientY >= rect.top - reach && event.clientY <= rect.bottom + reach;
           siteMap.classList.toggle('is-site-map-expanded', close);

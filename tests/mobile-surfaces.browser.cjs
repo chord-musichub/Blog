@@ -6,6 +6,7 @@ const assert=require('node:assert/strict');
 const out='local-only/mobile-surfaces';fs.mkdirSync(out,{recursive:true});
 const publicBase=process.env.BLOG_TEST_URL||'http://127.0.0.1:8080';
 const creatorBase=process.env.CREATOR_TEST_URL||'http://127.0.0.1:8091';
+const publicOnly=process.env.PUBLIC_ONLY==='1';
 const tools=fs.readdirSync('content/tools',{withFileTypes:true}).filter(d=>d.isDirectory()).map(d=>'/tools/'+d.name+'/');
 const publicPaths=['/','/posts/','/friends/','/friends/songline/','/friends/memories/','/tools/','/posts/c-note/','/tools/focus-timer/',...tools];
 const creatorPaths=['/write/','/write/articles/new','/write/account','/write/admin','/write/admin/media','/write/compose/projects','/write/compose/memories','/write/users/new','/write/admin/site','/write/admin/theme','/write/settings/manuscript'];
@@ -14,9 +15,10 @@ const creatorPaths=['/write/','/write/articles/new','/write/account','/write/adm
  try{
   for(const [width,height] of [[360,640],[844,390]]){
    const page=await browser.newPage({viewport:{width,height},hasTouch:true,isMobile:true});
+   await page.route('**/api/views?**',r=>r.fulfill({json:{views:83}}));
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.addInitScript(()=>localStorage.setItem('songline-theme','dark'));
-   for(const [base,paths] of [[publicBase,publicPaths],[creatorBase,creatorPaths]]){
+   for(const [base,paths] of (publicOnly?[[publicBase,publicPaths]]:[[publicBase,publicPaths],[creatorBase,creatorPaths]])){
     for(const path of paths){
      const response=await page.goto(base+path);await page.waitForTimeout(base===publicBase?1300:180);
      assert.equal(response.status(),200,path);
@@ -31,7 +33,7 @@ const creatorPaths=['/write/','/write/articles/new','/write/account','/write/adm
      console.log(`${metrics.clipped.length||metrics.scroll>width+2?'CHECK':'PASS'} ${width}x${height} ${path}`);
     }
    }
-   if(width===360){
+   if(!publicOnly && width===360){
     await page.goto(creatorBase+'/write/');
     await page.locator('.rail-toggle').tap();
     assert(await page.locator('.creator-rail-backdrop').isVisible());
@@ -39,10 +41,12 @@ const creatorPaths=['/write/','/write/articles/new','/write/account','/write/adm
     assert.equal(await page.locator('.rail-toggle').getAttribute('aria-expanded'),'false');
     assert(await page.locator('.creator-rail').evaluate(e=>e.inert));
    }
-   await page.goto(creatorBase+'/write/account');
-   await page.locator('[data-admin-theme-toggle]').tap();
-   assert.equal(await page.locator('html').getAttribute('data-admin-theme'),'light');
-   await page.screenshot({path:`${out}/${width}x${height}-account-light.png`,fullPage:true});
+   if(!publicOnly){
+    await page.goto(creatorBase+'/write/account');
+    await page.locator('[data-admin-theme-toggle]').tap();
+    assert.equal(await page.locator('html').getAttribute('data-admin-theme'),'light');
+    await page.screenshot({path:`${out}/${width}x${height}-account-light.png`,fullPage:true});
+   }
    assert.deepEqual(errors,[]);await page.close();
   }
  }finally{await browser.close();}

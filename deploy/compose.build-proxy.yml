@@ -1,0 +1,9 @@
+# Optional Linux-only build overlay for a proxy listening on host loopback.
+# Does not change runtime networking or persist proxy settings in the image.
+services:
+  blog-admin:
+    build:
+      network: host
+      args:
+        HTTP_PROXY: "${BLOG_BUILD_PROXY:?Set BLOG_BUILD_PROXY to your local HTTP proxy URL}"
+        HTTPS_PROXY: "${BLOG_BUILD_PROXY:?Set BLOG_BUILD_PROXY to your local HTTP proxy URL}"

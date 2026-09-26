@@ -389,8 +389,11 @@
 
     function safeImage(image, source){
       if(!image) return;
+      // Cached HTML without preview URLs must not download every avatar twice
+      // when newer JavaScript is served during a rolling update.
+      if(shell.dataset.mediaPreview === '640' && /^\/uploads\/[^?#]+\.(jpe?g|png)$/i.test(source)) source += '?preview=640';
       image.onerror = function(){ if(image.src.indexOf('/uploads/admin/friends/user-null.png') < 0) image.src = '/uploads/admin/friends/user-null.png'; };
-      image.src = source;
+      if(image.getAttribute('src') !== source) image.src = source;
     }
     function setProfile(friend){
       if(!friend) return;

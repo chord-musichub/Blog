@@ -1,0 +1,12 @@
+{{- /* Only local raster media is opted in. Old servers safely serve originals. */ -}}
+{{- $source := . -}}
+{{- $size := 640 -}}
+{{- if reflect.IsMap . -}}
+  {{- $source = .url -}}
+  {{- $size = .size | default 640 -}}
+{{- end -}}
+{{- $url := printf "%s" $source -}}
+{{- if findRE `^/uploads/[^?#]+\.(?i:jpe?g|png)$` $url -}}
+  {{- $url = printf "%s?preview=%d" $url $size -}}
+{{- end -}}
+{{- return $url -}}

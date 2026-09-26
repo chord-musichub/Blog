@@ -16,6 +16,27 @@ docker compose up --build -d
 
 脚本会创建未纳入 Git 的 `.env` 和运行目录，并显示一次随机生成的管理员密码。请把密码保存到密码管理器。
 
+## Linux 本机构建代理
+
+拉取基础镜像与 Dockerfile 内下载依赖是两条网络链路：Docker 服务的代理负责前者，不会自动配置后者。如果 `FROM` 报 `proxyconnect ... 127.0.0.1:7897 ... connection refused`，应先启动该端口对应的代理。如果已能拉镜像，但 `go mod download` / `go build` 访问 `proxy.golang.org` 超时，则可使用以下可选配置：
+
+```sh
+# 保持本机 HTTP / mixed 代理开启；端口按实际配置修改。
+BLOG_BUILD_PROXY=http://127.0.0.1:7897 docker compose \
+  -f docker-compose.yml -f deploy/compose.build-proxy.yml build blog-admin
+
+# 仅在构建成功且准备更新网站时执行；不再次构建。
+docker compose up -d --no-build
+```
+
+上述 overlay 仅适用于本机 Linux Docker Engine：构建步骤使用宿主机网络，使容器内的构建进程能访问宿主机回环代理；仅将代理作为 Docker 预定义构建参数传入，不改变网站容器网络，不将代理写入运行时环境。不要在 Dockerfile 内使用 `ENV HTTP_PROXY`，也不要关闭 Go 校验和或 TLS 校验。Docker Desktop / 远程构建器的宿主机地址不同，不应直接照搬此 overlay。
+
+默认 `docker compose build` 仍使用普通构建网络，适用于能直连依赖服务的环境。Dockerfile 单独缓存 `go.mod` / `go.sum` 的依赖下载层，修改业务代码时可以复用，不必每次重新下载。
+
+参考：[Docker 构建代理参数](https://docs.docker.com/build/building/variables/#proxy-arguments)、[Docker 服务代理](https://docs.docker.com/engine/daemon/proxy/)。
+
+## 账号与站点配置
+
 `ADMIN_PASS` 是该管理员账号的唯一配置来源：每次服务启动时，程序都会将 `data/auth/users.json` 中对应管理员的密码哈希同步为 `.env` 里的值。因此，修改 `.env` 后重启服务即可修改管理员密码；不要再从后台修改该管理员的密码。其他用户仍完全由 `data/auth/users.json` 和后台用户管理处理。
 
 `PUBLIC_SITE_URL` 是公开站完整 URL（例如 `https://blog.example.com`），`PUBLIC_API_URL` 是后台/API 完整 URL（例如 `https://write.example.com`）。它们用于 Hugo 生成链接、后台 CSP 和公开工具页的成绩接口；修改后重启服务会重建公开站。`PUBLIC_CORS_ORIGINS` 是允许调用成绩接口的网页来源，多个地址用英文逗号分隔；通常填写与 `PUBLIC_SITE_URL` 相同的地址。

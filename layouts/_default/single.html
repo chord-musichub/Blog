@@ -5,7 +5,7 @@
 {{ $coverMode := .Params.cover_mode | default "cover" }}
 <section class="card article-intro article-heading" aria-label="文章信息">
   <figure class="article-heading__cover cover-mode-{{ $coverMode }}">
-    <img src="{{ $cover }}" alt="" width="320" height="200" loading="eager" decoding="async" fetchpriority="high">
+    <img src="{{ partial "media-preview-url.html" $cover }}" alt="" width="320" height="200" loading="eager" decoding="async" fetchpriority="high">
   </figure>
   <div class="article-heading__main">
   <div class="article-heading__title">

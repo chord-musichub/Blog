@@ -853,6 +853,12 @@ html body .article-toc .toc-tree li > a{
   overflow-wrap:anywhere;
   text-overflow:clip;
 }
+/* Narrow desktop rails need space for all six heading levels. Keep the same
+   tree and connector styling, with a smaller branch step only in this range. */
+@media(min-width:981px) and (max-width:1200px){
+  .article-toc .toc-tree li > ul{margin-left:5px;padding-left:7px}
+  .article-toc .toc-tree li > ul > li:last-child::after{left:-8px}
+}
 
 /* 阅读头部：缩略封面与文章资料合为一张轻量信息卡，不再铺满首屏。 */
 html body[data-page-section="posts"] .article-intro.article-heading{

@@ -301,13 +301,16 @@
     }
 
     async function playCurrent(){
+      if(disposed) return;
       if(current < 0){ if(fileInput) fileInput.click(); return; }
       try{
         var fadeIn = !isMuted && !document.hidden;
         audio.volume = isMuted ? 0 : fadeIn ? .02 : preferredVolume;
         createBars();
         if(ensureAnalyser() && audioContext && audioContext.state === 'suspended') await audioContext.resume();
+        if(disposed) return;
         await audio.play();
+        if(disposed){ audio.pause(); return; }
         if(fadeIn && !audio.paused) await fadeAudioVolume(preferredVolume, 230);
         setStatus((tracks[current].source || '本地音乐') + ' · 正在播放');
       }catch(e){ setStatus('浏览器需要再次点击播放'); }
@@ -345,7 +348,7 @@
     }
 
     function loadTrack(index, autoplay){
-      if(!tracks.length) return;
+      if(disposed || !tracks.length) return;
       current = (index + tracks.length) % tracks.length;
       saveLastIndex(current);
       revokeActiveUrl();
@@ -364,6 +367,7 @@
     }
 
     function setTracks(files, source, preferredIndex){
+      if(disposed) return;
       stopPlaybackImmediately();
       revokeActiveUrl();
       tracks = Array.prototype.slice.call(files || []).filter(isAudio).sort(function(a, b){
@@ -499,12 +503,14 @@
     audio.addEventListener('pause', function(){ updateControls(); stopSpectrum(); });
     audio.addEventListener('ended', function(){ if(tracks.length) loadTrack(current + 1, true); });
     audio.addEventListener('error', function(){ if(current >= 0) setStatus('该音频暂时无法播放'); });
-    document.addEventListener('visibilitychange', function(){
+    function onVisibilityChange(){
+      if(disposed) return;
       if(!document.hidden) return;
       cancelVolumeFade();
       if(audio.paused) audio.volume = preferredVolume;
       else audio.volume = isMuted ? 0 : preferredVolume;
-    });
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange);
     document.addEventListener('pointerdown', closePlaylistOnOutside);
     host.addEventListener('dragenter', function(event){ if(hasFilePayload(event)){ event.preventDefault(); host.classList.add('is-drop-target'); } });
     host.addEventListener('dragover', function(event){ if(hasFilePayload(event)) event.preventDefault(); });
@@ -525,13 +531,20 @@
     restoreDirectory();
     window.__songlineHomeMusicPlayer = {
       destroy:function(){
+        if(disposed) return;
         disposed = true;
         destroySpectrum();
         cancelVolumeFade();
         document.removeEventListener('pointerdown', closePlaylistOnOutside);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
         if(volumeControl) volumeControl.removeEventListener('pointerleave', closeVolumeControl);
         try{ audio.pause(); }catch(e){}
         revokeActiveUrl();
+        audio.removeAttribute('src');
+        audio.load();
+        tracks = [];
+        current = -1;
+        metadataToken++;
         if(window.__songlineHomeMusicPlayer === this) window.__songlineHomeMusicPlayer = null;
       }
     };

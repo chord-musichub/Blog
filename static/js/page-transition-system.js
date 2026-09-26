@@ -175,25 +175,43 @@
   }
 
   function syncPageStyles(doc){
-    var nextStyles = Object.create(null);
+    var nextStyles = Array.from(doc.head.querySelectorAll('link[rel="stylesheet"]'));
     var pendingStyles = [];
-    doc.querySelectorAll('link[rel="stylesheet"][id^="songline-"]').forEach(function(next){
-      nextStyles[next.id] = next;
+    var currentStyles = Array.from(document.head.querySelectorAll('link[rel="stylesheet"]'));
+    var currentByKey = new Map();
+    function styleKey(link){
+      if(link.id) return '#' + link.id;
+      var url = new URL(link.getAttribute('href'), window.location.href);
+      return url.origin + url.pathname;
+    }
+    currentStyles.forEach(function(current){ currentByKey.set(styleKey(current), current); });
+    var nextKeys = new Set(nextStyles.map(styleKey));
+    // Keep the SAME cascade order as a direct visit, including the shared
+    // unnumbered styles. Appending a page stylesheet after touch/theme patches
+    // changes its priority and makes repeated navigation visually inconsistent.
+    var anchor = document.createComment('page stylesheet order');
+    document.head.insertBefore(anchor, currentStyles[0] || null);
+    currentStyles.forEach(function(current){
+      var url = new URL(current.getAttribute('href'), window.location.href);
+      var owned = current.id.indexOf('songline-') === 0 || (url.origin === window.location.origin && url.pathname.indexOf('/css/') === 0);
+      if(owned && !nextKeys.has(styleKey(current))) current.remove();
     });
-
-    // 页面专属样式必须随过场一起离开。此前这里只追加不移除，朋友页、档案页
-    // 和工具页会把旧 CSS 带到下一页，缩放后就会出现历史布局互相覆盖的情况。
-    document.querySelectorAll('link[rel="stylesheet"][id^="songline-"]').forEach(function(current){
-      if(!nextStyles[current.id]) current.remove();
+    nextStyles.forEach(function(next){
+      var current = currentByKey.get(styleKey(next));
+      // A newly built asset version must not reuse an old stylesheet by id.
+      if(!current || current.getAttribute('href') !== next.getAttribute('href') || current.media !== next.media){
+        var clone = next.cloneNode(true);
+        clone.dataset.songlineTransitionStyle = 'true';
+        if(current) current.remove();
+        current = clone;
+        pendingStyles.push(current);
+      }
+      // Move only links that are out of order. Removing/reinserting every
+      // shared link would reprocess CSS unnecessarily on each navigation.
+      if(current !== anchor.nextSibling) document.head.insertBefore(current, anchor.nextSibling);
+      document.head.insertBefore(anchor, current.nextSibling);
     });
-
-    Object.keys(nextStyles).forEach(function(id){
-      if(document.getElementById(id)) return;
-      var clone = nextStyles[id].cloneNode(true);
-      clone.dataset.songlineTransitionStyle = 'true';
-      document.head.appendChild(clone);
-      pendingStyles.push(clone);
-    });
+    anchor.remove();
 
     // 页面专属 CSS 是下一页场景的一部分。等它们至少完成加载（或明确失败）
     // 后再揭幕，避免工具土层、星图等在入场后才补上一帧。
@@ -300,6 +318,7 @@
     var direction = priority.getTransitionDirection(fromPath, url.pathname);
     var startedAt = Date.now();
     var loaderTimer = 0;
+    var doc = null;
     var controller = new AbortController();
     var requestTimer = setTimeout(function(){ controller.abort(); }, 15000);
     var request = fetch(url.href, {
@@ -320,7 +339,7 @@
       var response = await request;
       if(!response.ok) throw new Error('request failed: ' + response.status);
       var html = await response.text();
-      var doc = new DOMParser().parseFromString(html, 'text/html');
+      doc = new DOMParser().parseFromString(html, 'text/html');
       var nextMain = doc.querySelector('main.container');
       if(!nextMain) throw new Error('next page main container missing');
 
@@ -357,6 +376,26 @@
       console.warn('[page-transition] document fallback', error);
       window.location.assign(url.href);
     }finally{
+      // These are unused media copies in the parsed response, not the live
+      // player inserted into main. Native RemotePlayback activity can retain
+      // their entire temporary document after every visit to the home page.
+      if(doc) doc.querySelectorAll('audio,video').forEach(function(media){
+        try{
+          media.remove();
+          media.pause();
+          media.removeAttribute('src');
+          media.querySelectorAll('source').forEach(function(source){ source.remove(); });
+          // Detach the unused element from the inert document's execution
+          // context as well; clearing src alone does not release that context.
+          document.adoptNode(media);
+          media.load();
+          // The API rejects cancellation once disableRemotePlayback is set.
+          // Cancel first, then disable only this discarded copy.
+          if(!media.disableRemotePlayback && media.remote && media.remote.cancelWatchAvailability){
+            media.remote.cancelWatchAvailability().catch(function(){}).then(function(){ media.disableRemotePlayback = true; });
+          }else media.disableRemotePlayback = true;
+        }catch(error){}
+      });
       clearTimeout(requestTimer);
       clearTimeout(loaderTimer);
       if(!locked) return;

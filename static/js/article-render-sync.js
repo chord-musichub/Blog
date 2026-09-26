@@ -6,10 +6,11 @@
   // 站内过场会动态重新插入 defer 脚本；外链脚本的完成顺序不能假定。
   // 若渲染器晚到，等它发出就绪信号后再执行本初始化，而不是留下 Hugo 的原始正文。
   if(!window.SonglineMarkdown){
+    const syncScriptURL = (document.currentScript && document.currentScript.src) || '/js/article-render-sync.js';
     window.addEventListener('songline:markdown-ready', function(){
       if(reader.dataset.songlineRenderSyncBound === '1' || !reader.isConnected) return;
       const retry = document.createElement('script');
-      retry.src = '/js/article-render-sync.js';
+      retry.src = syncScriptURL;
       retry.async = false;
       document.body.appendChild(retry);
     }, {once:true});
@@ -107,13 +108,19 @@
   async function getMarkdown(){
     const sourceURL = sourceElement.dataset.sourceUrl || '';
     if(sourceURL){
+      const controller = new AbortController();
+      let timer;
       try{
-        const response = await fetch(sourceURL, {credentials:'same-origin', cache:'no-store'});
-        if(response.ok){
-          const text = await response.text();
-          if(text && isMarkdownSource(text)) return text;
-        }
-      }catch(error){}
+        // Bound both headers AND body so a stalled source cannot prevent the
+        // embedded article and directory from becoming ready indefinitely.
+        const timeout = new Promise(function(resolve){
+          timer = window.setTimeout(function(){ controller.abort(); resolve(''); }, 2500);
+        });
+        const download = fetch(sourceURL, {credentials:'same-origin', cache:'no-cache', signal:controller.signal})
+          .then(function(response){ return response.ok ? response.text() : ''; });
+        const text = await Promise.race([download, timeout]);
+        if(text && isMarkdownSource(text)) return text;
+      }catch(error){}finally{ window.clearTimeout(timer); }
     }
     return readInlineMarkdown();
   }

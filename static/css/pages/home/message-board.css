@@ -15,7 +15,9 @@
 .songline-home-message-board{
   position:absolute; inset:0; z-index:6; display:grid; grid-template-rows:auto minmax(0,1fr) auto;
   min-height:0; padding:clamp(18px,2vw,28px) clamp(18px,2.2vw,32px) clamp(15px,1.7vw,23px);
-  color:#302016; text-shadow:none; opacity:0; pointer-events:none; transform:translate3d(12%,0,0);
+  /* Bound the hidden panel's entrance offset so wide desktop terminals do
+     not create a horizontal scrollbar. Open-panel geometry is unchanged. */
+  color:#302016; text-shadow:none; opacity:0; pointer-events:none; transform:translate3d(min(12%,24px),0,0);
   background:
     repeating-linear-gradient(3deg,rgba(83,40,18,.055) 0 1px,transparent 1px 7px),
     linear-gradient(118deg,#ecd5ae 0%,#fff0cd 43%,#d9ab77 100%);

@@ -78,6 +78,9 @@ func (app *App) handlePublicMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+	if app.serveMediaPreview(w, r, file, info, name) {
+		return
+	}
 	w.Header().Set("Cache-Control", "public, no-cache")
 	http.ServeContent(w, r, info.Name(), info.ModTime(), file)
 }

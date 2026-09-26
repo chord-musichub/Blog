@@ -87,14 +87,13 @@
   }
 
   function updateVisibility(topButton, bottomButton){
+    if(!topButton && !bottomButton) return;
     const y = window.scrollY || document.documentElement.scrollTop || 0;
     const maxY = Math.max(0, Math.max(document.body.scrollHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight) - window.innerHeight);
     if(topButton){
-      cleanInline(topButton);
       topButton.classList.toggle('show', y > 360);
     }
     if(bottomButton){
-      cleanInline(bottomButton);
       bottomButton.classList.toggle('show', maxY - y > 360);
     }
   }
@@ -123,19 +122,34 @@
     updateVisibility(topButton, bottomButton);
   }
 
+  let normalizeTimers = [];
+  function clearNormalizeTimers(){ normalizeTimers.forEach(window.clearTimeout); normalizeTimers = []; }
   function scheduleNormalizeFloatReadingButtons(){
+    clearNormalizeTimers();
     normalizeFloatReadingButtons();
-    window.setTimeout(normalizeFloatReadingButtons, 80);
-    window.setTimeout(normalizeFloatReadingButtons, 260);
+    normalizeTimers = [window.setTimeout(normalizeFloatReadingButtons, 80), window.setTimeout(normalizeFloatReadingButtons, 260)];
   }
   window.SonglineNormalizeFloatReadingButtons = scheduleNormalizeFloatReadingButtons;
 
+  let visibilityFrame = 0;
   window.addEventListener('scroll', function(){
-    updateVisibility(
-      document.querySelector('.back-to-top-button.songline-reading-float-button'),
-      document.querySelector('.scroll-to-bottom-button.songline-reading-float-button')
-    );
+    if(visibilityFrame) return;
+    visibilityFrame = window.requestAnimationFrame(function(){
+      visibilityFrame = 0;
+      updateVisibility(
+        document.querySelector('.back-to-top-button.songline-reading-float-button'),
+        document.querySelector('.scroll-to-bottom-button.songline-reading-float-button')
+      );
+    });
   }, {passive:true});
   window.addEventListener('resize', normalizeFloatReadingButtons);
   window.addEventListener('orientationchange', normalizeFloatReadingButtons);
+  window.addEventListener('songline:page-transition-start', function(){
+    clearNormalizeTimers();
+    removePortaledButtons();
+    document.documentElement.classList.remove('has-reading-float-tools', 'has-mobile-reading-tools');
+  });
+  // Non-reader pages do not run this module's initializer. Still clean up its
+  // body-level controls on every swap, and portal fresh article buttons once.
+  window.addEventListener('songline:page-swap', normalizeFloatReadingButtons);
 })();

@@ -25,14 +25,14 @@
 
     <div class="songline-terminal-main">
       <section class="songline-terminal-feature" aria-label="精选文章" data-home-recommendations>
-        {{ $pool := slice }}{{ range $recommendable }}{{ $pool = $pool | append (dict "url" .RelPermalink "title" .Title "cover" (.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png") "date" (.Date.Format "2006-01-02") "displayDate" (.Date.Format "2006.01.02")) }}{{ end }}
+        {{ $pool := slice }}{{ range $recommendable }}{{ $pool = $pool | append (dict "url" .RelPermalink "title" .Title "cover" (partial "media-preview-url.html" (.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png")) "date" (.Date.Format "2006-01-02") "displayDate" (.Date.Format "2006.01.02")) }}{{ end }}
         <script type="application/json" data-home-recommendation-pool>{{ $pool | jsonify | safeJS }}</script>
         <div class="songline-terminal-heading"><span>推荐文章</span><i></i></div>
         <div class="songline-terminal-feature-stage">
           {{ range $index, $post := $featuredPosts }}
             {{ $cover := $post.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png" }}
             <a class="songline-terminal-feature-card{{ if eq $index 0 }} is-active{{ end }}" href="{{ $post.RelPermalink }}" data-home-recommendation-card aria-hidden="{{ if eq $index 0 }}false{{ else }}true{{ end }}"{{ if ne $index 0 }} tabindex="-1"{{ end }}>
-              <img src="{{ $cover }}" alt="" loading="{{ if eq $index 0 }}eager{{ else }}lazy{{ end }}" fetchpriority="{{ if eq $index 0 }}high{{ else }}low{{ end }}" decoding="async" onerror="this.onerror=null;this.src='/uploads/admin/article/article_default.png';">
+              <img src="{{ partial "media-preview-url.html" $cover }}" alt="" loading="{{ if eq $index 0 }}eager{{ else }}lazy{{ end }}" fetchpriority="{{ if eq $index 0 }}high{{ else }}low{{ end }}" decoding="async" onerror="this.onerror=null;this.src='/uploads/admin/article/article_default.png';">
               <span class="songline-terminal-feature-wash" aria-hidden="true"></span>
               <span class="songline-terminal-feature-copy">
                 <time datetime="{{ $post.Date.Format "2006-01-02" }}">{{ $post.Date.Format "2006.01.02" }}</time>
