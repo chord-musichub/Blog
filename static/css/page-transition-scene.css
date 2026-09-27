@@ -21,10 +21,10 @@ html.songline-page-transitioning .page-loading-orb{
   align-items:center;
   justify-content:center;
   pointer-events:none;
-  top:-12svh;
+  top:-12lvh;
   left:-2vw;
   width:104vw;
-  height:124svh;
+  height:124lvh;
   overflow:hidden;
   visibility:hidden;
   opacity:1;
@@ -42,25 +42,25 @@ html.songline-page-transitioning .page-loading-orb{
   pointer-events:auto;
 }
 .songline-page-transition-overlay.is-forward:not(.is-covering):not(.is-leaving){
-  transform:translate3d(0,112svh,0);
+  transform:translate3d(0,112lvh,0);
 }
 .songline-page-transition-overlay.is-forward.is-covering{
   transform:translate3d(0,0,0);
   transition:transform .42s cubic-bezier(.16,.82,.22,1);
 }
 .songline-page-transition-overlay.is-forward.is-leaving{
-  transform:translate3d(0,-112svh,0);
+  transform:translate3d(0,-112lvh,0);
   transition:transform .42s cubic-bezier(.54,0,.86,.42);
 }
 .songline-page-transition-overlay.is-backward:not(.is-covering):not(.is-leaving){
-  transform:translate3d(0,-112svh,0);
+  transform:translate3d(0,-112lvh,0);
 }
 .songline-page-transition-overlay.is-backward.is-covering{
   transform:translate3d(0,0,0);
   transition:transform .42s cubic-bezier(.16,.82,.22,1);
 }
 .songline-page-transition-overlay.is-backward.is-leaving{
-  transform:translate3d(0,112svh,0);
+  transform:translate3d(0,112lvh,0);
   transition:transform .42s cubic-bezier(.54,0,.86,.42);
 }
 .songline-page-transition-overlay.is-right:not(.is-covering):not(.is-leaving){transform:translate3d(112vw,0,0)}
@@ -185,7 +185,7 @@ main.container.songline-page-enter-active{
     top:0;
     left:0;
     width:100vw;
-    height:100svh;
+    height:100lvh;
     opacity:0;
     transform:none!important;
     transition:opacity .14s ease!important;

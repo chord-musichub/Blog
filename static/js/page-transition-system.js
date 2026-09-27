@@ -153,20 +153,29 @@
 
   function saveCurrentHistoryState(){
     var current = history.state || {};
-    history.replaceState({
+    history.replaceState(Object.assign({}, current, {
       songlineTransition:true,
       path:activePath,
       priority:priority.getPagePriority(activePath),
       scrollY:window.scrollY || window.pageYOffset || 0,
       previous:current.songlineTransition ? undefined : current
-    }, '', window.location.href);
+    }), '', window.location.href);
   }
 
   function seedHistoryState(){
     var current = history.state || {};
     if(current.songlineTransition) return;
+    // Only at a new document's first initialization is referrer useful. Never
+    // consult it after AJAX swaps, and never send a fresh tab to another site.
+    var localArrival = false;
+    try{
+      var arrival = performance.getEntriesByType('navigation')[0];
+      localArrival = history.length > 1 && arrival && arrival.type === 'navigate' &&
+        new URL(document.referrer).origin === window.location.origin;
+    }catch(error){}
     history.replaceState({
       songlineTransition:true,
+      songlineCanGoBack:!!localArrival,
       path:activePath,
       priority:priority.getPagePriority(activePath),
       scrollY:window.scrollY || 0,
@@ -247,6 +256,10 @@
       ['pageKind', 'pageSection', 'pageLayout', 'bootWelcome'].forEach(function(name){
         if(nextBody.dataset && nextBody.dataset[name]) document.body.dataset[name] = nextBody.dataset[name];
         else delete document.body.dataset[name];
+        if(name !== 'bootWelcome'){
+          if(nextBody.dataset && nextBody.dataset[name]) root.dataset[name] = nextBody.dataset[name];
+          else delete root.dataset[name];
+        }
       });
     }
     var nextDescription = doc.querySelector('meta[name="description"]');
@@ -273,6 +286,7 @@
     if(pushState){
       history.pushState({
         songlineTransition:true,
+        songlineCanGoBack:true,
         path:url.pathname,
         priority:priority.getPagePriority(url.pathname),
         scrollY:0
@@ -410,9 +424,41 @@
     }
   }
 
+  function previousPageDelta(){
+    // Navigation API entries describe this tab's real history, unlike referrer
+    // (which stays stale during AJAX navigation) or history.length alone.
+    try{
+      var api = window.navigation;
+      if(api && api.currentEntry && typeof api.entries === 'function'){
+        var entries = api.entries();
+        var current = entries.findIndex(function(entry){ return entry.key === api.currentEntry.key; });
+        for(var i = current - 1; i >= 0; i--){
+          var url = new URL(entries[i].url);
+          if(url.origin !== window.location.origin) return 0;
+          if(url.pathname !== window.location.pathname || url.search !== window.location.search) return i - current;
+        }
+        if(current >= 0) return 0;
+      }
+    }catch(error){}
+    // Older browsers: only traverse an entry we ourselves pushed from a
+    // same-origin page. A fresh tab / external arrival keeps the HTML fallback.
+    return history.state && history.state.songlineCanGoBack ? -1 : 0;
+  }
+
   function handleClick(event){
-    if(event.defaultPrevented || locked || !isPlainLeftClick(event)) return;
+    if(event.defaultPrevented || !isPlainLeftClick(event)) return;
     var link = event.target && event.target.closest ? event.target.closest('a[href]') : null;
+    if(link && link.hasAttribute('data-back-icon') && (!link.target || link.target === '_self') && !link.hasAttribute('download')){
+      if(locked){ event.preventDefault(); event.stopImmediatePropagation(); return; }
+      var delta = previousPageDelta();
+      if(delta){
+        event.preventDefault(); event.stopImmediatePropagation();
+        saveCurrentHistoryState();
+        history.go(delta);
+        return;
+      }
+    }
+    if(locked) return;
     if(!shouldHandleLink(link)) return;
     var url;
     try{ url = new URL(link.href, window.location.href); }catch(e){ return; }

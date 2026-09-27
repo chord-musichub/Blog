@@ -162,7 +162,8 @@
       if(hash.length <= 1 || !window.SonglineScrollToArticleHeading(hash, false)) return;
       event.preventDefault();
       event.stopPropagation();
-      try{ history.pushState(null, '', window.location.pathname + window.location.search + hash); }catch(error){}
+      // Directory jumps are positions within this article, not a new page.
+      try{ history.replaceState(history.state, '', window.location.pathname + window.location.search + hash); }catch(error){}
     }, true);
   }
 

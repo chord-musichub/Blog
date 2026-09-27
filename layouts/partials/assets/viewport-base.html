@@ -1,0 +1,14 @@
+{{/* 在任何阻塞脚本/外部样式之前绘制场景底色；切页时 root 的场景属性同步更新。 */}}
+<style id="songline-viewport-base">
+@media(max-width:980px){
+  html{--mobile-scene-base:#0d1728;min-height:100%;background:var(--mobile-scene-base)!important}
+  html[data-theme="light"]{--mobile-scene-base:#fbfaf7}
+  html[data-page-kind="home"]{--mobile-scene-base:#060d1e}
+  html[data-page-kind="home"][data-theme="light"]{--mobile-scene-base:#f3c3ad}
+  html[data-page-section="posts"]{--mobile-scene-base:#071126}
+  html[data-page-section="posts"][data-theme="light"]{--mobile-scene-base:#d8ebf4}
+  html[data-page-section="friends"]{--mobile-scene-base:#071426}
+  html[data-page-section="tools"]{--mobile-scene-base:#130906}
+  html[data-page-section="tools"][data-theme="light"]{--mobile-scene-base:#251208}
+}
+</style>

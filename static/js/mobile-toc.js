@@ -235,7 +235,7 @@
             if(!target.isConnected) return;
             if(window.SonglineScrollToArticleHeading) window.SonglineScrollToArticleHeading(href, false);
             else target.scrollIntoView({behavior:'smooth', block:'start'});
-            history.replaceState(null, '', href);
+            history.replaceState(history.state, '', href);
           }, 80);
         }else{
           closeDrawer();

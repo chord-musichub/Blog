@@ -134,6 +134,10 @@
       if(!delta) return;
       event.preventDefault(); moveTo(target - delta * .62, false);
     }
+    function onLostPointerCapture(event){
+      // Ignore the photo's implicit-capture loss when the viewport takes over.
+      if(event.target === viewport) stopDrag(event);
+    }
     function onLightboxClick(event){ if(event.target === lightbox) close(); }
     function onKeyDown(event){ if(event.key === 'Escape') close(); }
     function onResize(){ measure(); moveTo(target, true); }
@@ -150,7 +154,7 @@
       viewport.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', stopDrag);
       window.removeEventListener('pointercancel', stopDrag);
-      viewport.removeEventListener('lostpointercapture', stopDrag);
+      viewport.removeEventListener('lostpointercapture', onLostPointerCapture);
       viewport.removeEventListener('wheel', onWheel);
       if(lightbox){
         lightbox.removeEventListener('click', onLightboxClick);
@@ -170,7 +174,7 @@
     viewport.addEventListener('pointerdown', onPointerDown);
     viewport.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', stopDrag); window.addEventListener('pointercancel', stopDrag);
-    viewport.addEventListener('lostpointercapture', stopDrag);
+    viewport.addEventListener('lostpointercapture', onLostPointerCapture);
     viewport.addEventListener('wheel', onWheel, {passive:false});
     if(lightbox){
       lightbox.addEventListener('click', onLightboxClick);

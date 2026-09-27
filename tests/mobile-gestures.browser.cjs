@@ -27,7 +27,8 @@ async function fits(page,label){
  const browser=await chromium.launch({headless:true,channel:'msedge'});
  try{
   for(const [width,height] of (process.env.MOBILE_SIZES||'360x640,390x844,820x720').split(',').map(size=>size.split('x').map(Number))){
-   const page=await browser.newPage({viewport:{width,height},isMobile:true,hasTouch:true});
+   const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true});
+   const page=await context.newPage();
    const errors=[];page.on('pageerror',error=>errors.push(error.message));
    if(process.env.UI_SOURCE_CSS) await page.route('**/css/**',route=>{
     const path='static'+new URL(route.request().url()).pathname;
@@ -125,7 +126,7 @@ async function fits(page,label){
    await page.screenshot({path:`${out}/${width}-login.png`,fullPage:true});
    assert.deepEqual(errors,[],'no runtime JS errors');
    console.log(`PASS ${width}x${height}: native scrolling, message flow, archive chaining, avatar/photo drag, zoom, stacked memories, login`);
-   await page.close();
+   await context.close();
   }
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1)});

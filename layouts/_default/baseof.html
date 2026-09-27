@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-page-section="{{ if .IsHome }}home{{ else }}{{ default "general" .Section }}{{ end }}" data-page-layout="{{ .Layout }}">
 <head>
   {{ $assetVersion := partial "asset-version.html" . }}
   {{ $cfg := .Site.Data.site }}
@@ -9,10 +9,9 @@
   {{ $isFixedFriendsScene := $isFriendsSurface }}
   {{ $isToolsSurface := hasPrefix .RelPermalink "/tools/" }}
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  {{ partial "assets/viewport-base.html" . }}
   <noscript><style>img[data-image-src]{display:none!important}</style></noscript>
-  <script defer src="/static/resource-readiness.js?v=22.10.0"></script>
-  <script src="/static/document-transition.js?v=22.9.0"></script>
   <title>{{ if .IsHome }}{{ $siteTitle }}{{ else }}{{ .Title }} - {{ $siteTitle }}{{ end }}</title>
   <meta name="description" content="{{ with .Params.summary }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}">
   <script>
@@ -28,6 +27,8 @@
       }
     })();
   </script>
+  <script defer src="/static/resource-readiness.js?v=22.10.0"></script>
+  <script src="/static/document-transition.js?v=22.9.0"></script>
   <script>
     // 唯一页面配置源：楼层导航与过场 priority 都从同一 Hugo partial 读取。
     window.SonglinePageConfig = {{ partial "page-navigation-data.html" . | jsonify | safeJS }};

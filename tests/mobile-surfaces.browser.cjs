@@ -14,7 +14,8 @@ const creatorPaths=['/write/','/write/articles/new','/write/account','/write/adm
  const browser=await chromium.launch({channel:'msedge',headless:true});const failures=[];
  try{
   for(const [width,height] of [[360,640],[844,390]]){
-   const page=await browser.newPage({viewport:{width,height},hasTouch:true,isMobile:true});
+   const context=await browser.newContext({viewport:{width,height},hasTouch:true,isMobile:true});
+   const page=await context.newPage();
    await page.route('**/api/views?**',r=>r.fulfill({json:{views:83}}));
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.addInitScript(()=>localStorage.setItem('songline-theme','dark'));
@@ -47,7 +48,7 @@ const creatorPaths=['/write/','/write/articles/new','/write/account','/write/adm
     assert.equal(await page.locator('html').getAttribute('data-admin-theme'),'light');
     await page.screenshot({path:`${out}/${width}x${height}-account-light.png`,fullPage:true});
    }
-   assert.deepEqual(errors,[]);await page.close();
+   assert.deepEqual(errors,[]);await context.close();
   }
  }finally{await browser.close();}
  console.log(JSON.stringify(failures,null,2));assert.deepEqual(failures,[],'mobile surfaces should not clip form controls');

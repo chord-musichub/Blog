@@ -322,6 +322,11 @@
       syncMotionState();
     }
     function preventNativeDrag(event){ event.preventDefault(); }
+    function onLostPointerCapture(event){
+      // Touch starts with implicit capture on the avatar. Moving capture to
+      // the stage bubbles a loss from that child; it is not the end of a drag.
+      if(event.target === stage) stopPan(event);
+    }
     function cancelPan(){
       if(pan.drag) stopPan({type:'pointercancel', pointerId:pan.drag.id});
       stopZoom();
@@ -650,7 +655,7 @@
       window.removeEventListener('pointerup', stopPan, true);
       window.removeEventListener('pointercancel', stopPan, true);
       window.removeEventListener('blur', cancelPan);
-      stage.removeEventListener('lostpointercapture', stopPan);
+      stage.removeEventListener('lostpointercapture', onLostPointerCapture);
       stage.removeEventListener('dragstart', preventNativeDrag);
       stage.removeEventListener('click', blockDragClick, true);
       stage.removeEventListener('wheel', onWheel);
@@ -687,7 +692,7 @@
     window.addEventListener('pointerup', stopPan, true);
     window.addEventListener('pointercancel', stopPan, true);
     window.addEventListener('blur', cancelPan);
-    stage.addEventListener('lostpointercapture', stopPan);
+    stage.addEventListener('lostpointercapture', onLostPointerCapture);
     stage.addEventListener('dragstart', preventNativeDrag);
     stage.addEventListener('click', blockDragClick, true);
     stage.addEventListener('wheel', onWheel, {passive:false});

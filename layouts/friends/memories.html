@@ -3,7 +3,7 @@
 {{ $dates := slice }}
 {{ range $memories }}{{ $date := printf "%v" .date }}{{ if not (in $dates $date) }}{{ $dates = $dates | append $date }}{{ end }}{{ end }}
 <section class="memory-room" data-memory-room aria-label="回忆室">
-  <a class="memory-room__back" href="/friends/" aria-label="返回朋友星图">←</a>
+  <a class="memory-room__back" href="/friends/" data-back-icon aria-label="返回上一页" title="返回上一页">←</a>
   <div class="memory-room__viewport" data-memory-viewport>
     <div class="memory-room__track" data-memory-track data-memory-count="{{ len $dates }}" style="--memory-count:{{ len $dates }}">
     {{ range $index, $memory := $memories }}
