@@ -6,12 +6,12 @@ const code=fs.readFileSync(require('node:path').join(__dirname,'../static/js/art
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 function setup(fetch){
  const timers=new Map();let id=0;
- const reader={dataset:{},isConnected:true,innerHTML:'server rendering'};
+ const reader={dataset:{},isConnected:true,innerHTML:'server rendering',querySelectorAll:()=>[],replaceChildren(content){this.innerHTML=content.html;}};
  const source={dataset:{sourceUrl:'/md-source/example.md'},textContent:JSON.stringify('# Embedded fallback'),isConnected:true};
  const events=[];
  const window={SonglineMarkdown:{render:text=>text},addEventListener(){},dispatchEvent:e=>events.push(e.type),location:{hash:''},
   setTimeout:fn=>{timers.set(++id,fn);return id;},clearTimeout:n=>timers.delete(n)};
- const document={querySelector:s=>s.startsWith('[data-article-renderer')?reader:null,getElementById:()=>source,addEventListener(){}};
+ const document={querySelector:s=>s.startsWith('[data-article-renderer')?reader:null,getElementById:()=>source,addEventListener(){},createElement(){const content={querySelectorAll:()=>[]};return {content,set innerHTML(value){content.html=value;}};}};
  vm.runInNewContext(code,{window,document,fetch,AbortController,Event});
  return {reader,events,timers,timeout(){for(const fn of [...timers.values()])fn();}};
 }

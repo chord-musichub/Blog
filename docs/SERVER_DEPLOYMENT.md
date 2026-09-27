@@ -161,6 +161,8 @@ curl -I https://blog.songline-blog.com/write/login
 
 ## 日常更新与回滚
 
+当前 Go 构建使用项目内的 `vendor/` 依赖，不再访问 `proxy.golang.org`。发布时必须将 `vendor/`、`go.mod`、`go.sum` 和源码一起提交/推送；Git 拉取及服务器工具安装仍需要网络。旧发布版本不自动获得此修复，不能仅更新本机文件后直接期待服务器生效。
+
 每次更新都从仓库最新源码启动候选版本：
 
 ```bash

@@ -15,6 +15,10 @@
     if(/^<\s*\/?\s*(script|iframe|object|embed|style|link|meta|base|form|input|button|textarea|select|option)\b/i.test(tag)) return escapeHtml(tag);
     tag = tag.replace(/\s+on[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '');
     tag = tag.replace(/javascript\s*:/gi, '');
+    if(/^<\s*img\b/i.test(tag)){
+      if(!/\sloading\s*=/i.test(tag)) tag = tag.replace(/\s*\/?>$/, ' loading="lazy">');
+      if(!/\sdecoding\s*=/i.test(tag)) tag = tag.replace(/\s*\/?>$/, ' decoding="async">');
+    }
     return tag;
   }
 
@@ -89,7 +93,7 @@
 
     s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g, function(_, alt, src){
       if(/^javascript\s*:/i.test(src) || /^data\s*:/i.test(src)) return '';
-      return '<img src="' + escapeHtml(src) + '" alt="' + escapeHtml(alt) + '">';
+      return '<img src="' + escapeHtml(src) + '" alt="' + escapeHtml(alt) + '" loading="lazy" decoding="async">';
     });
     s = s.replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g, function(_, label, href){
       return renderLink(label, href);

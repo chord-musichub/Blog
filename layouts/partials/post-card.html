@@ -9,7 +9,7 @@
 {{ $cover := $p.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png" }}
 {{ $coverMode := $p.Params.cover_mode | default "cover" }}
 <article class="card post-card {{ if and $p.Params.is_notice (not $flat) }}notice-card{{ end }}" data-card-link="{{ $p.RelPermalink }}" role="link" tabindex="0" aria-label="阅读文章：{{ $p.Title }}">
-  <a class="post-thumb lazy-bg cover-mode-{{ $coverMode }}" href="{{ $p.RelPermalink }}" data-bg="{{ $cover }}"></a>
+  <a class="post-thumb lazy-bg cover-mode-{{ $coverMode }}" href="{{ $p.RelPermalink }}" data-bg="{{ partial "media-preview-url.html" $cover }}"></a>
   <div class="post-info">
     <div class="post-card-head">
       {{ if and $p.Params.is_notice (not $flat) }}<a class="notice-badge" href="/tags/site-notice/">站点公告</a>{{ end }}

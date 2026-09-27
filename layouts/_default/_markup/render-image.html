@@ -1,0 +1,3 @@
+{{- /* Match the live Markdown renderer so offscreen originals are not fetched
+      eagerly before the article's client-side hydration. Keep original URLs. */ -}}
+<img src="{{ .Destination | safeURL }}" alt="{{ .PlainText }}"{{ with .Title }} title="{{ . }}"{{ end }} loading="lazy" decoding="async">

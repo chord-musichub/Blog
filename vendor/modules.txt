@@ -1,0 +1,4 @@
+# golang.org/x/image v0.24.0
+## explicit; go 1.18
+golang.org/x/image/draw
+golang.org/x/image/math/f64

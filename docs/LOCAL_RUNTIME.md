@@ -18,7 +18,9 @@ docker compose up --build -d
 
 ## Linux 本机构建代理
 
-拉取基础镜像与 Dockerfile 内下载依赖是两条网络链路：Docker 服务的代理负责前者，不会自动配置后者。如果 `FROM` 报 `proxyconnect ... 127.0.0.1:7897 ... connection refused`，应先启动该端口对应的代理。如果已能拉镜像，但 `go mod download` / `go build` 访问 `proxy.golang.org` 超时，则可使用以下可选配置：
+当前版本把 `go.sum` 锁定的 Go 依赖保存在 `vendor/`（约 340 KiB），编译阶段不再联网下载。普通 `docker compose build blog-admin` 即可编译；不要遗漏 `vendor/`。如果仍看到 `RUN go mod download`，说明使用的是旧版 Dockerfile。
+
+基础镜像拉取与 Alpine 软件包安装仍需要网络：Docker 服务的代理负责镜像拉取，不会自动配置容器里的软件包下载。如果 `FROM` 报 `proxyconnect ... 127.0.0.1:7897 ... connection refused`，应先启动该端口对应的代理。如果 `apk add` 访问 Alpine 站点失败，可使用以下可选配置：
 
 ```sh
 # 保持本机 HTTP / mixed 代理开启；端口按实际配置修改。
@@ -31,7 +33,7 @@ docker compose up -d --no-build
 
 上述 overlay 仅适用于本机 Linux Docker Engine：构建步骤使用宿主机网络，使容器内的构建进程能访问宿主机回环代理；仅将代理作为 Docker 预定义构建参数传入，不改变网站容器网络，不将代理写入运行时环境。不要在 Dockerfile 内使用 `ENV HTTP_PROXY`，也不要关闭 Go 校验和或 TLS 校验。Docker Desktop / 远程构建器的宿主机地址不同，不应直接照搬此 overlay。
 
-默认 `docker compose build` 仍使用普通构建网络，适用于能直连依赖服务的环境。Dockerfile 单独缓存 `go.mod` / `go.sum` 的依赖下载层，修改业务代码时可以复用，不必每次重新下载。
+默认 `docker compose build` 使用普通网络安装 Hugo，Go 编译步骤则明确关闭网络并使用 `-mod=vendor`。这不会改变图片处理算法或依赖版本。
 
 参考：[Docker 构建代理参数](https://docs.docker.com/build/building/variables/#proxy-arguments)、[Docker 服务代理](https://docs.docker.com/engine/daemon/proxy/)。
 

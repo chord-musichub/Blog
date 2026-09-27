@@ -80,7 +80,7 @@ const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"><re
       const site = await browser.newPage({viewport:{width:1440,height:900}});
       const failures=[];
       let slowAvatarRequested=false, slowAvatarReleased=false;
-      await site.route('**/uploads/admin/friends/kfc.jpg',async route=>{
+      await site.route('**/uploads/admin/friends/kfc.jpg*',async route=>{
         slowAvatarRequested=true;
         await new Promise(resolve=>setTimeout(resolve,5000));
         slowAvatarReleased=true;
@@ -100,8 +100,8 @@ const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"><re
           assert.ok(slowAvatarRequested && !slowAvatarReleased,'slow secondary media must not keep navigation locked');
           assert.ok(navigationMs<4000,'slow-avatar page should become interactive before four seconds');
           assert.ok(state.report.pending>0 && state.report.timedOut,'pending media must be reported, not called fully ready');
-          assert.equal(await site.locator('img[src="/uploads/admin/friends/kfc.jpg"]').getAttribute('data-image-state'),'pending');
-          await site.waitForFunction(()=>document.querySelector('img[src="/uploads/admin/friends/kfc.jpg"]').dataset.imageState==='ready');
+          assert.equal(await site.locator('img[src^="/uploads/admin/friends/kfc.jpg"]').getAttribute('data-image-state'),'pending');
+          await site.waitForFunction(()=>document.querySelector('img[src^="/uploads/admin/friends/kfc.jpg"]').dataset.imageState==='ready');
         }
         console.log('PAGE',JSON.stringify({...state,navigationMs}));
         const snapshot=await site.evaluate(()=>readinessSnapshots.at(-1));

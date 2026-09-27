@@ -1,9 +1,10 @@
 FROM golang:1.22-alpine AS build
 WORKDIR /app
 COPY go.mod go.sum ./
-RUN go mod download
+COPY vendor ./vendor
 COPY . .
-RUN go build -o /blog-admin ./cmd/server
+# Compile from checked-in dependencies, even on hosts without Go proxy access.
+RUN --network=none go build -mod=vendor -o /blog-admin ./cmd/server
 
 FROM alpine:3.20
 WORKDIR /app

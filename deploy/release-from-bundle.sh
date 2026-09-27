@@ -72,7 +72,7 @@ done
 
 # 编译不依赖线上运行数据；先完成此步骤，尽量缩短服务暂停时间。
 echo "正在编译本地发布包…"
-(cd "$SOURCE_DIR" && go build -buildvcs=false -trimpath -ldflags='-s -w' -o blog-admin ./cmd/server)
+(cd "$SOURCE_DIR" && go build -mod=vendor -buildvcs=false -trimpath -ldflags='-s -w' -o blog-admin ./cmd/server)
 install -d -m 0755 "$SOURCE_DIR/published"
 
 # 源码中不得携带运行时目录，以免发布版本和 shared 出现两份数据。

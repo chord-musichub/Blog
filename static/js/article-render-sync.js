@@ -169,7 +169,38 @@
   getMarkdown().then(function(markdown){
     if(!reader.isConnected || !sourceElement.isConnected) return;
     if(!markdown){ rebuildToc(); window.dispatchEvent(new Event('songline:article-toc-ready')); return; }
-    reader.innerHTML = window.SonglineMarkdown.render(markdown);
+    // Parse inertly, then reuse identical images from the server rendering.
+    // Recreating them can refetch no-store third-party URLs and decode again.
+    const template = document.createElement('template');
+    template.innerHTML = window.SonglineMarkdown.render(markdown);
+    const images = new Map();
+    function imageKey(img){
+      return JSON.stringify(Array.from(img.attributes)
+        .filter(function(attr){ return !['loading', 'decoding', 'data-image-state'].includes(attr.name); })
+        .map(function(attr){ return [attr.name, attr.value]; })
+        .sort(function(a,b){ return a[0].localeCompare(b[0]); }));
+    }
+    reader.querySelectorAll('img').forEach(function(img){
+      if(img.closest('picture')) return;
+      const key = imageKey(img);
+      if(!images.has(key)) images.set(key, []);
+      images.get(key).push(img);
+    });
+    const reused = [];
+    template.content.querySelectorAll('img').forEach(function(img){
+      if(img.closest('picture')) return;
+      const matches = images.get(imageKey(img));
+      if(matches && matches.length){
+        const placeholder = document.createComment('article image');
+        img.replaceWith(placeholder);
+        reused.push({placeholder:placeholder, image:matches.shift()});
+      }
+    });
+    reader.replaceChildren(template.content);
+    // Keep the reused element in the live document's ownership. Moving it
+    // through template.content adopts it into an inert document and refetches.
+    reused.forEach(function(item){ item.placeholder.replaceWith(item.image); });
+    if(window.SonglineResources) window.SonglineResources.observe(reader);
     if(window.SonglineEnhanceMarkdown) window.SonglineEnhanceMarkdown(reader);
     rebuildToc();
     window.dispatchEvent(new Event('songline:article-toc-ready'));

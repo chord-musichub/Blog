@@ -9,8 +9,8 @@ v20.20.6：首屏资源提示。
 
 <link rel="preload" href="/css/site.css?v={{ $v }}" as="style">
 
-{{- if or (eq $section "friends") (hasPrefix $rel "/friends/") }}
-<link rel="preload" href="/js/pages/friends/galaxy.js?v={{ $v }}&friends=22.8" as="script">
+{{- if eq .Layout "friends-list" }}
+<link rel="preload" href="/js/pages/friends/galaxy.js?v={{ $v }}&friends=22.15" as="script">
 {{- end }}
 
 {{- if or (eq $section "tags") (hasPrefix $rel "/tags/") }}
