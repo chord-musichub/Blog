@@ -113,73 +113,6 @@ body .section-head::after{
   content:none !important;
 }
 
-.home-friends-section .section-head-with-action{
-  align-items:center;
-}
-.home-friend-arrows{
-  margin-left:auto;
-  display:flex;
-  gap:8px;
-}
-.home-friend-arrow{
-  width:36px;
-  height:36px;
-  border-radius:999px;
-  border:1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
-  background:color-mix(in srgb, var(--panel) 74%, transparent);
-  color:var(--text);
-  cursor:pointer;
-  font-size:24px;
-  line-height:1;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, opacity .18s ease;
-}
-.home-friend-arrow:hover,
-.home-friend-arrow:focus-visible{
-  transform:translateY(-2px);
-  border-color:var(--accent);
-  box-shadow:0 12px 28px color-mix(in srgb, var(--accent) 14%, transparent);
-}
-.home-friend-arrow:disabled{
-  opacity:.38;
-  cursor:default;
-  transform:none;
-  box-shadow:none;
-}
-.home-friend-carousel{
-  position:relative;
-  overflow:hidden;
-  margin:0 -6px;
-  padding:2px 6px 6px;
-}
-.home-friend-track.friend-grid{
-  display:flex !important;
-  grid-template-columns:none !important;
-  gap:18px;
-  overflow-x:auto;
-  overscroll-behavior-x:contain;
-  scroll-snap-type:x proximity;
-  scroll-padding:6px;
-  padding:3px 2px 14px;
-  scrollbar-width:none;
-}
-.home-friend-track.friend-grid::-webkit-scrollbar{display:none;}
-.home-friend-slide{
-  flex:0 0 calc((100% - 54px) / 4);
-  min-width:190px;
-  scroll-snap-align:start;
-}
-@media(max-width:980px){
-  .home-friend-slide{flex-basis:calc((100% - 18px) / 2);}
-}
-@media(max-width:620px){
-  .home-friend-slide{flex-basis:82%;}
-  .home-friend-arrows{gap:6px;}
-  .home-friend-arrow{width:32px;height:32px;}
-}
-
 body .posts-list > .post-search-item.is-search-filtered,
 body .posts-list > .post-search-item[hidden],
 body .article-list > .post-search-item.is-search-filtered,
@@ -482,4 +415,3 @@ html body .tool-app-card.search-hidden{
     width:100% !important;
   }
 }
-

@@ -25,6 +25,25 @@
   var lastW = 0;
   var lastH = 0;
 
+  function sceneEnabled(){
+    if(!document.body) return false;
+    var page = document.body.dataset;
+    return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageLayout !== 'tools';
+  }
+
+  function releaseLayer(){
+    window.clearTimeout(resizeTimer);
+    if(layer){
+      window.clearTimeout(layer.__starstreamPhaseFallbackTimer);
+      window.clearTimeout(layer.__softResumeTimer);
+      pauseSvgAnimations();
+      layer.remove();
+    }
+    layer = null;
+    svg = null;
+    started = false;
+  }
+
   function viewport(){
     return {
       w: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0, 320),
@@ -256,7 +275,7 @@
     // 下一帧再加 class，保证浏览器先拿到 opacity:0 的初始状态。
     window.requestAnimationFrame(function(){
       window.requestAnimationFrame(function(){
-        layer.classList.add('is-visible');
+        if(layer) layer.classList.add('is-visible');
       });
     });
   }
@@ -280,6 +299,7 @@
   }
 
   function resumeSvgAnimations(){
+    if(!sceneEnabled() || document.hidden) return;
     prepareSvgPhaseResume();
     if(svg && typeof svg.unpauseAnimations === 'function'){
       try{ svg.unpauseAnimations(); }catch(e){}
@@ -288,12 +308,13 @@
       layer.classList.add('is-soft-resume');
       window.clearTimeout(layer.__softResumeTimer);
       layer.__softResumeTimer = window.setTimeout(function(){
-        layer.classList.remove('is-soft-resume');
+        if(layer) layer.classList.remove('is-soft-resume');
       }, 720);
     }
   }
 
   function render(force){
+    if(!sceneEnabled()){ releaseLayer(); return; }
     var compact = !!(mobileQuery && mobileQuery.matches);
     if(compact !== isMobile){ isMobile = compact; force = true; }
     createLayer();
@@ -318,9 +339,11 @@
     });
 
     revealLayer();
+    if(document.hidden) pauseSvgAnimations();
   }
 
   function scheduleResize(){
+    if(!sceneEnabled()) return;
     window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(function(){
       render(false);
@@ -328,13 +351,13 @@
   }
 
   function startNow(){
-    if(!document.body) return;
+    if(!sceneEnabled()){ releaseLayer(); return; }
     render(!started);
     started = true;
   }
 
   function start(){
-    if(!document.body) return;
+    if(!sceneEnabled()){ releaseLayer(); return; }
     waitUntilBootDone(function(){
       var run = function(){ window.setTimeout(startNow, 260); };
       if(window.SonglineRuntime && typeof window.SonglineRuntime.idle === 'function'){
@@ -348,11 +371,8 @@
     });
   }
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', start);
-  }else{
-    start();
-  }
+  // 由页面模块按需初始化；全局监听只注册一次，返回可见场景可再次调用。
+  window.SonglineInitSpaceRibbons = start;
 
   window.addEventListener('resize', scheduleResize);
   window.addEventListener('orientationchange', scheduleResize);
@@ -377,6 +397,7 @@
 
   // 页面切换不重新生成曲线，只保证背景图层仍在。
   window.addEventListener('songline:page-swap', function(){
+    if(!sceneEnabled()){ releaseLayer(); return; }
     window.setTimeout(start, 120);
     window.setTimeout(resumeSvgAnimations, 180);
   });

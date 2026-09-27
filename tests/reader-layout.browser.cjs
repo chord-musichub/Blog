@@ -11,7 +11,8 @@ fs.mkdirSync(out,{recursive:true});
  const browser=await chromium.launch({headless:true,channel:'msedge'});
  try {
   for(const [width,theme,height=900] of [[1440,'dark'],[1440,'light'],[1024,'dark'],[1024,'dark',500],[820,'dark'],[390,'dark'],[390,'light']]) {
-   const page=await browser.newPage({viewport:{width,height},hasTouch:width<=820,isMobile:width<=820});
+   const context=await browser.newContext({viewport:{width,height},hasTouch:width<=820,isMobile:width<=820});
+   const page=await context.newPage();
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.addInitScript(theme=>{localStorage.setItem('songline-theme',theme);localStorage.setItem('songline-toc-state','expanded');},theme);
    await page.route('**/api/views?**',route=>route.fulfill({json:{views:83}}));
@@ -80,7 +81,7 @@ fs.mkdirSync(out,{recursive:true});
    }
    assert.deepEqual(errors,[]);
    console.log(`PASS ${width}x${height} ${theme}: compact cover, article metadata, sticky/scrollable TOC, collapse and anchors`);
-   await page.close();
+   await context.close();
   }
  } finally {await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1);});

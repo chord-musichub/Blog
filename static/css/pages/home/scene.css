@@ -27,9 +27,6 @@ body[data-page-kind="home"] .site-bg-layer::after,
 body[data-page-kind="home"] .songline-starstream-layer{
   display:none!important;
 }
-.songline-home-scene-frame{
-  display:none!important;
-}
 .songline-home-scene{
   min-height:clamp(440px, calc(100svh - 178px), 680px);
 }
@@ -104,33 +101,6 @@ body[data-page-kind="home"] .songline-home-system{
   color:rgba(255,255,255,.78);
   font-size:clamp(14px, 1.18vw, 18px);
   letter-spacing:.08em;
-}
-.songline-home-scene-frame{
-  width:100%;
-  overflow:hidden;
-  border-radius:0!important;
-  background:transparent;
-}
-.songline-home-scene .hero-banner.hero-banner-image-only.hero-banner-actual-image{
-  width:100%;
-  border-radius:0!important;
-  box-shadow:none!important;
-}
-.songline-home-scene .hero-banner-img{
-  width:100%!important;
-  min-height:clamp(440px, calc(100svh - 178px), 680px);
-  object-fit:cover!important;
-  object-position:center!important;
-  border-radius:0!important;
-  filter:saturate(.92) contrast(1.04) brightness(.84);
-}
-.songline-home-scene-frame::after{
-  content:"";
-  position:absolute;
-  z-index:1;
-  inset:0;
-  pointer-events:none;
-  background:linear-gradient(90deg, rgba(7,12,20,.62), rgba(7,12,20,.16) 47%, rgba(7,12,20,.03) 72%), linear-gradient(0deg, color-mix(in srgb, var(--bg) 55%, transparent), transparent 28%);
 }
 .songline-home-intro{
   max-width:760px;
@@ -207,7 +177,6 @@ body[data-page-kind="home"] .songline-home-system{
   .songline-home-layout{ display:block!important; width:100%!important; margin-inline:0!important; padding:74px 18px 92px!important; }
   .songline-home-scene{ min-height:clamp(310px, 65svh, 560px); }
   .songline-home-scene-copy{ top:26px; left:18px; max-width:80%; }
-  .songline-home-scene .hero-banner-img{ min-height:clamp(310px, 65svh, 560px); }
   .songline-home-system{ position:static; margin-top:32px; padding:0; border-left:0; border-top:1px solid color-mix(in srgb, var(--border) 78%, transparent); }
 
   .songline-home-system{ grid-template-columns:1fr; }
@@ -216,7 +185,6 @@ body[data-page-kind="home"] .songline-home-system{
   .songline-home-layout{ padding-inline:14px!important; }
   .songline-home-scene-copy h1{ font-size:34px; }
   .songline-home-scene-copy p{ margin-top:10px; font-size:13px; }
-  .songline-home-scene-frame::after{ background:linear-gradient(90deg, rgba(7,12,20,.55), rgba(7,12,20,.08)), linear-gradient(0deg, color-mix(in srgb, var(--bg) 62%, transparent), transparent 31%); }
 
 }
 

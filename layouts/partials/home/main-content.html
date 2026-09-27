@@ -1,13 +1,5 @@
-{{- $cfg := .Site.Data.site -}}
-{{- $posts := where .Site.RegularPages "Section" "posts" -}}
 <div class="songline-home-main">
-  {{ $homeHeroImage := default "/uploads/admin/background/qiandai_background.png" $cfg.home.hero_image }}
-  <section class="songline-home-scene" aria-label="首页场景" data-home-parallax-root>
-    <div class="songline-home-scene-frame">
-      <section class="hero-banner hero-banner-image-only hero-banner-actual-image" style="background-image:url('{{ $homeHeroImage }}')" aria-label="首页视觉封面">
-        <img class="hero-banner-img" src="{{ $homeHeroImage }}" alt="" loading="eager" decoding="async" fetchpriority="high">
-      </section>
-    </div>
-  </section>
-
+  {{/* 保留场景占位和视差入口；实际封面由 site-bg-layer 展示。
+       旧 scene-frame 永久 display:none，不能再携带高优先级图片请求。 */}}
+  <section class="songline-home-scene" aria-label="首页场景" data-home-parallax-root></section>
 </div>

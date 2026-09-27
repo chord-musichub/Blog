@@ -71,6 +71,17 @@
 
   var modules = [
     {
+      key:'space-ribbons',
+      src:'/js/space-ribbons.js?v=' + VERSION,
+      test:function(){
+        // 与 space-ribbons.js 的可见场景条件一致；隐藏背景不下载、不创建动画。
+        var page = document.body.dataset;
+        return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageLayout !== 'tools' &&
+          !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      },
+      init:function(){ if(window.SonglineInitSpaceRibbons) window.SonglineInitSpaceRibbons(); }
+    },
+    {
       key:'views',
       src:'/js/views.js?v=' + VERSION,
       test:function(root){
@@ -126,16 +137,6 @@
       },
       init:function(root){
         if(window.SonglineInitSearch) window.SonglineInitSearch(root || document);
-      }
-    },
-    {
-      key:'home-friend-carousel',
-      src:'/js/pages/home/friend-carousel.js?v=' + VERSION,
-      test:function(root){
-        return !!query(root, '[data-home-friend-carousel], [data-home-friend-track]');
-      },
-      init:function(root){
-        if(window.SonglineInitHomeFriendCarousel) window.SonglineInitHomeFriendCarousel(root || document);
       }
     },
     {

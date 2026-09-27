@@ -44,7 +44,7 @@
 <link id="songline-home-night-style" rel="stylesheet" href="/css/pages/home/night-mode.css?v={{ $assetVersion }}">
 <link id="songline-home-boot-style" rel="stylesheet" href="/css/pages/home/boot-sequence.css?v={{ $assetVersion }}">
 {{ end }}
-{{ if or (eq .Section "friends") (hasPrefix .RelPermalink "/friends/") }}
+{{ if eq .Layout "friends-list" }}
 <link id="songline-friends-galaxy-style" rel="stylesheet" href="/css/pages/friends/galaxy.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if hasPrefix .RelPermalink "/friends/memories/" }}

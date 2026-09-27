@@ -6,7 +6,8 @@ fs.mkdirSync('local-only/galaxy-lens',{recursive:true});
  const browser=await chromium.launch({headless:true,channel:'msedge'});
  try{
   for(const width of [1440,390]){
-   const page=await browser.newPage({viewport:{width,height:900},isMobile:width<981,hasTouch:width<981});
+   const context=await browser.newContext({viewport:{width,height:900},isMobile:width<981,hasTouch:width<981});
+   const page=await context.newPage();
    const errors=[];page.on('pageerror',e=>errors.push(e.message));
    await page.goto((process.env.BLOG_TEST_URL||'http://127.0.0.1:8080')+'/friends/');await page.waitForTimeout(2200);
    const inspect=()=>page.evaluate(()=>{
@@ -53,7 +54,7 @@ fs.mkdirSync('local-only/galaxy-lens',{recursive:true});
    await page.waitForTimeout(600);
    const resizedAnimations=await page.locator('.songline-starstream-layer animate').count();
    assert.ok(width<981 ? resizedAnimations>0 : resizedAnimations===0,'star trail mode follows the viewport breakpoint');
-   assert.deepEqual(errors,[]);await page.close();
+   assert.deepEqual(errors,[]);await context.close();
   }
  }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)});
