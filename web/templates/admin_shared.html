@@ -27,7 +27,7 @@
   </div>
 </header>
 <aside class="creator-rail" id="creatorRail" aria-label="创作中心导航">
-  {{if not (isAdminUser .User)}}<a class="rail-publish btn" href="{{adminURL "/articles/new"}}"><span aria-hidden="true">＋</span> 投稿</a>{{end}}
+  <a class="rail-publish btn" href="{{adminURL "/articles/new"}}"><span aria-hidden="true">＋</span> {{if isAdminUser .User}}发布通知{{else}}投稿{{end}}</a>
   <nav class="admin-client-links">
     <a href="{{adminURL "/"}}" data-cc-page="home">{{template "admin-icon" "home"}}工作台</a>
     {{if isAdminUser .User}}

@@ -2,6 +2,9 @@
   'use strict';
 
   var VERSION = '20.20.6';
+  var frame = 0;
+  var settleTimer = 0;
+  var finalTimer = 0;
   var headerSelector = [
     '.modern-site-header',
     '.site-header',
@@ -51,10 +54,15 @@
   }
 
   function schedule(){
-    window.requestAnimationFrame(function(){
+    // Keep at most one frame and two settling checks, even during resize bursts.
+    window.clearTimeout(settleTimer);
+    window.clearTimeout(finalTimer);
+    if(frame) return;
+    frame = window.requestAnimationFrame(function(){
+      frame = 0;
       measure();
-      window.setTimeout(measure, 80);
-      window.setTimeout(measure, 240);
+      settleTimer = window.setTimeout(measure, 80);
+      finalTimer = window.setTimeout(measure, 240);
     });
   }
 

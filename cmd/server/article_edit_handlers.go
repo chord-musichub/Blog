@@ -22,10 +22,8 @@ func (app *App) showEditor(w http.ResponseWriter, r *http.Request, id string, u 
 }
 
 func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id string, u User) {
-	if id == "" && isAdmin(u) {
-		http.Error(w, "审核管理员不能投稿", http.StatusForbidden)
-		return
-	}
+	app.articleMu.Lock()
+	defer app.articleMu.Unlock()
 	r.Body = http.MaxBytesReader(w, r.Body, 600*1024)
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "表单太大或格式错误", 400)
@@ -63,9 +61,7 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 			wasPublished = true
 			oldPublished = old
 			if !isAdmin(u) {
-				// 普通作者修改已发布文章时，先从公开站撤下，保存后需要重新提交审核。
-				_ = app.removeHugoArticle(old)
-				_ = app.runHugo(r.Context())
+				// 仅在全部校验和保存成功后再撤下公开文件。
 				a.Status = stDraft
 				a.PublishedAt = nil
 			}
@@ -126,7 +122,7 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 	a.SourceMD = body
 	a.RejectNote = ""
 
-	shouldWritePublic := false
+	shouldWritePublic := wasPublished && isAdmin(u) && intent == "save"
 	if intent == "submit" {
 		if a.Title == "" || a.Slug == "" || a.Body == "" {
 			app.redirect(w, r, "/articles/"+a.ID+"/edit?msg=请先补全文章再提交审核", http.StatusSeeOther)
@@ -134,9 +130,6 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 		}
 		a.Status = stPending
 		a.PublishedAt = nil
-		if wasPublished {
-			_ = app.removeHugoArticle(oldPublished)
-		}
 	} else if intent == "publish" && isAdmin(u) {
 		now := time.Now()
 		a.Status = stPublished
@@ -144,6 +137,12 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 		shouldWritePublic = true
 	}
 
+	if shouldWritePublic {
+		if err := app.validatePublicationTarget(a); err != nil {
+			app.editorError(w, u, a, err.Error())
+			return
+		}
+	}
 	if err := app.store.SaveArticle(a); err != nil {
 		http.Error(w, "保存失败: "+err.Error(), 500)
 		return
@@ -151,11 +150,10 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 
 	if shouldWritePublic {
 		if oldPublished.Slug != "" && oldPublished.Slug != a.Slug {
-			_ = app.removeHugoArticle(oldPublished)
-		}
-		if err := app.writeHugoArticle(a); err != nil {
-			http.Error(w, "写入 Hugo 文章失败: "+err.Error(), 500)
-			return
+			if err := app.removeHugoArticle(oldPublished); err != nil {
+				http.Error(w, "已保存，但旧发布文件移入备份失败: "+err.Error(), 500)
+				return
+			}
 		}
 		if err := app.runHugo(r.Context()); err != nil {
 			log.Printf("hugo build after article save error: %v", err)
@@ -168,6 +166,17 @@ func (app *App) createOrUpdateArticle(w http.ResponseWriter, r *http.Request, id
 			app.redirect(w, r, "/articles/"+a.ID+"/edit?msg=已保存修改，并同步到公开站", http.StatusSeeOther)
 		}
 		return
+	}
+	if wasPublished {
+		if err := app.removeHugoArticle(oldPublished); err != nil {
+			http.Error(w, "已保存，但撤下旧发布文件失败: "+err.Error(), 500)
+			return
+		}
+		if err := app.runHugo(r.Context()); err != nil {
+			log.Printf("hugo build after article withdrawal: %v", err)
+			app.redirect(w, r, "/articles/"+a.ID+"/edit?msg="+urlMsg("已保存，但公开站重建失败，旧页面可能仍可见，请重试或查看日志"), http.StatusSeeOther)
+			return
+		}
 	}
 
 	if intent == "submit" {

@@ -32,3 +32,8 @@ test('retired home carousel and permanently hidden hero have no loading entry',(
 test('galaxy stylesheet is scoped to the actual constellation layout',()=>{
  assert.match(read('layouts/partials/assets/page-styles.html'),/{{ if eq \.Layout "friends-list" }}\s*<link id="songline-friends-galaxy-style"/);
 });
+test('retired contact copier is no longer shipped or requested',()=>{
+ assert(!fs.existsSync(path.join(root,'static/js/contact-copy.js')));
+ assert(!read('layouts/partials/footer.html').includes('contact-copy'));
+ assert(read('static/js/pages/home/recommendations.js').includes('clipboard'),'The active home copy action remains');
+});

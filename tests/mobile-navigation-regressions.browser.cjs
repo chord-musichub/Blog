@@ -18,7 +18,7 @@ async function fixture(context){
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:'not found'});
   return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json'})[path.extname(file)]||'application/octet-stream'});
  });
- await context.addInitScript(()=>{sessionStorage.setItem('songline-home-boot-v21.4','1');localStorage.setItem('songline-theme','dark');});
+ await context.addInitScript(()=>{sessionStorage.setItem('songline-home-boot-v21.4','1');localStorage.setItem('songline-theme','dark');localStorage.setItem('songline-privacy-v1',JSON.stringify({version:1,statistics:false,expires:Date.now()+86400000}));});
 }
 async function ready(page,route){await page.goto(base+route);await page.evaluate(()=>SonglinePageModules.ready(document));await page.waitForTimeout(800);}
 async function dragImage(page,route,selector,canvas,moving){

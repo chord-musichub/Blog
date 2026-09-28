@@ -52,7 +52,7 @@ func isOwner(u User) bool { return normalizeRole(u.Role) == roleOwner }
 // isAdmin 表示专职审核管理员。站主拥有内容所有权，但不再被混同为审核账号。
 func isAdmin(u User) bool { return normalizeRole(u.Role) == roleAdmin }
 
-// canManageArticles 保留站主编辑成员文章的能力；审核、发布和退回则只交给管理员。
+// 站主和管理员可编辑、删除全站文章；审核、发布和退回仍交给管理员。
 func canManageArticles(u User) bool { return isOwner(u) || isAdmin(u) }
 func canModerate(u User) bool {
 	return isAdmin(u)

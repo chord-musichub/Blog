@@ -9,12 +9,36 @@ function counter(path,mode='get'){
  const value={textContent:'0'};
  return {attrs,value,dataset:{},getAttribute:name=>attrs[name],querySelector:()=>value,classList:{contains:()=>false}};
 }
-function setup(fetch,storage){
- const window={location:{pathname:'/article/'}};
+function setup(fetch,storage,consent=true){
+ const events={};let nodes=[];
+ const window={location:{pathname:'/article/'},SonglinePrivacy:{allows:()=>consent},addEventListener:(name,fn)=>events[name]=fn};
+ if(consent==='missing')delete window.SonglinePrivacy;
  const memory=new Map();
- vm.runInNewContext(source,{window,document:{},fetch,AbortController,setTimeout,clearTimeout,sessionStorage:storage||{getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)}});
- return nodes=>window.SonglineInitViews({querySelectorAll:()=>nodes});
+ vm.runInNewContext(source,{window,document:{querySelectorAll:()=>nodes},fetch,AbortController,setTimeout,clearTimeout,sessionStorage:storage||{getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)}});
+ const init=value=>{nodes=value;window.SonglineInitViews({querySelectorAll:()=>nodes});};
+ init.consent=value=>{consent=value;events['songline:privacy-change']();};
+ init.memory=memory;
+ return init;
 }
+test('no consent only reads; granting updates current article; withdrawal prevents new increments',async()=>{
+ const calls=[];const init=setup(async(url,opts)=>{calls.push(opts.method);return {ok:true,json:async()=>({views:4})};},null,false);
+ init([counter('/p/','post')]);await settle();assert.deepEqual(calls,['GET']);assert.equal(init.memory.size,0);
+ init.consent(true);await settle();assert.deepEqual(calls,['GET','POST']);
+ init.consent(false);await settle();init([counter('/q/','post')]);await settle();assert.deepEqual(calls,['GET','POST','GET','GET']);
+});
+test('withdrawal before fetch prevents the queued increment',async()=>{
+ const calls=[];const init=setup(async(url,opts)=>{calls.push(opts.method);return {ok:true,json:async()=>({views:4})};});
+ init([counter('/p/','post')]);init.consent(false);await settle();assert.deepEqual(calls,['GET']);assert.equal(init.memory.size,0);
+});
+test('a missing privacy script fails closed without breaking displayed counts',async()=>{
+ const calls=[];const init=setup(async(url,opts)=>{calls.push(opts.method);return {ok:true,json:async()=>({views:4})};},null,'missing');
+ const node=counter('/p/','post');init([node]);await settle();assert.deepEqual(calls,['GET']);assert.equal(node.value.textContent,4);assert.equal(init.memory.size,0);
+});
+test('withdrawing while a POST is in flight does not recreate session markers',async()=>{
+ let resolve;const init=setup(()=>new Promise(done=>{resolve=done;}));
+ init([counter('/p/','post')]);await settle();init.consent(false);
+ resolve({ok:true,json:async()=>({views:4})});await settle();assert.equal(init.memory.size,0);
+});
 test('repeated initialization and duplicate counters share one increment',async()=>{
  const calls=[];const init=setup(async(url,opts)=>{calls.push(opts.method);return {ok:true,json:async()=>({views:42})};});
  const nodes=[counter('/p/'),counter('/p/','post'),counter('/p/','post')];

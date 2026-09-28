@@ -39,6 +39,7 @@ func (app *App) router() http.Handler {
 	mux.HandleFunc("/compose/projects", app.requireOwner(app.handleCreatorProjects))
 	mux.HandleFunc("/compose/memories", app.requireOwner(app.handleCreatorMemories))
 	mux.HandleFunc("/admin", app.requireArticleManager(app.handleAdmin))
+	mux.HandleFunc("/admin/publication-repair", app.requireArticleManager(app.handlePublicationRepair))
 	mux.HandleFunc("/admin/site", app.requireOwner(app.handleSiteSettings))
 	mux.HandleFunc("/admin/manuscript", app.requireOwner(app.handleManuscriptSettings))
 	mux.HandleFunc("/admin/theme", app.requireOwner(app.handleThemeSettings))

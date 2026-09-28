@@ -35,7 +35,7 @@ func (app *App) requireAdmin(next http.HandlerFunc) http.HandlerFunc {
 }
 
 // requireArticleManager is shared by the review workspace: the administrator
-// reviews/publishes, while the owner can only inspect and edit member drafts.
+// reviews/publishes, while the owner can inspect, edit and delete all articles.
 func (app *App) requireArticleManager(next http.HandlerFunc) http.HandlerFunc {
 	return app.requireLogin(func(w http.ResponseWriter, r *http.Request) {
 		u, _ := app.currentUser(r)

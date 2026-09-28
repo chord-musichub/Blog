@@ -18,9 +18,10 @@
 </footer>
 {{ end }}
 {{ $assetVersion := partial "asset-version.html" . }}
+{{ partial "privacy.html" . }}
+<script defer data-core-script="privacy" src="/js/privacy.js?v={{ $assetVersion }}"></script>
 <script defer data-core-script="icon-system" src="/js/icon-system.js?v={{ $assetVersion }}"></script>
 <script defer data-core-script="theme-toggle" src="/js/theme-toggle.js?v={{ $assetVersion }}"></script>
-<script defer data-core-script="contact-copy" src="/js/contact-copy.js?v={{ $assetVersion }}"></script>
 <script defer data-core-script="card-interactions" src="/js/card-interactions.js?v={{ $assetVersion }}"></script>
 <script defer data-core-script="scroll-reveal" src="/js/scroll-reveal.js?v={{ $assetVersion }}"></script>
 <script defer data-core-script="desktop-fixed-nav" src="/js/desktop-fixed-nav.js?v={{ $assetVersion }}"></script>

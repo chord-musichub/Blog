@@ -10,6 +10,7 @@
   <header class="workspace-detail-header"><h1>{{if isAdminUser .User}}管理{{else}}成员文章{{end}}</h1></header>
 
   <section id="reviews" class="admin-workspace-section">
+    <p><a class="btn small secondary" href="{{adminURL "/admin/publication-repair"}}">发布残留检查</a></p>
     <div class="toolbar section-toolbar"><h2>{{if isAdminUser .User}}稿件审核{{else}}成员文章{{end}}</h2><span class="soft-count">{{len .ArticleGroups}} 位作者</span></div>
     {{range .ArticleGroups}}
     <details class="card admin-author-group" open>

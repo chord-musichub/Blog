@@ -13,10 +13,6 @@ import (
 
 func (app *App) handleUploadArticle(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
-	if isAdmin(u) {
-		app.redirect(w, r, "/admin", http.StatusSeeOther)
-		return
-	}
 	if r.Method == http.MethodGet {
 		// 保留旧的 POST 导入接口，GET 统一收口到投稿编辑器。
 		app.redirect(w, r, "/articles/new?import=1", http.StatusSeeOther)
@@ -26,6 +22,8 @@ func (app *App) handleUploadArticle(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", 405)
 		return
 	}
+	app.articleMu.Lock()
+	defer app.articleMu.Unlock()
 	r.Body = http.MaxBytesReader(w, r.Body, 1200*1024)
 	if err := r.ParseMultipartForm(1200 * 1024); err != nil {
 		app.render(w, "upload.html", map[string]any{"User": u, "Error": "上传失败：文件过大或表单格式错误"})
@@ -99,15 +97,17 @@ func (app *App) handleUploadArticle(w http.ResponseWriter, r *http.Request) {
 	} else if submitAfterUpload {
 		a.Status = stPending
 	}
+	if publishNow {
+		if err := app.validatePublicationTarget(a); err != nil {
+			http.Error(w, err.Error(), 409)
+			return
+		}
+	}
 	if err := app.store.SaveArticle(a); err != nil {
 		http.Error(w, "保存失败: "+err.Error(), 500)
 		return
 	}
 	if publishNow {
-		if err := app.writeHugoArticle(a); err != nil {
-			http.Error(w, "写入 Hugo 文章失败: "+err.Error(), 500)
-			return
-		}
 		if err := app.runHugo(r.Context()); err != nil {
 			log.Printf("hugo build after markdown upload error: %v", err)
 			app.redirect(w, r, "/articles/"+a.ID+"/edit?msg=已上传并发布，但公开站重建失败，请看服务器日志", http.StatusSeeOther)
@@ -124,12 +124,14 @@ func (app *App) handleUploadArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) deleteArticle(w http.ResponseWriter, r *http.Request, id string, u User) {
+	app.articleMu.Lock()
+	defer app.articleMu.Unlock()
 	a, ok := app.store.GetArticle(id)
 	if !ok {
 		http.NotFound(w, r)
 		return
 	}
-	// 管理员可删除所有稿件；站主只代管普通成员稿件；作者只能删除自己的草稿/退回稿。
+	// 管理员和站主可管理全站稿件；作者只能删除自己的草稿/退回稿。
 	if isAdmin(u) {
 		// allowed
 	} else if isOwner(u) {
@@ -151,6 +153,8 @@ func (app *App) deleteArticle(w http.ResponseWriter, r *http.Request, id string,
 	}
 	if err := app.runHugo(r.Context()); err != nil {
 		log.Printf("hugo build after delete error: %v", err)
+		app.redirect(w, r, "/?msg="+urlMsg("后台文章已删除，但公开站重建失败，旧页面可能仍可见，请重试或查看日志"), http.StatusSeeOther)
+		return
 	}
 	if canManageArticles(u) {
 		app.redirect(w, r, "/admin?msg=文章已删除", http.StatusSeeOther)

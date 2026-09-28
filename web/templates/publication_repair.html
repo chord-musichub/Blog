@@ -1,0 +1,23 @@
+{{template "admin-head" (dict "Title" "发布残留检查" "Data" . "Navigation" true)}}
+<body>
+{{template "admin-client-nav" .}}
+<main class="wrap wide workspace-shell">
+ {{template "workspace-sidebar" .}}
+ <section class="workspace-detail">
+  <header class="workspace-detail-header"><h1>发布残留检查</h1></header>
+  {{if .Flash}}<div class="flash" role="status">{{.Flash}}</div>{{end}}
+  <p>以下目录带有后台生成的特征，但网址已不属于当前任何稿件。旧版本没有保存文章 ID，因此不能仅凭标题判断它是否应当删除。</p>
+  <p>请先查看公开页，确认是修改前的旧文章，再逐项移入备份。不会删除后台稿件或媒体库；备份保存在 DATA_DIR/backups/article-publication，可人工恢复。手写内容不会列入此清单。</p>
+  {{range .Entries}}
+  <article class="card article-row">
+   <div><h2>{{.Title}}</h2><p class="meta">作者：{{.Author}} · 目录：{{.Slug}}</p><a href="/posts/{{.Slug}}/" target="_blank" rel="noopener">查看公开页 ↗</a></div>
+   <form method="post" action="{{adminURL "/admin/publication-repair"}}">
+    <input type="hidden" name="slug" value="{{.Slug}}"><input type="hidden" name="fingerprint" value="{{.Fingerprint}}">
+    <label><input type="checkbox" name="confirm" value="archive" required> 已确认这是不再需要的旧发布目录</label>
+    <button type="submit" class="secondary">移入备份并重建</button>
+   </form>
+  </article>
+  {{else}}<p class="card">没有发现未关联的后台生成目录。</p>{{end}}
+ </section>
+</main>
+</body></html>

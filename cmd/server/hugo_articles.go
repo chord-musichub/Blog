@@ -54,8 +54,33 @@ func (app *App) effectiveArticleSummary(a Article) string {
 	return strings.TrimSpace(settings.Manuscript.DefaultSummary)
 }
 
+func (app *App) validatePublicationTarget(a Article) error {
+	dir, err := app.articleDirectory(a.Slug)
+	if err != nil {
+		return err
+	}
+	if _, statErr := os.Lstat(filepath.Join(dir, "index.md")); statErr == nil {
+		entry, generated, readErr := readPublication(dir)
+		if readErr != nil {
+			return readErr
+		}
+		if !generated || (entry.Managed && entry.ArticleID != a.ID) || entry.Author != a.Author {
+			return fmt.Errorf("网址目录 %q 已有其他来源的内容，请先检查发布残留或更换网址", a.Slug)
+		}
+	} else if !os.IsNotExist(statErr) {
+		return statErr
+	}
+	return nil
+}
+
 func (app *App) writeHugoArticle(a Article) error {
-	dir := filepath.Join(app.cfg.HugoContentDir, a.Slug)
+	if err := app.validatePublicationTarget(a); err != nil {
+		return err
+	}
+	dir, err := app.articleDirectory(a.Slug)
+	if err != nil {
+		return err
+	}
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}
@@ -106,13 +131,29 @@ func (app *App) writeHugoArticle(a Article) error {
 	renderBody := normalizeArticleBodyForHugo(a.Body)
 	summary := app.effectiveArticleSummary(a)
 	md := fmt.Sprintf("---\ntitle: %q\ndate: %q\nauthor: %q\nauthor_username: %q\nauthor_display: %q\naccount_type: %q\nis_notice: %t\nfriends: %s\ntags: %s\nsummary: %q\n%sauthor_bio: %q\nauthor_homepage: %q\nauthor_avatar: %q\nauthor_cover: %q\nsource_md_url: %q\nsource_md_b64: %q\ndraft: false\n---\n\n%s\n", a.Title, date, authorDisplay, a.Author, authorDisplay, accountType, isNotice, friends, tags, summary, coverLine, authorBio, authorHomepage, authorAvatar, authorCover, sourceURL, sourceB64, renderBody)
+	md = strings.Replace(md, "---\n", fmt.Sprintf("---\ngenerated_by: %q\narticle_id: %q\n", articleGenerator, a.ID), 1)
 	return os.WriteFile(filepath.Join(dir, "index.md"), []byte(md), 0644)
 }
 
 func (app *App) removeHugoArticle(a Article) error {
+	app.buildMu.Lock()
+	defer app.buildMu.Unlock()
 	if a.Slug == "" {
 		return nil
 	}
-	dir := filepath.Join(app.cfg.HugoContentDir, a.Slug)
-	return os.RemoveAll(dir)
+	dir, err := app.articleDirectory(a.Slug)
+	if err != nil {
+		return err
+	}
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil
+	}
+	entry, generated, err := readPublication(dir)
+	if err != nil {
+		return err
+	}
+	if !generated || (entry.Managed && entry.ArticleID != a.ID) || entry.Author != a.Author {
+		return fmt.Errorf("目录 %q 无法确认属于此文章，未移除", a.Slug)
+	}
+	return app.archivePublication(a.Slug)
 }

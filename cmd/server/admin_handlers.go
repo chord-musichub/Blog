@@ -49,8 +49,8 @@ func (app *App) handleAdmin(w http.ResponseWriter, r *http.Request) {
 	articles := app.store.AllArticles()
 	include := func(User) bool { return true }
 	if isOwner(u) {
-		// 站主在此只管理普通成员稿件；自己的创作留在首页，管理员稿件不在这里混排。
-		include = func(user User) bool { return normalizeRole(user.Role) == roleUser }
+		// 自己的创作留在首页，成员和管理员的稿件均可代管。
+		include = func(user User) bool { return user.Username != u.Username }
 	}
 	app.render(w, "admin.html", map[string]any{
 		"User":           u,
@@ -91,6 +91,8 @@ func (app *App) handleNewUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleCleanup(w http.ResponseWriter, r *http.Request) {
+	app.articleMu.Lock()
+	defer app.articleMu.Unlock()
 	if r.Method != http.MethodPost {
 		http.NotFound(w, r)
 		return
@@ -121,14 +123,7 @@ func (app *App) handleCleanup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) canAccessArticle(u User, a Article) bool {
-	if a.Author == u.Username || isAdmin(u) {
-		return true
-	}
-	if !isOwner(u) {
-		return false
-	}
-	author, ok := app.store.GetUser(a.Author)
-	return ok && normalizeRole(author.Role) == roleUser
+	return a.Author == u.Username || canManageArticles(u)
 }
 
 func safeIntRange(raw string, min int, max int, fallback int) int {

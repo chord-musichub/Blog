@@ -32,7 +32,7 @@ func (app *App) handleSettingsHub(w http.ResponseWriter, r *http.Request) {
 func (app *App) handleComposeHub(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
 	if isAdmin(u) {
-		app.redirect(w, r, "/admin", http.StatusSeeOther)
+		app.redirect(w, r, "/articles/new", http.StatusSeeOther)
 		return
 	}
 	app.render(w, "compose_hub.html", map[string]any{
@@ -45,10 +45,6 @@ func (app *App) handleComposeHub(w http.ResponseWriter, r *http.Request) {
 
 func (app *App) handleNewArticle(w http.ResponseWriter, r *http.Request) {
 	u, _ := app.currentUser(r)
-	if isAdmin(u) {
-		app.redirect(w, r, "/admin", http.StatusSeeOther)
-		return
-	}
 	if r.Method == http.MethodGet {
 		a := Article{Author: u.Username, Status: stDraft}
 		app.render(w, "editor.html", map[string]any{"User": u, "Article": a, "Mode": "new", "CoverFiles": listMediaFiles(app.userMediaDir(u.Username), userMediaPublicPrefix(u.Username)), "Workspace": "editor", "WorkspacePage": "article"})

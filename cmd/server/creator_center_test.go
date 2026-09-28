@@ -55,8 +55,8 @@ func TestCreatorCenterRoleShellAndPages(t *testing.T) {
 			if role != roleOwner && strings.Contains(html, `data-cc-page="memories"`) {
 				t.Fatalf("%s sees owner-only navigation", role)
 			}
-			if role == roleAdmin && strings.Contains(html, `class="rail-publish btn"`) {
-				t.Fatal("administrator must not have a publish entry")
+			if role == roleAdmin && !strings.Contains(html, "发布通知") {
+				t.Fatal("administrator needs a site notice entry")
 			}
 		}
 	}
@@ -97,8 +97,9 @@ func TestCreatorCenterSaveSubmitAndOwnership(t *testing.T) {
 	if w := post(a.ID, User{Username: "bob", Role: roleUser}); w.Code != http.StatusForbidden {
 		t.Fatal("another member can edit this draft")
 	}
-	if w := post("", User{Username: "moderator", Role: roleAdmin}); w.Code != http.StatusForbidden {
-		t.Fatal("administrator can create a new submission")
+	form.Set("slug", "site-notice-new")
+	if w := post("", User{Username: "moderator", Role: roleAdmin}); w.Code != http.StatusSeeOther {
+		t.Fatal("administrator cannot create a site notice")
 	}
 }
 

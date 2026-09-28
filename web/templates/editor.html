@@ -6,7 +6,7 @@
   {{if .Flash}}<div class="flash" role="status">{{.Flash}}</div>{{end}}
   {{if .Error}}<div class="error" role="alert">{{.Error}}</div>{{end}}
   <header class="editor-heading">
-    <div><a class="back-link" href="{{if isAdminUser .User}}{{adminURL "/admin#reviews"}}{{else}}{{adminURL "/#manuscripts"}}{{end}}">‹ 稿件管理</a><h1>{{if isAdminUser .User}}审阅文章{{else if .Article.ID}}编辑文章{{else}}文章投稿{{end}}</h1></div>
+    <div><a class="back-link" href="{{if canManageArticle .User}}{{adminURL "/admin#reviews"}}{{else}}{{adminURL "/#manuscripts"}}{{end}}">‹ 稿件管理</a><h1>{{if and (isAdminUser .User) (not .Article.ID)}}发布站点通知{{else if isAdminUser .User}}审阅文章{{else if .Article.ID}}编辑文章{{else}}文章投稿{{end}}</h1></div>
     <span class="badge {{statusClass .Article.Status}}">{{statusText .Article.Status}}</span>
   </header>
   {{if .Article.RejectNote}}<p class="warn">退回原因：{{.Article.RejectNote}}</p>{{end}}

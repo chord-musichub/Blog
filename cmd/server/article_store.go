@@ -74,8 +74,17 @@ func (s *Store) SaveArticle(a Article) error {
 		a.Status = stDraft
 	}
 	a.UpdatedAt = now
+	previous, existed := s.articles[a.ID]
 	s.articles[a.ID] = a
-	return s.saveLocked("articles.json", s.articles)
+	if err := s.saveLocked("articles.json", s.articles); err != nil {
+		if existed {
+			s.articles[a.ID] = previous
+		} else {
+			delete(s.articles, a.ID)
+		}
+		return err
+	}
+	return nil
 }
 
 func (s *Store) SlugExists(slug, exceptID string) bool {
@@ -95,8 +104,13 @@ func (s *Store) DeleteArticle(id string) error {
 	if _, ok := s.articles[id]; !ok {
 		return errors.New("文章不存在")
 	}
+	previous := s.articles[id]
 	delete(s.articles, id)
-	return s.saveLocked("articles.json", s.articles)
+	if err := s.saveLocked("articles.json", s.articles); err != nil {
+		s.articles[id] = previous
+		return err
+	}
+	return nil
 }
 
 func (s *Store) DeleteArticlesByStatus(statuses ...string) (int, error) {
