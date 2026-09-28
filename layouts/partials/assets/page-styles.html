@@ -50,7 +50,7 @@
 {{ if hasPrefix .RelPermalink "/friends/memories/" }}
 <link id="songline-friends-memories-style" rel="stylesheet" href="/css/pages/friends/memories.css?v={{ $assetVersion }}">
 {{ end }}
-{{ if or (eq .Section "tags") (hasPrefix .RelPermalink "/tags/") }}
+{{ if and (ne .Layout "site-notice") (or (eq .Section "tags") (hasPrefix .RelPermalink "/tags/")) }}
 <link id="songline-tags-style" rel="stylesheet" href="/css/pages/tags/index.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if or (and .IsPage (eq .Section "posts")) (hasPrefix .RelPermalink "/tools/markdown-previewer/") }}
@@ -60,10 +60,10 @@
 {{ if hasPrefix .RelPermalink "/tools/markdown-previewer/" }}
 <link id="songline-markdown-previewer-style" rel="stylesheet" href="/css/tools/markdown-previewer.css?v={{ $assetVersion }}">
 {{ end }}
-{{ if and .IsSection (eq .Section "posts") }}
+{{ if or (and .IsSection (eq .Section "posts")) (eq .Layout "site-notice") }}
 <link id="songline-posts-list-style" rel="stylesheet" href="/css/pages/posts/list.css?v={{ $assetVersion }}">
 {{ end }}
-{{ if eq .Section "posts" }}
+{{ if or (eq .Section "posts") (eq .Layout "site-notice") }}
 <link id="songline-posts-campus-scene-style" rel="stylesheet" href="/css/pages/posts/campus-scene.css?v={{ $assetVersion }}&tone=22.2">
 {{ end }}
 {{ if hasPrefix .RelPermalink "/tools/reaction-test/" }}

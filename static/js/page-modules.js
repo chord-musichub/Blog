@@ -76,7 +76,7 @@
       test:function(){
         // 与 space-ribbons.js 的可见场景条件一致；隐藏背景不下载、不创建动画。
         var page = document.body.dataset;
-        return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageLayout !== 'tools' &&
+        return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageLayout !== 'tools' && page.pageLayout !== 'site-notice' &&
           !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       },
       init:function(){ if(window.SonglineInitSpaceRibbons) window.SonglineInitSpaceRibbons(); }

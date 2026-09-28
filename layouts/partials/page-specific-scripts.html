@@ -21,7 +21,7 @@ v20.20.6：页面级 JS 按需加载。
 <script defer data-page-script="memory-room" src="/js/pages/friends/memories.js?v={{ $v }}"></script>
 {{- end }}
 
-{{- if or (eq $section "tags") (hasPrefix $rel "/tags/") }}
+{{- if and (ne .Layout "site-notice") (or (eq $section "tags") (hasPrefix $rel "/tags/")) }}
 <script defer data-page-script="tag-flow" src="/js/pages/tags/flow.js?v={{ $v }}"></script>
 {{- end }}
 

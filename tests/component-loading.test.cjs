@@ -13,7 +13,7 @@ function modulesFor(dataset,reduced=false){
  return window.testModules;
 }
 test('hidden starstream scenes and reduced motion do not load the effect',()=>{
- for(const dataset of [{pageKind:'home'},{pageSection:'posts'},{pageLayout:'tools'}]){
+ for(const dataset of [{pageKind:'home'},{pageSection:'posts'},{pageLayout:'tools'},{pageSection:'tags',pageLayout:'site-notice'}]){
   assert.equal(modulesFor(dataset).find(m=>m.key==='space-ribbons').test(),false);
  }
  for(const dataset of [{pageLayout:'friends-list'},{pageLayout:'memories'},{pageSection:'tags'},{pageLayout:'random-number'}]){

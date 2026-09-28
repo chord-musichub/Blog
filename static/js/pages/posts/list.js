@@ -199,7 +199,7 @@
         var empty = archive.querySelector('[data-archive-empty="' + mode + '"]'); if(empty) empty.hidden = count !== 0;
       });
       var visible = visibleCount(activeMode), total = records(activeMode).length;
-      if(status) status.textContent = (query || tagFilter ? '搜索 / ' : '') + (activeMode === 'articles' ? '文章' : '项目') + ' / ' + visible + ' / ' + total;
+      if(status) status.textContent = (query || tagFilter ? '搜索 / ' : '') + (activeMode === 'articles' ? (archive.dataset.archiveArticleLabel || '文章') : '项目') + ' / ' + visible + ' / ' + total;
       if(projectHint){ var matchedProjects = visibleCount('projects'); projectHint.hidden = !(activeMode === 'articles' && query && matchedProjects); projectHint.textContent = '项目 / ' + matchedProjects + ' →'; }
     }
     function switchMode(mode){

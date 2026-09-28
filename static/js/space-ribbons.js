@@ -28,7 +28,7 @@
   function sceneEnabled(){
     if(!document.body) return false;
     var page = document.body.dataset;
-    return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageLayout !== 'tools';
+    return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageLayout !== 'tools' && page.pageLayout !== 'site-notice';
   }
 
   function releaseLayer(){

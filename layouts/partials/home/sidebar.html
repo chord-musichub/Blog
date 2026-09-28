@@ -24,7 +24,8 @@
     </header>
 
     <div class="songline-terminal-main">
-      <section class="songline-terminal-feature" aria-label="精选文章" data-home-recommendations>
+      <div class="songline-terminal-feature">
+      <section class="songline-terminal-recommendations" aria-label="精选文章" data-home-recommendations>
         {{ $pool := slice }}{{ range $recommendable }}{{ $pool = $pool | append (dict "url" .RelPermalink "title" .Title "cover" (partial "media-preview-url.html" (.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png")) "date" (.Date.Format "2006-01-02") "displayDate" (.Date.Format "2006.01.02")) }}{{ end }}
         <script type="application/json" data-home-recommendation-pool>{{ $pool | jsonify | safeJS }}</script>
         <div class="songline-terminal-heading"><span>推荐文章</span><i></i></div>
@@ -55,6 +56,9 @@
           </div>
         {{ end }}
       </section>
+
+      {{ partial "home/notices.html" . }}
+      </div>
 
       <section class="songline-terminal-stats" aria-label="站点统计">
         <div class="songline-terminal-heading"><span>站点数据</span><i></i></div>

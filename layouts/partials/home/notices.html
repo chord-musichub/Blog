@@ -1,0 +1,18 @@
+{{- $posts := where .Site.RegularPages "Section" "posts" -}}
+{{- $notices := sort (where $posts ".Params.is_notice" true) "Date" "desc" -}}
+<section class="songline-terminal-notices" aria-labelledby="home-notices-title" data-home-notices>
+  <div class="songline-terminal-heading songline-notices-heading">
+    <h2 id="home-notices-title">站点通知</h2><i aria-hidden="true"></i>
+    <a href="/tags/site-notice/" aria-label="查看全部站点公告">全部公告 <span aria-hidden="true">↗</span></a>
+  </div>
+  {{ with first 1 $notices }}
+    {{ range . }}
+    <a class="songline-notice-latest" href="{{ .RelPermalink }}" data-home-notice-latest>
+      <h3>{{ .Title }}</h3>
+      <span class="songline-notice-meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time><span aria-hidden="true">↗</span></span>
+    </a>
+    {{ end }}
+  {{ else }}
+    <p class="songline-notice-empty">暂时没有新公告，站点消息会在这里与你见面。</p>
+  {{ end }}
+</section>

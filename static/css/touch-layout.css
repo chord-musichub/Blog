@@ -10,7 +10,7 @@
   html body{min-height:100dvh!important;padding-bottom:calc(var(--touch-dock) + env(safe-area-inset-bottom))!important;background-color:var(--mobile-scene-base,#0d1728)!important}
   /* 背景/幕布覆盖底栏完全隐藏后的最大视口；控件继续使用实际可见视口。
      不用 JS 在每次 visualViewport resize 时写高度，避免拖动期间反复布局。 */
-  html body:is([data-page-kind="home"],[data-page-section="posts"],[data-page-section="friends"]) .site-bg-layer{
+  html body:is([data-page-kind="home"],[data-page-section="posts"],[data-page-section="friends"],[data-page-layout="site-notice"]) .site-bg-layer{
     height:100vh!important;height:100lvh!important;--site-bg-height:100lvh!important;
   }
   html .site-boot-overlay,html.document-cover::after{

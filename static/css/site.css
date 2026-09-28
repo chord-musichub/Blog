@@ -2609,20 +2609,6 @@ body.dark .post-card-head > a.notice-badge{
 }
 
 
-/* v12.3：站点公告空状态，避免 /tags/site-notice/ 404 */
-.notice-empty-card{
-  padding:30px;
-  text-align:left;
-}
-.notice-empty-card h2{
-  margin:12px 0 8px;
-}
-.notice-empty-card p{
-  color:var(--muted);
-  margin:0 0 18px;
-}
-
-
 /* v12.4：朋友头像默认背景统一 + 朋友详情横幅更完整 */
 .friend-card .avatar,
 .featured-card .avatar,

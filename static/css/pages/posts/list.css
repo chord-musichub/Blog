@@ -254,3 +254,10 @@ body.dark .content-archive{border-color:rgba(171,207,239,.24);background:linear-
 .content-archive .content-archive__search-terms button{min-height:40px;padding:8px 13px;font-size:14px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;text-align:left}
 .content-archive .content-archive__search-terms button[aria-pressed="true"]{background:rgba(145,204,255,.28);border-color:#bcdfff}
 @media(max-width:760px){.content-archive .content-archive__search-terms{max-height:180px;scroll-snap-type:y proximity}}
+
+/* 公告页的返回是轻量图标，不占用一整格主操作；保留触屏点击范围。 */
+[data-notice-archive] .content-archive__controls{grid-template-columns:44px repeat(2,minmax(0,1fr));align-items:center}
+.content-archive__back{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;color:var(--text);text-decoration:none}
+.content-archive__back .ui-icon,.content-archive__back svg{width:22px;height:22px}
+.content-archive__back:hover{color:var(--accent);background:rgba(129,189,235,.16)}
+.content-archive__back:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
