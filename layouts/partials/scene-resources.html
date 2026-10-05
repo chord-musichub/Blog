@@ -1,0 +1,21 @@
+{{- /* Early hints only: runtime readiness checks the actual computed scene CSS. */ -}}
+{{- $background := .Site.Data.site.background.image | default "" -}}
+{{- $light := slice -}}
+{{- $dark := slice -}}
+{{- $friends := hasPrefix .RelPermalink "/friends/" -}}
+{{- if hasPrefix .RelPermalink "/tools/" -}}
+  {{- $light = slice "/uploads/admin/background/under-ground.png" "/uploads/admin/background/tools-underground-soil-light-v1.png" -}}
+  {{- $dark = slice "/uploads/admin/background/under-ground-black.png" "/uploads/admin/background/tools-underground-soil-dark-v1.png" -}}
+{{- else if $background -}}
+  {{- if .IsHome -}}
+    {{- $light = slice "/uploads/admin/background/qiandai_background.png" -}}
+    {{- $dark = slice "/uploads/admin/background/qiandai-background-black.png" -}}
+  {{- else if or (eq .Section "posts") (eq .Layout "site-notice") -}}
+    {{- $light = slice "/uploads/admin/background/ground-background.png" -}}
+    {{- $dark = slice "/uploads/admin/background/ground-back-black.png" -}}
+  {{- else -}}
+    {{- $light = slice $background -}}
+    {{- $dark = $light -}}
+  {{- end -}}
+{{- end -}}
+{{- return (dict "light" $light "dark" $dark "forceDark" $friends) -}}

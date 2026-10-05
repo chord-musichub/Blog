@@ -30,7 +30,7 @@
   function createTracker(){
     var state = {ready:false};
     state.promise = (window.SonglineResources
-      ? window.SonglineResources.prepare(document)
+      ? window.SonglineResources.enter()
       : Promise.resolve()).then(function(){ state.ready = true; });
     state.ratio = function(){ return state.ready ? 1 : .75; };
     return state;

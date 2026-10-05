@@ -37,3 +37,17 @@ test('retired contact copier is no longer shipped or requested',()=>{
  assert(!read('layouts/partials/footer.html').includes('contact-copy'));
  assert(read('static/js/pages/home/recommendations.js').includes('clipboard'),'The active home copy action remains');
 });
+test('archive search does not load the unrelated manual-search modules',()=>{
+ const modules=modulesFor({});
+ function surface(selectors){return {querySelector:query=>query.split(',').some(part=>selectors.includes(part.trim()))?{}:null};}
+ for(const key of ['search-utils','search']){
+  const module=modules.find(m=>m.key===key);
+  assert.equal(module.test(surface(['input[type="search"]','[data-content-archive]'])),false);
+  for(const selector of ['[data-search-submit]','[data-tag-search-panel]','[data-tools-search]'])assert.equal(module.test(surface([selector])),true);
+ }
+ const archive=modules.find(m=>m.key==='posts-list-flat');
+ assert.equal(archive.test(surface(['#postList'])),false);
+ assert.equal(archive.test(surface(['[data-content-archive]'])),true);
+ assert(!read('static/js/pages/posts/list.js').includes('SonglineInitPostsListLayout'));
+ assert(!read('static/css/pages/posts/list.css').includes('.posts-list'));
+});

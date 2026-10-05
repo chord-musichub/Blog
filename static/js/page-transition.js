@@ -14,7 +14,7 @@
     }else{
       clearTimeout(window.__songlineBootPrepFallback);
       root.classList.remove('is-boot-preparing', 'is-booting');
-      if(!window.__songlineDocumentArrival && window.SonglineResources) window.SonglineResources.prepare(document);
+      if((!window.__songlineDocumentArrival || reduced) && window.SonglineResources) window.SonglineResources.enter();
     }
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, {once:true});

@@ -43,9 +43,13 @@
     // Start article increments before duplicate GET counters on the same page.
     counters.sort(function(a,b){ return Number(mode(b)==='post')-Number(mode(a)==='post'); });
     counters.forEach(function(el){
+      if(el.getAttribute('data-view-deferred') === 'archive'){
+        const record = el.closest('[data-archive-record]');
+        if(!record || record.hidden || !record.classList.contains('is-open')) return;
+      }
       const path = el.getAttribute('data-view-path') || window.location.pathname;
       const allowed = statisticsAllowed();
-      const identity = path + ':' + mode(el) + ':' + allowed;
+      const identity = path + ':' + mode(el) + ':' + (mode(el)==='post' && allowed);
       const previous = states.get(el);
       if(previous && previous.identity === identity) return;
       const state = {identity:identity};

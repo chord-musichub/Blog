@@ -249,8 +249,17 @@
   async function syncDocumentShell(doc, url, pushState){
     if(doc.title) document.title = doc.title;
     var nextBody = doc.body;
+    var nextScene = doc.getElementById('songline-scene-resources');
     if(nextBody){
       var dark = document.body.classList.contains('dark');
+      // Friends forces a local night scene. Resolve the destination preference
+      // before applying its CSS, or the browser downloads an unused night/day
+      // background during the later theme initializer's correction.
+      if(nextScene){
+        try{ dark = JSON.parse(nextScene.textContent).forceDark || (localStorage.getItem('songline-theme') || 'dark') === 'dark'; }
+        catch(error){ dark = true; }
+      }
+      root.setAttribute('data-theme', dark ? 'dark' : 'light');
       document.body.className = nextBody.className || '';
       if(dark) document.body.classList.add('dark');
       ['pageKind', 'pageSection', 'pageLayout', 'bootWelcome'].forEach(function(name){
@@ -265,6 +274,8 @@
     var nextDescription = doc.querySelector('meta[name="description"]');
     var description = document.querySelector('meta[name="description"]');
     if(nextDescription && description) description.setAttribute('content', nextDescription.getAttribute('content') || '');
+    var currentScene = document.getElementById('songline-scene-resources');
+    if(nextScene && currentScene) currentScene.textContent = nextScene.textContent;
     await syncPageStyles(doc);
     // 过场只替换 main；同步可选页脚，避免从首页切出后残留备案栏。
     var currentFooter = document.querySelector('footer.site-footer-clean');
@@ -356,6 +367,7 @@
       doc = new DOMParser().parseFromString(html, 'text/html');
       var nextMain = doc.querySelector('main.container');
       if(!nextMain) throw new Error('next page main container missing');
+      if(window.SonglineResources) window.SonglineResources.preloadScene(doc);
 
       // 幕布下先切换页面壳与专属样式，并预热首屏图片；此前在这里直接替换
       // main，慢网速时会先露出无背景/未定位的页面，再陆续加载场景资源。

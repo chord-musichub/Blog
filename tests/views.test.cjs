@@ -58,3 +58,16 @@ test('failed requests retry; a stale response cannot overwrite a reused element'
  const reused=counter('/old/');reuse([reused]);await settle();reused.attrs['data-view-path']='/new/';reuse([reused]);await settle();
  resolvers[1]({ok:true,json:async()=>({views:20})});await settle();resolvers[0]({ok:true,json:async()=>({views:10})});await settle();assert.equal(reused.value.textContent,20);
 });
+test('closed archive counters do no work; opening reads once and privacy changes do not refresh GET-only counts',async()=>{
+ const calls=[];const init=setup(async(url,opts)=>{calls.push(opts.method);return {ok:true,json:async()=>({views:12})};},null,false);
+ let open=false,hidden=false;
+ const record={get hidden(){return hidden;},classList:{contains:()=>open}};
+ const node=counter('/archive/');node.attrs['data-view-deferred']='archive';node.closest=()=>record;
+ init([node]);await settle();assert.equal(calls.length,0);assert.equal(node.value.textContent,'0');
+ init.consent(true);await settle();assert.equal(calls.length,0);
+ open=true;init([node]);await settle();assert.deepEqual(calls,['GET']);assert.equal(node.value.textContent,12);
+ init.consent(false);await settle();assert.deepEqual(calls,['GET']);
+ open=false;init([node]);open=true;init([node]);await settle();assert.deepEqual(calls,['GET']);
+ const filtered=counter('/filtered/');filtered.attrs['data-view-deferred']='archive';filtered.closest=()=>record;hidden=true;
+ init([filtered]);await settle();assert.deepEqual(calls,['GET']);
+});

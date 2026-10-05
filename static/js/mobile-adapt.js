@@ -1,5 +1,6 @@
 /* v20.18.5：客户端移动端深度适配辅助 */
 (function(){
+  var resizeTimer = 0, orientationTimer = 0;
   function isMobile(){
     return window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
   }
@@ -44,8 +45,8 @@
   }else{
     init(document);
   }
-  window.addEventListener('resize', function(){ window.setTimeout(scrollActiveNavIntoView, 120); });
-  window.addEventListener('orientationchange', function(){ window.setTimeout(init, 260); });
+  window.addEventListener('resize', function(){ window.clearTimeout(resizeTimer); resizeTimer = window.setTimeout(scrollActiveNavIntoView, 120); });
+  window.addEventListener('orientationchange', function(){ window.clearTimeout(orientationTimer); orientationTimer = window.setTimeout(init, 260); });
   window.addEventListener('songline:page-swap', function(event){
     init(event.detail && event.detail.root ? event.detail.root : document);
   });

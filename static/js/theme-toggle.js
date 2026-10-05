@@ -34,24 +34,33 @@
     return curtain;
   }
 
-  function switchTheme(){
+  function wait(milliseconds){ return new Promise(function(resolve){ window.setTimeout(resolve, milliseconds); }); }
+
+  async function switchTheme(){
     if(isTransitioning || !document.body || document.documentElement.classList.contains('songline-page-transitioning')) return;
     isTransitioning = true;
     var wasDark = document.documentElement.getAttribute('data-theme') === 'dark';
     var next = wasDark ? 'light' : 'dark';
     var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var curtain = createCurtain(wasDark);
+    if(window.SonglineResources) window.SonglineResources.preloadScene(document, next);
     requestAnimationFrame(function(){ curtain.classList.add('is-covering'); });
-    window.setTimeout(function(){
+    try{
+      await wait(reduced ? 90 : 420);
       try{ localStorage.setItem(KEY, next); }catch(e){}
       apply(next);
       curtain.classList.add('is-swapping');
-    }, reduced ? 90 : 420);
-    window.setTimeout(function(){ curtain.classList.add('is-leaving'); }, reduced ? 145 : 790);
-    window.setTimeout(function(){
+      var swappedAt = performance.now();
+      if(window.SonglineResources) await window.SonglineResources.scene();
+      // Preserve the existing icon animation's minimum duration, but a slow
+      // target background must not be exposed after this fixed timer expires.
+      await wait(Math.max(0, (reduced ? 55 : 370) - (performance.now() - swappedAt)));
+      curtain.classList.add('is-leaving');
+      await wait(reduced ? 145 : 400);
+    }finally{
       curtain.remove();
       isTransitioning = false;
-    }, reduced ? 290 : 1190);
+    }
   }
 
   function playFriendsPlaceholder(){

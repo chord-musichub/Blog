@@ -29,8 +29,9 @@
       }
     })();
   </script>
-  <script defer src="/static/resource-readiness.js?v=22.10.0"></script>
-  <script src="/static/document-transition.js?v=22.9.0"></script>
+  {{ partial "scene-entry.html" . }}
+  <script defer src="/static/resource-readiness.js?v={{ $assetVersion }}"></script>
+  <script src="/static/document-transition.js?v={{ $assetVersion }}"></script>
   <script>
     // 唯一页面配置源：楼层导航与过场 priority 都从同一 Hugo partial 读取。
     window.SonglinePageConfig = {{ partial "page-navigation-data.html" . | jsonify | safeJS }};

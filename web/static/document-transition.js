@@ -47,7 +47,8 @@
   async function reveal(){
     if(!incoming || reduced) return;
     if(window.SonglineResources){
-      await window.SonglineResources.prepare(document);
+      if(window.SonglineResources.enter) await window.SonglineResources.enter();
+      else await window.SonglineResources.prepare(document);
       requestAnimationFrame(()=>requestAnimationFrame(()=>{
         root.classList.add('is-document-revealing');
         setTimeout(clear,550);

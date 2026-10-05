@@ -125,7 +125,7 @@
       key:'search-utils',
       src:'/js/search-utils.js?v=' + VERSION,
       test:function(root){
-        return !!query(root, 'input[type="search"]');
+        return !!query(root, '[data-search-submit], [data-tag-search-panel], [data-tools-search]');
       },
       init:function(){}
     },
@@ -319,10 +319,9 @@
       key:'posts-list-flat',
       src:'/js/pages/posts/list.js?v=' + VERSION,
       test:function(root){
-        return !!query(root, '[data-content-archive], #postList');
+        return !!query(root, '[data-content-archive]');
       },
       init:function(root){
-        if(window.SonglineInitPostsListLayout) window.SonglineInitPostsListLayout(root || document);
         if(window.SonglineInitPostsListFlat) window.SonglineInitPostsListFlat(root || document);
       }
     }
