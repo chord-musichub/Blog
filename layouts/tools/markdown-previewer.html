@@ -1,25 +1,23 @@
 {{ define "main" }}
 {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
 <section data-md-tool>
-  <div class="card article-intro md-file-controls">
+  <div class="card md-file-controls" data-md-drop>
     <div class="md-tool-head">
       <button class="btn md-file-button" type="button" data-md-choose>选择 .md 文件</button>
       <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" data-md-file hidden>
-      <span class="meta">仅在本机预览，不上传文件</span>
     </div>
-    <div class="md-drop-zone" data-md-drop><strong>拖放 Markdown 文件到这里</strong></div>
-    <div class="md-tool-meta" role="status" aria-live="polite">
-      <span data-md-name>尚未选择文件</span><span data-md-size></span>
+    <div class="md-tool-meta" role="status" aria-live="polite" hidden>
+      <span data-md-name></span>
     </div>
   </div>
   <div class="article-shell section md-tool-layout" data-toc-state="expanded">
     <article class="card article-reader markdown-body md-live-preview" data-md-preview aria-label="Markdown 预览">
-      <div class="md-empty-state">选择文件后预览</div>
+      <div class="md-empty-state"></div>
     </article>
     <div class="article-toc-rail">
       <aside class="card article-toc" data-md-toc data-toc-toggle-card role="button" tabindex="0" aria-label="展开或收起目录" title="点击展开 / 收起目录">
         <div class="toc-head"><h3>{{ partial "ui-icon.html" "menu" }} 目录</h3></div>
-        <div class="toc-body"><nav><ul><li><span class="meta">选择文件后生成目录</span></li></ul></nav></div>
+        <div class="toc-body"></div>
       </aside>
     </div>
   </div>

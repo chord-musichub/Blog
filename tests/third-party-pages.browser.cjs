@@ -19,6 +19,9 @@ async function fixture(context,{native=false,failExternal=false}={}){
   const file=path.resolve(root,relative+(u.pathname.endsWith('/')?'index.html':''));
   if(file.startsWith(root+path.sep)&&fs.existsSync(file)&&fs.statSync(file).isFile()&&!u.pathname.startsWith('/uploads/')){
    let body=fs.readFileSync(file);
+   // Playwright aborts exact /favicon.ico URLs before route callbacks, even
+   // for card images. Only fixture HTML uses this stable query workaround.
+   if(u.pathname==='/tools/')body=body.toString().replace(/((?:data-image-src|src)=["']?https:\/\/[^"'\s>]+\/favicon\.ico)/g,'$1?fixture=1');
    if(native && u.pathname==='/tools/')body=body.toString().replaceAll('data-image-src=','src=');
    const type={'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml'}[path.extname(file)]||'application/octet-stream';
    return route.fulfill({body,contentType:type});

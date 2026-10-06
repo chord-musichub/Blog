@@ -33,8 +33,19 @@ test('preview uses the actual reader structure and has no old layout stylesheet'
  const template=read('layouts/tools/markdown-previewer.html');
  for(const token of ['article-reader markdown-body','article-toc-rail','data-md-choose','type="button"','aria-live="polite"'])assert(template.includes(token));
  assert(!fs.existsSync(path.join(__dirname,'../static/css/tools/markdown-previewer-base.css')));
- assert(!read('static/css/tools/markdown-previewer.css').includes('grid-template-columns'),'Preview cannot compete with the article layout');
+ const css=read('static/css/tools/markdown-previewer.css');
+ assert(css.includes('main.container:has([data-md-tool])'),'Centering only affects the preview frame');
+ assert(css.includes('.md-tool-layout[data-toc-state="expanded"]'),'Directory columns stay inside the centered preview');
+ for(const text of ['仅在本机预览','尚未选择文件','选择文件后预览','选择文件后生成目录','data-md-size'])assert(!template.includes(text),'No extra helper text: '+text);
  const controller=read('static/js/tools/markdown-previewer.js');assert(controller.includes('SonglineReading.buildToc'));
  assert(!controller.includes('function slugify'),'Preview has no divergent heading implementation');
  assert(read('static/js/article-render-sync.js').includes('SonglineReading.buildToc'));
+});
+test('external tool icon URLs do not use Google or local mirrors',()=>{
+ const tools=JSON.parse(read('assets/data/tools/external.json'));assert.equal(tools.length,27);
+ for(const tool of tools){
+  const url=new URL(tool.icon_url);assert.equal(url.protocol,'https:');
+  assert(!/(^|\.)(google|gstatic|googleusercontent)\.com$/.test(url.hostname),tool.title+' cannot depend on Google');
+ }
+ assert(!read('layouts/partials/tool-card.html').includes('google.com'),'Templates do not reinstate the old source');
 });

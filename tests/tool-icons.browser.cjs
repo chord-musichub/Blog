@@ -9,14 +9,14 @@ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><rect 
 (async()=>{
  const browser=await chromium.launch({channel:'msedge',headless:true});
  try{
-  for(const width of [390,1440])for(const theme of ['light','dark'])for(const mode of ['primary','alternative','unavailable']){
+  for(const width of [390,1440])for(const theme of ['light','dark'])for(const mode of ['primary','unavailable']){
    const context=await browser.newContext({viewport:{width,height:900},isMobile:width<981,hasTouch:width<981,reducedMotion:'reduce'});
    const requests=[],errors=[],consoleErrors=[];
    await context.addInitScript(theme=>{localStorage.setItem('songline-theme',theme);sessionStorage.setItem('songline-home-boot-v21.4','1');},theme);
    await context.route('**/*',route=>{
     const req=route.request(),url=new URL(req.url());requests.push({url:req.url(),method:req.method()});
     if(url.origin!==base){
-     if(mode==='unavailable'||(mode==='alternative'&&url.hostname==='www.google.com'))return route.abort();
+     if(mode==='unavailable')return route.abort();
      return route.fulfill({contentType:'image/svg+xml',body:svg});
     }
     if(url.pathname.startsWith('/api/'))return route.fulfill({json:{items:[],views:0}});
@@ -29,7 +29,7 @@ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><rect 
     // Playwright unconditionally aborts URLs ending in /favicon.ico before
     // context.route sees them. A stable fixture-only query bypasses that rule.
     // Production markup and addresses remain unchanged.
-    if(url.pathname==='/tools/')body=body.toString().replace(/(data-image-fallback=["']?https:\/\/[^"'\s>]+\/favicon\.ico)/g,'$1?fixture=1');
+    if(url.pathname==='/tools/')body=body.toString().replace(/((?:data-image-src|src)=["']?https:\/\/[^"'\s>]+\/favicon\.ico)/g,'$1?fixture=1');
     return route.fulfill({body,contentType:({'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream'});
    });
    const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('console',msg=>{if(msg.type()==='error')consoleErrors.push(msg.text());});
@@ -46,7 +46,6 @@ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><rect 
     assert.deepEqual(await icon.evaluate(img=>[img.getBoundingClientRect().width,img.getBoundingClientRect().height]),[36,36]);
     const fallback=icon.locator('..').locator('.tool-icon-fallback');
     assert.equal(await fallback.isVisible(),mode==='unavailable');
-    if(mode==='alternative')assert.equal(await icon.getAttribute('src'),await icon.getAttribute('data-image-fallback'));
     if(mode==='primary')assert.equal(await icon.getAttribute('src'),await icon.getAttribute('data-image-src'));
    }
    await page.goto(base+'/tools/');await page.evaluate(()=>SonglinePageModules.ready(document));
@@ -62,6 +61,7 @@ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><rect 
    await page.evaluate(()=>SonglinePageModules.ready(document));await checkIcon(page.locator('.tool-card-icon > img[data-image-src]').first());
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
    assert.deepEqual(errors,[]);assert(!requests.some(r=>r.method!=='GET'),'No external writes');
+   assert(!requests.some(r=>/(^|\.)(google|gstatic|googleusercontent)\.com$/.test(new URL(r.url).hostname)),'No requests to Google');
    console.log('PASS tools icons',width,theme,mode,'scroll/search/reentry');await context.close();
   }
  }finally{await browser.close();}

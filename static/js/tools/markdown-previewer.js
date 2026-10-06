@@ -13,7 +13,7 @@
     const preview = panel.querySelector('[data-md-preview]');
     const toc = panel.querySelector('[data-md-toc] .toc-body');
     const nameEl = panel.querySelector('[data-md-name]');
-    const sizeEl = panel.querySelector('[data-md-size]');
+    const statusEl = panel.querySelector('.md-tool-meta');
     window.SonglineInitArticleToc(panel);
 
     function notify(){
@@ -36,7 +36,7 @@
       preview.appendChild(empty);
       window.SonglineReading.buildToc(preview, toc);
       nameEl.textContent = message;
-      sizeEl.textContent = '';
+      statusEl.hidden = !message;
       notify();
     }
     function setFile(file){
@@ -61,7 +61,7 @@
         if(window.SonglineResources) window.SonglineResources.observe(preview);
         if(window.SonglinePageModules) window.SonglinePageModules.scan(panel);
         nameEl.textContent = file.name || '已选择文件';
-        sizeEl.textContent = file.size ? Math.max(1, Math.round(file.size / 1024)) + ' KB' : '0 KB';
+        statusEl.hidden = false;
         preview.removeAttribute('aria-busy');
         // New file headings must not inherit the previous file's fragment.
         if(location.hash) history.replaceState(history.state, '', location.pathname + location.search);

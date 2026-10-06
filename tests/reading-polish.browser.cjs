@@ -56,10 +56,18 @@ async function settledScroll(page){
   for(const [width,theme] of [[1440,'dark'],[1440,'light'],[1024,'dark'],[390,'dark'],[390,'light']]){
    const f=await fixture(browser,width,theme),p=f.page;
    await p.goto(base+'/tools/markdown-previewer/');await ready(p,'/tools/markdown-previewer/');
+   // body is the scrolling container and reserves its own scrollbar gutter;
+   // html.clientWidth includes that reserved area even when overflow is clipped.
+   const frame=await p.locator('main.container').boundingBox(),layoutWidth=await p.evaluate(()=>document.body.clientWidth);
+   assert(Math.abs(frame.x+frame.width/2-layoutWidth/2)<1,'Preview frame is centered: '+JSON.stringify({width,layoutWidth,frame}));
+   assert.equal(await p.locator('.md-tool-meta').isVisible(),false,'No empty status/helper line');
+   assert.equal(await p.locator('[data-md-tool]').textContent().then(text=>text.includes('仅在本机预览')),false);
+   await p.screenshot({path:path.join(out,`preview-empty-${width}-${theme}.png`)});
    // Keyboard-accessible file picker, not a label around a hidden input.
    const chooser=p.waitForEvent('filechooser');await p.locator('[data-md-choose]').focus();await p.keyboard.press('Enter');
    await (await chooser).setFiles({name:'test.md',mimeType:'text/markdown',buffer:Buffer.from(sample)});
    await p.waitForFunction(()=>document.querySelector('[data-md-name]').textContent==='test.md');
+   if(width>980){const rail=await p.locator('.article-toc-rail').boundingBox();assert(rail.x>=frame.x&&rail.x+rail.width<=frame.x+frame.width,'Directory stays inside the centered frame');}
    await p.locator('.md-code-copy').waitFor();
    assert.equal(await p.locator('.toc-tree a').count(),47,'Every heading level including h5/h6 is included');
    assert.equal(await p.locator('.toc-tree [data-toc-level="6"]').count(),1);

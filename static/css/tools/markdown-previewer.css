@@ -1,13 +1,20 @@
 /* Article shell, sticky rail, typography and actions are shared.
    Only local-file controls and the empty state belong to this tool. */
-.md-file-controls{padding:22px!important;margin-top:18px;color:var(--article-ink,var(--text))}
-.md-tool-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.md-file-controls{padding:18px 22px!important;margin:18px 0;color:var(--article-ink,var(--text));background:var(--article-surface,var(--panel))!important;transition:background .18s ease,border-color .18s ease}
+.md-tool-head{display:flex;align-items:center;justify-content:center;gap:12px}
 .md-file-button{font:inherit;cursor:pointer;min-height:44px;background:var(--article-surface-strong,var(--panel));border-color:var(--article-line-strong,var(--border));color:var(--article-ink,var(--text))}
 .md-file-button:hover,.md-file-button:focus-visible{border-color:var(--article-accent,var(--accent));background:var(--article-accent-soft,var(--soft-blue))}
-.md-drop-zone{display:grid;place-items:center;min-height:86px;padding:18px;border:1px dashed var(--article-line-strong,var(--border));border-radius:14px;color:var(--article-muted,var(--muted));background:var(--article-accent-soft,var(--soft-blue));transition:background .18s ease,border-color .18s ease}
-.md-drop-zone.dragging{border-color:var(--article-accent,var(--accent));background:var(--article-surface-strong,var(--panel))}
-.md-tool-meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;color:var(--article-muted,var(--muted));font-size:13px;overflow-wrap:anywhere}
+.md-file-controls.dragging{border-color:var(--article-accent,var(--accent));background:var(--article-surface-strong,var(--panel))!important}
+.md-tool-meta{display:flex;justify-content:center;margin-top:12px;color:var(--article-muted,var(--muted));font-size:13px;overflow-wrap:anywhere}
+.md-tool-meta[hidden]{display:none}
 .md-tool-meta [data-md-name]{min-width:0}
 .md-tool-layout .md-live-preview{min-height:340px;max-height:none;overflow:visible}
 .md-empty-state{min-height:260px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:var(--article-muted,var(--muted))}
-@media(max-width:600px){.md-file-controls{padding:18px!important}.md-tool-head{align-items:flex-start;flex-direction:column}.md-drop-zone{min-height:72px}}
+/* Center the preview as one frame; only articles retain the offset outer rail. */
+@media(min-width:981px){
+  html body[data-page-layout="markdown-previewer"] main.container:has([data-md-tool]){width:min(1350px,calc(100vw - 80px))!important;max-width:min(1350px,calc(100vw - 80px))!important;margin-left:auto!important;margin-right:auto!important}
+  html body .md-tool-layout[data-toc-state]{display:grid!important;grid-template-columns:minmax(0,1fr) 56px!important;gap:24px!important}
+  html body .md-tool-layout[data-toc-state="expanded"]{grid-template-columns:minmax(0,1fr) 210px!important}
+  html body .md-tool-layout .article-toc-rail{position:static;align-self:stretch;width:auto;min-width:0}
+}
+@media(max-width:600px){.md-file-controls{padding:18px!important}}
