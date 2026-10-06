@@ -36,6 +36,10 @@
   }
 
   window.SonglineInitSnake = init;
+  window.addEventListener('songline:page-transition-start', function(){
+    if(activeController) activeController.destroy();
+    activeController = null;
+  });
 
   function createGame(game){
     const canvas = game.querySelector('[data-snake-canvas]');
@@ -845,6 +849,9 @@
       destroyed = true;
       if(raf) cancelAnimationFrame(raf);
       if(scorePoll) window.clearInterval(scorePoll);
+      raf = scorePoll = 0;
+      if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
+      audioCtx = null;
       document.removeEventListener('keydown', handleKeydown);
       document.removeEventListener('keyup', handleKeyup);
       document.removeEventListener('visibilitychange', handleVisibility);

@@ -47,13 +47,15 @@
   async function getMarkdown(){
     const sourceURL = sourceElement.dataset.sourceUrl || '';
     if(sourceURL){
+      const controller = new AbortController();
+      let timer;
       try{
-        const response = await fetch(sourceURL, {credentials:'same-origin', cache:'no-store'});
-        if(response.ok){
-          const text = await response.text();
-          if(text && isMarkdownSource(text)) return text;
-        }
-      }catch(error){}
+        const timeout = new Promise(function(resolve){ timer = window.setTimeout(function(){ controller.abort(); resolve(''); }, 2500); });
+        const download = fetch(sourceURL, {credentials:'same-origin', cache:'no-store', signal:controller.signal})
+          .then(function(response){ return response.ok ? response.text() : ''; });
+        const text = await Promise.race([download, timeout]);
+        if(text && isMarkdownSource(text)) return text;
+      }catch(error){}finally{ window.clearTimeout(timer); }
     }
     return readInlineMarkdown();
   }
@@ -63,7 +65,9 @@
     button.disabled = true;
     button.textContent = '准备中...';
     try{
-      const blob = new Blob(['\ufeff' + await getMarkdown()], {type:'text/markdown;charset=utf-8'});
+      const markdown = await getMarkdown();
+      if(!button.isConnected || !sourceElement.isConnected) return;
+      const blob = new Blob(['\ufeff' + markdown], {type:'text/markdown;charset=utf-8'});
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;

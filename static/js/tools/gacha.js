@@ -1,6 +1,8 @@
 (function(){
-  const tool = document.querySelector('[data-gacha-tool]');
-  if(!tool) return;
+  function init(root){
+  const tool = (root || document).querySelector('[data-gacha-tool]');
+  if(!tool || tool.dataset.gachaBound === '1') return;
+  tool.dataset.gachaBound = '1';
 
   const modes = {
     starRailLike: {
@@ -285,4 +287,6 @@
   els.banner.addEventListener('change', reset);
 
   render([]);
+  }
+  window.SonglineInitGacha = init;
 })();

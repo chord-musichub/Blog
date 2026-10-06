@@ -1,5 +1,6 @@
 /* v14.3：整卡点击统一事件委托，兜底 related-card */
 (function(){
+  if(window.SonglineInitCardInteractions){ window.SonglineInitCardInteractions(document); return; }
   const interactiveSelector = 'a, button, input, textarea, select, label, summary, [role="button"], [data-no-card-link]';
 
   function getHref(card){
@@ -27,13 +28,18 @@
     return target && target.closest && target.closest('[data-card-link], .related-card');
   }
 
-  document.querySelectorAll('[data-card-link], .related-card').forEach(function(card){
+  function init(root){
+  (root || document).querySelectorAll('[data-card-link], .related-card').forEach(function(card){
     if(getHref(card)){
       card.classList.add('clickable-card');
       if(!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '0');
       if(!card.hasAttribute('role')) card.setAttribute('role', 'link');
     }
   });
+  }
+  window.SonglineInitCardInteractions = init;
+  init(document);
+  window.addEventListener('songline:page-swap', function(event){ init(event.detail && event.detail.root); });
 
   document.addEventListener('click', function(event){
     const card = findCard(event.target);
@@ -60,4 +66,3 @@
 
 
 /* 页面返回统一由 page-transition-system.js 按真实站内历史处理。 */
-

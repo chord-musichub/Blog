@@ -14,6 +14,18 @@
     var button = config.button ? document.querySelector(config.button) : null;
     var count = config.count ? document.querySelector(config.count) : null;
     var empty = config.empty ? document.querySelector(config.empty) : null;
+    if(config.strata && !empty){
+      empty = document.createElement('div');
+      empty.className = 'card tools-empty-state';
+      empty.textContent = '这层土里还没有挖到这个工具。';
+      list.appendChild(empty);
+    }
+    function syncStrata(active){
+      if(!config.strata) return;
+      list.querySelectorAll('.tools-strata').forEach(function(layer){
+        layer.hidden = active && !Array.from(layer.querySelectorAll(config.item)).some(function(item){ return !item.hidden; });
+      });
+    }
     if(button) button.setAttribute('data-no-page-loading', '');
 
     function allText(item){
@@ -37,6 +49,7 @@
         if(show) visible++;
       });
       setEmpty(empty, visible, active);
+      syncStrata(active);
       updateCount(active, visible);
       input.classList.toggle('has-search-value', active);
       if(opts.feedback){
@@ -49,6 +62,7 @@
       input.value = '';
       items.forEach(function(item){ setVisible(item, true); item.classList.remove('is-search-hit'); });
       setEmpty(empty, items.length, false);
+      syncStrata(false);
       updateCount(false, items.length);
       input.classList.remove('has-search-value');
     }
@@ -61,6 +75,7 @@
       }
     }, true);
     input.addEventListener('search', function(){ if(!input.value) clearSearch(); });
+    if(config.live) input.addEventListener('input', function(){ runSearch({feedback:false}); });
     var params = new URLSearchParams(window.location.search);
     var initial = params.get('q') || params.get('search') || '';
     if(!input.value && initial) input.value = initial;
@@ -337,7 +352,7 @@
   }
 
   function initToolsSearch(){
-    bindManualSearch({input:'[data-tools-search]', button:'[data-tools-search-submit]', list:'.modern-tools-grid', item:'.tool-app-card, .tool-card', count:'[data-tools-search-count]', unit:'个工具', feedbackText:'搜索工具中', text:function(item){ return [item.dataset.toolKeywords, item.textContent].filter(Boolean).join(' '); }});
+    bindManualSearch({input:'[data-tools-search]', button:'[data-tools-search-submit]', list:'.modern-tools-grid', item:'.tool-app-card, .tool-card', count:'[data-tools-search-count]', unit:'个工具', strata:true, live:true, feedbackText:'搜索工具中', text:function(item){ return [item.dataset.toolKeywords, item.textContent].filter(Boolean).join(' '); }});
   }
 
   function initAllSearch(root){

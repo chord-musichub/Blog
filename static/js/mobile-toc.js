@@ -11,6 +11,8 @@
     readyForPath: ''
   };
   var onDocumentKeydown = null;
+  var focusTimer = 0;
+  var scrollTimer = 0;
 
   function isMobile(){
     return !mq || mq.matches;
@@ -75,6 +77,9 @@
   }
 
   function removeUi(){
+    window.clearTimeout(focusTimer);
+    window.clearTimeout(scrollTimer);
+    focusTimer = scrollTimer = 0;
     [drawerId, fabId, backdropId].forEach(function(id){
       var node = document.getElementById(id);
       if(node) node.remove();
@@ -183,11 +188,15 @@
     if(input){
       input.value = '';
       renderLinks('');
-      window.setTimeout(function(){ input.focus({preventScroll:true}); }, 80);
+      window.clearTimeout(focusTimer);
+      focusTimer = window.setTimeout(function(){
+        if(input.isConnected && document.documentElement.classList.contains('mobile-toc-open')) input.focus({preventScroll:true});
+      }, 80);
     }
   }
 
   function closeDrawer(){
+    window.clearTimeout(focusTimer);
     var fab = document.getElementById(fabId);
     var drawer = document.getElementById(drawerId);
     document.documentElement.classList.remove('mobile-toc-open');
@@ -231,7 +240,8 @@
         if(target){
           event.preventDefault();
           closeDrawer();
-          window.setTimeout(function(){
+          window.clearTimeout(scrollTimer);
+          scrollTimer = window.setTimeout(function(){
             if(!target.isConnected) return;
             if(window.SonglineScrollToArticleHeading) window.SonglineScrollToArticleHeading(href, false);
             else target.scrollIntoView({behavior:'smooth', block:'start'});
@@ -309,11 +319,11 @@
     hideSource(source);
     markReadingTools();
     ensureUi();
-    renderLinks('');
+    var search = document.querySelector('#' + drawerId + ' [data-mobile-toc-search]');
+    renderLinks(search ? search.value : '');
   }
 
   function boot(root){
-    removeUi();
     init(root || document);
   }
   window.SonglineInitMobileToc = boot;
@@ -321,6 +331,13 @@
   if(mq && mq.addEventListener){
     mq.addEventListener('change', function(){ init(document); });
   }
-  window.addEventListener('songline:page-transition-start', removeUi);
+  window.addEventListener('songline:page-transition-start', function(){
+    removeUi();
+    unmarkReadingTools();
+    if(state.source) showSource(state.source);
+    state.source = null;
+    state.links = [];
+    state.readyForPath = '';
+  });
   window.addEventListener('songline:article-toc-ready', function(){ init(document); });
 })();

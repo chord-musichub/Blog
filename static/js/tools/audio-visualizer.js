@@ -1065,7 +1065,24 @@
     renderer.resize();
 
     function onVisibilityChange(){ renderer.handleVisibility(document.hidden); }
-    function onPageShow(event){ if(event && event.persisted) renderer.softenAnimationResume(); }
+    var resumeCachedAudio = false;
+    function onPageShow(event){
+      if(!event || !event.persisted) return;
+      renderer.start();
+      renderer.softenAnimationResume();
+      if(resumeCachedAudio && audio){
+        resumeCachedAudio = false;
+        if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(function(){});
+        audio.play().catch(function(){});
+      }
+    }
+    function onPageHide(event){
+      if(!event.persisted){ cleanup(); return; }
+      renderer.stop();
+      resumeCachedAudio = !!(audio && !audio.paused);
+      if(audio) audio.pause();
+      if(audioCtx && audioCtx.state === 'running') audioCtx.suspend().catch(function(){});
+    }
     function cleanup(){
       renderer.stop();
       setDisplayMode(false);
@@ -1090,7 +1107,7 @@
       window.removeEventListener('songline:animation-before-resume', renderer.syncVisualPhase);
       window.removeEventListener('songline:animation-resume', renderer.softenAnimationResume);
       window.removeEventListener('songline:page-transition-start', onTransitionStart);
-      window.removeEventListener('pagehide', cleanup);
+      window.removeEventListener('pagehide', onPageHide);
       if(document.fullscreenElement && root.contains(document.fullscreenElement) && document.exitFullscreen) document.exitFullscreen().catch(function(){});
       if(window.__songlineAudioVisualizerCleanup === cleanup) window.__songlineAudioVisualizerCleanup = null;
     }
@@ -1101,7 +1118,7 @@
     window.addEventListener('songline:animation-before-resume', renderer.syncVisualPhase);
     window.addEventListener('songline:animation-resume', renderer.softenAnimationResume);
     window.addEventListener('songline:page-transition-start', onTransitionStart);
-    window.addEventListener('pagehide', cleanup, {once:true});
+    window.addEventListener('pagehide', onPageHide);
     window.__songlineAudioVisualizerCleanup = cleanup;
     renderer.start();
   }

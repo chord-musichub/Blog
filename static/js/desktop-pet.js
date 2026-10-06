@@ -1,6 +1,7 @@
 /* 信息面板雪人摆件：拖动只改绕木杆下端的转角，不平移组件。 */
 (function(){
   'use strict';
+  if(window.SonglineInitDesktopPet) return;
 
   function init(root){
     root = root || document;
@@ -52,6 +53,7 @@
 
     pet.addEventListener('pointerdown', function(event){
       if(event.button !== undefined && event.button !== 0) return;
+      if(activePointer !== null || event.isPrimary === false) return;
       activePointer = event.pointerId;
       moved = false;
       startX = event.clientX;
@@ -69,6 +71,7 @@
     });
 
     function releasePointer(event){
+      if(event && event.type === 'lostpointercapture' && event.target !== pet) return;
       if(activePointer === null || (event && event.pointerId !== undefined && event.pointerId !== activePointer)) return;
       activePointer = null;
       pet.classList.remove('is-dragging');
@@ -87,7 +90,5 @@
     image.addEventListener('error', function(){ pet.hidden = true; }, { once:true });
   }
 
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ init(document); }, { once:true });
-  else init(document);
-  window.addEventListener('songline:page-swap', function(){ init(document); });
+  window.SonglineInitDesktopPet = init;
 })();

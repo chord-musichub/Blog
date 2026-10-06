@@ -71,6 +71,41 @@
 
   var modules = [
     {
+      key:'home-parallax', src:'/js/pages/home/scene-parallax.js?v=' + VERSION,
+      test:function(root){ return document.body.dataset.pageKind === 'home' && !!query(root, '[data-home-parallax]') && !window.matchMedia('(max-width:980px), (prefers-reduced-motion: reduce)').matches; },
+      init:function(){ window.SonglineInitHomeParallax(); }
+    },
+    {
+      key:'desktop-pet', src:'/js/desktop-pet.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-desktop-pet]'); },
+      init:function(root){ window.SonglineInitDesktopPet(root || document); }
+    },
+    {
+      key:'random-number', src:'/js/tools/random-number.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-random-tool]'); },
+      init:function(root){ window.SonglineInitRandomNumber(root || document); }
+    },
+    {
+      key:'gacha', src:'/js/tools/gacha.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-gacha-tool]'); },
+      init:function(root){ window.SonglineInitGacha(root || document); }
+    },
+    {
+      key:'focus-timer', src:'/js/tools/focus-timer.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-focus-timer]'); },
+      init:function(root){ window.SonglineInitFocusTimer(root || document); }
+    },
+    {
+      key:'markdown-renderer', src:'/js/markdown-renderer.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-md-tool]'); },
+      init:function(){}
+    },
+    {
+      key:'markdown-previewer', src:'/js/tools/markdown-previewer.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-md-tool]'); },
+      init:function(root){ window.SonglineInitMarkdownPreviewer(root || document); }
+    },
+    {
       key:'space-ribbons',
       src:'/js/space-ribbons.js?v=' + VERSION,
       test:function(){
@@ -340,21 +375,53 @@
     return false;
   }
 
+  // A DOM script tag is not proof of execution (inert main HTML, failed loads,
+  // and still-loading deferred scripts all have tags). Check the exported API.
+  var exports = {
+    'home-parallax':'SonglineInitHomeParallax', 'desktop-pet':'SonglineInitDesktopPet',
+    'random-number':'SonglineInitRandomNumber', 'gacha':'SonglineInitGacha', 'focus-timer':'SonglineInitFocusTimer',
+    'markdown-renderer':'SonglineMarkdown', 'markdown-previewer':'SonglineInitMarkdownPreviewer',
+    'space-ribbons':'SonglineInitSpaceRibbons', 'views':'SonglineInitViews',
+    'home-recommendations':'SonglineInitHomeRecommendations', 'home-message-board':'SonglineInitHomeMessageBoard',
+    'markdown-code-tools':'SonglineEnhanceMarkdown', 'search-utils':'SonglineSearchUtils', 'search':'SonglineInitSearch',
+    'friend-galaxy':'SonglineInitFriendGalaxy', 'memory-room':'SonglineInitMemoryRoom', 'tag-flow':'SonglineInitTagFlow',
+    'snake-leaderboard':'SonglineCreateSnakeLeaderboard', 'snake-renderer':'SonglineCreateSnakeRenderer', 'snake':'SonglineInitSnake',
+    '2048-engine':'Songline2048Engine', '2048-renderer':'SonglineCreate2048Renderer',
+    '2048-leaderboard':'SonglineCreate2048Leaderboard', '2048-audio':'SonglineCreate2048Audio', '2048':'SonglineInit2048',
+    'typing-practice':'SonglineInitTypingPractice', 'flappy-bird':'SonglineInitFlappyBird', 'reaction-test':'SonglineInitReactionTest',
+    'audio-metadata':'SonglineAudioMetadata', 'home-music':'SonglineInitHomeMusic',
+    'audio-visualizer-renderer':'SonglineCreateAudioVisualizerRenderer', 'audio-visualizer':'SonglineInitAudioVisualizer',
+    'mobile-toc':'SonglineInitMobileToc', 'reader-floating-controls':'SonglineNormalizeFloatReadingButtons',
+    'posts-list-flat':'SonglineInitPostsListFlat'
+  };
+  var dependencies = {
+    'search':['search-utils'], 'markdown-previewer':['markdown-renderer'],
+    'snake':['snake-leaderboard','snake-renderer'],
+    '2048':['2048-engine','2048-renderer','2048-leaderboard','2048-audio'],
+    'home-music':['audio-metadata'], 'audio-visualizer':['audio-metadata','audio-visualizer-renderer']
+  };
+  function isReady(mod){ return !!window[exports[mod.key]]; }
+  function initCurrent(mod, root){
+    root = root || document;
+    if(root !== document && root.isConnected === false) return;
+    mod.init(root);
+  }
   function loadScript(mod, root){
+    var deps = dependencies[mod.key] || [];
+    return Promise.all(deps.map(function(key){
+      return loadScript(modules.find(function(candidate){ return candidate.key === key; }), root);
+    })).then(function(){ return loadScriptFile(mod, root); });
+  }
+  function loadScriptFile(mod, root){
     if(loaded[mod.key]){
-      mod.init(root || document);
+      initCurrent(mod, root);
       return Promise.resolve();
     }
-    if(loading[mod.key]) return loading[mod.key].then(function(){ mod.init(root || document); });
+    if(loading[mod.key]) return loading[mod.key].then(function(){ initCurrent(mod, root); });
 
-    // 服务端页级脚本在本调度器之前执行；直接复用它，避免额外监听和延迟兜底。
-    var existing = document.querySelector('script[data-page-script="' + mod.key + '"], script[src*="' + mod.src.split('?')[0] + '"]');
-    // 站内过场会把新页面的 main 直接写入 DOM，其中的 script 标签不会执行。
-    // Friends 过去因此误把这类“未执行脚本”当作已加载，星图只剩服务端兜底头像。
-    var friendGalaxyReady = mod.key !== 'friend-galaxy' || typeof window.SonglineInitFriendGalaxy === 'function';
-    if(existing && friendGalaxyReady){
+    if(isReady(mod)){
       loaded[mod.key] = true;
-      mod.init(root || document);
+      initCurrent(mod, root);
       return Promise.resolve();
     }
 
@@ -367,9 +434,13 @@
     script.dataset.pageScript = mod.key;
     script.dataset.loadedBy = 'page-modules';
     script.onload = function(){
-      loaded[mod.key] = true;
       loading[mod.key] = false;
-      try{ mod.init(root || document); resolve(); }
+      try{
+        if(!isReady(mod)) throw new Error('Module API missing: ' + mod.key);
+        initCurrent(mod, root);
+        loaded[mod.key] = true;
+        resolve();
+      }
       catch(error){ reject(error); }
     };
     script.onerror = function(){
@@ -394,6 +465,7 @@
   function scanNow(root){
     root = root || pendingRoot || document;
     pendingRoot = null;
+    if(root !== document && root.isConnected === false) return Promise.resolve();
     if(activeScans.has(root)) return activeScans.get(root);
     var now = Date.now();
     if(window.SonglinePageModules) window.SonglinePageModules.lastScanAt = now;

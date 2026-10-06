@@ -1,5 +1,6 @@
 (function(){
   'use strict';
+  if(window.SonglineInitHomeParallax) return;
 
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var compactQuery = window.matchMedia('(max-width:980px)');
@@ -91,9 +92,8 @@
 
   document.addEventListener('pointermove', onPointerMove, { passive:true });
   document.addEventListener('pointerleave', onPointerLeave, { passive:true });
-  window.addEventListener('songline:page-swap', function(){ window.setTimeout(initialize, 30); });
-  window.addEventListener('pageshow', initialize);
+  window.SonglineInitHomeParallax = initialize;
+  window.addEventListener('songline:page-transition-start', clearLayers);
+  window.addEventListener('pageshow', function(event){ if(event.persisted) initialize(); });
   if(compactQuery.addEventListener) compactQuery.addEventListener('change', initialize);
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once:true });
-  else initialize();
 })();

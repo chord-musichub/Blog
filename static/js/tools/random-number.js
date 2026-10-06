@@ -1,6 +1,8 @@
 (function(){
-  const tool = document.querySelector('[data-random-tool]');
-  if(!tool) return;
+  function init(root){
+  const tool = (root || document).querySelector('[data-random-tool]');
+  if(!tool || tool.dataset.randomBound === '1') return;
+  tool.dataset.randomBound = '1';
   const minInput = tool.querySelector('[data-random-min]');
   const maxInput = tool.querySelector('[data-random-max]');
   const btn = tool.querySelector('[data-random-generate]');
@@ -44,4 +46,6 @@
       if(event.key === 'Enter') generate();
     });
   });
+  }
+  window.SonglineInitRandomNumber = init;
 })();

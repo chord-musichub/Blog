@@ -1,4 +1,4 @@
-(function(){'use strict';function createAudio(options){options=options||{};var audioCtx=null,masterGain=Number(options.masterGain)||1;function isEnabled(){return typeof options.isEnabled==='function'&&options.isEnabled();}
+(function(){'use strict';function createAudio(options){options=options||{};var audioCtx=null,disposed=false,masterGain=Number(options.masterGain)||1;function isEnabled(){return !disposed&&typeof options.isEnabled==='function'&&options.isEnabled();}
     function ensureAudio(){
       if(!isEnabled()) return null;
       var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -90,4 +90,5 @@
     }
 
 
-return {ensureAudio:ensureAudio,playTone:playTone,playNoise:playNoise,playSound:playSound};}window.SonglineCreate2048Audio=createAudio;})();
+function destroy(){disposed=true;options={};if(audioCtx&&audioCtx.state!=='closed')audioCtx.close().catch(function(){});audioCtx=null;}
+return {ensureAudio:ensureAudio,playTone:playTone,playNoise:playNoise,playSound:playSound,destroy:destroy};}window.SonglineCreate2048Audio=createAudio;})();

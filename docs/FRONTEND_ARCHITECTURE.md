@@ -23,7 +23,7 @@
 
 `page-modules.js` 负责站内换页后的样式补载与页面级初始化。阅读量、首页推荐、Markdown 代码工具和搜索不应再由页脚全站加载；它们必须通过该调度器按实际 DOM 特征载入。服务端页级脚本必须排在该调度器之前，并且只暴露初始化函数：直开与站内换页都由调度器调用同一个入口。
 
-音频可视化工具的脚本也按边界拆分：`audio-visualizer.js` 管理音频来源、播放列表、元数据、界面与事件；`audio-visualizer-renderer.js` 封装 Canvas 尺寸、频谱采样、帧循环与全部绘制状态。两个文件必须以该顺序使用 `defer` 加载。
+音频可视化工具的脚本也按边界拆分：`audio-visualizer.js` 管理音频来源、播放列表、元数据、界面与事件；`audio-visualizer-renderer.js` 封装 Canvas 尺寸、频谱采样、帧循环与全部绘制状态。元数据与 renderer 必须先于控制器加载；直开页面使用有序 `defer`，站内换页由调度器显式等待依赖。
 
 小游戏遵循同一原则。`snake.js` 管理规则、输入、音效与排行榜，`snake-renderer.js` 专门绘制 Canvas；`game-2048-engine.js` 提供无副作用的棋盘运算，`game-2048-renderer.js` 管理棋盘 DOM 和过渡，`game-2048.js` 编排回合、输入、音效和排行榜。各工具的依赖脚本必须先于其控制器加载。
 
@@ -36,3 +36,15 @@
 - 页面级脚本只暴露初始化函数；不要同时注册 `DOMContentLoaded`、页面切换监听和模块调度三套入口。
 - 页面过场期间不得创建第二个 overlay 或再次写 history；统一通过 `SonglinePageTransition.navigate()` 和内部锁管理。无障碍的减少动态效果会自动退化为短淡入淡出。
 - 修改公共样式后，至少检查首页、文章页、朋友页、标签页、工具页的浅色与深色模式。
+
+## 组件生命周期契约
+
+- `page-modules.js` 的 `exports` 表声明模块就绪 API，`dependencies` 表声明依赖。存在 script 标签不代表脚本执行成功，尤其不能把写入 `main` 的惰性标签当作就绪。依赖与控制器均须导出 API，失败不能标记 loaded；页面导航仍保留完整文档回退。
+- 初始化应能重复调用而不重复绑定。页面局部组件使用 DOM 标记，全站委托或全局工厂使用 singleton；不要同时让脚本自启动和调度器初始化。
+- 首页视差、桌宠也属于页面模块，必须支持从文章等非首页直开后进入首页。桌宠在移动端实际存在，不应按名称把它误判为仅桌面组件。
+- `songline:page-transition-start` 释放离开页面的计时器、帧循环、轮询、全局监听、音频上下文及本地文件 URL。不能等下次进入同组件才释放；迟到的 FileReader / 下载 / 渲染回调须检查当前 DOM 与任务有效性。
+- `pagehide.persisted` 是暂存而非永久销毁：保留缓存 DOM 对应的输入监听，仅暂停动画与媒体；`pageshow.persisted` 恢复。永久离开才清理不能重用的控制器。
+- 异步 Markdown 加入首个代码块后再次 `SonglinePageModules.scan(reader)`，避免首扫未发现代码而漏加载增强。浮动阅读控件仅由共享控制器定位，不要在工具中再设 scroll / resize 所有者。
+- 阅读目录的 hover 颜色反馈可以变化，但目录和链接的命中区域不能因 hover 位移；键盘折叠只响应目录容器本身，不能拦截子链接的 Enter。
+
+回归入口：`tests/stability.test.cjs`、`tests/article-download.test.cjs`、`tests/stability.browser.cjs`。浏览器测试需指定新构建的 `BLOG_UI_BUILD`，并使用离线请求拦截，禁止测试写入线上数据。

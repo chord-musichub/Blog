@@ -5,14 +5,6 @@
   var STORAGE_KEY = 'songline_focus_timer_settings';
   var STATS_KEY = 'songline_focus_timer_stats';
 
-  function ready(fn){
-    if(document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', fn, {once:true});
-    }else{
-      fn();
-    }
-  }
-
   function clamp(n, min, max){
     n = Number(n);
     if(!Number.isFinite(n)) n = min;
@@ -57,8 +49,8 @@
     }catch(e){}
   }
 
-  ready(function(){
-    var root = document.querySelector('[data-focus-timer]');
+  function init(scope){
+    var root = (scope || document).querySelector('[data-focus-timer]');
     if(!root){
       console.warn('[focus-timer] root not found');
       return;
@@ -157,6 +149,9 @@
     }
 
     function render(){
+      if(state.raf) cancelAnimationFrame(state.raf);
+      state.raf = 0;
+      if(!root.isConnected) return;
       var remain = getRemaining();
       var total = Math.max(1, state.durationMs);
       var ratio = Math.max(0, Math.min(1, remain / total));
@@ -376,9 +371,18 @@
       renderStats();
     });
 
-    document.addEventListener('visibilitychange', function(){
+    function onVisibilityChange(){
       if(state.status === 'running') render();
-    });
+    }
+    function cleanup(){
+      if(state.raf) cancelAnimationFrame(state.raf);
+      state.raf = 0;
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('songline:page-transition-start', cleanup);
+      if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('songline:page-transition-start', cleanup);
 
     syncControls();
     setDuration(settings.durationMinutes);
@@ -387,5 +391,6 @@
     render();
 
     console.info('[focus-timer] robust ready', VERSION);
-  });
+  }
+  window.SonglineInitFocusTimer = init;
 })();

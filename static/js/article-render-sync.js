@@ -203,8 +203,11 @@
     reused.forEach(function(item){ item.placeholder.replaceWith(item.image); });
     if(window.SonglineResources) window.SonglineResources.observe(reader);
     if(window.SonglineEnhanceMarkdown) window.SonglineEnhanceMarkdown(reader);
+    if(window.SonglinePageModules) window.SonglinePageModules.scan(reader);
     rebuildToc();
     window.dispatchEvent(new Event('songline:article-toc-ready'));
-    if(window.location.hash) window.setTimeout(function(){ scrollToArticleHeading(window.location.hash, true); }, 90);
+    if(window.location.hash) window.setTimeout(function(){
+      if(reader.isConnected) scrollToArticleHeading(window.location.hash, true);
+    }, 90);
   });
 })();

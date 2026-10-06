@@ -301,6 +301,7 @@
     window.addEventListener('resize', onResize, {passive:true});
     function cleanup(){
       window.clearTimeout(resizeTimer);
+      audioEngine.destroy();
       window.removeEventListener('keydown', onKeydown);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('songline:page-transition-start', onTransitionStart);

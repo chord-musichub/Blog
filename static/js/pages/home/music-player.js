@@ -1,5 +1,6 @@
 (function(){
   'use strict';
+  if(window.SonglineInitHomeMusic) return;
 
   var AUDIO_RE = /\.(mp3|flac|wav|m4a|aac|ogg|opus)$/i;
   var DB_NAME = 'songline-home-music';
@@ -293,7 +294,7 @@
       if(spectrumBars) spectrumBars.innerHTML = '';
       try{ if(sourceNode) sourceNode.disconnect(); }catch(e){}
       try{ if(analyser) analyser.disconnect(); }catch(e){}
-      try{ if(audioContext && audioContext.state !== 'closed') audioContext.close(); }catch(e){}
+      try{ if(audioContext && audioContext.state !== 'closed') audioContext.close().catch(function(){}); }catch(e){}
       sourceNode = null;
       analyser = null;
       audioContext = null;
@@ -551,6 +552,7 @@
   }
 
   window.SonglineInitHomeMusic = init;
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ init(document); }, {once:true});
-  else init(document);
+  window.addEventListener('songline:page-transition-start', function(){
+    if(window.__songlineHomeMusicPlayer) window.__songlineHomeMusicPlayer.destroy();
+  });
 })();

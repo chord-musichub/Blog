@@ -910,3 +910,14 @@ html body .article-intro.article-heading h1{margin:0;font-size:clamp(26px,2.6vw,
   .article-toc-rail .toc-body{min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:thin}
 }
 @media(max-width:980px){.article-toc-rail{display:none}}
+
+/* A sticky navigation surface must not move its own pointer hit area on hover. */
+html body .article-toc,
+html body .article-toc:hover,
+html body .article-toc:focus-visible{
+  transform:none;
+}
+html body .article-toc nav a,
+html body .article-toc nav a:hover{
+  transform:none;
+}

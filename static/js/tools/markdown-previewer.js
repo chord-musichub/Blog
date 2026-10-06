@@ -1,6 +1,10 @@
 (function(){
-  const panel = document.querySelector('[data-md-tool]');
-  if(!panel) return;
+  function init(root){
+  const panel = (root || document).querySelector('[data-md-tool]');
+  if(!panel || panel.dataset.mdToolBound === '1') return;
+  panel.dataset.mdToolBound = '1';
+  let activeReader = null;
+  let disposed = false;
   const fileInput = panel.querySelector('[data-md-file]');
   const drop = panel.querySelector('[data-md-drop]');
   const preview = panel.querySelector('[data-md-preview]');
@@ -11,19 +15,20 @@
   const layout = panel;
   const tocCard = panel.querySelector('[data-md-toc]');
   if(layout && tocCard){
-    layout.dataset.tocState = localStorage.getItem('songline-md-tool-toc-state') || 'expanded';
+    try{ layout.dataset.tocState = localStorage.getItem('songline-md-tool-toc-state') === 'collapsed' ? 'collapsed' : 'expanded'; }
+    catch(error){ layout.dataset.tocState = 'expanded'; }
     function syncTocAria(){
       tocCard.setAttribute('aria-expanded', layout.dataset.tocState === 'expanded' ? 'true' : 'false');
     }
     function toggleToc(event){
       if(event && event.target && event.target.closest('a')) return;
       layout.dataset.tocState = layout.dataset.tocState === 'expanded' ? 'collapsed' : 'expanded';
-      localStorage.setItem('songline-md-tool-toc-state', layout.dataset.tocState);
+      try{ localStorage.setItem('songline-md-tool-toc-state', layout.dataset.tocState); }catch(error){}
       syncTocAria();
     }
     tocCard.addEventListener('click', toggleToc);
     tocCard.addEventListener('keydown', function(event){
-      if(event.key === 'Enter' || event.key === ' '){
+      if(event.target === tocCard && (event.key === 'Enter' || event.key === ' ')){
         event.preventDefault();
         toggleToc(event);
       }
@@ -67,7 +72,8 @@
       if(!h.id) h.id = slugifyHeading(h.textContent, used);
       const rawLevel = Number(h.tagName.slice(1)) || baseLevel;
       const relativeLevel = Math.min(6, Math.max(1, rawLevel - baseLevel + 1));
-      return '<li class="toc-level-' + rawLevel + ' toc-depth-' + relativeLevel + '" data-toc-level="' + rawLevel + '" data-toc-depth="' + relativeLevel + '"><a href="#' + h.id + '">' + h.textContent + '</a></li>';
+      const label = h.textContent.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch]);
+      return '<li class="toc-level-' + rawLevel + ' toc-depth-' + relativeLevel + '" data-toc-level="' + rawLevel + '" data-toc-depth="' + relativeLevel + '"><a href="#' + encodeURIComponent(h.id) + '">' + label + '</a></li>';
     }).join('');
     toc.innerHTML = '<nav><ul>' + items + '</ul></nav>';
   }
@@ -77,28 +83,35 @@
     sizeEl.textContent = '';
     preview.innerHTML = '<div class="md-empty-state"><h2>正在刷新预览</h2><p>新文件读取中。</p></div>';
     if(toc) toc.innerHTML = '<nav><ul><li><span class="meta">读取中...</span></li></ul></nav>';
-    if(window.updateScrollButtons) window.updateScrollButtons();
+    if(window.SonglineNormalizeFloatReadingButtons) window.SonglineNormalizeFloatReadingButtons();
   }
 
   function setFile(file){
     if(!file) return;
+    if(activeReader && activeReader.readyState === 1) activeReader.abort();
     resetPreviewState();
     const reader = new FileReader();
+    activeReader = reader;
     reader.onload = function(){
+      if(disposed || !panel.isConnected || activeReader !== reader) return;
       const text = String(reader.result || '');
-      preview.innerHTML = window.SonglineMarkdown ? window.SonglineMarkdown.render(text) : text;
+      if(window.SonglineMarkdown) preview.innerHTML = window.SonglineMarkdown.render(text);
+      else preview.textContent = text;
       if(window.SonglineEnhanceMarkdown) window.SonglineEnhanceMarkdown(preview);
+      if(window.SonglinePageModules) window.SonglinePageModules.scan(panel);
       rebuildToc();
       nameEl.textContent = file.name || '已选择文件';
       sizeEl.textContent = file.size ? Math.max(1, Math.round(file.size / 1024)) + ' KB' : '';
-      if(window.updateScrollButtons) window.updateScrollButtons();
+      if(window.SonglineNormalizeFloatReadingButtons) window.SonglineNormalizeFloatReadingButtons();
+      window.dispatchEvent(new Event('songline:article-toc-ready'));
     };
     reader.onerror = function(){
+      if(disposed || !panel.isConnected || activeReader !== reader) return;
       preview.innerHTML = '<div class="md-empty-state"><h2>读取失败</h2><p>换一个文件试试。</p></div>';
       if(toc) toc.innerHTML = '<nav><ul><li><span class="meta">读取失败</span></li></ul></nav>';
       nameEl.textContent = '文件读取失败';
       sizeEl.textContent = '';
-      if(window.updateScrollButtons) window.updateScrollButtons();
+      if(window.SonglineNormalizeFloatReadingButtons) window.SonglineNormalizeFloatReadingButtons();
     };
     reader.readAsText(file, 'utf-8');
   }
@@ -127,79 +140,14 @@
       drop.classList.remove('dragging');
     });
   });
-})();
-
-(function(){
-  const topBtn = document.querySelector('.tool-page-top-button');
-  const bottomBtn = document.querySelector('.tool-page-bottom-button');
-  const reader = document.querySelector('[data-md-preview]');
-  if(!topBtn && !bottomBtn) return;
-
-  function placeButton(btn, index){
-    if(!btn) return;
-    const vw = window.innerWidth || document.documentElement.clientWidth;
-    const size = btn.offsetWidth || 54;
-    const pageGap = 18;
-    const sideGap = vw < 1080 ? 24 : 34;
-
-    if(!reader){
-      btn.style.removeProperty('left');
-      btn.style.setProperty('right', index === 0 ? '82px' : '14px', 'important');
-      return;
-    }
-
-    // 手机端空间太窄，保留右下角两个按钮；桌面端严格避开预览卡片边框。
-    if(vw <= 760){
-      btn.style.removeProperty('left');
-      btn.style.setProperty('right', index === 0 ? '82px' : '14px', 'important');
-      return;
-    }
-
-    const rect = reader.getBoundingClientRect();
-
-    // 先放在阅读区域右侧，和边框至少隔一段距离。
-    let left = rect.right + sideGap;
-
-    // 如果右侧放不下，改放阅读区域左侧；绝不贴进阅读区域内部。
-    if(left + size > vw - pageGap){
-      const leftSide = rect.left - sideGap - size;
-      if(leftSide >= pageGap){
-        left = leftSide;
-      }else{
-        // 两边都放不下时，贴近视窗边缘，但隐藏按钮，避免压住阅读区边框。
-        btn.classList.add('tool-edge-hidden');
-        return;
-      }
-    }
-
-    btn.classList.remove('tool-edge-hidden');
-    btn.style.setProperty('left', Math.round(left) + 'px', 'important');
-    btn.style.setProperty('right', 'auto', 'important');
+  // Floating reading buttons already have one shared owner. A second scroll /
+  // resize owner here used to reposition them and keep detached previews alive.
+  function cleanup(){
+    disposed = true;
+    if(activeReader && activeReader.readyState === 1) activeReader.abort();
+    window.removeEventListener('songline:page-transition-start', cleanup);
   }
-
-  window.updateScrollButtons = function(){
-    const y = window.scrollY || document.documentElement.scrollTop || 0;
-    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    if(topBtn) topBtn.classList.toggle('show', y > 520);
-    if(bottomBtn) bottomBtn.classList.toggle('show', maxY - y > 520);
-    placeButton(topBtn, 0);
-    placeButton(bottomBtn, 1);
-  };
-
-  if(topBtn){
-    topBtn.addEventListener('click', function(){
-      window.scrollTo({top:0, behavior:'smooth'});
-    });
+  window.addEventListener('songline:page-transition-start', cleanup);
   }
-  if(bottomBtn){
-    bottomBtn.addEventListener('click', function(){
-      window.scrollTo({top:document.documentElement.scrollHeight, behavior:'smooth'});
-    });
-  }
-  window.addEventListener('scroll', window.updateScrollButtons, {passive:true});
-  window.addEventListener('resize', window.updateScrollButtons);
-  window.addEventListener('load', window.updateScrollButtons);
-  window.updateScrollButtons();
-  window.setTimeout(window.updateScrollButtons, 80);
-  window.setTimeout(window.updateScrollButtons, 360);
+  window.SonglineInitMarkdownPreviewer = init;
 })();

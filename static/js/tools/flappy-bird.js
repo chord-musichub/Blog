@@ -720,13 +720,28 @@
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('resize', resize);
       window.removeEventListener('songline:page-transition-start', onTransitionStart);
-      window.removeEventListener('pagehide', cleanup);
+      window.removeEventListener('pagehide', onPageHide);
+      window.removeEventListener('pageshow', onPageShow);
       if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
       if(window.__songlineFlappyBirdCleanup === cleanup) window.__songlineFlappyBirdCleanup = null;
     }
     function onTransitionStart(){ cleanup(); }
+    function onPageHide(event){
+      if(!event.persisted){ cleanup(); return; }
+      // bfcache retains this DOM and its local handlers. Suspend, do not tear
+      // down the controller whose dataset would prevent a fresh bind on return.
+      if(raf){ cancelAnimationFrame(raf); raf = 0; }
+      spaceHeld = false;
+      if(audioCtx && audioCtx.state === 'running') audioCtx.suspend().catch(function(){});
+    }
+    function onPageShow(event){
+      if(!event.persisted) return;
+      resize();
+      if(running && !raf){ lastTime = performance.now(); raf = requestAnimationFrame(loop); }
+    }
     window.addEventListener('songline:page-transition-start', onTransitionStart);
-    window.addEventListener('pagehide', cleanup, {once:true});
+    window.addEventListener('pagehide', onPageHide);
+    window.addEventListener('pageshow', onPageShow);
     window.__songlineFlappyBirdCleanup = cleanup;
 
     setOverlay(true, '准备起飞', '点击开始', '点击屏幕 / 按空格：向上飞一下。');

@@ -26,7 +26,7 @@
     if(!(event.target && event.target.closest('a'))) toggle();
   });
   toc.addEventListener('keydown', function(event){
-    if((event.key !== 'Enter' && event.key !== ' ') || (event.target && event.target.closest('a'))) return;
+    if((event.key !== 'Enter' && event.key !== ' ') || event.target !== toc) return;
     event.preventDefault();
     toggle();
   });

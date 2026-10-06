@@ -53,6 +53,14 @@
     var audioCtx = null;
     var soundEnabled = localStorage.getItem(SOUND_KEY) !== '0';
     var autoSyncedLocalBest = false;
+    var disposed = false;
+    function cleanup(){
+      disposed = true;
+      resetTimer();
+      if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
+      window.removeEventListener('songline:page-transition-start', cleanup);
+    }
+    window.addEventListener('songline:page-transition-start', cleanup);
 
 
     function setSyncButtonText(text, delay){
@@ -88,7 +96,7 @@
     }
 
     function ensureAudio(){
-      if(!soundEnabled) return null;
+      if(disposed || !soundEnabled) return null;
       var AudioContext = window.AudioContext || window.webkitAudioContext;
       if(!AudioContext) return null;
       if(!audioCtx) audioCtx = new AudioContext();
@@ -390,7 +398,7 @@
     setMessage('准备测试', '点击开始', '变色前不要点。变色后越快越好。');
     renderStats();
     updateSoundToggle();
-    fetchScores().then(function(){ window.setTimeout(function(){ syncLocalBest(false); }, 320); });
+    fetchScores().then(function(){ window.setTimeout(function(){ if(!disposed && root.isConnected) syncLocalBest(false); }, 320); });
   }
 
   function boot(target){
