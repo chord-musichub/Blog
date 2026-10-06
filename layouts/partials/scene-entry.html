@@ -1,22 +1,47 @@
 {{- $scene := partial "scene-resources.html" . -}}
 <script id="songline-scene-resources" type="application/json">{{ $scene | jsonify | safeJS }}</script>
 <style id="songline-scene-entry-style">
-html.is-scene-preparing::before{content:'';position:fixed;inset:0;z-index:2147482998;background:#020304;pointer-events:auto}
-html.is-scene-preparing:not(.document-cover)::after{content:'';position:fixed;left:calc(50% - 15px);top:calc(50% - 15px);width:30px;height:30px;z-index:2147482999;border:1px solid rgba(237,243,255,.2);border-top-color:#edf3ff;border-radius:50%;animation:sceneEntrySpin 1s linear infinite;pointer-events:none}
-html.is-boot-preparing.is-scene-preparing::after,html.is-booting.is-scene-preparing::after{display:none}
-@keyframes sceneEntrySpin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){html.is-scene-preparing::after{animation:none}}
+{{ readFile "static/css/transition-loader.css" | safeCSS }}
+/* Critical entry shell exists before external CSS, using the same loader as navigation. */
+#songline-scene-entry-loader{position:fixed;inset:0;width:auto;height:auto;display:flex;align-items:center;justify-content:center;z-index:2147482998;background:#020304;pointer-events:auto;opacity:1;visibility:visible;transform:none;transition:opacity .44s ease}
+#songline-scene-entry-loader.is-leaving{opacity:0;pointer-events:none}
+html:is(.is-boot-preparing,.is-booting,.document-cover) #songline-scene-entry-loader{visibility:hidden;pointer-events:none}
+@media(prefers-reduced-motion:reduce){#songline-scene-entry-loader{transition:none}}
 </style>
 <script>
 (function(){
   var root=document.documentElement;
+  window.SonglineTransitionLoaderMarkup={{ partial "transition-loader.html" . | jsonify | safeJS }};
   var scene=JSON.parse(document.getElementById('songline-scene-resources').textContent);
   var urls=scene[scene.forceDark?'dark':root.getAttribute('data-theme')||'dark']||[];
   urls.forEach(function(url){var link=document.createElement('link');link.rel='preload';link.as='image';link.href=url;link.setAttribute('fetchpriority','high');link.dataset.scenePreload='1';document.head.appendChild(link);});
   if(!urls.length)return;
   root.classList.add('is-scene-preparing');
   root.setAttribute('aria-busy','true');
+  var overlay=document.createElement('div');
+  overlay.id='songline-scene-entry-loader';
+  overlay.className='songline-page-transition-overlay is-visible is-covering is-same is-loader-visible';
+  overlay.setAttribute('aria-hidden','true');
+  overlay.innerHTML=window.SonglineTransitionLoaderMarkup;
+  root.appendChild(overlay);
+  var finishTimer;
+  var finished=false;
+  window.SonglineFinishSceneEntry=function(immediate){
+    clearTimeout(window.__songlineSceneEntryFallback);
+    root.classList.remove('is-scene-preparing');
+    root.setAttribute('aria-busy','false');
+    if(finished && !immediate)return;
+    finished=true;
+    overlay.classList.remove('is-loader-visible');
+    overlay.classList.add('is-loader-closing','is-leaving');
+    clearTimeout(finishTimer);
+    var remove=function(){overlay.remove();};
+    if(immediate || window.matchMedia('(prefers-reduced-motion: reduce)').matches)remove();
+    else finishTimer=setTimeout(remove,460);
+  };
   // A missing/blocked initialization script must not leave the document covered.
-  window.__songlineSceneEntryFallback=setTimeout(function(){root.classList.remove('is-scene-preparing');root.setAttribute('aria-busy','false');},18000);
+  window.__songlineSceneEntryFallback=setTimeout(window.SonglineFinishSceneEntry,18000);
+  window.addEventListener('songline:page-transition-start',function(){window.SonglineFinishSceneEntry(true);});
+  window.addEventListener('pageshow',function(event){if(event.persisted)window.SonglineFinishSceneEntry(true);});
 })();
 </script>

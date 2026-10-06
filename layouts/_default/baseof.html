@@ -1,6 +1,8 @@
 <!doctype html>
 {{ $sceneSection := default "general" .Section }}
 {{ if eq .Layout "site-notice" }}{{ $sceneSection = "posts" }}{{ end }}
+{{ $isMarkdownPreview := hasPrefix .RelPermalink "/tools/markdown-previewer/" }}
+{{ if $isMarkdownPreview }}{{ $sceneSection = "posts" }}{{ end }}
 <html lang="zh-CN" data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-page-section="{{ if .IsHome }}home{{ else }}{{ $sceneSection }}{{ end }}" data-page-layout="{{ .Layout }}">
 <head>
   {{ $assetVersion := partial "asset-version.html" . }}
@@ -9,7 +11,7 @@
   {{ $favicon := default $cfg.site.logo_icon $cfg.site.favicon }}
   {{ $isFriendsSurface := hasPrefix .RelPermalink "/friends/" }}
   {{ $isFixedFriendsScene := $isFriendsSurface }}
-  {{ $isToolsSurface := hasPrefix .RelPermalink "/tools/" }}
+  {{ $isToolsSurface := and (hasPrefix .RelPermalink "/tools/") (not $isMarkdownPreview) }}
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   {{ partial "assets/viewport-base.html" . }}
@@ -51,7 +53,8 @@
     (function(){
       try{
         var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var played = window.__songlineDocumentArrival || sessionStorage.getItem('songline-home-boot-v21.4') === '1';
+        var arrival = performance.getEntriesByType('navigation')[0];
+        var played = window.__songlineDocumentArrival || (arrival && arrival.type === 'reload') || sessionStorage.getItem('songline-home-boot-v21.4') === '1';
         if(!reduced && !played){
           document.documentElement.classList.add('is-boot-preparing');
           document.documentElement.style.backgroundColor = '#000';

@@ -8,7 +8,9 @@
     var played = false;
     try{ played = sessionStorage.getItem(key) === '1'; }catch(e){}
     var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var shouldBoot = isHome && !played && !reduced && !window.__songlineDocumentArrival;
+    var arrival = performance.getEntriesByType('navigation')[0];
+    var reloading = arrival && arrival.type === 'reload';
+    var shouldBoot = isHome && !played && !reduced && !reloading && !window.__songlineDocumentArrival;
     if(shouldBoot && window.SonglineHomeBoot){
       window.SonglineHomeBoot.run({shouldBoot:true, bootKey:key});
     }else{

@@ -1,7 +1,25 @@
 {{ $class := default "" .class }}
+{{ $iconFallbackURL := "" }}
+{{ if and .icon_url (findRE `^https://www\.google\.com/s2/favicons\?` .icon_url) }}
+  {{ $target := urls.Parse .href }}
+  {{ if and $target.Host (in (slice "http" "https") $target.Scheme) }}
+    {{ $iconFallbackURL = printf "https://%s/favicon.ico" $target.Host }}
+  {{ end }}
+{{ end }}
 <a class="tool-card tool-link-card{{ with $class }} {{ . }}{{ end }}" href="{{ .href }}" data-tool-node data-tool-side="{{ default "left" .side }}" data-tool-index="{{ default 0 .index }}"{{ with .id }} data-tool-id="{{ . }}"{{ end }}{{ with .keywords }} data-tool-keywords="{{ delimit . " " }}"{{ end }}>
   <span class="tool-node-connector" aria-hidden="true"><i></i></span>
-  <div class="tool-card-icon">{{ with .icon_url }}{{ $iconURL := partial "media-preview-url.html" (dict "url" . "size" 160) }}{{ if findRE `^(https?:)?//` $iconURL }}<img data-image-src="{{ $iconURL }}" alt="" width="36" height="36" loading="lazy" decoding="async" referrerpolicy="no-referrer"><noscript><img src="{{ $iconURL }}" alt="" width="36" height="36" loading="lazy" referrerpolicy="no-referrer"></noscript>{{ else }}<img src="{{ $iconURL }}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">{{ end }}{{ else }}{{ .icon }}{{ end }}</div>
+  <div class="tool-card-icon">
+    {{ with .icon_url }}
+      {{ $iconURL := partial "media-preview-url.html" (dict "url" . "size" 160) }}
+      {{ if findRE `^(https?:)?//` $iconURL }}
+        <img data-image-src="{{ $iconURL }}"{{ with $iconFallbackURL }} data-image-fallback="{{ . }}"{{ end }} alt="" width="36" height="36" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+        <span class="tool-icon-fallback" aria-hidden="true">{{ substr $.title 0 1 | upper }}</span>
+        <noscript><img src="{{ $iconURL }}" alt="" width="36" height="36" loading="lazy" referrerpolicy="no-referrer"></noscript>
+      {{ else }}
+        <img src="{{ $iconURL }}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+      {{ end }}
+    {{ else }}{{ .icon }}{{ end }}
+  </div>
   <div class="tool-card-copy">
     <h2>{{ .title }}</h2>
     <p>{{ .desc }}</p>

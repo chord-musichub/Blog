@@ -9,6 +9,7 @@ const readSource=file=>process.env.RESOURCE_AUDIT_BASELINE
 const loader=readSource('web/static/resource-readiness.js');
 const renderer=readSource('static/js/markdown-renderer.js');
 const articleSync=readSource('static/js/article-render-sync.js');
+const reading=readSource('static/js/article-reading.js');
 const svg='<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"><rect width="120" height="80" fill="steelblue"/></svg>';
 const report=[];
 (async()=>{
@@ -50,6 +51,13 @@ const report=[];
    await page.evaluate(()=>window.dispatchEvent(new Event('online')));
    await page.waitForFunction(()=>document.querySelector('img').dataset.imageState==='ready',null,{timeout:1500});
    assert.equal(calls,2);return {requests:calls};
+  });
+  await check('A failed tool favicon loads its alternative once',async page=>{
+   const calls=[];
+   await page.route('https://media.test/icon-*.svg',r=>{calls.push(r.request().url());return r.request().url().endsWith('/icon-primary.svg')?r.abort():r.fulfill({contentType:'image/svg+xml',body:svg});});
+   await page.evaluate(()=>{document.querySelector('main').innerHTML='<img data-image-src="https://media.test/icon-primary.svg" data-image-fallback="https://media.test/icon-alternative.svg" width="36" height="36">';window.favicon=SonglineResources.image(document.querySelector('img'));});
+   await page.waitForFunction(()=>document.querySelector('img').dataset.imageState==='ready',null,{timeout:2000});
+   assert.equal((await page.evaluate(()=>favicon)).failed,false);assert.equal(calls.length,2);return {requests:calls.length};
   });
   await check('Slow lazy background applies even after observation timeout',async page=>{
    let release;const gate=new Promise(r=>release=r);
@@ -95,6 +103,7 @@ const report=[];
   await check('Article hydration reuses already loaded external images',async page=>{
    let requests=0;await page.route('https://media.test/reused.svg',r=>{requests++;return r.fulfill({headers:{'cache-control':'no-store'},contentType:'image/svg+xml',body:svg});});
    await page.addScriptTag({content:renderer});
+   await page.addScriptTag({content:reading});
    await page.evaluate(()=>{
     document.querySelector('main').innerHTML='<article data-article-renderer="songline-markdown"><p><img src="https://media.test/reused.svg" alt="same"></p></article><script id="article-md-source" type="application/json">"![same](https://media.test/reused.svg)"</script>';
     window.original=document.querySelector('article img');return SonglineResources.image(original);

@@ -42,10 +42,10 @@
     }
     if(path.indexOf('/tools/markdown-previewer/') === 0 || !!query(root, '[data-md-tool], .md-tool-layout')){
       // 动态换页时明确维持与服务端直开一致的层级顺序。
-      ensureStylesheet('songline-markdown-previewer-base-style', '/css/tools/markdown-previewer-base.css');
       ensureStylesheet('songline-article-reader-style', '/css/pages/content/article-reader.css');
       ensureStylesheet('songline-reader-floating-controls-style', '/css/pages/content/reader-floating-controls.css');
       ensureStylesheet('songline-markdown-previewer-style', '/css/tools/markdown-previewer.css');
+      ensureStylesheet('songline-posts-campus-scene-style', '/css/pages/posts/campus-scene.css');
     }
     if(path.indexOf('/tools/audio-visualizer/') === 0 || !!query(root, '[data-audio-visualizer], .audio-visualizer-page')){
       // 与服务端直开页面保持一致：后面的样式层覆盖前面的历史规则。
@@ -70,6 +70,16 @@
   }
 
   var modules = [
+    {
+      key:'article-reading', src:'/js/article-reading.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '.article-shell'); },
+      init:function(){}
+    },
+    {
+      key:'article-toc-controls', src:'/js/article-toc-controls.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '.article-shell'); },
+      init:function(root){ window.SonglineInitArticleToc(root || document); }
+    },
     {
       key:'home-parallax', src:'/js/pages/home/scene-parallax.js?v=' + VERSION,
       test:function(root){ return document.body.dataset.pageKind === 'home' && !!query(root, '[data-home-parallax]') && !window.matchMedia('(max-width:980px), (prefers-reduced-motion: reduce)').matches; },
@@ -378,6 +388,7 @@
   // A DOM script tag is not proof of execution (inert main HTML, failed loads,
   // and still-loading deferred scripts all have tags). Check the exported API.
   var exports = {
+    'article-reading':'SonglineReading', 'article-toc-controls':'SonglineInitArticleToc',
     'home-parallax':'SonglineInitHomeParallax', 'desktop-pet':'SonglineInitDesktopPet',
     'random-number':'SonglineInitRandomNumber', 'gacha':'SonglineInitGacha', 'focus-timer':'SonglineInitFocusTimer',
     'markdown-renderer':'SonglineMarkdown', 'markdown-previewer':'SonglineInitMarkdownPreviewer',
@@ -395,7 +406,7 @@
     'posts-list-flat':'SonglineInitPostsListFlat'
   };
   var dependencies = {
-    'search':['search-utils'], 'markdown-previewer':['markdown-renderer'],
+    'search':['search-utils'], 'markdown-previewer':['markdown-renderer','article-reading','article-toc-controls'],
     'snake':['snake-leaderboard','snake-renderer'],
     '2048':['2048-engine','2048-renderer','2048-leaderboard','2048-audio'],
     'home-music':['audio-metadata'], 'audio-visualizer':['audio-metadata','audio-visualizer-renderer']

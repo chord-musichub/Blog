@@ -1,39 +1,29 @@
 {{ define "main" }}
 {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-<section class="article-shell md-tool-layout" data-md-tool>
-  <div class="card md-tool-panel md-tool-panel-single">
+<section data-md-tool>
+  <div class="card article-intro md-file-controls">
     <div class="md-tool-head">
-      <label class="btn md-file-button">
-        选择 .md 文件
-        <input type="file" accept=".md,.markdown,text/markdown,text/plain" data-md-file hidden>
-      </label>
+      <button class="btn md-file-button" type="button" data-md-choose>选择 .md 文件</button>
+      <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" data-md-file hidden>
+      <span class="meta">仅在本机预览，不上传文件</span>
     </div>
-
-    <div class="md-drop-zone" data-md-drop>
-      <strong>拖放 Markdown 文件到这里</strong>
+    <div class="md-drop-zone" data-md-drop><strong>拖放 Markdown 文件到这里</strong></div>
+    <div class="md-tool-meta" role="status" aria-live="polite">
+      <span data-md-name>尚未选择文件</span><span data-md-size></span>
     </div>
-
-    <div class="md-tool-meta">
-      <span data-md-name>尚未选择文件</span>
-      <span data-md-size></span>
-    </div>
-
-    <article class="markdown-body md-live-preview md-render-only" data-md-preview>
+  </div>
+  <div class="article-shell section md-tool-layout" data-toc-state="expanded">
+    <article class="card article-reader markdown-body md-live-preview" data-md-preview aria-label="Markdown 预览">
       <div class="md-empty-state">选择文件后预览</div>
     </article>
+    <div class="article-toc-rail">
+      <aside class="card article-toc" data-md-toc data-toc-toggle-card role="button" tabindex="0" aria-label="展开或收起目录" title="点击展开 / 收起目录">
+        <div class="toc-head"><h3>{{ partial "ui-icon.html" "menu" }} 目录</h3></div>
+        <div class="toc-body"><nav><ul><li><span class="meta">选择文件后生成目录</span></li></ul></nav></div>
+      </aside>
+    </div>
   </div>
-
-  <aside class="card article-toc md-tool-toc" data-md-toc-toggle-card data-md-toc>
-    <div class="toc-head">
-      <h3>{{ partial "ui-icon.html" "menu" }} 目录</h3>
-    </div>
-    <div class="toc-body">
-      <nav><ul><li><span class="meta">选择文件后生成目录</span></li></ul></nav>
-    </div>
-  </aside>
 </section>
-
-<button class="back-to-top-button tool-page-top-button" type="button" aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "arrow-up" }}</button>
-<button class="scroll-to-bottom-button tool-page-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "arrow-down" }}</button>
-
+<button class="back-to-top-button" type="button" aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "arrow-up" }}</button>
+<button class="scroll-to-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "arrow-down" }}</button>
 {{ end }}

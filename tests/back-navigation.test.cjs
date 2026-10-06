@@ -26,7 +26,7 @@ test('older browsers can traverse only app-owned history entries',()=>{
  assert.match(source,/replaceState\(Object\.assign\(\{\}, current/,'saving scroll must preserve the back marker');
 });
 test('desktop and mobile directory jumps preserve history metadata',()=>{
- for(const file of ['article-render-sync.js','mobile-toc.js']){
+ for(const file of ['article-reading.js','mobile-toc.js']){
   const js=fs.readFileSync(path.join(__dirname,'../static/js',file),'utf8');
   assert(js.includes('history.replaceState(history.state,'));
   assert(!js.includes('history.pushState(null'));

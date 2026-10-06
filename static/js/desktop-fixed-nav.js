@@ -49,7 +49,10 @@
 
     // fixed 之后 rect.top 会是 0，因此高度只取 height。
     var rect = header.getBoundingClientRect();
-    var height = Math.max(56, Math.ceil(rect.height || header.offsetHeight || 72));
+    // The desktop HUD shell can legitimately have zero height: keep the
+    // minimum clearance instead of treating zero as a missing measurement.
+    var measuredHeight = Number.isFinite(rect.height) ? rect.height : header.offsetHeight;
+    var height = Math.max(56, Math.ceil(Number.isFinite(measuredHeight) ? measuredHeight : 72));
     root.style.setProperty('--desktop-fixed-nav-height', height + 'px');
   }
 

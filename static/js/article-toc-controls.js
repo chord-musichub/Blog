@@ -1,7 +1,9 @@
 // 记住文章目录的展开状态，并支持鼠标和键盘切换。
 (function(){
-  const shell = document.querySelector('.article-shell');
-  const toc = document.querySelector('.article-toc');
+  if(window.SonglineInitArticleToc) return;
+  function init(root){
+  const shell = (root || document).querySelector('.article-shell');
+  const toc = shell && shell.querySelector('.article-toc');
   if(!shell || !toc || shell.dataset.songlineTocBound === '1') return;
   shell.dataset.songlineTocBound = '1';
 
@@ -31,4 +33,7 @@
     toggle();
   });
   syncAria();
+  }
+  window.SonglineInitArticleToc = init;
+  init(document);
 })();

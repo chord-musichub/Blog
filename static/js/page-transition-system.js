@@ -28,15 +28,7 @@
     overlay = document.createElement('div');
     overlay.className = 'songline-page-transition-overlay';
     overlay.setAttribute('aria-hidden', 'true');
-    overlay.innerHTML = [
-      '<div class="songline-page-transition-loader">',
-      '  <svg viewBox="0 0 76 76" role="presentation" focusable="false">',
-      '    <circle class="songline-transition-orbit songline-transition-orbit--primary" cx="38" cy="38" r="33"></circle>',
-      '    <circle class="songline-transition-orbit songline-transition-orbit--secondary" cx="38" cy="38" r="28"></circle>',
-      '    <circle class="songline-transition-orbit songline-transition-orbit--tertiary" cx="38" cy="38" r="23"></circle>',
-      '  </svg>',
-      '</div>'
-    ].join('');
+    overlay.innerHTML = window.SonglineTransitionLoaderMarkup || '';
     document.body.appendChild(overlay);
     return overlay;
   }

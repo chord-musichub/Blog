@@ -48,8 +48,8 @@
     var entry = {source:source, img:img, background:!!options.background, retries:retry ? previous.retries + 1 : 0, failed:false, timedOut:false};
     pendingImages.set(img, entry);
     img.setAttribute('data-image-state', 'pending');
-    img.loading = 'eager';
-    img.decoding = 'async';
+    if(img.loading !== 'eager') img.loading = 'eager';
+    if(img.decoding !== 'async') img.decoding = 'async';
     var task = new Promise(function(resolve){
       var settled = false;
       var closed = false;
@@ -87,7 +87,19 @@
         settle({failed:!ok});
         if(ok) img.dispatchEvent(new Event('songline:image-ready'));
       }
-      function failed(){ finish(false); }
+      function failed(){
+        // Tool favicons can name a direct-site alternative. Never add a retry
+        // loop or switch sources after a timeout while the original is loading.
+        var fallback = img.getAttribute('data-image-fallback');
+        if(!closed && pendingImages.get(img) === entry && imageSource(img) === source && fallback && img.getAttribute('src') !== fallback){
+          cleanup();
+          pendingImages.delete(img);
+          img.src = fallback;
+          settle(imageReady(img, {freshSource:true}));
+          return;
+        }
+        finish(false);
+      }
       function loaded(){
         if(decoding || closed) return;
         if(imageSource(img) !== source){ finish(false); return; }
@@ -110,7 +122,9 @@
       img.addEventListener('error', failed);
       if(!img.getAttribute('src') && img.getAttribute('data-image-src')) img.src = img.getAttribute('data-image-src');
       else if(retry) img.src = img.getAttribute('src');
-      if(img.complete) { if(img.naturalWidth > 0) loaded(); else failed(); }
+      // Immediately after replacing a failed src, complete can still describe
+      // the old request. Wait for the new request's own load/error event.
+      if(!options.freshSource && img.complete) { if(img.naturalWidth > 0) loaded(); else failed(); }
     });
     entry.promise = task;
     return task;
@@ -338,6 +352,7 @@
     return report;
   }
   function finishEntry(){
+    if(window.SonglineFinishSceneEntry){ window.SonglineFinishSceneEntry(); return; }
     clearTimeout(window.__songlineSceneEntryFallback);
     document.documentElement.classList.remove('is-scene-preparing');
     document.documentElement.setAttribute('aria-busy', 'false');

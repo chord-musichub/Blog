@@ -292,6 +292,17 @@ html.nav-enter-from-left.is-nav-enter-ready body > :not(.site-boot-overlay):not(
   pointer-events:none!important;
   background:transparent!important;
 }
+/* The legacy horizontal header still painted a 1px border across the HUD.
+   The floating brand/icons/elevator have no full-width header surface. */
+html body .site-header.modern-site-header{
+  border:0!important;
+}
+@media(min-width:981px){
+html body .site-header.modern-site-header{
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+}
 .modern-site-header .modern-navbar{
   pointer-events:auto;
   width:auto!important;

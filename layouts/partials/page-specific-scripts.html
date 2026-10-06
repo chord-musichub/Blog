@@ -75,5 +75,7 @@ v20.20.6：页面级 JS 按需加载。
 {{- end }}
 {{- if hasPrefix $rel "/tools/markdown-previewer/" }}
 <script defer data-page-script="markdown-renderer" src="/js/markdown-renderer.js?v={{ $v }}"></script>
+<script defer data-page-script="article-reading" src="/js/article-reading.js?v={{ $v }}"></script>
+<script defer data-page-script="article-toc-controls" src="/js/article-toc-controls.js?v={{ $v }}"></script>
 <script defer data-page-script="markdown-previewer" src="/js/tools/markdown-previewer.js?v={{ $v }}"></script>
 {{- end }}

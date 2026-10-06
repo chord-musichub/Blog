@@ -18,7 +18,7 @@
   }
   /* 顶栏以原首页为基准：一整条玻璃，不让历史规则额外叠出亮白渐变和内缩空边。 */
   html.has-fixed-mobile-nav body .modern-site-header,
-  html body .modern-site-header{position:fixed!important;top:0!important;left:0!important;right:0!important;height:60px!important;padding:0!important;background:rgba(10,22,38,.62)!important;border:0!important;border-bottom:1px solid rgba(195,213,236,.16)!important;box-shadow:none!important;backdrop-filter:blur(14px) saturate(104%)!important;-webkit-backdrop-filter:blur(14px) saturate(104%)!important;z-index:12000!important}
+  html body .modern-site-header{position:fixed!important;top:0!important;left:0!important;right:0!important;height:60px!important;padding:0!important;background:rgba(10,22,38,.62)!important;border:0!important;box-shadow:none!important;backdrop-filter:blur(14px) saturate(104%)!important;-webkit-backdrop-filter:blur(14px) saturate(104%)!important;z-index:12000!important}
   html.has-fixed-mobile-nav body .modern-site-header .modern-navbar,
   html body .modern-site-header .modern-navbar{width:100%!important;max-width:none!important;height:60px!important;min-height:60px!important;box-sizing:border-box;padding:8px 14px!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;flex-wrap:nowrap!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
   html.has-fixed-mobile-nav body:not(.dark) .modern-site-header,

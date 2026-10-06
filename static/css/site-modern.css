@@ -1620,61 +1620,49 @@ html body .tag-river-searchbox:focus-within .site-search-icon,
 html body .friend-search-box:focus-within .site-search-icon{
   color:var(--accent) !important;
 }
-html body .article-toc nav li,
-html body .md-tool-layout .md-tool-toc nav li{
+html body .article-toc nav li{
   margin-top:5px !important;
   margin-bottom:5px !important;
 }
-html body .article-toc .toc-depth-1,
-html body .md-tool-layout .md-tool-toc .toc-depth-1{
+html body .article-toc .toc-depth-1{
   margin-left:0 !important;
   font-weight:850 !important;
 }
-html body .article-toc .toc-depth-2,
-html body .md-tool-layout .md-tool-toc .toc-depth-2{
+html body .article-toc .toc-depth-2{
   margin-left:14px !important;
   font-weight:760 !important;
 }
-html body .article-toc .toc-depth-3,
-html body .md-tool-layout .md-tool-toc .toc-depth-3{
+html body .article-toc .toc-depth-3{
   margin-left:28px !important;
   font-weight:680 !important;
 }
-html body .article-toc .toc-depth-4,
-html body .md-tool-layout .md-tool-toc .toc-depth-4{
+html body .article-toc .toc-depth-4{
   margin-left:42px !important;
   font-weight:620 !important;
 }
-html body .article-toc .toc-depth-5,
-html body .md-tool-layout .md-tool-toc .toc-depth-5{
+html body .article-toc .toc-depth-5{
   margin-left:56px !important;
 }
-html body .article-toc .toc-depth-6,
-html body .md-tool-layout .md-tool-toc .toc-depth-6{
+html body .article-toc .toc-depth-6{
   margin-left:70px !important;
 }
-html body .article-toc li:not([data-toc-depth]).toc-level-1,
-html body .md-tool-layout .md-tool-toc li:not([data-toc-depth]).toc-level-1{
+html body .article-toc li:not([data-toc-depth]).toc-level-1{
   margin-left:0 !important;
   font-weight:850 !important;
 }
-html body .article-toc li:not([data-toc-depth]).toc-level-2,
-html body .md-tool-layout .md-tool-toc li:not([data-toc-depth]).toc-level-2{
+html body .article-toc li:not([data-toc-depth]).toc-level-2{
   margin-left:14px !important;
   font-weight:760 !important;
 }
-html body .article-toc li:not([data-toc-depth]).toc-level-3,
-html body .md-tool-layout .md-tool-toc li:not([data-toc-depth]).toc-level-3{
+html body .article-toc li:not([data-toc-depth]).toc-level-3{
   margin-left:28px !important;
   font-weight:680 !important;
 }
-html body .article-toc li:not([data-toc-depth]).toc-level-4,
-html body .md-tool-layout .md-tool-toc li:not([data-toc-depth]).toc-level-4{
+html body .article-toc li:not([data-toc-depth]).toc-level-4{
   margin-left:42px !important;
   font-weight:620 !important;
 }
-html body .article-toc nav a,
-html body .md-tool-layout .md-tool-toc nav a{
+html body .article-toc nav a{
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -1682,4 +1670,3 @@ html body .md-tool-layout .md-tool-toc nav a{
 html body .page-hero > h1 + p{
   display:none !important;
 }
-

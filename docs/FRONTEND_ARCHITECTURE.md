@@ -48,3 +48,13 @@
 - 阅读目录的 hover 颜色反馈可以变化，但目录和链接的命中区域不能因 hover 位移；键盘折叠只响应目录容器本身，不能拦截子链接的 Enter。
 
 回归入口：`tests/stability.test.cjs`、`tests/article-download.test.cjs`、`tests/stability.browser.cjs`。浏览器测试需指定新构建的 `BLOG_UI_BUILD`，并使用离线请求拦截，禁止测试写入线上数据。
+
+## 刷新与本地 Markdown 阅读
+
+- 初始文档等待和站内过场共享 `transition-loader.html` 的 SVG 与 `transition-loader.css` 的动画定义。加载器的关键 CSS 在 `scene-entry.html` 内联，阻塞外部样式时仍可显示；场景资源准备完成后关闭，缺失初始化时保留超时兜底，缓存恢复/站内导航立即清理旧入口遮罩。刷新不重播首页首访开场。
+- 电梯/HUD 导航不应继承旧横向导航的全宽边框。桌面空壳不保留 backdrop-filter；手机仍保留原玻璃顶栏，只去掉边线。桌面空壳高度为零也是有效测量，应保留原 56px 最小内容间距，不能误用 72px 的缺失测量兜底。
+- Markdown 预览器仍属于工具路由与工具导航，但阅读场景属性、校园主题、正文卡片、目录轨道及浮动操作采用文章阅读设计。文件选择区单独在正文上方，文件只在浏览器本地读取，不新增上传 API。
+- `article-reading.js` 是文章与预览器的目录树及锚点滚动唯一实现，涵盖六级标题、唯一 ID、安全目录标签和 replaceState 历史策略；`article-toc-controls.js` 提供同一个重复安全的折叠入口。异步文章渲染等待渲染器和阅读工具均就绪。
+- 不再加载 `markdown-previewer-base.css`，旧双层卡片、独立目录缩进和工具独立浮动按钮布局已删除。被删除的是可从 Git 恢复的旧样式代码，没有删除用户文件。
+
+专项回归：`tests/reading-polish.test.cjs`、`tests/reading-polish.browser.cjs`，覆盖真实 reload 的加载器一致性、无白边、桌面/手机正文样式一致性、六级/重复标题、长目录、空/无效文件、换文件及 AJAX 重入。截图须等待平滑滚动稳定，避免截图工具的 viewport 采样与正在变化的滚动位置错位。
