@@ -1,9 +1,9 @@
 {{ define "main" }}
 <main class="tool-page focus-timer-page" data-focus-timer data-version="20.21.0">
-  <a class="back-icon-link focus-back-link" href="/tools/" aria-label="返回上一页" data-back-icon>←</a>
 
   <section class="focus-shell" aria-label="学习倒计时">
-    <div class="focus-panel focus-main-card">
+    <div class="focus-panel focus-main-card" data-tool-back-surface>
+      {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
       <div class="focus-orbit" data-focus-orbit>
         <svg class="focus-ring" viewBox="0 0 260 260" role="img" aria-label="倒计时进度环">
           <defs>

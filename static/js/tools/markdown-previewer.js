@@ -11,12 +11,16 @@
     const fileInput = panel.querySelector('[data-md-file]');
     const drop = panel.querySelector('[data-md-drop]');
     const preview = panel.querySelector('[data-md-preview]');
+    const shell = panel.querySelector('.article-shell');
     const toc = panel.querySelector('[data-md-toc] .toc-body');
     const nameEl = panel.querySelector('[data-md-name]');
+    const messageEl = panel.querySelector('[data-md-message]');
+    const chooseButton = panel.querySelector('[data-md-choose]');
     const statusEl = panel.querySelector('.md-tool-meta');
     window.SonglineInitArticleToc(panel);
 
     function notify(){
+      document.querySelectorAll('[data-md-reading-action]').forEach(function(button){ button.hidden = shell.hidden; });
       if(window.SonglineNormalizeFloatReadingButtons) window.SonglineNormalizeFloatReadingButtons();
       window.dispatchEvent(new Event('songline:article-toc-ready'));
     }
@@ -30,12 +34,12 @@
     function setState(message, detail){
       preview.replaceChildren();
       preview.removeAttribute('aria-busy');
-      const empty = document.createElement('div');
-      empty.className = 'md-empty-state';
-      empty.textContent = detail;
-      preview.appendChild(empty);
+      shell.hidden = true;
+      panel.dataset.mdState = 'empty';
+      chooseButton.textContent = '选择文件';
       window.SonglineReading.buildToc(preview, toc);
       nameEl.textContent = message;
+      messageEl.textContent = detail;
       statusEl.hidden = !message;
       notify();
     }
@@ -47,6 +51,7 @@
         return;
       }
       setState('正在读取新文件…', '新文件读取中。');
+      panel.dataset.mdState = 'loading';
       const reader = new FileReader();
       activeReader = reader;
       reader.onload = function(){
@@ -54,13 +59,21 @@
         activeReader = null;
         const text = String(reader.result || '').replace(/^\uFEFF/, '');
         reader.onload = reader.onerror = null;
-        if(text.trim()) preview.innerHTML = window.SonglineMarkdown.render(text);
-        else setState(file.name || '已选择文件', '这个文件没有可预览的内容。');
+        if(!text.trim()){
+          setState(file.name || '已选择文件', '这个文件为空，请选择其他文件。');
+          if(location.hash) history.replaceState(history.state, '', location.pathname + location.search);
+          return;
+        }
+        preview.innerHTML = window.SonglineMarkdown.render(text);
+        shell.hidden = false;
+        panel.dataset.mdState = 'ready';
+        chooseButton.textContent = '更换文件';
         window.SonglineReading.buildToc(preview, toc);
         if(window.SonglineEnhanceMarkdown) window.SonglineEnhanceMarkdown(preview);
         if(window.SonglineResources) window.SonglineResources.observe(preview);
         if(window.SonglinePageModules) window.SonglinePageModules.scan(panel);
         nameEl.textContent = file.name || '已选择文件';
+        messageEl.textContent = '';
         statusEl.hidden = false;
         preview.removeAttribute('aria-busy');
         // New file headings must not inherit the previous file's fragment.
@@ -76,7 +89,7 @@
       preview.setAttribute('aria-busy', 'true');
       reader.readAsText(file, 'utf-8');
     }
-    panel.querySelector('[data-md-choose]').addEventListener('click', function(){ fileInput.click(); });
+    chooseButton.addEventListener('click', function(){ fileInput.click(); });
     fileInput.addEventListener('click', function(){ fileInput.value = ''; });
     fileInput.addEventListener('change', function(){ setFile(fileInput.files && fileInput.files[0]); });
     drop.addEventListener('dragenter', function(event){ event.preventDefault(); dragDepth++; drop.classList.add('dragging'); });

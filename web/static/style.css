@@ -1908,21 +1908,25 @@ html[data-admin-theme="dark"] .admin-page-title{
 
 /* v14.6 后台返回 / 外观归并 / 同步客户端背景 */
 .admin-back-icon{
-  width:38px;
-  height:38px;
-  min-width:38px;
+  width:44px;
+  height:44px;
+  min-width:44px;
+  min-height:44px;
   padding:0 !important;
-  border-radius:999px !important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:var(--admin-text,#1f2937);
   font-size:0 !important;
   line-height:0 !important;
   position:relative;
 }
 .admin-back-icon::before{
-  content:"";
-  font-size:20px;
-  line-height:1;
-  font-weight:850;
+  content:none;
 }
+.admin-back-icon:is(:hover,:focus-visible){background:transparent!important;box-shadow:none!important;transform:none!important;color:var(--admin-accent-2,#075985)}
+.admin-back-icon:focus-visible{outline:2px solid currentColor!important;outline-offset:2px!important}
 .admin-site-bg-layer{
   position:fixed;
   inset:0 0 auto 0;
@@ -2537,9 +2541,14 @@ button svg,
   place-items:center;
 }
 .admin-back-icon svg{
-  width:18px !important;
-  height:18px !important;
+  width:24px !important;
+  height:24px !important;
+  transform:translateX(0) scale(1);
+  transition:transform .18s ease;
 }
+.admin-back-icon:is(:hover,:focus-visible) svg{transform:translateX(-3px) scale(1.08)}
+.admin-back-icon:active svg{transform:translateX(-2px) scale(.96)}
+@media(prefers-reduced-motion:reduce){.admin-back-icon svg{transition:none}.admin-back-icon:is(:hover,:focus-visible,:active) svg{transform:none}}
 .btn-ico svg,
 .quick-card svg{
   width:18px !important;

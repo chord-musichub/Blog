@@ -1,19 +1,21 @@
 {{ define "main" }}
 {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-<section data-md-tool>
-  <div class="card md-file-controls" data-md-drop>
-    <div class="md-tool-head">
-      <button class="btn md-file-button" type="button" data-md-choose>选择 .md 文件</button>
-      <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" data-md-file hidden>
+<section data-md-tool data-md-state="empty">
+  <div class="card md-file-controls" data-md-drop role="group" aria-label="导入 Markdown 文件">
+    <div class="md-upload-emblem" aria-hidden="true">{{ partial "ui-icon.html" "article" }}</div>
+    <div class="md-upload-copy">
+      <h1>Markdown 预览</h1>
+      <p>拖入 .md 文件，或点击下方选择</p>
     </div>
+    <button class="md-file-button" type="button" data-md-choose>选择文件</button>
+    <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" data-md-file hidden>
     <div class="md-tool-meta" role="status" aria-live="polite" hidden>
       <span data-md-name></span>
+      <span data-md-message></span>
     </div>
   </div>
-  <div class="article-shell section md-tool-layout" data-toc-state="expanded">
-    <article class="card article-reader markdown-body md-live-preview" data-md-preview aria-label="Markdown 预览">
-      <div class="md-empty-state"></div>
-    </article>
+  <div class="article-shell section md-tool-layout" data-toc-state="expanded" hidden>
+    <article class="card article-reader markdown-body" data-md-preview aria-label="Markdown 预览"></article>
     <div class="article-toc-rail">
       <aside class="card article-toc" data-md-toc data-toc-toggle-card role="button" tabindex="0" aria-label="展开或收起目录" title="点击展开 / 收起目录">
         <div class="toc-head"><h3>{{ partial "ui-icon.html" "menu" }} 目录</h3></div>
@@ -22,6 +24,6 @@
     </div>
   </div>
 </section>
-<button class="back-to-top-button" type="button" aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "arrow-up" }}</button>
-<button class="scroll-to-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "arrow-down" }}</button>
+<button class="back-to-top-button" type="button" data-md-reading-action hidden aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "arrow-up" }}</button>
+<button class="scroll-to-bottom-button" type="button" data-md-reading-action hidden aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "arrow-down" }}</button>
 {{ end }}

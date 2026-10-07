@@ -34,8 +34,12 @@ test('preview uses the actual reader structure and has no old layout stylesheet'
  for(const token of ['article-reader markdown-body','article-toc-rail','data-md-choose','type="button"','aria-live="polite"'])assert(template.includes(token));
  assert(!fs.existsSync(path.join(__dirname,'../static/css/tools/markdown-previewer-base.css')));
  const css=read('static/css/tools/markdown-previewer.css');
- assert(css.includes('main.container:has([data-md-tool])'),'Centering only affects the preview frame');
- assert(css.includes('.md-tool-layout[data-toc-state="expanded"]'),'Directory columns stay inside the centered preview');
+ assert(css.includes(':not([data-md-state="ready"])'),'Only the empty import frame has a separate compact layout');
+ assert(!css.includes('grid-template-columns'),'Reading uses the article external rail, not an internal directory column');
+ assert(!css.includes('position:static'),'Preview cannot move the article rail into the glass panel');
+ assert(!css.includes('md-live-preview'),'No independent reader sizing overrides');
+ assert(template.includes('拖入 .md 文件，或点击下方选择'),'Import has concise functional guidance');
+ assert(template.includes('data-toc-state="expanded" hidden'),'No blank reading card before import');
  for(const text of ['仅在本机预览','尚未选择文件','选择文件后预览','选择文件后生成目录','data-md-size'])assert(!template.includes(text),'No extra helper text: '+text);
  const controller=read('static/js/tools/markdown-previewer.js');assert(controller.includes('SonglineReading.buildToc'));
  assert(!controller.includes('function slugify'),'Preview has no divergent heading implementation');
@@ -48,4 +52,13 @@ test('external tool icon URLs do not use Google or local mirrors',()=>{
   assert(!/(^|\.)(google|gstatic|googleusercontent)\.com$/.test(url.hostname),tool.title+' cannot depend on Google');
  }
  assert(!read('layouts/partials/tool-card.html').includes('google.com'),'Templates do not reinstate the old source');
+});
+test('page-history chevrons are registered in both static and live icon systems',()=>{
+ assert(read('layouts/partials/icons.html').includes('eq $name "chevron-left"'));
+ assert(read('static/js/icon-system.js').includes("'chevron-left': svg('<path d=\"m15 5-7 7 7 7\"/>'"));
+ for(const file of ['layouts/partials/back-icon.html','layouts/partials/notices/archive.html','layouts/friends/memories.html'])assert(read(file).includes('"chevron-left"'));
+ for(const name of ['random-number','gacha','snake','2048','reaction-test','flappy-bird','typing-practice','focus-timer','audio-visualizer']){const template=read('layouts/tools/'+name+'.html');assert(template.includes('data-tool-back-surface'));assert(template.indexOf('data-tool-back-surface')<template.indexOf('partial "back-icon.html"'),'Return belongs inside the actual panel: '+name);}
+ for(const file of ['web/templates/upload.html','web/templates/request_password.html']){assert(read(file).includes('m15 5-7 7 7 7'));assert(!read(file).includes('M8.5 12H21'));}
+ assert(read('static/js/page-transition-system.js').includes("'pageLayout', 'pageScene'"),'AJAX shell owns scene marker changes');
+ assert(read('static/css/touch-layout.css').includes(':not(.dark):not([data-page-kind="home"]) .modern-site-header .header-icons'),'Mobile light-mode fallback cannot override the white home icons');
 });

@@ -1,0 +1,36 @@
+/* One bare chevron for page-history controls. Keep per-page placement and color,
+   plus a 44px invisible hit area for touch, without a circular/glass button. */
+html:root body [data-back-icon][data-back-icon]{
+  display:inline-grid!important;place-items:center!important;
+  box-sizing:border-box!important;width:44px!important;height:44px!important;
+  min-width:44px!important;min-height:44px!important;padding:0!important;
+  border:0!important;border-radius:0!important;text-decoration:none!important;
+  background:transparent!important;box-shadow:none!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  color:var(--back-ink,var(--text))!important;
+  transform:none!important;transition:color .18s ease,opacity .18s ease!important;
+}
+html:root body [data-back-icon][data-back-icon]::before,
+html:root body [data-back-icon][data-back-icon]::after{content:none!important;display:none!important}
+html:root body [data-back-icon][data-back-icon] :is(.ui-icon,svg){width:24px!important;height:24px!important;--ui-icon-size:24px}
+html:root body [data-back-icon][data-back-icon] > .ui-icon{transform:translateX(0) scale(1);transition:transform .18s ease}
+html:root body [data-back-icon][data-back-icon]:is(:hover,:focus-visible){
+  background:transparent!important;box-shadow:none!important;transform:none!important;
+  color:var(--back-hover-ink,var(--accent-2))!important;
+}
+html:root body [data-back-icon][data-back-icon]:is(:hover,:focus-visible) > .ui-icon{transform:translateX(-3px) scale(1.08)}
+html:root body [data-back-icon][data-back-icon]:active > .ui-icon{transform:translateX(-2px) scale(.96)}
+html:root body [data-back-icon][data-back-icon]:focus-visible{outline:2px solid currentColor!important;outline-offset:2px!important}
+/* Fallback ink for tool returns that have not opted into a panel surface. */
+body[data-page-section="tools"]{--back-ink:#fff1d2;--back-hover-ink:#fff}
+/* Returns belong to their tool panel, not to the scenery behind it. */
+[data-tool-back-surface]{--back-ink:var(--text);--back-hover-ink:var(--accent-2)}
+html:root body [data-tool-back-surface] > [data-back-icon]{margin:0 0 12px!important;justify-self:start;align-self:start}
+.focus-main-card[data-tool-back-surface]{--back-ink:var(--focus-ink);--back-hover-ink:var(--accent-2)}
+html:root body .focus-main-card[data-tool-back-surface] > [data-back-icon]{position:absolute;top:16px;left:16px;margin:0!important;z-index:5}
+.av-stage[data-tool-back-surface]{--back-ink:#f8fafc;--back-hover-ink:#7dd3fc}
+html:root body .av-stage[data-tool-back-surface] > [data-back-icon]{position:absolute!important;top:18px!important;left:18px!important;right:auto!important;bottom:auto!important;margin:0!important;z-index:10000!important}
+@media(prefers-reduced-motion:reduce){
+  html:root body [data-back-icon][data-back-icon],html:root body [data-back-icon][data-back-icon] > .ui-icon{transition:none!important;transform:none!important}
+  html:root body [data-back-icon][data-back-icon]:is(:hover,:focus-visible,:active) > .ui-icon{transform:none!important}
+}

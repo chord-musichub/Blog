@@ -46,6 +46,7 @@
       ensureStylesheet('songline-reader-floating-controls-style', '/css/pages/content/reader-floating-controls.css');
       ensureStylesheet('songline-markdown-previewer-style', '/css/tools/markdown-previewer.css');
       ensureStylesheet('songline-posts-campus-scene-style', '/css/pages/posts/campus-scene.css');
+      ensureStylesheet('songline-tool-detail-shell-style', '/css/tools/detail-shell.css');
     }
     if(path.indexOf('/tools/audio-visualizer/') === 0 || !!query(root, '[data-audio-visualizer], .audio-visualizer-page')){
       // 与服务端直开页面保持一致：后面的样式层覆盖前面的历史规则。

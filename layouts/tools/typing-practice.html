@@ -1,9 +1,9 @@
 {{ define "main" }}
-{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
 
 <main class="tool-page typing-page">
   <section class="typing-shell" data-typing-practice>
-    <section class="typing-panel">
+    <section class="typing-panel" data-tool-back-surface>
+      {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
       <div class="typing-topbar">
         <div class="typing-mode-group" role="group" aria-label="打字模式">
           <button class="typing-mode is-active" type="button" data-typing-mode="english">英文</button>

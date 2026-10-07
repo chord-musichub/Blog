@@ -1,20 +1,21 @@
-/* Article shell, sticky rail, typography and actions are shared.
-   Only local-file controls and the empty state belong to this tool. */
-.md-file-controls{padding:18px 22px!important;margin:18px 0;color:var(--article-ink,var(--text));background:var(--article-surface,var(--panel))!important;transition:background .18s ease,border-color .18s ease}
-.md-tool-head{display:flex;align-items:center;justify-content:center;gap:12px}
-.md-file-button{font:inherit;cursor:pointer;min-height:44px;background:var(--article-surface-strong,var(--panel));border-color:var(--article-line-strong,var(--border));color:var(--article-ink,var(--text))}
-.md-file-button:hover,.md-file-button:focus-visible{border-color:var(--article-accent,var(--accent));background:var(--article-accent-soft,var(--soft-blue))}
-.md-file-controls.dragging{border-color:var(--article-accent,var(--accent));background:var(--article-surface-strong,var(--panel))!important}
-.md-tool-meta{display:flex;justify-content:center;margin-top:12px;color:var(--article-muted,var(--muted));font-size:13px;overflow-wrap:anywhere}
-.md-tool-meta[hidden]{display:none}
-.md-tool-meta [data-md-name]{min-width:0}
-.md-tool-layout .md-live-preview{min-height:340px;max-height:none;overflow:visible}
-.md-empty-state{min-height:260px;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:var(--article-muted,var(--muted))}
-/* Center the preview as one frame; only articles retain the offset outer rail. */
-@media(min-width:981px){
-  html body[data-page-layout="markdown-previewer"] main.container:has([data-md-tool]){width:min(1350px,calc(100vw - 80px))!important;max-width:min(1350px,calc(100vw - 80px))!important;margin-left:auto!important;margin-right:auto!important}
-  html body .md-tool-layout[data-toc-state]{display:grid!important;grid-template-columns:minmax(0,1fr) 56px!important;gap:24px!important}
-  html body .md-tool-layout[data-toc-state="expanded"]{grid-template-columns:minmax(0,1fr) 210px!important}
-  html body .md-tool-layout .article-toc-rail{position:static;align-self:stretch;width:auto;min-width:0}
-}
-@media(max-width:600px){.md-file-controls{padding:18px!important}}
+/* Reading cards, the external sticky TOC and actions use article-reader.css.
+   Only the file import UI and its empty/ready states belong to this tool. */
+html body .md-tool-layout[hidden],
+html body[data-page-layout="markdown-previewer"] [data-md-reading-action][hidden]{display:none!important}
+html body[data-page-layout="markdown-previewer"] main.container:has([data-md-tool]:not([data-md-state="ready"])){width:min(740px,calc(100% - 32px))!important;max-width:min(740px,calc(100% - 32px))!important;min-height:0!important;margin:clamp(24px,8svh,76px) auto 32px!important;padding:24px!important}
+.md-file-controls{display:flex;flex-direction:column;align-items:center;gap:20px;margin:18px 0 0;padding:38px 28px!important;text-align:center;color:var(--article-ink,var(--text));background:var(--article-surface,var(--panel))!important;border:1px dashed var(--article-line-strong,var(--border))!important;transition:background .18s ease,border-color .18s ease}
+.md-upload-emblem{display:grid;place-items:center;width:64px;height:64px;border:1px solid var(--article-line,var(--border));border-radius:18px;background:var(--article-accent-soft,var(--soft-blue));color:var(--article-accent,var(--accent))}
+.md-upload-emblem .ui-icon{--ui-icon-size:30px}
+.md-upload-copy h1{margin:0!important;font-size:clamp(24px,3vw,30px)!important;line-height:1.3}
+.md-upload-copy p{margin:10px 0 0;font-size:15px;line-height:1.6;color:var(--article-muted,var(--muted))}
+.md-file-button{font:inherit;font-weight:650;cursor:pointer;min-height:44px;padding:10px 24px;border-radius:12px;border:1px solid var(--article-accent,var(--accent));background:var(--article-accent-soft,var(--soft-blue));color:var(--article-ink,var(--text))}
+.md-file-button:hover,.md-file-button:focus-visible{background:var(--article-surface-strong,var(--panel));outline:2px solid var(--article-accent,var(--accent));outline-offset:3px}
+.md-file-controls.dragging{border-color:var(--article-accent,var(--accent))!important;background:var(--article-surface-strong,var(--panel))!important}
+.md-tool-meta{display:flex;flex-direction:column;gap:5px;max-width:100%;font-size:14px;line-height:1.5;overflow-wrap:anywhere;color:var(--article-muted,var(--muted))}
+.md-tool-meta[hidden],.md-tool-meta [data-md-message]:empty{display:none}
+[data-md-state="ready"] .md-file-controls{flex-direction:row;justify-content:space-between;padding:16px 20px!important;text-align:left;border-style:solid!important}
+[data-md-state="ready"] :is(.md-upload-emblem,.md-upload-copy){display:none}
+[data-md-state="ready"] .md-file-button{order:2;flex-shrink:0}
+[data-md-state="ready"] .md-tool-meta{min-width:0;color:var(--article-ink,var(--text))}
+@media(max-width:600px){.md-file-controls{padding:28px 18px!important}.md-upload-copy p{font-size:14px}[data-md-state="ready"] .md-file-controls{gap:12px;padding:14px!important}.md-tool-meta{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.md-file-controls{transition:none}}

@@ -1,6 +1,6 @@
 {{ define "main" }}
-{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-<section class="card gacha-tool-panel" data-gacha-tool>
+<section class="card gacha-tool-panel" data-gacha-tool data-tool-back-surface>
+  {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
   <div class="gacha-head">
     <div class="gacha-status">
       <span>当前游戏 <b data-gacha-mode-name>—</b></span>

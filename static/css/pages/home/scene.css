@@ -37,13 +37,13 @@ body[data-page-kind="home"] .songline-starstream-layer{
   text-shadow:0 3px 18px rgba(44,24,31,.62), 0 1px 0 rgba(255,255,255,.16);
 }
 
-/* 明亮场景图上的首页 HUD 使用墨色文字，避免继承深色主题的低对比白字。 */
+/* 首页 HUD 与其他场景一致，三个操作图标始终为白色。 */
 body[data-page-kind="home"] .modern-site-header .header-icons .icon-btn{
-  color:rgba(65,39,48,.82)!important;
+  color:#fff!important;
 }
 body[data-page-kind="home"] .modern-site-header .header-icons .icon-btn:hover,
 body[data-page-kind="home"] .modern-site-header .header-icons .icon-btn:focus-visible{
-  color:#2f1d27!important;
+  color:#fff!important;
 }
 /* 首页场景上的品牌字始终使用白色，不跟随主题类切换瞬间回落为深色。 */
 body[data-page-kind="home"] .modern-site-header .logo,

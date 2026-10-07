@@ -1,9 +1,9 @@
 {{ define "main" }}
-{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
 
 <main class="tool-page tool-2048-page">
   <section class="tool-2048-shell" data-game-2048>
-    <div class="game-2048-panel">
+    <div class="game-2048-panel" data-tool-back-surface>
+      {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
       <div class="game-2048-topbar">
         <div class="game-2048-score-card">
           <span>分数</span>

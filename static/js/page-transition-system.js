@@ -254,7 +254,7 @@
       root.setAttribute('data-theme', dark ? 'dark' : 'light');
       document.body.className = nextBody.className || '';
       if(dark) document.body.classList.add('dark');
-      ['pageKind', 'pageSection', 'pageLayout', 'bootWelcome'].forEach(function(name){
+      ['pageKind', 'pageSection', 'pageLayout', 'pageScene', 'bootWelcome'].forEach(function(name){
         if(nextBody.dataset && nextBody.dataset[name]) document.body.dataset[name] = nextBody.dataset[name];
         else delete document.body.dataset[name];
         if(name !== 'bootWelcome'){

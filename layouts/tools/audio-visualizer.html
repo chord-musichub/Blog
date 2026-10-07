@@ -1,8 +1,8 @@
 {{ define "main" }}
-{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
 
 <main class="tool-page audio-visualizer-page" data-audio-visualizer>
-  <section class="av-stage" data-av-stage>
+  <section class="av-stage" data-av-stage data-tool-back-surface>
+    {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
     <canvas class="av-canvas" data-av-canvas width="1440" height="900" aria-label="音频可视化画布"></canvas>
     <div class="av-noise" aria-hidden="true"></div>
     <div class="av-vignette" aria-hidden="true"></div>

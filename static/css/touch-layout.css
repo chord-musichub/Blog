@@ -23,7 +23,7 @@
   html body .modern-site-header .modern-navbar{width:100%!important;max-width:none!important;height:60px!important;min-height:60px!important;box-sizing:border-box;padding:8px 14px!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;flex-wrap:nowrap!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
   html.has-fixed-mobile-nav body:not(.dark) .modern-site-header,
   html body:not(.dark) .modern-site-header{background:rgba(75,66,75,.48)!important;border-bottom-color:rgba(241,215,205,.20)!important}
-  html body:not(.dark) .modern-site-header :is(.logo,.logo-text),html:root body:not(.dark) .modern-site-header .header-icons .icon-btn{color:rgba(250,244,240,.94)!important;text-shadow:0 1px 10px rgba(31,30,39,.22)!important}
+  html body:not(.dark) .modern-site-header :is(.logo,.logo-text),html:root body:not(.dark):not([data-page-kind="home"]) .modern-site-header .header-icons .icon-btn{color:rgba(250,244,240,.94)!important;text-shadow:0 1px 10px rgba(31,30,39,.22)!important}
   /* 浅色移动端不再沿用旧系统接近纯白的 --border；玻璃靠色块区分，不靠亮边框切割。 */
   html body:not(.dark){--border:rgba(102,83,92,.24)!important}
   html body:not(.dark) :is(.card,.area-card,.page-hero,.content-archive,.archive-record__drawer-shell,.article-shell,.article-intro,.article-reader,.tools-search-station,.tool-card,.typing-panel,.typing-card){border-color:transparent!important}

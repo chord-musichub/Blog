@@ -1,9 +1,9 @@
 {{ define "main" }}
-{{ partial "back-icon.html" (dict "fallback" "/tools/") }}
 
 <main class="tool-page reaction-test-page">
   <section class="reaction-shell" data-reaction-test>
-    <section class="reaction-panel">
+    <section class="reaction-panel" data-tool-back-surface>
+      {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
       <div class="reaction-stats">
         <div class="reaction-stat-card">
           <span>本次</span>

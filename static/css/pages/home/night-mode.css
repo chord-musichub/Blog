@@ -29,12 +29,12 @@ body.dark[data-page-kind="home"] .modern-site-header .modern-navbar{ background:
 body.dark[data-page-kind="home"] .modern-site-header .logo,
 body.dark[data-page-kind="home"] .modern-site-header .logo-text{ color:#edf3ff!important; }
 body.dark[data-page-kind="home"] .modern-site-header .header-icons .icon-btn{
-  color:rgba(225,235,250,.72)!important;
+  color:#fff!important;
   text-shadow:0 0 20px rgba(181,210,255,.08);
 }
 body.dark[data-page-kind="home"] .modern-site-header .header-icons .icon-btn:hover,
 body.dark[data-page-kind="home"] .modern-site-header .header-icons .icon-btn:focus-visible{
-  color:rgba(255,255,255,.95)!important;
+  color:#fff!important;
   background:radial-gradient(circle, rgba(213,229,255,.12), transparent 66%)!important;
 }
 
