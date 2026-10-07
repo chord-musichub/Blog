@@ -3,7 +3,7 @@
 {{ if eq .Layout "site-notice" }}{{ $sceneSection = "posts" }}{{ end }}
 {{ $isMarkdownPreview := hasPrefix .RelPermalink "/tools/markdown-previewer/" }}
 {{ if $isMarkdownPreview }}{{ $sceneSection = "posts" }}{{ end }}
-<html lang="zh-CN" data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-page-section="{{ if .IsHome }}home{{ else }}{{ $sceneSection }}{{ end }}" data-page-layout="{{ .Layout }}">
+<html lang="zh-CN" data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-page-section="{{ if .IsHome }}home{{ else }}{{ $sceneSection }}{{ end }}" data-page-layout="{{ .Layout }}"{{ if $isMarkdownPreview }} data-page-scene="tools"{{ end }}>
 <head>
   {{ $assetVersion := partial "asset-version.html" . }}
   {{ $cfg := .Site.Data.site }}

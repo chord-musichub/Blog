@@ -42,7 +42,8 @@ test('icon sound controls retain native toggle semantics in all six tools',()=>{
   assert(read('static/js/icon-system.js').includes("'volume-off': svg("));
 });
 test('rank rail and timer controls have dedicated responsive owners',()=>{
-  const css=read('static/css/tools/detail-layout.css');assert(css.includes('grid-template-columns:minmax(0,1fr) 220px'));
+  const css=read('static/css/tools/detail-layout.css');assert(css.includes('grid-template-columns:var(--ranking-rail-width) minmax(0,1fr) var(--ranking-rail-width)'));
+  assert(css.includes('> .tool-detail-surface{grid-column:2;grid-row:1}'),'Tool occupies the middle track independently of its ranking');
   assert(css.includes('position:absolute;top:0;right:0;width:220px'));
   const timer=read('static/css/tools/focus-timer.css');
   for(const hook of ['focus-duration-panel','focus-minute-field','focus-switch:checked','::-webkit-slider-thumb','focus-stats-grid'])assert(timer.includes(hook));

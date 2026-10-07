@@ -8,7 +8,7 @@
   html[data-page-section="posts"]{--mobile-scene-base:#071126}
   html[data-page-section="posts"][data-theme="light"]{--mobile-scene-base:#d8ebf4}
   html[data-page-section="friends"]{--mobile-scene-base:#071426}
-  html[data-page-section="tools"]{--mobile-scene-base:#130906}
-  html[data-page-section="tools"][data-theme="light"]{--mobile-scene-base:#251208}
+  html:is([data-page-section="tools"],[data-page-scene="tools"]){--mobile-scene-base:#130906}
+  html:is([data-page-section="tools"],[data-page-scene="tools"])[data-theme="light"]{--mobile-scene-base:#251208}
 }
 </style>

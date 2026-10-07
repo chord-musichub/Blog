@@ -1,12 +1,16 @@
-/* 工具内页统一场景：延续工具主页的地下土层，不接管各工具的操作界面。 */
-html:has(body[data-page-section="tools"]):not(:has(body[data-page-layout="tools"])),
-html:has(body[data-page-scene="tools"]){
+/* 工具主页、子页和 Markdown 预览器共用场景，不接管操作界面。 */
+html:has(body:is([data-page-section="tools"],[data-page-scene="tools"])){
   background:#251208!important;
 }
+html[data-theme="dark"]:has(body:is([data-page-section="tools"],[data-page-scene="tools"])){background:#130906!important}
 
 /* Scene-only opt-in preserves Markdown's shared article panels and typography. */
-body:is([data-page-scene="tools"],[data-page-section="tools"]:not([data-page-layout="tools"])){
+body:is([data-page-scene="tools"],[data-page-section="tools"]){
+  /* Contain the final panel's margins: otherwise the document is taller than
+     the body background and its bottom reveals the untextured root canvas. */
+  display:flow-root;
   min-height:100svh;
+  min-height:100dvh;
   color:#fff0d4;
   background-color:#251208!important;
 background-image:linear-gradient(180deg,rgba(52,21,4,.06),rgba(25,9,2,.46) 100%),url('/uploads/admin/background/under-ground.png'),url('/uploads/admin/background/tools-underground-soil-light-v1.png')!important;
@@ -15,15 +19,15 @@ background-image:linear-gradient(180deg,rgba(52,21,4,.06),rgba(25,9,2,.46) 100%)
   background-size:100% auto,100% auto,100% auto!important;
 }
 
-body.dark:is([data-page-scene="tools"],[data-page-section="tools"]:not([data-page-layout="tools"])){
+body.dark:is([data-page-scene="tools"],[data-page-section="tools"]){
   background-color:#130906!important;
 background-image:linear-gradient(180deg,rgba(4,7,16,.14),rgba(8,3,2,.60) 100%),url('/uploads/admin/background/under-ground-black.png'),url('/uploads/admin/background/tools-underground-soil-dark-v1.png')!important;
 }
 
-body[data-page-section="tools"]:not([data-page-layout="tools"])::before,
-body[data-page-section="tools"]:not([data-page-layout="tools"]) .site-bg-layer,
-body[data-page-section="tools"]:not([data-page-layout="tools"]) .songline-starstream-layer,
-body[data-page-section="tools"]:not([data-page-layout="tools"]) .songline-ribbon-layer{
+body[data-page-section="tools"]::before,
+body[data-page-section="tools"] .site-bg-layer,
+body[data-page-section="tools"] .songline-starstream-layer,
+body[data-page-section="tools"] .songline-ribbon-layer{
   display:none!important;
 }
 body[data-page-scene="tools"]::before,

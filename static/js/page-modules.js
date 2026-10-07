@@ -33,6 +33,7 @@
     }
     if(isToolsPage){
       ensureStylesheet('songline-tool-shared-style', '/css/tool-shared.css');
+      ensureStylesheet('songline-tool-detail-shell-style', '/css/tools/detail-shell.css');
     }
     if(isSearchSurface){
       ensureStylesheet('songline-search-overrides-style', '/css/site-search-overrides.css');

@@ -15,6 +15,8 @@
     sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2.8v2M12 19.2v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2.8 12h2M19.2 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
     back: svg('<path d="M15 5 8 12l7 7"/><path d="M8.5 12H21"/>'),
     'chevron-left': svg('<path d="m15 5-7 7 7 7"/>'),
+    'chevron-up': svg('<path d="m5 15 7-7 7 7"/>'),
+    'chevron-down': svg('<path d="m5 9 7 7 7-7"/>'),
     'arrow-right': svg('<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>'),
     'arrow-left': svg('<path d="M19 12H5"/><path d="m11 6-6 6 6 6"/>'),
     'arrow-up': svg('<path d="M12 19V5"/><path d="m6 11 6-6 6 6"/>'),

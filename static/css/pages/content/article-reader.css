@@ -768,15 +768,17 @@ body[data-page-section="posts"] .article-intro{
   }
 }
 
-/* 目录轨道要在主毛玻璃之外，而不是在其内部预留一块空白。
-   因此文章主容器本身在桌面端为右侧目录让出场景空间，
-   阅读卡片则填满该容器，目录自然落在校园背景上。 */
+/* 正文独立居中；两侧保留等宽场景空间，右侧空间承托目录。
+   展开/收起目录只改变侧栏，不改变正文的宽度和水平位置。 */
 @media(min-width:981px){
   body[data-page-section="posts"] main.container:has(.article-shell){
-    width:min(1120px, calc(100vw - 310px)) !important;
-    max-width:min(1120px, calc(100vw - 310px)) !important;
+    --reader-rail-width:210px;
+    --reader-rail-gap:22px;
+    --reader-edge:18px;
+    width:min(1120px, calc(100% - 2 * (var(--reader-rail-width) + var(--reader-rail-gap) + var(--reader-edge)))) !important;
+    max-width:1120px !important;
     box-sizing:border-box;
-    margin-left:max(40px, calc((100vw - 1350px) / 2));
+    margin-left:auto;
     margin-right:auto;
   }
   .article-shell,
@@ -785,6 +787,12 @@ body[data-page-section="posts"] .article-intro{
     width:100%;
     margin-left:0;
     margin-right:0;
+  }
+}
+@media(min-width:981px) and (max-width:1279px){
+  body[data-page-section="posts"] main.container:has(.article-shell){
+    --reader-rail-width:160px;
+    --reader-rail-gap:16px;
   }
 }
 
@@ -898,8 +906,11 @@ html body .article-intro.article-heading h1{margin:0;font-size:clamp(26px,2.6vw,
 /* 右侧轨道与正文等高，目录在轨道内吸顶，到正文末尾停止，不遮挡后续阅读。 */
 @media(min-width:981px){
   html:has(.article-toc-rail),body:has(.article-toc-rail){overflow-x:clip}
+  /* Match tools/Markdown's stable gutter, including direct article loads. */
+  html:has(.article-toc-rail){scrollbar-gutter:stable}
   body[data-page-section="posts"] main.container:has(.article-toc-rail){overflow:visible!important}
-  .article-toc-rail{position:absolute;top:18px;bottom:0;left:calc(100% + clamp(52px,4vw,68px));width:210px}
+  .article-toc-rail{position:absolute;top:18px;bottom:0;left:calc(100% + 34px + var(--reader-rail-gap,22px));width:var(--reader-rail-width,210px)}
+  html body .article-shell[data-toc-state="expanded"] .article-toc-rail > .article-toc{width:100%!important}
   html body .article-toc-rail > .article-toc{
     position:sticky!important;top:96px;left:auto;margin:0;
     display:flex;flex-direction:column;
