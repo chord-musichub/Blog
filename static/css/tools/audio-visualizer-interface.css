@@ -11,81 +11,23 @@
   background:rgba(15,23,42,.28);
   color:rgba(203,213,225,.72);
 }
-.av-guide-panel{
-  position:relative;
-  z-index:4;
-  width:min(920px, calc(100% - 32px));
-  margin:18px auto 0;
-  display:grid;
-  grid-template-columns:1.25fr 1fr 1fr;
-  gap:12px;
-}
-.av-guide-card{
-  border:1px solid rgba(148,163,184,.2);
-  background:linear-gradient(135deg, rgba(15,23,42,.42), rgba(15,23,42,.22));
-  backdrop-filter:blur(18px);
-  border-radius:24px;
-  padding:15px 16px;
-  color:rgba(226,232,240,.82);
-  box-shadow:0 18px 46px rgba(0,0,0,.2);
-}
-.av-guide-card.is-primary{
-  border-color:rgba(56,189,248,.34);
-  background:
-    radial-gradient(circle at 18% 14%, rgba(56,189,248,.18), transparent 42%),
-    linear-gradient(135deg, rgba(15,23,42,.54), rgba(15,23,42,.25));
-}
-.av-guide-card span{
-  display:inline-flex;
-  align-items:center;
-  height:1.55rem;
-  padding:0 .55rem;
-  border-radius:999px;
-  background:rgba(14,165,233,.15);
-  color:#bae6fd;
-  font-size:.72rem;
-  font-weight:900;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-}
-.av-guide-card strong{
-  display:block;
-  margin:.62rem 0 .34rem;
-  color:#f8fafc;
-  font-size:1.05rem;
-}
-.av-guide-card p{
-  margin:0;
-  line-height:1.58;
-  font-size:.92rem;
-}
 .audio-visualizer-page .av-now,
-.audio-visualizer-page .av-guide-card,
-.audio-visualizer-page .av-bridge-card,
 .audio-visualizer-page .av-button,
-.audio-visualizer-page .av-link-button,
 .audio-visualizer-page .av-status-pill{
   box-shadow:0 18px 54px rgba(2,6,23,.26);
 }
 .audio-visualizer-page .av-button.primary{
   background:linear-gradient(135deg, rgba(14,165,233,.38), rgba(168,85,247,.24));
 }
-.audio-visualizer-page .av-bridge-card{
-  border-color:rgba(56,189,248,.2);
-}
 @media(max-width:900px){
-  .av-guide-panel{ grid-template-columns:1fr; }
   .av-status-stack{ align-items:flex-start; }
 }
 
 
 /* v20.18.5：音频可视化 UI 聚焦优化 */
 .audio-visualizer-page .av-now,
-.audio-visualizer-page .av-guide-card,
-.audio-visualizer-page .av-bridge-card,
 .audio-visualizer-page .av-status-pill,
-.audio-visualizer-page .av-button,
-.audio-visualizer-page .av-link-button{
+.audio-visualizer-page .av-button{
   clip-path:none!important;
   -webkit-clip-path:none!important;
   mask-image:none!important;
@@ -99,46 +41,15 @@
     radial-gradient(circle at 16% 12%, rgba(56,189,248,.14), transparent 34%),
     linear-gradient(135deg, rgba(15,23,42,.62), rgba(15,23,42,.28))!important;
 }
-.audio-visualizer-page .av-guide-card,
-.audio-visualizer-page .av-bridge-card{
-  border-radius:30px!important;
-  overflow:hidden;
-}
 .audio-visualizer-page .av-cover{
   border-radius:30px!important;
 }
-.audio-visualizer-page .av-button,
-.audio-visualizer-page .av-link-button{
+.audio-visualizer-page .av-button{
   border-radius:999px!important;
-}
-.av-source-guide{
-  align-items:stretch;
-}
-.av-capture-fallback{
-  cursor:default;
-}
-.av-capture-fallback summary{
-  list-style:none;
-  cursor:pointer;
-}
-.av-capture-fallback summary::-webkit-details-marker{
-  display:none;
-}
-.av-capture-fallback summary span,
-.av-capture-fallback summary strong{
-  pointer-events:none;
-}
-.av-capture-fallback .av-button{
-  margin-top:12px;
-  padding:.62rem .9rem;
-  font-size:.9rem;
 }
 .av-button.subtle{
   background:rgba(15,23,42,.3);
   color:rgba(226,232,240,.86);
-}
-.audio-visualizer-page.is-bridge-trying .av-guide-panel{
-  opacity:.72;
 }
 
 /* 正式接入音频后：把视觉中心还给 Canvas，只保留悬浮控制 */
@@ -147,16 +58,12 @@
   transform:translateY(-24px);
   pointer-events:none;
 }
-.audio-visualizer-page.is-visual-live .av-guide-panel,
-.audio-visualizer-page.is-visual-live .av-bridge-card,
 .audio-visualizer-page.is-visual-live .av-hint{
   opacity:0;
   transform:translateY(28px);
   pointer-events:none;
 }
 .audio-visualizer-page .av-topbar,
-.audio-visualizer-page .av-guide-panel,
-.audio-visualizer-page .av-bridge-card,
 .audio-visualizer-page .av-hint,
 .audio-visualizer-page .av-now,
 .audio-visualizer-page .av-controls{
@@ -296,8 +203,7 @@
   font-size:1.2rem;
 }
 .audio-visualizer-page .av-now,
-.audio-visualizer-page .av-source-card,
-.audio-visualizer-page .av-bridge-card{
+.audio-visualizer-page .av-source-card{
   border-radius:36px!important;
   clip-path:none!important;
   -webkit-clip-path:none!important;
@@ -307,9 +213,7 @@
 .audio-visualizer-page .av-now::before,
 .audio-visualizer-page .av-now::after,
 .audio-visualizer-page .av-source-card::before,
-.audio-visualizer-page .av-source-card::after,
-.audio-visualizer-page .av-bridge-card::before,
-.audio-visualizer-page .av-bridge-card::after{
+.audio-visualizer-page .av-source-card::after{
   border-radius:inherit!important;
   clip-path:none!important;
   -webkit-clip-path:none!important;
@@ -320,7 +224,6 @@
   pointer-events:none!important;
 }
 .audio-visualizer-page.is-visual-live .av-topbar,
-.audio-visualizer-page.is-visual-live .av-bridge-card,
 .audio-visualizer-page.is-visual-live .av-hint{
   opacity:0!important;
   pointer-events:none!important;
@@ -429,7 +332,6 @@
   margin:clamp(34px, 8vh, 92px) auto 0;
 }
 .audio-visualizer-page .av-source-card,
-.audio-visualizer-page .av-bridge-card,
 .audio-visualizer-page .av-now{
   border-radius:36px!important;
   overflow:hidden!important;
@@ -472,18 +374,8 @@
   margin:0 0 1rem;
   color:rgba(203,213,225,.78);
 }
-.audio-visualizer-page .av-source-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-.audio-visualizer-page .av-link-button.primary{
-  border-color:rgba(56,189,248,.42);
-  background:rgba(14,165,233,.28);
-}
 .audio-visualizer-page .av-topbar,
 .audio-visualizer-page .av-source-panel,
-.audio-visualizer-page .av-bridge-card,
 .audio-visualizer-page .av-hint,
 .audio-visualizer-page .av-controls,
 .audio-visualizer-page .av-now{
@@ -496,7 +388,6 @@
 }
 .audio-visualizer-page.is-visual-live .av-topbar,
 .audio-visualizer-page.is-visual-live .av-source-panel,
-.audio-visualizer-page.is-visual-live .av-bridge-card,
 .audio-visualizer-page.is-visual-live .av-hint{
   opacity:0!important;
   transform:translateY(24px)!important;
@@ -613,9 +504,6 @@ main.tool-page.audio-visualizer-page::after,
 .audio-visualizer-page .av-stage::after{
   display:none!important;
 }
-.audio-visualizer-page .av-bridge-card{
-  display:none!important;
-}
 .audio-visualizer-page .av-source-panel{
   grid-template-columns:repeat(3, minmax(0, 1fr))!important;
   width:min(1100px, calc(100% - 32px))!important;
@@ -623,15 +511,6 @@ main.tool-page.audio-visualizer-page::after,
 }
 .audio-visualizer-page .av-source-card{
   border-radius:34px!important;
-}
-.audio-visualizer-page .av-source-actions{
-  display:flex!important;
-  flex-wrap:wrap!important;
-  gap:10px!important;
-}
-.audio-visualizer-page .av-source-actions .av-link-button,
-.audio-visualizer-page .av-source-actions .av-button{
-  flex:0 1 auto;
 }
 .audio-visualizer-page.is-visual-live .av-source-panel{
   opacity:0!important;
@@ -657,13 +536,7 @@ body:has(.audio-visualizer-page){
   background:#061226!important;
 }
 body:has(.audio-visualizer-page) main,
-body:has(.audio-visualizer-page) .site-main,
-body:has(.audio-visualizer-page) .page-main,
-body:has(.audio-visualizer-page) .content,
-body:has(.audio-visualizer-page) .content-shell,
-body:has(.audio-visualizer-page) .page-shell,
-body:has(.audio-visualizer-page) .main-shell,
-body:has(.audio-visualizer-page) .tool-shell{
+body:has(.audio-visualizer-page) .content{
   border:0!important;
   outline:0!important;
   box-shadow:none!important;
@@ -760,8 +633,7 @@ main.tool-page.audio-visualizer-page::after,
 }
 .audio-visualizer-page.is-visual-live .av-source-panel,
 .audio-visualizer-page.is-visual-live .av-topbar,
-.audio-visualizer-page.is-visual-live .av-hint,
-.audio-visualizer-page.is-visual-live .av-bridge-card{
+.audio-visualizer-page.is-visual-live .av-hint{
   opacity:0!important;
   pointer-events:none!important;
 }
@@ -836,9 +708,6 @@ main.tool-page.audio-visualizer-page::after,
   flex:1 1 auto!important;
   margin:.8rem 0 1.15rem!important;
   line-height:1.72!important;
-}
-.audio-visualizer-page .av-source-actions{
-  margin-top:auto!important;
 }
 .audio-visualizer-page .av-controls{
   z-index:18!important;

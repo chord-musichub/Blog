@@ -9,9 +9,6 @@ html.songline-page-transitioning body{
 html.songline-page-transitioning main.container{
   will-change:transform, opacity;
 }
-html.songline-page-transitioning .page-loading-orb{
-  display:none!important;
-}
 
 /* v2：场景式穿屏过场。覆盖首版淡入黑幕，保持同一模块边界。 */
 .songline-page-transition-overlay{

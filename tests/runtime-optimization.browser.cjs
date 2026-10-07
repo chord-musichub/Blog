@@ -96,6 +96,12 @@ async function geometry(page){return page.evaluate(()=>[...document.querySelecto
      await page.mouse.move(0,0);
      await page.evaluate(href=>SonglinePageTransition.navigateLink(href),base+route);await page.evaluate(()=>SonglinePageModules.ready(document));
      assert.equal(new URL(page.url()).pathname,route);assert.equal(await page.locator('[data-elevator-nav]').count(),1,'One navigation instance at '+width+' '+cycle+' '+route);
+     assert.equal(await page.locator('link#songline-home-runtime-style').count(),route==='/'?1:0,'Home-only styles follow AJAX navigation');
+     assert.equal(await page.locator('link[href*="navigation-motion.css"]').count(),0,'Retired navigation stylesheet is not restored');
+     if(route==='/')assert(await page.evaluate(()=>{
+      const styles=[...document.head.querySelectorAll('link[rel="stylesheet"]')].map(link=>new URL(link.href).pathname);
+      return styles.indexOf('/css/site.css')<styles.indexOf('/css/site-runtime.css')&&styles.indexOf('/css/site-runtime.css')<styles.indexOf('/css/site-modern.css');
+     }),'Home-only startup styles retain cascade order after reentry');
      if(route==='/posts/'||route==='/tags/site-notice/'){
       const count=requests.filter(r=>r.path==='/api/views').length;await page.waitForTimeout(100);
       assert.equal(requests.filter(r=>r.path==='/api/views').length,count);

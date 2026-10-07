@@ -90,10 +90,11 @@ async function tools(page,route){
   await page.locator('[data-gacha-reset]').click();assert.equal(await page.locator('[data-gacha-total]').textContent(),'0');
  }else if(route==='/tools/focus-timer/'){
   await page.locator('[data-focus-sound]').uncheck();
-  await page.locator('[data-focus-toggle]').click();assert.equal(await page.locator('[data-focus-toggle]').textContent(),'暂停');
+  const toggle=page.locator('[data-focus-toggle]');
+  await toggle.click();assert.equal(await (baseline?toggle.textContent():toggle.getAttribute('aria-label')),'暂停');
   const frames=await page.evaluate(()=>{for(let i=0;i<4;i++)document.dispatchEvent(new Event('visibilitychange'));return pendingTimerFrames();});
   if(!baseline)assert.equal(frames,1,'Visibility events must not multiply timer animation loops');
-  await page.locator('[data-focus-toggle]').click();assert.equal(await page.locator('[data-focus-toggle]').textContent(),'开始');
+  await toggle.click();assert.equal(await (baseline?toggle.textContent():toggle.getAttribute('aria-label')),baseline?'开始':'继续');
   await page.locator('[data-focus-toggle]').click();
  }else if(route==='/tools/markdown-previewer/'){
   await uploadFile(page,'[data-md-file]',{name:'stability.md',mimeType:'text/markdown',buffer:Buffer.from('# 一级\n\n## 二级\n\n#### 四级 <name>\n\n```js\nconst example = 1;\n```\n\n'+('正文。'.repeat(200)+'\n\n').repeat(20))});
@@ -114,7 +115,9 @@ async function tools(page,route){
   }
   assert.match(await page.locator('[data-snake-state]').textContent(),/暂停/);
  }else if(route==='/tools/typing-practice/'){
-  await page.locator('[data-typing-mode="mixed"]').click();assert.match(await page.locator('[data-typing-mode-label]').textContent(),/中/);
+  await page.locator('[data-typing-mode="mixed"]').click();
+  if(baseline)assert.match(await page.locator('[data-typing-mode-label]').textContent(),/中/);
+  else assert.equal(await page.locator('[data-typing-mode="mixed"]').evaluate(e=>e.classList.contains('is-active')),true,'Mode buttons expose the active selection');
   await page.locator('[data-typing-mode="english"]').click();await page.locator('[data-typing-input]').pressSequentially('Typing');
   await page.locator('[data-typing-restart]').click();assert.equal(await page.locator('[data-typing-input]').inputValue(),'');
  }else if(route==='/tools/reaction-test/'){

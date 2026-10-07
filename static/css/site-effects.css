@@ -6,13 +6,6 @@
   filter:none!important;
   will-change:auto!important;
 }
-
-/* v20.18.5：手机端导航改为真正 fixed + 背景飘带增强 */
-.songline-ribbon-layer{
-  z-index:1!important;
-  opacity:1!important;
-  mix-blend-mode:normal!important;
-}
 .songline-space-ribbon{
   filter:drop-shadow(0 0 14px rgba(125,211,252,.32)) drop-shadow(0 0 28px rgba(168,85,247,.12))!important;
 }
@@ -67,34 +60,8 @@
   .modern-navbar{
     transform:none!important;
   }
-  html.is-live-nav-swapping .site-header,
-  html.is-live-nav-swapping .modern-site-header,
-  html.is-nav-swapping .site-header,
-  html.is-nav-swapping .modern-site-header,
-  html.nav-leave-to-left .site-header,
-  html.nav-leave-to-right .site-header,
-  html.nav-enter-from-left .site-header,
-  html.nav-enter-from-right .site-header,
-  html.nav-leave-to-left .modern-site-header,
-  html.nav-leave-to-right .modern-site-header,
-  html.nav-enter-from-left .modern-site-header,
-  html.nav-enter-from-right .modern-site-header{
-    position:fixed!important;
-    top:0!important;
-    transform:none!important;
-    opacity:1!important;
-    visibility:visible!important;
-    z-index:12000!important;
-    animation:none!important;
-    transition:none!important;
-  }
   html{
     scroll-padding-top:calc(var(--songline-mobile-nav-height, 118px) + 8px)!important;
-  }
-
-  .songline-ribbon-layer{
-    z-index:1!important;
-    opacity:1!important;
   }
   .songline-space-ribbon{
     filter:drop-shadow(0 0 16px rgba(125,211,252,.42)) drop-shadow(0 0 32px rgba(168,85,247,.16))!important;

@@ -364,12 +364,6 @@ body > .scroll-to-bottom-button[data-songline-float-portal="1"]:focus-visible{
 
 /* 手机阅读页右侧三键：回到顶部、目录、下滑到底部。 */
 @media(max-width:980px){
-  .floating-toc-button{
-    display:none!important;
-    visibility:hidden!important;
-    opacity:0!important;
-    pointer-events:none!important;
-  }
 
   .back-to-top-button,
   .mobile-toc-fab,

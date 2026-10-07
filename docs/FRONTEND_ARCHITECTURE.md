@@ -6,18 +6,20 @@
 | --- | --- |
 | `foundation.css` | 设计 token、基础排版和共享组件的初始规则。 |
 | `site.css` | 早期公共站点规则与兼容基础层。 |
-| `site-runtime.css` | 页面加载指示与首页开机动画。 |
+| `site-runtime.css` | 仅首页加载的首访开机遮罩基础；通过带 ID 的链接随站内换页恢复/移除。 |
 | `site-modern.css` | 现代页面布局、卡片、搜索与视觉兼容规则。 |
 | `site-search-overrides.css` | 搜索反馈、筛选状态与搜索相关覆盖规则。 |
 | `site-article-compat.css` | 文章目录和 Markdown 表格的兼容规则。 |
 | `site-friends-compat.css` | 仅朋友页加载的星图、资料展示与交互兼容规则。 |
 | `site-markdown-compat.css` | Markdown 代码高亮、注释字体与目录锚点兼容规则。 |
-| `site-navigation-overrides.css` | 导航滑块、页面切换与锚点反馈。 |
+| `site-navigation-overrides.css` | 桌面固定导航和手机顶栏的兼容覆盖。 |
 | `page-transition-scene.css` | 全站纵向页面过场、黑幕和 SVG 生长圆加载器；仅作用于 `main.container`。 |
 | `site-article-overrides.css` | 阅读页目录定位反馈。 |
 | `mobile-foundation.css` | 公共断点与移动端可用性规则。 |
 
 页面专用样式（首页、朋友、标签、文章和工具）在公共层之后按页面条件加载。新增规则应优先落到对应页面文件；只有需要作用于多个页面时才放入公共层。历史组件被删除后，应同时删除其 CSS 与模板加载入口，不能保留“未引用但可能有用”的响应式补丁。
+
+`navigation.css` 保留导航基础和原 `navigation-motion.css` 中仍使用的链接反馈，后者的加载入口已合并删除；当前电梯导航由专用样式负责。2026-10-07 的清理移除了旧横向切页、旧首页卡片、旧工具操作栏等不再生成的组件规则，但没有重排保留规则的层叠顺序。删除依据及回归方法见 [本次清理记录](FRONTEND_CLEANUP_2026-10-07.md)。不可仅凭初始页面的 CSS 覆盖率删除规则：六级目录、2048 数字配色、上传后的封面模式和交互状态都可能延迟生成。
 
 样式入口统一维护在 `layouts/partials/assets/page-styles.html`，其顺序就是实际层叠顺序；全站核心脚本入口在同目录的 `core-scripts.html`。`baseof.html` 只负责调用这两个入口，页面专用脚本则继续由 `page-specific-scripts.html` 和 `page-modules.js` 管理。
 
@@ -43,6 +45,7 @@
 - 初始化应能重复调用而不重复绑定。页面局部组件使用 DOM 标记，全站委托或全局工厂使用 singleton；不要同时让脚本自启动和调度器初始化。
 - 首页视差、桌宠也属于页面模块，必须支持从文章等非首页直开后进入首页。桌宠在移动端实际存在，不应按名称把它误判为仅桌面组件。
 - `songline:page-transition-start` 释放离开页面的计时器、帧循环、轮询、全局监听、音频上下文及本地文件 URL。不能等下次进入同组件才释放；迟到的 FileReader / 下载 / 渲染回调须检查当前 DOM 与任务有效性。
+- 首屏渐显的 IntersectionObserver 在全部目标可见或页面离开时断开，并移除自身切页监听，避免未进入视口的旧节点继续被持有。
 - `pagehide.persisted` 是暂存而非永久销毁：保留缓存 DOM 对应的输入监听，仅暂停动画与媒体；`pageshow.persisted` 恢复。永久离开才清理不能重用的控制器。
 - 异步 Markdown 加入首个代码块后再次 `SonglinePageModules.scan(reader)`，避免首扫未发现代码而漏加载增强。浮动阅读控件仅由共享控制器定位，不要在工具中再设 scroll / resize 所有者。
 - 阅读目录的 hover 颜色反馈可以变化，但目录和链接的命中区域不能因 hover 位移；键盘折叠只响应目录容器本身，不能拦截子链接的 Enter。

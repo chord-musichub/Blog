@@ -3,48 +3,11 @@
 #site-notice{
   scroll-margin-top:96px;
 }
-html.nav-leave-to-left body > :not(.site-boot-overlay):not(.page-loading-orb),
-html.nav-leave-to-right body > :not(.site-boot-overlay):not(.page-loading-orb),
-html.nav-enter-from-right body > :not(.site-boot-overlay):not(.page-loading-orb),
-html.nav-enter-from-left body > :not(.site-boot-overlay):not(.page-loading-orb){
-  will-change:transform,opacity;
-}
-html.nav-leave-to-left body > :not(.site-boot-overlay):not(.page-loading-orb){
-  animation:songlineNavLeaveLeft .28s cubic-bezier(.4,0,.2,1) forwards;
-}
-html.nav-leave-to-right body > :not(.site-boot-overlay):not(.page-loading-orb){
-  animation:songlineNavLeaveRight .28s cubic-bezier(.4,0,.2,1) forwards;
-}
-html.nav-enter-from-right body > :not(.site-boot-overlay):not(.page-loading-orb){
-  transform:translateX(42px);
-  opacity:0;
-}
-html.nav-enter-from-left body > :not(.site-boot-overlay):not(.page-loading-orb){
-  transform:translateX(-42px);
-  opacity:0;
-}
-html.nav-enter-from-right.is-nav-enter-ready body > :not(.site-boot-overlay):not(.page-loading-orb),
-html.nav-enter-from-left.is-nav-enter-ready body > :not(.site-boot-overlay):not(.page-loading-orb){
-  transform:translateX(0);
-  opacity:1;
-  transition:transform .38s cubic-bezier(.22,1,.36,1), opacity .30s ease;
-}
 @keyframes songlineNavLeaveLeft{
   to{transform:translateX(-46px);opacity:0}
 }
 @keyframes songlineNavLeaveRight{
   to{transform:translateX(46px);opacity:0}
-}
-@media(prefers-reduced-motion: reduce){
-  html.nav-leave-to-left body > :not(.site-boot-overlay):not(.page-loading-orb),
-  html.nav-leave-to-right body > :not(.site-boot-overlay):not(.page-loading-orb),
-  html.nav-enter-from-right body > :not(.site-boot-overlay):not(.page-loading-orb),
-  html.nav-enter-from-left body > :not(.site-boot-overlay):not(.page-loading-orb){
-    animation:none!important;
-    transition:none!important;
-    transform:none!important;
-    opacity:1!important;
-  }
 }
 
 /* v22：最右侧楼层刻度。默认只保留编号/轨道，当前层或 hover 才展开名称。 */
@@ -438,7 +401,6 @@ html body .site-header.modern-site-header{
   opacity:1;
   transform:translateX(3px);
 }
-.modern-site-header .songline-elevator-nav .songline-nav-slider{ display:none!important; }
 /* 不能只按窗口宽度切换：桌面浏览器半屏时也需要保留完整电梯交互。 */
 @media (max-width:760px), (max-width:980px) and (hover:none){
   html.has-fixed-mobile-nav body{ padding-top:0!important; }
@@ -479,307 +441,16 @@ html body .site-header.modern-site-header{
   .modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
   .modern-site-header .songline-elevator-nav a:hover .songline-elevator-name{ transform:none; }
 }
-
-
-/* v20.18.5：主导航横向切换去加载遮罩，只保留自然滑动 */
-html.is-nav-sliding .page-loading-orb,
-html.is-nav-sliding .page-loading-pill,
-html.is-nav-sliding .page-loading-ring,
-html.is-nav-sliding .page-loading-text{
-  display:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
-  pointer-events:none!important;
-}
-html.is-nav-sliding{
-  background:var(--bg)!important;
-}
-html.is-nav-sliding body{
-  background:var(--bg)!important;
-}
-html.nav-leave-to-left body > :not(.site-boot-overlay):not(.page-loading-orb),
-html.nav-leave-to-right body > :not(.site-boot-overlay):not(.page-loading-orb){
-  animation-duration:.24s;
-}
-html.nav-enter-from-right body > :not(.site-boot-overlay):not(.page-loading-orb){
-  transform:translateX(34px);
-  opacity:.001;
-}
-html.nav-enter-from-left body > :not(.site-boot-overlay):not(.page-loading-orb){
-  transform:translateX(-34px);
-  opacity:.001;
-}
-html.nav-enter-from-right.is-nav-enter-ready body > :not(.site-boot-overlay):not(.page-loading-orb),
-html.nav-enter-from-left.is-nav-enter-ready body > :not(.site-boot-overlay):not(.page-loading-orb){
-  transition:transform .34s cubic-bezier(.22,1,.36,1), opacity .24s ease;
-}
 @keyframes songlineNavLeaveLeft{
   to{transform:translateX(-34px);opacity:.001}
 }
 @keyframes songlineNavLeaveRight{
   to{transform:translateX(34px);opacity:.001}
 }
-
-
-/* v20.18.5：首页介绍并入封面图下方 + 主导航 AJAX 丝滑横向换页 */
-.hero-intro-strip{
-  margin-top:14px;
-  padding:18px 22px;
-  display:grid;
-  grid-template-columns:auto minmax(0, 1fr);
-  gap:14px;
-  align-items:start;
-  border-radius:24px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--card) 94%, transparent), color-mix(in srgb, var(--card) 78%, transparent)),
-    radial-gradient(circle at 12% 20%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 38%);
-}
-.hero-intro-mark{
-  width:38px;
-  height:38px;
-  border-radius:16px;
-  display:grid;
-  place-items:center;
-  color:var(--accent-2);
-  background:color-mix(in srgb, var(--accent) 10%, transparent);
-}
-.hero-intro-strip h2{
-  margin:0 0 6px;
-  font-size:20px;
-  letter-spacing:.04em;
-}
-.hero-intro-strip p{
-  margin:0;
-  color:var(--muted);
-  line-height:1.75;
-  font-size:15px;
-}
-main.container.is-nav-swap-stage{
-  position:relative;
-  overflow:hidden;
-  min-height:var(--nav-swap-height, 60vh);
-  contain:layout paint;
-}
-.nav-swap-layer{
-  position:absolute;
-  left:0;
-  top:0;
-  width:100%;
-  min-height:100%;
-  will-change:transform;
-  backface-visibility:hidden;
-}
-.nav-swap-old{
-  transform:translateX(0);
-  z-index:1;
-}
-.nav-swap-new{
-  z-index:2;
-}
-main.container.is-nav-swap-stage.swap-forward .nav-swap-new{
-  transform:translateX(100%);
-}
-main.container.is-nav-swap-stage.swap-backward .nav-swap-new{
-  transform:translateX(-100%);
-}
-main.container.is-nav-swap-stage.is-nav-swap-ready .nav-swap-old,
-main.container.is-nav-swap-stage.is-nav-swap-ready .nav-swap-new{
-  transition:transform .42s cubic-bezier(.22,1,.36,1);
-}
-main.container.is-nav-swap-stage.swap-forward.is-nav-swap-ready .nav-swap-old{
-  transform:translateX(-100%);
-}
-main.container.is-nav-swap-stage.swap-forward.is-nav-swap-ready .nav-swap-new{
-  transform:translateX(0);
-}
-main.container.is-nav-swap-stage.swap-backward.is-nav-swap-ready .nav-swap-old{
-  transform:translateX(100%);
-}
-main.container.is-nav-swap-stage.swap-backward.is-nav-swap-ready .nav-swap-new{
-  transform:translateX(0);
-}
-html.is-nav-swapping .page-loading-orb,
-html.is-nav-swapping .page-loading-pill,
-html.is-nav-swapping .page-loading-ring,
-html.is-nav-swapping .page-loading-text{
-  display:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
-}
-@media(max-width:760px){
-  .hero-intro-strip{
-    grid-template-columns:1fr;
-    padding:16px;
-  }
-  .hero-intro-mark{
-    width:34px;
-    height:34px;
-  }
-}
-@media(prefers-reduced-motion: reduce){
-  main.container.is-nav-swap-stage .nav-swap-layer{
-    position:static!important;
-    transform:none!important;
-    transition:none!important;
-  }
-}
-
-
-/* v20.18.5：导航切换改为真实 DOM 进入，不再做双页面截图式平移 */
-html.is-live-nav-swapping .page-loading-orb,
-html.is-live-nav-swapping .page-loading-pill,
-html.is-live-nav-swapping .page-loading-ring,
-html.is-live-nav-swapping .page-loading-text{
-  display:none!important;
-  opacity:0!important;
-  visibility:hidden!important;
-}
-main.container.live-leave-to-left,
-main.container.live-leave-to-right{
-  transition:opacity .09s ease, transform .09s ease;
-  opacity:.72;
-}
-main.container.live-leave-to-left{
-  transform:translateX(-10px);
-}
-main.container.live-leave-to-right{
-  transform:translateX(10px);
-}
-main.container.live-enter-from-right,
-main.container.live-enter-from-left{
-  transform:none!important;
-  opacity:1!important;
-}
-main.container .live-nav-item{
-  opacity:0;
-  will-change:transform, opacity;
-  transition:
-    transform .42s cubic-bezier(.22,1,.36,1) var(--live-nav-delay, 0ms),
-    opacity .32s ease var(--live-nav-delay, 0ms);
-}
-main.container.live-enter-from-right .live-nav-item{
-  transform:translateX(28px);
-}
-main.container.live-enter-from-left .live-nav-item{
-  transform:translateX(-28px);
-}
-@media(prefers-reduced-motion: reduce){
-  main.container.live-leave-to-left,
-  main.container.live-leave-to-right,
-  main.container .live-nav-item{
-    transition:none!important;
-    transform:none!important;
-    opacity:1!important;
-  }
-}
-
-
-main.container.is-live-swap-cut{
-  opacity:.98;
-}
-/* 朋友星图圆角兼容。页面切换的最终动画由 runtime-animation.css 统一维护。 */
-html.is-live-nav-swapping .site-header{
-  z-index:50;
-}
-main.container .live-nav-item{
-  transition:
-    transform .62s cubic-bezier(.16,1,.3,1) var(--live-nav-delay, 0ms),
-    opacity .46s ease var(--live-nav-delay, 0ms),
-    filter .46s ease var(--live-nav-delay, 0ms);
-  filter:blur(1.4px);
-}
-.friend-map-wrap,
-.friend-map-card,
-.friends-map,
-.friend-star-map,
-.friend-constellation,
-.star-map,
-.starfield-card,
 [id*="friend"][class*="map"],
 [class*="friend"][class*="map"]{
   border-radius:28px!important;
   overflow:hidden!important;
-}
-.friend-map-wrap canvas,
-.friend-map-card canvas,
-.friends-map canvas,
-.friend-star-map canvas,
-.friend-constellation canvas,
-.star-map canvas{
-  border-radius:inherit!important;
-}
-/* v20.18.5：页面切换同步启动 / 朋友星图真实圆角 / 文章页返回键 */
-.modern-nav-links.is-click-sliding a.active{
-  color:var(--accent-2)!important;
-}
-main.container.live-page-enter{
-  will-change:transform, opacity;
-}
-main.container.live-page-enter.live-enter-from-right{
-  transform:translateX(42px);
-  opacity:.96;
-}
-main.container.live-page-enter.live-enter-from-left{
-  transform:translateX(-42px);
-  opacity:.96;
-}
-main.container.live-page-enter.is-live-enter-ready{
-  transform:translateX(0);
-  opacity:1;
-  transition:
-    transform .56s cubic-bezier(.16,1,.3,1),
-    opacity .38s ease;
-}
-main.container.live-leave-to-left,
-main.container.live-leave-to-right{
-  transition:
-    transform .22s cubic-bezier(.4,0,.2,1),
-    opacity .20s ease,
-    filter .20s ease;
-  opacity:.46;
-  filter:blur(1.1px);
-}
-main.container.live-leave-to-left{transform:translateX(-96px)}
-main.container.live-leave-to-right{transform:translateX(96px)}
-main.container.live-enter-from-right .live-nav-item{transform:translateX(138px)}
-main.container.live-enter-from-left .live-nav-item{transform:translateX(-138px)}
-main.container.is-live-enter-ready .live-nav-item{
-  transform:translateX(0);
-  opacity:1;
-  filter:blur(0);
-}
-.friend-galaxy-shell,
-.friend-galaxy-shell.slv2007-shell,
-.slv2004-stage,
-.slv2007-stage,
-.friend-galaxy-shell [data-galaxy-stage]{
-  border-radius:32px!important;
-  overflow:hidden!important;
-}
-.friend-galaxy-shell .slv2004-stage,
-.friend-galaxy-shell .slv2007-stage{
-  border-radius:30px!important;
-}
-.friend-galaxy-shell svg,
-.friend-galaxy-shell .slv2004-lines,
-.friend-galaxy-shell .slv2004-nodes{
-  border-radius:inherit!important;
-}
-.friend-galaxy-shell::before,
-.friend-galaxy-shell::after,
-.slv2004-stage::before,
-.slv2004-stage::after,
-.slv2007-stage::before,
-.slv2007-stage::after{
-  border-radius:inherit!important;
-}
-@media(max-width:760px){
-  main.container.live-page-enter.live-enter-from-right{transform:translateX(24px)}
-  main.container.live-page-enter.live-enter-from-left{transform:translateX(-24px)}
-  main.container.live-leave-to-left{transform:translateX(-52px)}
-  main.container.live-leave-to-right{transform:translateX(52px)}
-  main.container.live-enter-from-right .live-nav-item{transform:translateX(72px)}
-  main.container.live-enter-from-left .live-nav-item{transform:translateX(-72px)}
 }
 
 
@@ -818,43 +489,6 @@ body.dark .modern-nav-links a.active{
   isolation:isolate!important;
   overflow:hidden!important;
 }
-.modern-nav-links .songline-nav-slider{
-  position:absolute!important;
-  left:0!important;
-  top:5px!important;
-  bottom:5px!important;
-  width:52px;
-  transform:translate3d(0,0,0);
-  z-index:1!important;
-  pointer-events:none!important;
-  border-radius:999px!important;
-  opacity:1!important;
-  visibility:visible!important;
-  display:block!important;
-  background:
-    linear-gradient(135deg, rgba(125,211,252,.38), rgba(59,130,246,.22)),
-    rgba(14,165,233,.16)!important;
-  border:1px solid rgba(125,211,252,.34)!important;
-  box-shadow:
-    0 12px 36px rgba(14,165,233,.22),
-    inset 0 1px 0 rgba(255,255,255,.28)!important;
-  transition:
-    transform .58s cubic-bezier(.16,1,.3,1),
-    width .58s cubic-bezier(.16,1,.3,1),
-    box-shadow .22s ease,
-    filter .22s ease!important;
-  will-change:transform,width;
-}
-.modern-nav-links .songline-nav-slider.is-instant{
-  transition:none!important;
-}
-.modern-nav-links.is-hover-sliding .songline-nav-slider,
-.modern-nav-links.is-click-sliding .songline-nav-slider{
-  filter:saturate(1.22) brightness(1.08);
-  box-shadow:
-    0 16px 46px rgba(14,165,233,.34),
-    inset 0 1px 0 rgba(255,255,255,.34)!important;
-}
 .modern-nav-links a,
 .modern-nav-links a:hover,
 .modern-nav-links a:focus,
@@ -891,21 +525,6 @@ body.dark .modern-nav-links a.active{
 .modern-nav-links a.active{
   color:var(--accent-2)!important;
 }
-body.dark .modern-nav-links .songline-nav-slider{
-  background:
-    linear-gradient(135deg, rgba(56,189,248,.32), rgba(59,130,246,.24)),
-    rgba(14,165,233,.14)!important;
-  border-color:rgba(125,211,252,.32)!important;
-  box-shadow:
-    0 14px 42px rgba(14,165,233,.22),
-    inset 0 1px 0 rgba(255,255,255,.16)!important;
-}
-@media(max-width:760px){
-  .modern-nav-links .songline-nav-slider{
-    top:4px!important;
-    bottom:4px!important;
-  }
-}
 
 
 /* v20.18.5：星际入口内部锚点滚动修正，避免错位跳转 */
@@ -913,14 +532,6 @@ body.dark .modern-nav-links .songline-nav-slider{
 #site-notice,
 #site-about{
   scroll-margin-top:clamp(104px, 11vh, 132px);
-}
-.hero-intro-strip.is-orbit-scroll-target,
-.notice-section.is-orbit-scroll-target,
-.about-mini.is-orbit-scroll-target,
-#site-intro.is-orbit-scroll-target,
-#site-notice.is-orbit-scroll-target,
-#site-about.is-orbit-scroll-target{
-  animation:songlineOrbitTargetPulse 1.15s ease both;
 }
 @keyframes songlineOrbitTargetPulse{
   0%{
@@ -934,16 +545,6 @@ body.dark .modern-nav-links .songline-nav-slider{
   100%{
     box-shadow:var(--shadow), 0 0 0 0 rgba(56,189,248,.00);
     border-color:color-mix(in srgb, var(--accent) 12%, var(--border));
-  }
-}
-@media(prefers-reduced-motion: reduce){
-  .hero-intro-strip.is-orbit-scroll-target,
-  .notice-section.is-orbit-scroll-target,
-  .about-mini.is-orbit-scroll-target,
-  #site-intro.is-orbit-scroll-target,
-  #site-notice.is-orbit-scroll-target,
-  #site-about.is-orbit-scroll-target{
-    animation:none!important;
   }
 }
 

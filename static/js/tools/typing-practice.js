@@ -65,12 +65,6 @@
     ]
 };
 
-  function escapeHTML(text){
-    return String(text).replace(/[&<>"']/g, function(ch){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
-    });
-  }
-
   function fmt(ms){
     if(!ms) return '--';
     return (ms / 1000).toFixed(2) + 's';
@@ -122,6 +116,10 @@
     var isComposingIME = false;
     var autoSyncedModes = {};
     var disposed = false;
+    var renderedArticle = null;
+    var characterNodes = [];
+    var renderedValue = '';
+    var renderedCursor = -1;
 
 
     function ensureAudio(){
@@ -187,25 +185,39 @@
     function modeName(){ return mode === 'mixed' ? '中文/中英混打' : '英文'; }
 
     function renderArticle(){
-      if(titleEl) titleEl.textContent = article.title;
-      if(rankTitle) rankTitle.textContent = modeName() + '排行榜';
-      var value = input.value || '';
-      var html = '';
-      for(var i = 0; i < article.text.length; i++){
-        var ch = article.text[i];
-        var cls = '';
-        if(i < value.length){
-          cls = value[i] === ch ? 'is-correct' : 'is-wrong';
-        }else if(i === value.length){
-          cls = 'is-current';
+      if(renderedArticle !== article){
+        if(titleEl) titleEl.textContent = article.title;
+        if(rankTitle) rankTitle.textContent = modeName() + '排行榜';
+        var fragment = document.createDocumentFragment();
+        characterNodes = [];
+        for(var index = 0; index < article.text.length; index++){
+          var node = document.createElement('span');
+          node.textContent = article.text[index];
+          fragment.appendChild(node);
+          characterNodes.push(node);
         }
-        html += '<span class="' + cls + '">' + escapeHTML(ch) + '</span>';
+        textEl.replaceChildren(fragment);
+        renderedArticle = article;
+        renderedValue = '';
+        renderedCursor = -1;
+        textEl.scrollTop = 0;
       }
-      textEl.innerHTML = html;
+      var value = input.value || '';
+      var firstChanged = 0;
+      var commonLength = Math.min(value.length, renderedValue.length);
+      while(firstChanged < commonLength && value[firstChanged] === renderedValue[firstChanged]) firstChanged++;
+      var endChanged = Math.min(article.text.length, Math.max(value.length, renderedValue.length));
+      if(renderedCursor >= 0) characterNodes[renderedCursor].classList.remove('is-current');
+      for(var i = firstChanged; i < endChanged; i++){
+        characterNodes[i].className = i < value.length ? (value[i] === article.text[i] ? 'is-correct' : 'is-wrong') : '';
+      }
+      renderedCursor = value.length < characterNodes.length ? value.length : -1;
+      if(renderedCursor >= 0) characterNodes[renderedCursor].classList.add('is-current');
+      renderedValue = value;
       // Keep the next character in view inside the reference pane, without
       // scrolling the entire page away from the typing input.
       if(startedAt && !finished){
-        var current = textEl.querySelector('.is-current');
+        var current = characterNodes[renderedCursor];
         if(current){
           var pane = textEl.getBoundingClientRect();
           var cursor = current.getBoundingClientRect();
@@ -227,12 +239,16 @@
     function renderStats(){
       var now = startedAt && !finished ? performance.now() - startedAt : 0;
       if(finished && input.dataset.finalTime) now = Number(input.dataset.finalTime || 0);
-      if(timeEl) timeEl.textContent = startedAt ? fmt(now) : '0.00s';
+      setStat(timeEl, startedAt ? fmt(now) : '0.00s');
       var pct = Math.min(100, Math.round((input.value.length / article.text.length) * 100));
-      if(progressEl) progressEl.textContent = pct + '%';
-      if(errorsEl) errorsEl.textContent = String(errors);
+      setStat(progressEl, pct + '%');
+      setStat(errorsEl, String(errors));
       var best = Number(localStorage.getItem(bestKey()) || 0) || 0;
-      if(bestEl) bestEl.textContent = best ? fmt(best) : '--';
+      setStat(bestEl, best ? fmt(best) : '--');
+    }
+
+    function setStat(element, value){
+      if(element && element.textContent !== value) element.textContent = value;
     }
 
     function startTimer(){
@@ -359,6 +375,7 @@
       input.value = '';
       input.dataset.finalTime = '';
       input.disabled = false;
+      textEl.scrollTop = 0;
       renderArticle(); renderStats(); fetchScores().then(function(){ window.setTimeout(function(){ if(!disposed) syncLocalBest(false); }, 260); });
     }
 

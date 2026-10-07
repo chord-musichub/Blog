@@ -68,10 +68,6 @@
     padding:8px 13px!important;
     white-space:nowrap;
   }
-  .modern-nav-links .songline-nav-slider{
-    top:5px!important;
-    bottom:5px!important;
-  }
   .container{
     width:100%;
     max-width:100%;
@@ -87,28 +83,19 @@
   .card,
   .page-hero,
   .hero-banner,
-  .sidebar-card,
-  .notice-entry,
-  .notice-item,
-  .recommended-card,
   .tool-card{
     border-radius:22px!important;
   }
   .section{
     margin-top:24px!important;
   }
-  .section-head,
-  .section-head-with-action{
+  .section-head{
     gap:10px!important;
     flex-wrap:wrap!important;
     align-items:center!important;
   }
   .section-head h2{
     font-size:22px!important;
-  }
-  .section-more{
-    margin-left:0!important;
-    width:auto;
   }
   .toolbar-panel{
     flex-direction:column!important;
@@ -133,70 +120,6 @@
     padding:28px 20px!important;
     background-position:center!important;
   }
-  .hero-banner.hero-banner-image-only{
-    min-height:clamp(190px, 48vw, 280px)!important;
-  }
-  .hero-intro-strip{
-    margin-top:12px!important;
-    grid-template-columns:1fr!important;
-    gap:10px!important;
-    padding:16px!important;
-    border-radius:22px!important;
-  }
-  .hero-intro-strip h2{
-    font-size:19px!important;
-  }
-  .hero-intro-strip p{
-    font-size:14px!important;
-    line-height:1.72!important;
-  }
-
-  /* 首页星际入口：手机端压住宽高与详情卡 */
-  .waapi-orbital-section{
-    margin-top:24px!important;
-  }
-  .waapi-orbital-gateway{
-    padding:16px 10px 18px!important;
-    overflow:hidden!important;
-  }
-  .waapi-orbit-stage{
-    min-height:520px!important;
-    height:520px!important;
-    overflow:hidden!important;
-  }
-  .waapi-orbit-core{
-    transform:translate(-50%, -50%) scale(.78)!important;
-  }
-  .waapi-orbit-guide{
-    opacity:.18!important;
-  }
-  .waapi-satellite{
-    transform-origin:center!important;
-  }
-  .waapi-satellite-label{
-    font-size:11px!important;
-    letter-spacing:.05em!important;
-  }
-  .waapi-orbit-detail{
-    left:12px!important;
-    right:12px!important;
-    bottom:12px!important;
-    width:auto!important;
-    max-width:none!important;
-    padding:14px!important;
-    border-radius:20px!important;
-  }
-  .waapi-orbit-detail h3{
-    font-size:18px!important;
-  }
-  .waapi-orbit-detail p{
-    font-size:13px!important;
-    line-height:1.62!important;
-  }
-
-  /* 首页列表 */
-  .recommended-grid,
-  .friend-grid,
   .all-friends,
   .featured-friends,
   .tools-grid,
@@ -206,19 +129,6 @@
     grid-template-columns:1fr!important;
     gap:14px!important;
   }
-  .notice-item,
-  .notice-item-with-cover{
-    grid-template-columns:1fr!important;
-  }
-  .notice-cover{
-    min-height:160px!important;
-    order:-1;
-  }
-  .recommended-card{
-    grid-template-columns:1fr!important;
-    min-height:0!important;
-  }
-  .recommended-cover,
   .post-thumb{
     min-height:165px!important;
   }
@@ -291,8 +201,7 @@
     max-height:220px!important;
     overflow:auto!important;
   }
-  .back-icon,
-  .floating-back-icon{
+  .back-icon{
     left:12px!important;
     top:auto!important;
     bottom:18px!important;
@@ -317,39 +226,6 @@
   .pills{
     gap:8px!important;
   }
-
-  /* 朋友星图 */
-  .friend-galaxy-shell{
-    padding:12px!important;
-    border-radius:24px!important;
-  }
-  .slv2004-stage,
-  .slv2007-stage,
-  .friend-galaxy-shell [data-galaxy-stage]{
-    min-height:560px!important;
-    height:560px!important;
-    border-radius:24px!important;
-  }
-  .slv2004-profile{
-    left:12px!important;
-    right:12px!important;
-    bottom:12px!important;
-    width:auto!important;
-    max-width:none!important;
-    padding:14px!important;
-    border-radius:20px!important;
-  }
-  .slv2004-profile h2{
-    font-size:20px!important;
-  }
-  .slv2004-profile p{
-    font-size:13px!important;
-    line-height:1.58!important;
-  }
-  .friend-galaxy-control{
-    padding:15px!important;
-    border-radius:22px!important;
-  }
   .friend-search-box{
     grid-template-columns:auto minmax(0,1fr) auto!important;
     width:100%!important;
@@ -363,8 +239,7 @@
   .tools-command-center,
   .random-tool-panel,
   .gacha-tool-panel,
-  .snake-tool-panel,
-  .md-tool-panel{
+  .snake-tool-panel{
     padding:16px!important;
   }
   .tools-search-row{
@@ -403,19 +278,11 @@
   .container{
     padding-inline:10px!important;
   }
-  .page-hero h1,
-  .hero-title{
+  .page-hero h1{
     font-size:30px!important;
   }
   .section-head h2{
     font-size:20px!important;
-  }
-  .waapi-orbit-stage{
-    height:500px!important;
-    min-height:500px!important;
-  }
-  .waapi-orbit-core{
-    transform:translate(-50%, -50%) scale(.68)!important;
   }
   .article-reader{
     padding:15px!important;
@@ -455,8 +322,7 @@
   .pill,
   .icon-btn,
   .search-submit,
-  .friend-search-submit,
-  .home-friend-arrow{
+  .friend-search-submit{
     min-height:42px!important;
   }
   input,
@@ -509,90 +375,17 @@
   .page-hero h1{
     word-break:break-word;
   }
-
-  /* 首页星际入口：手机端放弃过大的轨道错觉，改成更稳定的纵向入口卡 */
-  .waapi-orbit-stage{
-    height:auto!important;
-    min-height:0!important;
-    display:grid!important;
-    grid-template-columns:1fr!important;
-    gap:14px!important;
-    padding:12px!important;
-  }
-  .waapi-orbit-core,
-  .waapi-orbit-guide,
-  .waapi-gateway-credit{
-    display:none!important;
-  }
-  .waapi-satellite{
-    position:relative!important;
-    left:auto!important;
-    top:auto!important;
-    right:auto!important;
-    bottom:auto!important;
-    transform:none!important;
-    display:grid!important;
-    grid-template-columns:34px minmax(0,1fr)!important;
-    align-items:center!important;
-    gap:12px!important;
-    width:100%!important;
-    min-height:52px!important;
-    padding:10px 12px!important;
-    border-radius:18px!important;
-    border:1px solid color-mix(in srgb, var(--accent) 14%, var(--border))!important;
-    background:color-mix(in srgb, var(--panel) 74%, transparent)!important;
-    box-shadow:0 10px 26px rgba(15,23,42,.08)!important;
-  }
-  .waapi-satellite::before,
-  .waapi-satellite::after{
-    display:none!important;
-  }
-  .waapi-satellite-orb{
-    width:28px!important;
-    height:28px!important;
-  }
-  .waapi-satellite-label{
-    position:static!important;
-    transform:none!important;
-    text-align:left!important;
-    font-size:14px!important;
-    color:var(--text)!important;
-    text-shadow:none!important;
-  }
-  .waapi-satellite.is-active{
-    border-color:color-mix(in srgb, var(--accent) 34%, var(--border))!important;
-    background:color-mix(in srgb, var(--accent) 10%, var(--panel))!important;
-  }
-  .waapi-orbit-detail{
-    position:relative!important;
-    left:auto!important;
-    right:auto!important;
-    bottom:auto!important;
-    width:100%!important;
-    grid-row:auto!important;
-    margin-top:2px!important;
-  }
-
-  /* 列表与卡片：防止正文/图片撑宽 */
-  .recommended-info,
   .post-info,
-  .notice-item-content,
   .tool-card,
-  .friend-card,
   .small-friend,
   .featured-card{
     min-width:0!important;
   }
-  .recommended-info h3,
   .post-info h3,
-  .notice-item-content h3,
-  .tool-card h3,
-  .friend-card h3{
+  .tool-card h3{
     overflow-wrap:anywhere;
   }
   .lazy-bg,
-  .recommended-cover,
-  .notice-cover,
   .post-thumb{
     background-size:cover!important;
     background-position:center!important;
@@ -614,10 +407,6 @@
     max-height:190px!important;
     overflow:auto!important;
   }
-  .article-meta,
-  .article-actions{
-    flex-wrap:wrap!important;
-  }
   .markdown-body img{
     height:auto!important;
     max-width:100%!important;
@@ -637,61 +426,18 @@
     overflow-x:auto!important;
     -webkit-overflow-scrolling:touch;
   }
-
-  /* 朋友星图：手机端也改为更稳定的纵向信息区域，避免点不到/挤爆 */
-  .friend-galaxy-shell{
-    display:grid!important;
-    gap:14px!important;
-  }
-  .slv2004-stage,
-  .slv2007-stage,
-  .friend-galaxy-shell [data-galaxy-stage]{
-    height:auto!important;
-    min-height:420px!important;
-    padding:14px!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-  }
-  .slv2004-core{
-    transform:scale(.86)!important;
-  }
-  .slv2004-lines,
-  .slv2004-nodes{
-    max-width:100%!important;
-    overflow:hidden!important;
-  }
-  .slv2004-profile{
-    position:static!important;
-    width:100%!important;
-    margin-top:12px!important;
-  }
-  .friend-galaxy-control{
-    margin-top:0!important;
-  }
   .friend-search-box{
     display:grid!important;
     grid-template-columns:32px minmax(0,1fr) 56px!important;
   }
-
-  /* Legacy action rows and the tools search retain their mobile stack.
-     Current tool workspaces own their responsive layouts in detail-layout. */
-  .snake-controls,
   .tools-search-row{
     display:grid!important;
     grid-template-columns:1fr!important;
     gap:10px!important;
   }
-  .snake-controls .btn{
-    width:100%!important;
-  }
   .snake-mobile-pad{
     max-width:260px;
     margin-inline:auto;
-  }
-  .md-drop-zone{
-    min-height:120px!important;
-    text-align:center;
   }
 
   /* 浮动按钮避开手机边缘 */
@@ -711,23 +457,13 @@
     min-width:54px!important;
     font-size:13px!important;
   }
-  .hero-banner.hero-banner-image-only{
-    min-height:170px!important;
-  }
-  .hero-intro-strip p,
-  .waapi-orbit-detail p,
   .markdown-body{
     font-size:14.5px!important;
-  }
-  .waapi-satellite{
-    min-height:48px!important;
   }
   .article-reader h1{
     font-size:23px!important;
   }
-  .post-card .post-thumb,
-  .recommended-cover,
-  .notice-cover{
+  .post-card .post-thumb{
     height:150px!important;
     min-height:150px!important;
   }

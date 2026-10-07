@@ -42,20 +42,12 @@
 @media(max-width:760px){
   .search-count{width:100%;justify-content:center;text-align:center}
 }
-
-/* v20.0.8：搜索结果真正筛选列表；朋友星图搜索时隐藏无关节点；文章标签不再截断为 3 个。 */
-.friend-node.is-search-hidden,
-.galaxy-line.is-search-hidden{
-  display:none !important;
-}
 .post-card .meta-row,
-.article-meta,
 .article-reader + .article-toc,
 .meta-row{
   flex-wrap:wrap;
 }
 .post-card .meta-row .tag,
-.article-meta .tag,
 .card .meta-row .tag{
   max-width:100%;
 }
@@ -68,7 +60,6 @@
 /* v20.0.8：首页朋友轮播 + 搜索筛选兜底 + 子页面标题彻底无框化 */
 body .page-hero.minimal-page-hero,
 body .page-hero.minimal-page-hero.card,
-body .page-hero.minimal-page-hero.tools-hero,
 body .minimal-page-hero{
   background:transparent !important;
   background-image:none !important;
@@ -124,9 +115,7 @@ body .tag-search-item[hidden],
 body .tool-card.is-search-filtered,
 body .tool-card[hidden],
 body .tool-app-card.is-search-filtered,
-body .tool-app-card[hidden],
-body .friend-node.is-search-hidden,
-body .friend-node[hidden]{
+body .tool-app-card[hidden]{
   display:none !important;
 }
 .search-submit[data-no-page-loading],
@@ -139,8 +128,6 @@ body .friend-node[hidden]{
 /* v20.0.8：本轮强制兜底。标题区完全无框，搜索触发有刷新动画，筛选隐藏不被旧样式顶掉。 */
 html body .page-hero.minimal-page-hero,
 html body section.page-hero.minimal-page-hero,
-html body section.page-hero.minimal-page-hero.tools-hero,
-html body section.page-hero.minimal-page-hero.modern-tools-hero,
 html body section.page-hero.minimal-page-hero.tag-detail-hero{
   display:block !important;
   min-height:0 !important;
@@ -206,10 +193,7 @@ html body .tool-card.is-search-filtered,
 html body .tool-card[hidden],
 html body .tool-app-card.search-hidden,
 html body .tool-app-card.is-search-filtered,
-html body .tool-app-card[hidden],
-html body .friend-node.is-search-hidden,
-html body .friend-node.search-hidden,
-html body .friend-node[hidden]{
+html body .tool-app-card[hidden]{
   display:none !important;
 }
 .search-refresh-overlay{
@@ -313,27 +297,16 @@ body.dark .songline-search-clear:focus-visible{
 }
 .friend-search-box .songline-search-clear,
 .tools-search-row .songline-search-clear,
-.posts-search-toolbar .songline-search-clear,
 .toolbar-panel .songline-search-clear{
   align-self:center;
 }
 html body .post-search-item.search-hidden,
 html body .post-search-item.is-search-filtered,
 html body .post-search-item[hidden],
-html body .friend-node.is-search-hidden,
-html body .friend-node[hidden],
-html body .friend-result.search-hidden,
 html body .tag-search-item.search-hidden,
 html body .tool-card.search-hidden,
 html body .tool-app-card.search-hidden{
   display:none !important;
-}
-.friend-galaxy-shell.has-friend-search .friend-galaxy-results{
-  box-shadow:0 14px 36px rgba(14,165,233,.10);
-}
-.friend-search-status{
-  font-weight:700;
-  color:var(--text);
 }
 
 /* v20.0.8：统一搜索框结构。X 键放回输入框内部，避免跑出边框，也避免朋友页 grid 被插入按钮挤坏。 */
@@ -368,13 +341,9 @@ html body .tool-app-card.search-hidden{
 .songline-search-field > .songline-search-clear:focus-visible{
   transform:translateY(-50%) scale(1.06) !important;
 }
-.posts-search-toolbar,
 .toolbar-panel,
 .tools-search-row{
   align-items:center !important;
-}
-.posts-search-toolbar > .songline-search-field{
-  flex:1 1 420px !important;
 }
 .toolbar-panel > .songline-search-field{
   flex:1 1 320px !important;
@@ -385,10 +354,6 @@ html body .tool-app-card.search-hidden{
 .friend-search-box{
   grid-template-columns:auto minmax(0,1fr) auto !important;
   overflow:visible !important;
-}
-.friend-search-box .friend-search-icon{
-  grid-column:1 !important;
-  grid-row:1 !important;
 }
 .friend-search-box .songline-search-field{
   grid-column:2 !important;

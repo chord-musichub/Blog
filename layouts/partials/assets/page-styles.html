@@ -5,7 +5,9 @@
   {{ $isSearchSurface := or .IsHome (eq .Section "posts") (eq .Section "friends") (eq .Section "tags") $isToolsSurface }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
-  <link rel="stylesheet" href="/css/site-runtime.css?v={{ $assetVersion }}">
+  {{ if .IsHome }}
+  <link id="songline-home-runtime-style" rel="stylesheet" href="/css/site-runtime.css?v={{ $assetVersion }}">
+  {{ end }}
   <link rel="stylesheet" href="/css/site-modern.css?v={{ $assetVersion }}">
   {{ if $isSearchSurface }}
   <link id="songline-search-overrides-style" rel="stylesheet" href="/css/site-search-overrides.css?v={{ $assetVersion }}">
@@ -31,7 +33,6 @@
        当前页面分别由对应组件样式文件负责响应式。 */}}
   <link rel="stylesheet" href="/css/site-effects.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/navigation.css?v={{ $assetVersion }}">
-  <link rel="stylesheet" href="/css/navigation-motion.css?v={{ $assetVersion }}">
 {{ if or (and .IsPage (eq .Section "posts")) (hasPrefix .RelPermalink "/tools/markdown-previewer/") }}
 <link id="songline-markdown-renderer-style" rel="stylesheet" href="/css/pages/content/markdown-renderer.css?v={{ $assetVersion }}">
 {{ end }}

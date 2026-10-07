@@ -27,10 +27,6 @@
   font-size:clamp(4.2rem, 6.6vw, 7.6rem)!important;
   line-height:.82!important;
 }
-.audio-visualizer-page:not(.is-visual-live) .av-subtitle{
-  max-width:min(920px, 72vw)!important;
-  line-height:1.45!important;
-}
 .audio-visualizer-page:not(.is-visual-live) .av-status-stack{
   transform:none!important;
   margin-right:0!important;
@@ -175,14 +171,8 @@ body:has(.audio-visualizer-page){
 body:has(.audio-visualizer-page){
   --av-nav-real-height: 82px;
 }
-body:has(.audio-visualizer-page) .site-main,
-body:has(.audio-visualizer-page) .page-main,
 body:has(.audio-visualizer-page) main:not(.audio-visualizer-page),
 body:has(.audio-visualizer-page) .content,
-body:has(.audio-visualizer-page) .content-shell,
-body:has(.audio-visualizer-page) .page-shell,
-body:has(.audio-visualizer-page) .main-shell,
-body:has(.audio-visualizer-page) .tool-shell,
 body:has(.audio-visualizer-page) .container,
 body:has(.audio-visualizer-page) .wrap{
   max-width:none!important;
@@ -383,9 +373,6 @@ body:has(.audio-visualizer-page){
   font-size:clamp(4.2rem, 6.8vw, 8rem)!important;
   line-height:.82!important;
 }
-.audio-visualizer-page:not(.is-visual-live) .av-subtitle{
-  max-width:min(920px, 72%)!important;
-}
 .audio-visualizer-page:not(.is-visual-live) .av-source-panel{
   position:absolute!important;
   left:50%!important;
@@ -545,7 +532,6 @@ body:has(.audio-visualizer-page){
 .audio-visualizer-page .av-source-card.is-primary{
   border-color:rgba(56,189,248,.36)!important;
 }
-.audio-visualizer-page .av-bridge-card,
 .audio-visualizer-page [data-av-connect-bridge],
 .audio-visualizer-page [data-av-bridge-state]{
   display:none!important;

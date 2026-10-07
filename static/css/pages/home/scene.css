@@ -55,10 +55,6 @@ body[data-page-kind="home"] .songline-home-system{
 }
 
 
-
-
-
-
 .songline-home-layout{
   grid-template-columns:minmax(0, 1fr) minmax(270px, 31%)!important;
   align-items:start;
@@ -112,7 +108,6 @@ body[data-page-kind="home"] .songline-home-system{
   border-radius:0!important;
   box-shadow:none!important;
 }
-.songline-home-intro .hero-intro-mark{ display:none!important; }
 .songline-home-intro h2{
   color:var(--text);
   font-size:14px!important;
@@ -130,29 +125,6 @@ body[data-page-kind="home"] .songline-home-system{
   background:transparent!important;
   box-shadow:none!important;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /* 窄笔记本与浏览器放大后的有效视口：同步收缩三列间距，而非沿用大屏尺寸。 */
@@ -245,12 +217,6 @@ body[data-page-kind="home"] .songline-home-system{
 }
 
 
-
-
-
-
-
-
 .songline-ui-layer--front{
   margin-left:0!important;
   opacity:1;
@@ -268,10 +234,6 @@ body[data-page-kind="home"] .songline-home-system{
   opacity:.92;
   filter:none;
 }
-
-
-
-
 
 
 [data-home-parallax]{ will-change:transform; }
@@ -348,29 +310,7 @@ body[data-page-kind="home"] .songline-home-system{
 .songline-recommendations-actions button:disabled{ opacity:.42; cursor:default; }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @keyframes songlineRecommendationRefresh{ from{ opacity:.4; transform:translateY(6px); } to{ opacity:1; transform:translateY(0); } }
-
-@media(max-width:1180px){
-
-
-}
 @media (max-width:760px), (max-width:980px) and (hover:none){
 
   .songline-recommendations-head{ align-items:flex-start; }
@@ -382,10 +322,6 @@ body[data-page-kind="home"] .songline-home-system{
   .songline-recommendations-actions{ margin-top:18px; }
   .songline-recommendations-actions button,
   .songline-recommendations-actions a{ flex:1; }
-
-
-}
-@media(prefers-reduced-motion:reduce){
 
 
 }
@@ -401,30 +337,6 @@ body[data-page-kind="home"] .songline-home-system{
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @media (max-width:760px), (max-width:980px) and (hover:none){
   body[data-page-kind="home"] .songline-home-system{
     padding:18px!important;
@@ -435,19 +347,6 @@ body[data-page-kind="home"] .songline-home-system{
 
 @media(min-width:981px){
   body[data-page-kind="home"] .songline-home-system{ padding:12px 15px 10px!important; }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

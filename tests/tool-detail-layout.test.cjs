@@ -78,6 +78,6 @@ test('individual workspaces preserve functional hooks and own their responsive c
 test('typing reference wraps at normal spaces and follows the cursor within its own pane',()=>{
   const script=read('static/js/tools/typing-practice.js');
   assert(!script.includes("ch === ' ' ? '&nbsp;'"),'English words may wrap naturally');
-  assert(script.includes("textEl.querySelector('.is-current')"));
+  assert(script.includes('characterNodes[renderedCursor]'));
   assert(script.includes('textEl.scrollTop +='),'Long exercises keep the next character visible without scrolling the page');
 });

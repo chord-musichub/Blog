@@ -26,7 +26,6 @@
   margin-bottom:18px;
 }
 .reaction-stat-card,
-.reaction-button,
 .reaction-sound-toggle{
   border:1px solid rgba(148,163,184,.28);
   background:rgba(255,255,255,.72);
@@ -155,12 +154,6 @@
   30%{ transform:translateX(-8px); }
   65%{ transform:translateX(8px); }
 }
-.reaction-actions{
-  display:flex;
-  justify-content:center;
-  margin:18px 0 0;
-}
-.reaction-button,
 .reaction-sound-toggle{
   cursor:pointer;
   color:#0f172a;
@@ -172,8 +165,6 @@
     box-shadow .16s ease,
     color .16s ease;
 }
-.reaction-button:hover,
-.reaction-button:focus-visible,
 .reaction-sound-toggle:hover,
 .reaction-sound-toggle:focus-visible{
   transform:translateY(-2px);
@@ -183,7 +174,6 @@
   box-shadow:0 18px 34px rgba(14,165,233,.18);
   outline:none;
 }
-.reaction-button:active,
 .reaction-sound-toggle:active{
   transform:translateY(1px) scale(.98);
 }
@@ -216,8 +206,6 @@ body.dark .reaction-panel,
 html.dark .reaction-panel,
 body.dark .reaction-stat-card,
 html.dark .reaction-stat-card,
-body.dark .reaction-button,
-html.dark .reaction-button,
 body.dark .reaction-sound-toggle,
 html.dark .reaction-sound-toggle{
   background:rgba(15,23,42,.66);
@@ -248,7 +236,6 @@ html.dark .reaction-stat-card strong{
 }
 
 
-
 /* v20.18.5：反应测试排行榜显示账号/设备最佳 */
 .reaction-leaderboard li span small{
   display:inline-flex;
@@ -266,5 +253,4 @@ html.dark .reaction-leaderboard li span small{
   background:rgba(14,165,233,.2);
   color:rgba(186,230,253,.92);
 }
-
 

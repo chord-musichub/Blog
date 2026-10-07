@@ -111,15 +111,8 @@ body.dark .post-card,
 body.dark .related-card,
 body.dark .featured-card,
 body.dark .small-friend,
-body.dark .hot-card,
-body.dark .area-card,
-body.dark .friend-card,
-body.dark .sidebar-card,
 body.dark .toolbar-panel,
-body.dark .article-main,
 body.dark .article-toc,
-body.dark .prose-panel,
-body.dark .prose-card,
 body.dark .friend-detail-hero{
   background:rgba(17,28,46,.84) !important;
   background-color:rgba(17,28,46,.84) !important;
@@ -127,11 +120,7 @@ body.dark .friend-detail-hero{
   color:#e6f0ff;
 }
 body.dark .post-card p,
-body.dark .related-card p,
-body.dark .area-card p,
-body.dark .friend-card p,
-body.dark .prose-card p,
-body.dark .about-mini p{
+body.dark .related-card p{
   color:#a8bad1;
 }
 body.dark .post-thumb,
@@ -148,7 +137,6 @@ body.dark .tag-detail-hero.cover-mode-contain{
 }
 body.dark .tag,
 body.dark .pill,
-body.dark .area-more,
 body.dark .btn{
   background:rgba(19,43,66,.72) !important;
   background-color:rgba(19,43,66,.72) !important;
@@ -396,23 +384,7 @@ body.dark .highlight span{
 .article-shell[data-toc-state="expanded"] .article-toc a{
   line-height:1.55;
 }
-.floating-toc-button{
-  display:none;
-  position:fixed;
-  right:18px;
-  bottom:78px;
-  z-index:40;
-  width:44px;
-  height:44px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:rgba(255,242,220,.92);
-  color:var(--accent-2);
-  box-shadow:var(--shadow);
-  cursor:pointer;
-}
-body.dark .toc-toggle,
-body.dark .floating-toc-button{
+body.dark .toc-toggle{
   background:rgba(19,43,66,.86) !important;
   border-color:#2b4360 !important;
   color:#cfe6ff !important;
@@ -423,11 +395,6 @@ body.dark .floating-toc-button{
   }
   .article-toc{
     display:none !important;
-  }
-  .floating-toc-button{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
   }
 }
 
@@ -599,8 +566,6 @@ body.dark .article-cover-hero.cover-mode-contain{
 body[data-page-section="posts"] .article-intro,
 body[data-page-section="posts"] .article-reader,
 body[data-page-section="posts"] .article-toc,
-body[data-page-section="posts"] .article-bottom-actions,
-body[data-page-section="posts"] .prev-next .nav-card,
 body[data-page-section="posts"] .related-card{
   border:1px solid rgba(235,246,255,.34)!important;
   background:linear-gradient(135deg,rgba(244,251,255,.22),rgba(108,146,181,.16) 52%,rgba(23,49,80,.24))!important;
@@ -611,8 +576,6 @@ body[data-page-section="posts"] .related-card{
 body.dark[data-page-section="posts"] .article-intro,
 body.dark[data-page-section="posts"] .article-reader,
 body.dark[data-page-section="posts"] .article-toc,
-body.dark[data-page-section="posts"] .article-bottom-actions,
-body.dark[data-page-section="posts"] .prev-next .nav-card,
 body.dark[data-page-section="posts"] .related-card{
   border-color:rgba(171,207,239,.28)!important;
   background:linear-gradient(135deg,rgba(35,66,103,.38),rgba(8,23,46,.28) 54%,rgba(6,15,31,.38))!important;
@@ -622,8 +585,6 @@ body.dark[data-page-section="posts"] .related-card{
   body[data-page-section="posts"] .article-intro,
   body[data-page-section="posts"] .article-reader,
   body[data-page-section="posts"] .article-toc,
-  body[data-page-section="posts"] .article-bottom-actions,
-  body[data-page-section="posts"] .prev-next .nav-card,
   body[data-page-section="posts"] .related-card{backdrop-filter:blur(11px) saturate(120%);-webkit-backdrop-filter:blur(11px) saturate(120%)}
 }
 

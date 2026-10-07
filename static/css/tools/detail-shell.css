@@ -26,8 +26,7 @@ background-image:linear-gradient(180deg,rgba(4,7,16,.14),rgba(8,3,2,.60) 100%),u
 
 body[data-page-section="tools"]::before,
 body[data-page-section="tools"] .site-bg-layer,
-body[data-page-section="tools"] .songline-starstream-layer,
-body[data-page-section="tools"] .songline-ribbon-layer{
+body[data-page-section="tools"] .songline-starstream-layer{
   display:none!important;
 }
 body[data-page-scene="tools"]::before,

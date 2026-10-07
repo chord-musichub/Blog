@@ -80,48 +80,6 @@ body.dark .snake-overlay{
 .snake-overlay span{
   color:var(--muted);
 }
-.snake-controls{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:12px;
-  margin-top:20px;
-}
-.snake-sound-toggle{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  padding:9px 13px;
-  color:var(--muted);
-  background:rgba(255,255,255,.42);
-  font-weight:720;
-  user-select:none;
-}
-body.dark .snake-sound-toggle{
-  background:rgba(19,43,66,.72);
-}
-.snake-sound-toggle input{
-  accent-color:var(--accent-2);
-}
-.snake-help{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-top:16px;
-  color:var(--muted);
-  font-size:14px;
-}
-.snake-help kbd{
-  border:1px solid var(--border);
-  background:var(--panel-2);
-  border-radius:8px;
-  padding:2px 7px;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-}
 .snake-mobile-pad{
   display:none;
   grid-template-columns:54px 54px 54px;
@@ -188,15 +146,9 @@ body.dark .snake-sound-toggle{
 .snake-overlay.show{
   pointer-events:auto;
 }
-.snake-controls .btn,
-.snake-sound-toggle,
 .snake-mobile-pad button{
   transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease, filter .18s ease;
 }
-.snake-controls .btn:hover,
-.snake-controls .btn:focus-visible,
-.snake-sound-toggle:hover,
-.snake-sound-toggle:focus-within,
 .snake-mobile-pad button:hover,
 .snake-mobile-pad button:focus-visible{
   transform:translateY(-2px);
@@ -204,18 +156,7 @@ body.dark .snake-sound-toggle{
   box-shadow:0 14px 30px rgba(55,84,120,.12);
   outline:none;
 }
-.snake-sound-toggle{
-  cursor:pointer;
-}
-.snake-sound-toggle:hover{
-  color:var(--accent-2);
-  background:rgba(234,246,255,.72);
-}
-body.dark .snake-sound-toggle:hover{
-  background:rgba(19,43,66,.9);
-}
-.snake-mobile-pad button:active,
-.snake-controls .btn:active{
+.snake-mobile-pad button:active{
   transform:translateY(0) scale(.98);
 }
 @media(max-width:720px){
@@ -233,15 +174,6 @@ body.dark .snake-sound-toggle:hover{
   }
   .snake-overlay strong{
     font-size:28px;
-  }
-  .snake-controls{
-    gap:10px;
-  }
-  .snake-controls .btn{
-    flex:1 1 150px;
-  }
-  .snake-help{
-    font-size:12.5px;
   }
 }
 @media(max-width:430px){
@@ -272,22 +204,6 @@ body.dark .snake-sound-toggle:hover{
 }
 
 
-/* v15.4：贪吃蛇音效激活提示 */
-.snake-help span:last-child{
-  color:var(--accent-2);
-}
-
-
-/* v15.5：贪吃蛇特殊果实 */
-.snake-help{
-  align-items:center;
-}
-.snake-help span:nth-last-child(2){
-  color:#8b5cf6;
-}
-
-
-
 /* v15.8：贪吃蛇多果实机制 */
 .snake-overlay span{
   max-width:30rem;
@@ -300,10 +216,6 @@ body.dark .snake-sound-toggle:hover{
   .snake-head{gap:14px!important}
   .snake-stage-wrap{width:100%;max-width:min(92vw, 430px);margin:0 auto}
   .snake-canvas{width:100%!important;height:auto!important;aspect-ratio:1 / 1;touch-action:pan-y pinch-zoom}
-  .snake-controls{display:grid!important;grid-template-columns:1fr 1fr;gap:10px!important}
-  .snake-controls .btn{min-height:48px;padding:12px 10px;font-size:15px}
-  .snake-sound-toggle{grid-column:1 / -1;justify-content:center;min-height:46px}
-  .snake-help{display:none!important}
   .snake-mobile-pad{display:grid!important;grid-template-columns:76px 76px 76px!important;gap:14px!important;margin-top:20px!important;touch-action:none;user-select:none}
   .snake-mobile-pad button{width:76px!important;height:76px!important;border-radius:24px!important;font-size:34px!important;box-shadow:0 12px 28px rgba(55,84,120,.12);-webkit-tap-highlight-color:transparent}
   .snake-mobile-pad button:active{transform:scale(.96)}

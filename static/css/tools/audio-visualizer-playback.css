@@ -753,10 +753,6 @@ body:has(.audio-visualizer-page.is-display-mode) .back-icon-link[data-back-icon]
   border:1px solid rgba(186,230,253,.38) !important;
   box-shadow:0 26px 70px rgba(0,0,0,.42), 0 0 0 1px rgba(255,255,255,.04) inset, 0 0 44px rgba(56,189,248,.10) !important;
 }
-.audio-visualizer-page.is-visual-live .av-hero{
-  border-radius:30px !important;
-  box-shadow:0 32px 100px rgba(0,0,0,.36) !important;
-}
 
 
 /* v20.19.3：开机动画放行交互 + 音频星空律动 */
@@ -837,8 +833,6 @@ html.is-boot-interactive .site-boot-overlay{
 
 /* v20.20.6：同观感性能优化；弱机型不关闭视觉，只降低不必要的合成压力 */
 html.songline-low-perf .site-bg-layer{filter:none!important}
-html.songline-low-perf .live-nav-item{transition-duration:.22s!important}
-html.songline-low-perf .waapi-orbit-stage,
 html.songline-low-perf .audio-visualizer-page .av-stage{will-change:auto!important}
 html.songline-low-perf .songline-starstream-layer{will-change:opacity!important}
 @media (prefers-reduced-motion: reduce){

@@ -47,8 +47,7 @@ body.dark[data-page-section="posts"] .site-bg-layer::after{
   background:linear-gradient(90deg, rgba(2,7,20,.20) 0%, rgba(2,7,20,.03) 25%, rgba(2,7,20,.03) 75%, rgba(2,7,20,.26) 100%);
 }
 /* 校园场景本身足够完整，文章页不再叠加旧的全站星轨。 */
-body[data-page-section="posts"] .songline-starstream-layer,
-body[data-page-section="posts"] .songline-ribbon-layer{
+body[data-page-section="posts"] .songline-starstream-layer{
   display:none!important;
 }
 
@@ -75,9 +74,7 @@ body:not(.dark)[data-page-section="posts"] .toolbar-panel,
 body:not(.dark)[data-page-section="posts"] .posts-tag-explorer,
 body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card,
 body:not(.dark)[data-page-section="posts"] .article-reader,
-body:not(.dark)[data-page-section="posts"] .article-toc,
-body:not(.dark)[data-page-section="posts"] .article-bottom-actions,
-body:not(.dark)[data-page-section="posts"] .nav-card{
+body:not(.dark)[data-page-section="posts"] .article-toc{
   background:rgba(235,247,247,.58)!important;
   border-color:rgba(164,201,209,.34)!important;
   box-shadow:0 14px 34px rgba(62,104,124,.12)!important;
@@ -170,8 +167,7 @@ body[data-page-section="posts"] .section-head h2{
   color:var(--article-ink)!important;
 }
 body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card :is(p,.meta-row,.meta-row span,.views),
-body[data-page-section="posts"] .article-cover-hero + section.card > p,
-body[data-page-section="posts"] .article-bottom-actions p{
+body[data-page-section="posts"] .article-cover-hero + section.card > p{
   color:var(--article-muted)!important;
 }
 body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:hover,

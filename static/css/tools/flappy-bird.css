@@ -26,7 +26,6 @@
   margin-bottom:18px;
 }
 .flappy-score-card,
-.flappy-button,
 .flappy-sound-toggle{
   border:1px solid rgba(148,163,184,.28);
   background:rgba(255,255,255,.72);
@@ -49,7 +48,6 @@
   line-height:1;
   color:#0f172a;
 }
-.flappy-button,
 .flappy-sound-toggle{
   cursor:pointer;
   color:#0f172a;
@@ -61,14 +59,9 @@
     box-shadow .16s ease,
     color .16s ease;
 }
-.flappy-button{
-  margin-left:0;
-}
 .flappy-sound-toggle{
   margin-left:auto;
 }
-.flappy-button:hover,
-.flappy-button:focus-visible,
 .flappy-sound-toggle:hover,
 .flappy-sound-toggle:focus-visible{
   transform:translateY(-2px);
@@ -78,7 +71,6 @@
   box-shadow:0 18px 34px rgba(14,165,233,.18);
   outline:none;
 }
-.flappy-button:active,
 .flappy-sound-toggle:active{
   transform:translateY(1px) scale(.98);
 }
@@ -183,8 +175,6 @@ body.dark .flappy-panel,
 html.dark .flappy-panel,
 body.dark .flappy-score-card,
 html.dark .flappy-score-card,
-body.dark .flappy-button,
-html.dark .flappy-button,
 body.dark .flappy-sound-toggle,
 html.dark .flappy-sound-toggle{
   background:rgba(15,23,42,.66);
@@ -203,8 +193,7 @@ html.dark .flappy-score-card strong{
     display:grid;
     grid-template-columns:1fr 1fr;
   }
-  .flappy-sound-toggle,
-  .flappy-button{
+  .flappy-sound-toggle{
     margin-left:0;
     min-height:48px;
   }
@@ -212,4 +201,3 @@ html.dark .flappy-score-card strong{
     border-radius:24px;
   }
 }
-

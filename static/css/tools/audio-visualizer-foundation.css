@@ -49,7 +49,6 @@
 .av-topbar,
 .av-now,
 .av-controls,
-.av-bridge-card,
 .av-hint{
   position:relative;
   z-index:4;
@@ -177,8 +176,7 @@
   width:min(920px, calc(100% - 32px));
   margin:22px auto 0;
 }
-.av-button,
-.av-link-button{
+.av-button{
   border:1px solid rgba(148,163,184,.24);
   background:rgba(15,23,42,.46);
   color:rgba(248,250,252,.94);
@@ -204,40 +202,15 @@
   border-color:rgba(251,113,133,.28);
 }
 .av-button:hover,
-.av-button:focus-visible,
-.av-link-button:hover,
-.av-link-button:focus-visible{
+.av-button:focus-visible{
   transform:translateY(-2px);
   border-color:rgba(125,211,252,.62);
   background:rgba(14,165,233,.32);
   box-shadow:0 24px 54px rgba(14,165,233,.24);
   outline:none;
 }
-.av-button:active,
-.av-link-button:active{
+.av-button:active{
   transform:translateY(1px) scale(.985);
-}
-.av-bridge-card{
-  width:min(620px, calc(100% - 32px));
-  margin:22px auto 0;
-  padding:16px 18px;
-  border:1px solid rgba(148,163,184,.18);
-  border-radius:24px;
-  background:rgba(15,23,42,.34);
-  backdrop-filter:blur(16px);
-  color:rgba(226,232,240,.84);
-  box-shadow:0 18px 48px rgba(0,0,0,.22);
-}
-.av-bridge-card strong{
-  color:#f8fafc;
-}
-.av-bridge-card p{
-  margin:.45rem 0 .85rem;
-}
-.av-link-button{
-  display:inline-flex;
-  padding:.62rem .9rem;
-  font-size:.92rem;
 }
 .av-hint{
   width:min(820px, calc(100% - 32px));

@@ -1,18 +1,4 @@
-/* 2048 工具页样式：仅在该工具页面加载。 */
 
-/* v20.18.5：2048 棋盘比例、移动反馈和按键 UI 修复 */
-.tool-back-icon-only{
-  width:44px!important;
-  height:44px!important;
-  padding:0!important;
-  justify-content:center!important;
-  font-size:1.35rem!important;
-  font-weight:900!important;
-  line-height:1!important;
-}
-.tool-back-icon-only::after{
-  content:none!important;
-}
 .game-2048-board{
   grid-auto-rows:1fr!important;
   align-items:stretch!important;
@@ -57,8 +43,6 @@
   from{ transform:translateX(-10px) scale(.985); }
   to{ transform:translateX(0) scale(1); }
 }
-.game-2048-controls button,
-.game-2048-new,
 .game-2048-overlay button{
   transition:
     transform .16s ease,
@@ -67,21 +51,6 @@
     box-shadow .16s ease,
     color .16s ease;
 }
-.game-2048-controls button:hover,
-.game-2048-controls button:focus-visible{
-  transform:translateY(-2px);
-  border-color:rgba(14,165,233,.48);
-  background:rgba(224,242,254,.92);
-  color:#075985;
-  box-shadow:0 18px 34px rgba(14,165,233,.18);
-  outline:none;
-}
-.game-2048-controls button:active{
-  transform:translateY(1px) scale(.98);
-  box-shadow:0 8px 18px rgba(15,23,42,.08);
-}
-.game-2048-new:hover,
-.game-2048-new:focus-visible,
 .game-2048-overlay button:hover,
 .game-2048-overlay button:focus-visible{
   transform:translateY(-2px);
@@ -89,19 +58,7 @@
   box-shadow:0 18px 34px rgba(14,165,233,.16);
   outline:none;
 }
-body.dark .game-2048-controls button:hover,
-html.dark .game-2048-controls button:hover,
-body.dark .game-2048-controls button:focus-visible,
-html.dark .game-2048-controls button:focus-visible{
-  background:rgba(14,165,233,.22);
-  color:#e0f2fe;
-  border-color:rgba(125,211,252,.45);
-}
 @media(max-width:720px){
-  .tool-back-icon-only{
-    width:42px!important;
-    height:42px!important;
-  }
   .game-2048-board{
     width:100%;
     max-width:calc(100vw - 42px);
@@ -281,44 +238,6 @@ html.dark .game-2048-cell{
   45%{ transform:scale(1.13); filter:brightness(1.08); }
   100%{ transform:scale(1); filter:brightness(1); }
 }
-
-
-/* v20.18.5：工具子页标题统一为 2048 的透明标题风格 */
-.page-hero.tools-hero:not(.modern-tools-hero){
-  max-width:920px!important;
-  margin:0 auto 22px!important;
-  padding:clamp(28px, 5vw, 72px) clamp(16px, 4vw, 56px) 0!important;
-  border:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
-  backdrop-filter:none!important;
-  -webkit-backdrop-filter:none!important;
-  text-align:left!important;
-  min-height:0!important;
-}
-.page-hero.tools-hero:not(.modern-tools-hero)::before,
-.page-hero.tools-hero:not(.modern-tools-hero)::after{
-  display:none!important;
-}
-.page-hero.tools-hero:not(.modern-tools-hero) h1{
-  margin:.15em 0 .2em!important;
-  font-size:clamp(2.3rem, 8vw, 5.2rem)!important;
-  line-height:.9!important;
-  letter-spacing:-.08em!important;
-  color:inherit!important;
-  text-shadow:none!important;
-}
-.page-hero.tools-hero:not(.modern-tools-hero) h1::before{
-  content:"Songline Tool";
-  display:block;
-  margin:0 0 .8rem;
-  font-size:.78rem;
-  line-height:1;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  font-weight:800;
-  color:rgba(14,116,144,.72);
-}
 .game-2048-leaderboard{
   width:min(100%, 520px);
   margin:18px auto 0!important;
@@ -326,102 +245,8 @@ html.dark .game-2048-cell{
 .game-2048-leaderboard ol{
   margin-bottom:0;
 }
-body.dark .page-hero.tools-hero:not(.modern-tools-hero) h1::before,
-html.dark .page-hero.tools-hero:not(.modern-tools-hero) h1::before{
-  color:rgba(125,211,252,.78);
-}
 @media(max-width:720px){
-  .page-hero.tools-hero:not(.modern-tools-hero){
-    padding:18px 12px 0!important;
-    margin-bottom:16px!important;
-  }
-}
-
-
-/* v20.18.5：2048 音效开关 */
-.game-2048-sound-toggle{
-  border:1px solid rgba(148,163,184,.28);
-  background:rgba(255,255,255,.7);
-  border-radius:18px;
-  padding:.75rem .95rem;
-  box-shadow:0 12px 28px rgba(15,23,42,.08);
-  cursor:pointer;
-  color:#0f172a;
-  font-weight:800;
-  transition:transform .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease, color .16s ease;
-}
-.game-2048-sound-toggle::before{
-  content:"♪";
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:1.35em;
-  height:1.35em;
-  margin-right:.35em;
-  border-radius:999px;
-  background:rgba(14,165,233,.13);
-  color:#0369a1;
-  font-weight:900;
-}
-.game-2048-sound-toggle.is-muted::before{
-  content:"×";
-  background:rgba(148,163,184,.18);
-  color:#64748b;
-}
-.game-2048-sound-toggle:hover,
-.game-2048-sound-toggle:focus-visible{
-  transform:translateY(-2px);
-  border-color:rgba(14,165,233,.48);
-  background:rgba(224,242,254,.92);
-  color:#075985;
-  box-shadow:0 18px 34px rgba(14,165,233,.18);
-  outline:none;
-}
-.game-2048-sound-toggle:active{
-  transform:translateY(1px) scale(.98);
-  box-shadow:0 8px 18px rgba(15,23,42,.08);
-}
-body.dark .game-2048-sound-toggle,
-html.dark .game-2048-sound-toggle{
-  background:rgba(15,23,42,.66);
-  color:rgba(248,250,252,.92);
-  border-color:rgba(148,163,184,.22);
-}
-body.dark .game-2048-sound-toggle:hover,
-html.dark .game-2048-sound-toggle:hover,
-body.dark .game-2048-sound-toggle:focus-visible,
-html.dark .game-2048-sound-toggle:focus-visible{
-  background:rgba(14,165,233,.22);
-  color:#e0f2fe;
-  border-color:rgba(125,211,252,.45);
-}
-@media(max-width:720px){
-  .game-2048-sound-toggle{ grid-column:auto; }
   .game-2048-topbar{ grid-template-columns:1fr 1fr; }
-  .game-2048-sound-toggle,
-  .game-2048-new{ min-height:48px; }
-}
-
-
-/* v20.18.5：2048 强音量提示 */
-.game-2048-sound-toggle:not(.is-muted){
-  border-color:rgba(14,165,233,.38);
-  box-shadow:0 14px 32px rgba(14,165,233,.14);
-}
-.game-2048-sound-toggle:not(.is-muted)::before{
-  content:"♪";
-  background:rgba(14,165,233,.22);
-}
-
-
-/* v20.18.5：2048 音效对齐贪吃蛇响度 */
-.game-2048-sound-toggle:not(.is-muted){
-  border-color:rgba(14,165,233,.55);
-  box-shadow:0 18px 38px rgba(14,165,233,.18);
-}
-.game-2048-sound-toggle:not(.is-muted)::before{
-  content:"♪";
-  background:rgba(14,165,233,.28);
 }
 
 /* 从 site.css 迁移的 2048 页面基础样式。 */
@@ -433,23 +258,6 @@ html.dark .game-2048-sound-toggle:focus-visible{
 .tool-2048-shell{
   max-width:920px;
   margin:0 auto;
-}
-.tool-back-link{
-  display:inline-flex;
-  align-items:center;
-  gap:.4em;
-  border:1px solid rgba(148,163,184,.34);
-  background:rgba(255,255,255,.68);
-  color:rgba(15,23,42,.72);
-  border-radius:999px;
-  padding:.58rem .82rem;
-  text-decoration:none;
-  white-space:nowrap;
-  box-shadow:0 14px 34px rgba(15,23,42,.08);
-}
-.tool-back-link:hover{
-  transform:translateY(-1px);
-  color:rgba(14,116,144,.95);
 }
 .game-2048-panel{
   position:relative;
@@ -469,8 +277,7 @@ html.dark .game-2048-sound-toggle:focus-visible{
   gap:12px;
   margin-bottom:18px;
 }
-.game-2048-score-card,
-.game-2048-new{
+.game-2048-score-card{
   border:1px solid rgba(148,163,184,.28);
   background:rgba(255,255,255,.7);
   border-radius:18px;
@@ -491,16 +298,6 @@ html.dark .game-2048-sound-toggle:focus-visible{
   font-size:1.45rem;
   line-height:1;
   color:#0f172a;
-}
-.game-2048-new{
-  margin-left:auto;
-  cursor:pointer;
-  color:#0f172a;
-  font-weight:800;
-}
-.game-2048-new:hover{
-  transform:translateY(-1px);
-  border-color:rgba(14,165,233,.35);
 }
 .game-2048-board-wrap{
   position:relative;
@@ -585,46 +382,13 @@ html.dark .game-2048-sound-toggle:focus-visible{
   background:white;
   color:#0f172a;
 }
-.game-2048-controls{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-  margin:18px auto 0;
-}
-.game-2048-control-row{
-  display:flex;
-  gap:10px;
-}
-.game-2048-controls button{
-  width:64px;
-  height:52px;
-  border:1px solid rgba(148,163,184,.3);
-  border-radius:18px;
-  cursor:pointer;
-  font-size:1.4rem;
-  font-weight:900;
-  background:rgba(255,255,255,.78);
-  color:#0f172a;
-  box-shadow:0 12px 26px rgba(15,23,42,.08);
-}
-.game-2048-controls button:active{
-  transform:translateY(1px) scale(.98);
-}
-.tool-card .tool-card-icon,
-.tool-card-2048 .tool-card-icon{
+.tool-card .tool-card-icon{
   letter-spacing:-.06em;
 }
-body.dark .tool-back-link,
-html.dark .tool-back-link,
 body.dark .game-2048-panel,
 html.dark .game-2048-panel,
 body.dark .game-2048-score-card,
-html.dark .game-2048-score-card,
-body.dark .game-2048-new,
-html.dark .game-2048-new,
-body.dark .game-2048-controls button,
-html.dark .game-2048-controls button{
+html.dark .game-2048-score-card{
   background:rgba(15,23,42,.66);
   color:rgba(248,250,252,.92);
   border-color:rgba(148,163,184,.22);
@@ -637,16 +401,9 @@ html.dark .game-2048-score-card strong{
   .tool-2048-page{
     padding:18px 12px 34px;
   }
-  .tool-back-link{
-    margin-bottom:14px;
-  }
   .game-2048-topbar{
     display:grid;
     grid-template-columns:1fr 1fr;
-  }
-  .game-2048-new{
-    grid-column:1 / -1;
-    margin-left:0;
   }
   .game-2048-board{
     --game-2048-gap:8px;
@@ -654,9 +411,5 @@ html.dark .game-2048-score-card strong{
   }
   .game-2048-tile{
     border-radius:14px;
-  }
-.game-2048-controls button{
-    width:72px;
-    height:54px;
   }
 }

@@ -167,10 +167,6 @@ body.dark .modern-navbar{
 .card,
 .page-hero,
 .hero-banner,
-.sidebar-card,
-.notice-entry,
-.notice-item,
-.recommended-card,
 .tool-card{
   backdrop-filter:blur(16px) saturate(1.08);
   -webkit-backdrop-filter:blur(16px) saturate(1.08);
@@ -178,10 +174,7 @@ body.dark .modern-navbar{
   border-color:color-mix(in srgb, var(--accent) 12%, var(--border));
 }
 .card:hover,
-.notice-item:hover,
-.recommended-card:hover,
 .tool-card:hover,
-.friend-card:hover,
 .small-friend:hover,
 .featured-card:hover{
   box-shadow:var(--glow);
@@ -202,73 +195,11 @@ body.dark .modern-navbar{
     radial-gradient(circle at 12% 86%, color-mix(in srgb, #f59e0b 14%, transparent), transparent 32%);
   pointer-events:none;
 }
-.modern-hero-content{
-  position:relative;
-  z-index:2;
-}
-.hero-kicker{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  border:1px solid color-mix(in srgb, var(--accent) 18%, transparent);
-  border-radius:999px;
-  padding:7px 12px;
-  color:var(--accent-2);
-  font-weight:820;
-  background:color-mix(in srgb, var(--panel) 62%, transparent);
-  margin-bottom:18px;
-}
-.hero-kicker span{
-  width:9px;
-  height:9px;
-  border-radius:999px;
-  background:var(--accent);
-  box-shadow:0 0 18px var(--accent);
-}
-.hero-stat-row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:26px;
-}
-.hero-stat-row span{
-  display:inline-flex;
-  align-items:baseline;
-  gap:6px;
-  padding:9px 13px;
-  border-radius:16px;
-  background:color-mix(in srgb, var(--panel) 72%, transparent);
-  border:1px solid color-mix(in srgb, var(--accent) 12%, var(--border));
-  color:var(--muted);
-  font-weight:760;
-}
-.hero-stat-row b{
-  color:var(--accent-2);
-  font-size:18px;
-}
 .section-head{
   padding-left:4px;
 }
 .section-head h2{
   letter-spacing:.02em;
-}
-.recommended-grid{
-  grid-template-columns:repeat(2,minmax(0,1fr));
-}
-.recommended-card{
-  overflow:hidden;
-  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-}
-.recommended-card:hover{
-  transform:translateY(-4px);
-}
-.recommended-card:first-child{
-  grid-column:1/-1;
-  display:grid;
-  grid-template-columns:minmax(280px,42%) minmax(0,1fr);
-}
-.recommended-card:first-child .recommended-cover{
-  min-height:260px;
 }
 .tools-command-center{
   display:grid;
@@ -277,13 +208,6 @@ body.dark .modern-navbar{
   align-items:center;
   padding:24px;
   margin:0 0 22px;
-}
-.mini-eyebrow{
-  color:var(--accent-2);
-  font-weight:860;
-  letter-spacing:.08em;
-  font-size:12px;
-  text-transform:uppercase;
 }
 .tools-command-center h2{
   margin:4px 0 4px;
@@ -307,29 +231,6 @@ body.dark .modern-navbar{
   outline:none;
   border-color:var(--accent);
   box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent);
-}
-.tools-filter-row{
-  grid-column:1/-1;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-.tools-filter-row button{
-  border:1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
-  background:color-mix(in srgb, var(--panel-2) 68%, transparent);
-  color:var(--muted);
-  border-radius:999px;
-  padding:8px 13px;
-  cursor:pointer;
-  font-weight:800;
-  transition:transform .18s ease, background .18s ease, color .18s ease, border-color .18s ease;
-}
-.tools-filter-row button:hover,
-.tools-filter-row button.active{
-  color:var(--accent-2);
-  background:color-mix(in srgb, var(--accent) 13%, transparent);
-  border-color:color-mix(in srgb, var(--accent) 34%, var(--border));
-  transform:translateY(-1px);
 }
 .modern-tools-grid .tool-card{
   position:relative;
@@ -363,59 +264,6 @@ body.dark .modern-navbar{
   color:var(--muted);
   grid-column:1/-1;
 }
-.modern-friend-card,
-.modern-featured-friend,
-.modern-small-friend{
-  overflow:hidden;
-  position:relative;
-}
-.friend-card-cover,
-.friend-wide-cover,
-.small-friend-cover{
-  position:absolute;
-  inset:0 0 auto 0;
-  height:76px;
-  background-size:cover;
-  background-position:center;
-  filter:saturate(.92);
-  opacity:.72;
-}
-.friend-card-cover::after,
-.friend-wide-cover::after,
-.small-friend-cover::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(180deg, rgba(255,253,250,.08), var(--glass-strong));
-}
-body.dark .friend-card-cover::after,
-body.dark .friend-wide-cover::after,
-body.dark .small-friend-cover::after{
-  background:linear-gradient(180deg, rgba(15,23,42,.08), var(--glass-strong));
-}
-.modern-friend-card .avatar,
-.modern-featured-friend .avatar,
-.modern-small-friend .avatar{
-  position:relative;
-  z-index:1;
-  border:3px solid var(--panel);
-  box-shadow:0 10px 24px rgba(55,84,120,.13);
-}
-.modern-friend-card{
-  padding-top:58px !important;
-}
-.modern-featured-friend{
-  padding-top:88px !important;
-}
-.modern-featured-friend .friend-wide-cover{
-  height:112px;
-}
-.modern-small-friend{
-  padding-top:58px !important;
-}
-.modern-small-friend .small-friend-cover{
-  height:72px;
-}
 .reveal-item{
   opacity:0;
   transform:translateY(12px);
@@ -445,9 +293,6 @@ body.dark .small-friend-cover::after{
   .tools-command-center{
     grid-template-columns:1fr;
   }
-  .recommended-card:first-child{
-    grid-template-columns:1fr;
-  }
 }
 @media(max-width:720px){
   .modern-site-header{
@@ -464,17 +309,6 @@ body.dark .small-friend-cover::after{
     min-height:330px !important;
     padding:34px 26px !important;
     border-radius:28px !important;
-  }
-  .hero-title{
-    font-size:42px !important;
-  }
-  .recommended-grid{
-    grid-template-columns:1fr;
-  }
-  .tools-filter-row{
-    overflow:auto;
-    flex-wrap:nowrap;
-    padding-bottom:2px;
   }
 }
 
@@ -611,30 +445,6 @@ body.dark .modern-nav-links a.active{
   opacity:1 !important;
   transform:none !important;
 }
-.modern-hero-content{
-  max-width:720px;
-}
-.hero-kicker{
-  display:none !important;
-}
-.hero-stat-row{
-  gap:12px;
-  margin-top:24px;
-}
-.hero-stat-row span{
-  border:0 !important;
-  box-shadow:none !important;
-  background:color-mix(in srgb, var(--panel) 48%, transparent) !important;
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  padding:8px 12px;
-}
-body.dark .hero-stat-row span{
-  background:rgba(17,28,46,.42) !important;
-}
-.hero-stat-row b{
-  font-size:17px;
-}
 .hero-banner{
   box-shadow:0 18px 54px rgba(55,84,120,.08) !important;
 }
@@ -643,11 +453,6 @@ body.dark .hero-banner{
 }
 .hero-banner::after{
   opacity:.55;
-}
-@media(max-width:720px){
-  .hero-stat-row span{
-    padding:7px 10px;
-  }
 }
 
 
@@ -664,45 +469,9 @@ body.dark .hero-banner{
 .modern-navbar{
   overflow:visible !important;
 }
-.hero-stat-row{
-  gap:0 !important;
-  align-items:center;
-  margin-top:22px !important;
-}
-.hero-stat-row span{
-  border:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-  border-radius:0 !important;
-  padding:0 15px !important;
-  color:var(--muted);
-  position:relative;
-}
-.hero-stat-row span:first-child{
-  padding-left:0 !important;
-}
-.hero-stat-row span + span::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:50%;
-  transform:translateY(-50%);
-  width:1px;
-  height:16px;
-  background:color-mix(in srgb, var(--muted) 26%, transparent);
-}
-.hero-stat-row b{
-  font-size:18px;
-  margin-right:3px;
-}
 .tools-command-center{
   grid-template-columns:minmax(0,1fr) minmax(260px,460px) !important;
   padding:22px 24px !important;
-}
-.tools-filter-row{
-  display:none !important;
 }
 .tools-command-center h2{
   margin:0 0 4px !important;
@@ -711,115 +480,9 @@ body.dark .hero-banner{
   font-size:14px;
 }
 @media(max-width:720px){
-  .hero-stat-row{
-    row-gap:8px !important;
-  }
-  .hero-stat-row span{
-    padding:0 12px !important;
-  }
-  .hero-stat-row span:nth-child(3){
-    padding-left:0 !important;
-  }
-  .hero-stat-row span:nth-child(3)::before{
-    display:none;
-  }
   .tools-command-center{
     grid-template-columns:1fr !important;
   }
-}
-
-
-/* v17.0：首页 Hero 统计彻底去卡片化，直接贴合横幅图片 */
-.hero-banner .hero-stat-row{
-  display:flex;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:0 !important;
-  margin-top:22px !important;
-  padding:0 !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-.hero-banner .hero-stat-row span{
-  display:inline-flex;
-  align-items:baseline;
-  gap:5px;
-  padding:0 16px !important;
-  margin:0 !important;
-  border:0 !important;
-  outline:0 !important;
-  box-shadow:none !important;
-  background:transparent !important;
-  background-color:transparent !important;
-  background-image:none !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-  border-radius:0 !important;
-  color:color-mix(in srgb, var(--text) 72%, transparent);
-  text-shadow:0 1px 18px rgba(255,255,255,.36);
-}
-.hero-banner .hero-stat-row span:first-child{
-  padding-left:0 !important;
-}
-.hero-banner .hero-stat-row span + span::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:50%;
-  transform:translateY(-50%);
-  width:1px;
-  height:15px;
-  border-radius:999px;
-  background:color-mix(in srgb, var(--text) 20%, transparent);
-  box-shadow:none;
-}
-.hero-banner .hero-stat-row b{
-  color:var(--accent-2);
-  font-size:18px;
-  font-weight:880;
-  text-shadow:0 1px 18px rgba(255,255,255,.42);
-}
-body.dark .hero-banner .hero-stat-row span{
-  color:rgba(226,240,255,.78);
-  text-shadow:0 1px 18px rgba(0,0,0,.32);
-}
-body.dark .hero-banner .hero-stat-row span + span::before{
-  background:rgba(226,240,255,.22);
-}
-body.dark .hero-banner .hero-stat-row b{
-  color:#7dd3fc;
-  text-shadow:0 1px 18px rgba(0,0,0,.36);
-}
-@media(max-width:720px){
-  .hero-banner .hero-stat-row{
-    row-gap:8px !important;
-  }
-  .hero-banner .hero-stat-row span{
-    padding:0 12px !important;
-  }
-  .hero-banner .hero-stat-row span:nth-child(3){
-    padding-left:0 !important;
-  }
-  .hero-banner .hero-stat-row span:nth-child(3)::before{
-    display:none !important;
-  }
-}
-
-
-/* v17.1：手机端适配、贪吃蛇按键、文章推荐统一卡片 */
-.recommended-card:first-child{
-  grid-column:auto !important;
-  display:block !important;
-  grid-template-columns:none !important;
-}
-.recommended-card:first-child .recommended-cover{
-  min-height:190px !important;
-}
-.recommended-grid{
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
 }
 
 @media(max-width:760px){
@@ -841,16 +504,12 @@ body.dark .hero-banner .hero-stat-row b{
     padding:28px 22px !important;
     border-radius:24px !important;
   }
-  .hero-title,
   .page-hero h1{
     font-size:36px !important;
   }
-  .hero-subtitle,
   .page-hero p{
     font-size:16px !important;
   }
-  .recommended-grid,
-  .friend-grid,
   .all-friends,
   .featured-friends,
   .tools-grid{
@@ -864,13 +523,6 @@ body.dark .hero-banner .hero-stat-row b{
     top:auto !important;
     max-height:none !important;
   }
-  .article-bottom-actions{
-    flex-direction:column;
-    align-items:stretch !important;
-  }
-  .article-bottom-actions .btn{
-    width:100%;
-  }
 }
 
 /* v17.2：文章列表取消“最新文章突出显示”，所有文章卡片统一 */
@@ -881,11 +533,7 @@ body.dark .hero-banner .hero-stat-row b{
 }
 .article-list .post-search-item .post-card,
 .article-list .post-search-item:first-child .post-card,
-.article-list .post-search-item:first-of-type .post-card,
-.post-card.latest-card,
-.latest-card,
-.recent-card,
-.update-card{
+.article-list .post-search-item:first-of-type .post-card{
   display:grid;
   grid-template-columns:450px minmax(0,1fr);
   min-height:186px;
@@ -895,8 +543,7 @@ body.dark .hero-banner .hero-stat-row b{
   transform:none !important;
 }
 .article-list .post-search-item:first-child .post-thumb,
-.article-list .post-search-item:first-of-type .post-thumb,
-.post-card.latest-card .post-thumb{
+.article-list .post-search-item:first-of-type .post-thumb{
   min-height:186px !important;
 }
 .article-list .post-search-item:first-child .post-info,
@@ -909,38 +556,23 @@ body.dark .hero-banner .hero-stat-row b{
 }
 .article-list .post-search-item:first-child::before,
 .article-list .post-search-item:first-of-type::before,
-.article-list .post-card:first-child::before,
-.post-card.latest-card::before{
+.article-list .post-card:first-child::before{
   content:none !important;
   display:none !important;
 }
 body.dark .article-list .post-search-item .post-card,
 body.dark .article-list .post-search-item:first-child .post-card,
-body.dark .article-list .post-search-item:first-of-type .post-card,
-body.dark .post-card.latest-card,
-body.dark .latest-card,
-body.dark .recent-card,
-body.dark .update-card{
+body.dark .article-list .post-search-item:first-of-type .post-card{
   background:rgba(17,28,46,.82) !important;
   border-color:var(--border) !important;
 }
 @media(max-width:760px){
   .article-list .post-search-item .post-card,
   .article-list .post-search-item:first-child .post-card,
-  .article-list .post-search-item:first-of-type .post-card,
-  .post-card.latest-card,
-  .latest-card,
-  .recent-card,
-  .update-card{
+  .article-list .post-search-item:first-of-type .post-card{
     display:block !important;
     grid-template-columns:none !important;
   }
-}
-
-
-/* v17.3：首页文章推荐恢复首篇突出；/posts/ 文章列表继续保持统一普通卡片 */
-.recommended-section .recommended-grid{
-  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
 }
 /* v17.5：文章阅读页 <br> 兜底可见换行 */
 .markdown-body br,
@@ -1050,16 +682,6 @@ body.dark .posts-list .post-card .tag{
   border-color:#3a5878 !important;
 }
 
-/* 首页推荐区保留自己的推荐卡片规则，跟 /posts 列表分离 */
-.recommended-section .recommended-card:first-child{
-  grid-column:1 / -1 !important;
-  display:grid !important;
-  grid-template-columns:minmax(280px,42%) minmax(0,1fr) !important;
-}
-.recommended-section .recommended-card:first-child .recommended-cover{
-  min-height:260px !important;
-}
-
 @media(max-width:760px){
   .posts-list .post-card,
   .posts-list .post-search-item:first-child .post-card,
@@ -1072,25 +694,6 @@ body.dark .posts-list .post-card .tag{
     min-height:190px !important;
   }
   .posts-list .post-info{
-    padding:20px 18px !important;
-  }
-  .recommended-section .recommended-card:first-child{
-    display:block !important;
-    grid-template-columns:none !important;
-  }
-}
-
-@media(max-width:760px){
-  .posts-list .post-card-list,
-  .posts-list .post-search-item:first-child .post-card-list,
-  .posts-list .post-search-item:first-of-type .post-card-list{
-    display:block !important;
-    grid-template-columns:none !important;
-  }
-  .posts-list .post-card-list .post-thumb{
-    min-height:190px !important;
-  }
-  .posts-list .post-card-list .post-info{
     padding:20px 18px !important;
   }
 }
@@ -1128,21 +731,6 @@ body.dark .post-card:focus-visible{
   box-shadow:0 20px 48px rgba(0,0,0,.30), 0 0 0 1px rgba(125,211,252,.16) inset;
 }
 
-
-/* v19.6：文章列表搜索栏去掉分类小卡片后，保持搜索与排序布局清爽 */
-.posts-search-toolbar{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-.posts-search-toolbar .searchbox{
-  flex:1 1 320px;
-}
-.posts-search-toolbar .sort-pill{
-  flex:0 0 auto;
-}
-
 /* v19.6：除首页外，子页 Hero 改为极简文字标题，后续留给新的艺术形式 */
 .page-hero.minimal-page-hero{
   min-height:auto !important;
@@ -1172,12 +760,6 @@ body.dark .post-card:focus-visible{
 .tag-search-panel{
   margin-bottom:18px;
 }
-.tag-cloud .tag-search-item{
-  transition:opacity .16s ease, transform .16s ease, border-color .16s ease;
-}
-.tag-cloud .tag-search-item:hover{
-  transform:translateY(-1px);
-}
 @media(max-width:760px){
   .page-hero.minimal-page-hero{
     padding:16px 2px 12px !important;
@@ -1186,48 +768,6 @@ body.dark .post-card:focus-visible{
   .page-hero.minimal-page-hero h1{
     font-size:34px !important;
   }
-}
-
-
-
-
-/* v20.1.9：标签物理详情页与其他页面统一背景和返回按钮。
-   物理生成页现在会注入 has-site-bg/site-bg-layer；这里补一个 legacy .back-icon 兜底。 */
-html body.tag-detail-generated-page{
-  min-height:100vh !important;
-}
-html body.tag-detail-generated-page .back-icon,
-html body.tag-detail-generated-page .back-icon-link{
-  width:42px !important;
-  height:42px !important;
-  border-radius:999px !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  margin:0 0 18px !important;
-  border:1px solid var(--border) !important;
-  background:rgba(255,253,250,.86) !important;
-  color:var(--accent-2) !important;
-  box-shadow:0 10px 26px rgba(55,84,120,.08) !important;
-  font-size:24px !important;
-  font-weight:800 !important;
-  line-height:1 !important;
-}
-html body.dark.tag-detail-generated-page .back-icon,
-html body.dark.tag-detail-generated-page .back-icon-link{
-  background:rgba(19,34,56,.92) !important;
-  border-color:rgba(116,151,188,.32) !important;
-  color:#7dd3fc !important;
-}
-html body.tag-detail-generated-page .back-icon:hover,
-html body.tag-detail-generated-page .back-icon:focus-visible,
-html body.tag-detail-generated-page .back-icon-link:hover,
-html body.tag-detail-generated-page .back-icon-link:focus-visible{
-  transform:translateX(-2px) !important;
-  background:var(--soft-blue) !important;
-  border-color:rgba(14,165,233,.38) !important;
-  box-shadow:0 14px 32px rgba(14,165,233,.13) !important;
-  outline:none !important;
 }
 
 
@@ -1267,7 +807,6 @@ html body.tag-detail-generated-page .back-icon-link:focus-visible{
 
 /* v20.2.4：全站页面标题英文标识统一 + 标签漂流无缝循环修正。 */
 html body .page-hero > .eyebrow,
-html body .tools-hero > .eyebrow,
 html body .tag-detail-hero > .eyebrow{
   margin:0 0 10px !important;
   letter-spacing:.18em !important;
@@ -1330,16 +869,13 @@ html body .tag-river-lane:focus-within .tag-river-strip-seamless{
 .ui-line-icon,
 .logo-line-icon,
 .icon-btn svg,
-.area-icon svg,
 .section-icon svg,
 .back-icon-link svg,
 .tool-card-arrow svg,
 .tag-river-search-icon svg,
-.friend-search-icon svg,
 .meta-icon-item svg,
 .admin-back-icon svg,
 .btn-ico svg,
-.quick-card svg,
 .snake-mobile-pad svg{
   width:1.05em;
   height:1.05em;
@@ -1377,16 +913,6 @@ html body .tag-river-lane:focus-within .tag-river-strip-seamless{
   width:20px !important;
   height:20px !important;
 }
-.area-icon{
-  color:var(--text);
-  background:transparent !important;
-  border:1px solid color-mix(in srgb, currentColor 16%, transparent) !important;
-  box-shadow:none !important;
-}
-.area-icon svg{
-  width:24px !important;
-  height:24px !important;
-}
 .section-icon{
   display:inline-grid;
   place-items:center;
@@ -1423,14 +949,12 @@ html body .tag-river-lane:focus-within .tag-river-strip-seamless{
   width:19px !important;
   height:19px !important;
 }
-.tag-river-search-icon,
-.friend-search-icon{
+.tag-river-search-icon{
   display:inline-grid;
   place-items:center;
   color:var(--muted);
 }
-.tag-river-search-icon svg,
-.friend-search-icon svg{
+.tag-river-search-icon svg{
   width:18px !important;
   height:18px !important;
 }
@@ -1443,13 +967,11 @@ html body .tag-river-lane:focus-within .tag-river-strip-seamless{
   width:15px !important;
   height:15px !important;
 }
-.floating-toc-button svg,
 .back-to-top-button svg,
 .scroll-to-bottom-button svg{
   width:20px !important;
   height:20px !important;
 }
-body.dark .area-icon,
 body.dark .logo-mark.line-logo-mark{
   border-color:color-mix(in srgb, currentColor 24%, transparent) !important;
 }
@@ -1551,17 +1073,14 @@ html body .tag-detail-hero > .eyebrow{
 }
 .icon-btn .ui-icon{ --ui-icon-size:20px; }
 .logo-mark .ui-icon{ --ui-icon-size:21px; }
-.area-icon .ui-icon{ --ui-icon-size:24px; }
 .section-icon .ui-icon{ --ui-icon-size:22px; }
 .back-icon-link .ui-icon{ --ui-icon-size:19px; }
 .meta-icon-item .ui-icon{ --ui-icon-size:15px; }
 .tool-card-arrow .ui-icon{ --ui-icon-size:19px; }
-.tag-river-search-icon .ui-icon,
-.friend-search-icon .ui-icon{ --ui-icon-size:18px; }
+.tag-river-search-icon .ui-icon{ --ui-icon-size:18px; }
 .more .ui-icon{ --ui-icon-size:15px; }
 .snake-mobile-pad .ui-icon{ --ui-icon-size:22px; }
-html body .tag-river-search-icon,
-html body .friend-search-icon{
+html body .tag-river-search-icon{
   width:38px !important;
   min-width:38px !important;
   height:38px !important;
@@ -1580,16 +1099,13 @@ html body .eyebrow{
 html body .page-title-plain > .meta,
 html body .tag-river-head > div > .meta,
 html body .tag-river-search-copy > .meta,
-html body .friend-galaxy-control > div > .meta,
 html body .tools-command-center > div > p,
 html body .page-hero.minimal-page-hero > p,
-html body .page-hero.tools-hero > p,
 html body .tag-detail-hero > p{
   display:none !important;
 }
 html body .site-search-icon,
-html body .tag-river-search-icon,
-html body .friend-search-icon{
+html body .tag-river-search-icon{
   width:38px !important;
   min-width:38px !important;
   height:38px !important;
@@ -1603,15 +1119,13 @@ html body .friend-search-icon{
   line-height:1 !important;
 }
 html body .site-search-icon .ui-icon,
-html body .tag-river-search-icon .ui-icon,
-html body .friend-search-icon .ui-icon{
+html body .tag-river-search-icon .ui-icon{
   --ui-icon-size:19px !important;
   width:19px !important;
   height:19px !important;
 }
 html body .site-search-icon svg,
-html body .tag-river-search-icon svg,
-html body .friend-search-icon svg{
+html body .tag-river-search-icon svg{
   width:19px !important;
   height:19px !important;
   stroke-width:1.75 !important;

@@ -14,13 +14,23 @@
     return;
   }
   items.forEach(function(el){ el.classList.add('reveal-item'); });
+  let remaining = items.length;
+  function release(){
+    observer.disconnect();
+    window.removeEventListener('songline:page-transition-start', release);
+  }
   const observer = new IntersectionObserver(function(entries){
     entries.forEach(function(entry){
       if(entry.isIntersecting){
         entry.target.classList.add('is-visible');
         observer.unobserve(entry.target);
+        remaining--;
       }
     });
+    if(!remaining) release();
   }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
   items.forEach(function(el){ observer.observe(el); });
+  // Pending offscreen targets belong to this document's first view, not to
+  // subsequent AJAX pages. Release them when the current content departs.
+  window.addEventListener('songline:page-transition-start', release, {once:true});
 })();
