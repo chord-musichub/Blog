@@ -77,6 +77,11 @@
 
   var modules = [
     {
+      key:'tool-controls', src:'/js/tool-controls.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-tool-actionbar]'); },
+      init:function(root){ window.SonglineInitToolControls(root || document); }
+    },
+    {
       key:'article-reading', src:'/js/article-reading.js?v=' + VERSION,
       test:function(root){ return !!query(root, '.article-shell'); },
       init:function(){}
@@ -394,6 +399,7 @@
   // A DOM script tag is not proof of execution (inert main HTML, failed loads,
   // and still-loading deferred scripts all have tags). Check the exported API.
   var exports = {
+    'tool-controls':'SonglineInitToolControls',
     'article-reading':'SonglineReading', 'article-toc-controls':'SonglineInitArticleToc',
     'home-parallax':'SonglineInitHomeParallax', 'desktop-pet':'SonglineInitDesktopPet',
     'random-number':'SonglineInitRandomNumber', 'gacha':'SonglineInitGacha', 'focus-timer':'SonglineInitFocusTimer',

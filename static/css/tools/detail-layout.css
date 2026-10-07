@@ -133,6 +133,34 @@ html body[data-page-section="tools"] .tool-sound-toggle:has(input:focus-visible)
 body[data-page-section="tools"] .tool-detail-surface .snake-head{align-items:center;justify-content:space-between;flex-direction:row;gap:12px}
 body[data-page-section="tools"] .tool-detail-surface .snake-stats{flex:1;min-width:0}
 body[data-page-section="tools"] .tool-detail-surface .snake-head .tool-sound-toggle{align-self:flex-end}
+/* Bare icon controls live in the glass header, not in the score row. */
+body[data-page-section="tools"] .tool-actionbar{position:absolute;top:24px;right:24px;display:flex;align-items:center;gap:4px;width:max-content;margin:0;z-index:10}
+body[data-page-section="tools"] .tool-detail-surface:has(.tool-actionbar) > .tool-detail-title{padding-right:208px}
+html body[data-page-section="tools"] .tool-detail-surface :is(.tool-icon-button,.tool-actionbar .tool-sound-toggle){
+  display:inline-grid;place-items:center;box-sizing:border-box;flex:0 0 44px;
+  width:44px;height:44px;min-width:44px;min-height:44px;margin:0;padding:0;
+  border:0!important;border-radius:10px;background:transparent!important;box-shadow:none!important;
+  color:var(--tool-ink)!important;cursor:pointer;transform:none!important;
+  transition:background-color .18s ease,color .18s ease;
+}
+html body[data-page-section="tools"] .tool-detail-surface :is(.tool-icon-button,.tool-actionbar .tool-sound-toggle):is(:hover,:focus-visible,:has(input:focus-visible)){background:var(--tool-soft)!important;color:var(--tool-accent)!important}
+html body[data-page-section="tools"] .tool-icon-button:disabled{opacity:.35;cursor:default}
+html body[data-page-section="tools"] .tool-icon-button > .ui-icon{--ui-icon-size:22px;grid-area:1 / 1;pointer-events:none}
+.tool-icon-button[data-tool-paused="false"] > [data-ui-icon="play"],
+.tool-icon-button[data-tool-paused="true"] > [data-ui-icon="pause"]{display:none}
+/* Native modal top layer stays above the site's fixed dock and glass surfaces. */
+html:has(.tool-help-dialog[open]){overflow:hidden!important}
+.tool-help-dialog{box-sizing:border-box;width:min(520px,calc(100% - 32px));max-height:calc(100dvh - 48px);margin:auto;padding:24px;border:1px solid var(--tool-line);border-radius:22px;background:var(--tool-field);color:var(--tool-ink);box-shadow:0 24px 72px rgba(0,0,0,.3);overflow-y:auto;overscroll-behavior:contain}
+.tool-help-dialog::backdrop{background:rgba(5,14,25,.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.tool-help-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 16px}
+.tool-help-heading h2{margin:0;font-size:22px;line-height:1.4;color:var(--tool-ink)}
+.tool-help-content{font-size:15px;line-height:1.8;overflow-wrap:anywhere}
+.tool-help-content p{margin:0 0 14px}
+.tool-help-content p:last-child{margin-bottom:0}
+.tool-help-content kbd{display:inline-block;padding:0 5px;border:1px solid var(--tool-line);border-radius:5px;background:var(--tool-soft);font:inherit;font-size:.92em}
+.tool-help-content :is(ul,ol){padding-left:22px}
+.tool-help-content table{width:100%;border-collapse:collapse;font-size:14px}
+.tool-help-content :is(th,td){padding:6px;border-bottom:1px solid var(--tool-line);text-align:left}
 /* The audio canvas keeps its own dark contrast inside the shared glass. */
 body[data-page-section="tools"] .audio-visualizer-page{background:transparent!important}
 body[data-page-section="tools"] .tool-detail-audio.tool-detail-surface{max-width:960px;margin:clamp(24px,8svh,76px) auto 32px!important}
@@ -153,6 +181,7 @@ body[data-page-section="tools"] .audio-visualizer-page.is-visual-live .av-contro
   body[data-page-section="tools"] .tool-detail-ranking ol{padding-inline:12px}
 }
 @media(max-width:980px){
+  body[data-page-section="tools"] .tool-actionbar{top:18px;right:18px}
   body[data-page-section="tools"] .tool-detail-layout{margin:0 auto 24px}
   body[data-page-section="tools"] .tool-detail-layout:has(> .tool-detail-ranking){display:block;padding-top:60px}
   body[data-page-section="tools"] .tool-detail-ranking{position:absolute;top:0;right:0;width:220px!important;max-width:100%;z-index:30;max-height:calc(100svh - 160px);overflow:auto;background:rgba(12,22,30,.94)!important}
@@ -165,6 +194,9 @@ body[data-page-section="tools"] .audio-visualizer-page.is-visual-live .av-contro
   html body.dark[data-page-section="tools"] .tool-detail-surface{background:linear-gradient(145deg,rgba(10,23,42,.88),rgba(13,29,49,.80))!important}
 }
 @media(max-width:640px){
+  body[data-page-section="tools"] .tool-detail-surface:has(.tool-actionbar) > .tool-detail-title{padding-right:0;margin-bottom:12px!important}
+  body[data-page-section="tools"] .tool-actionbar{position:static;grid-column:1/-1;justify-self:end;margin:-4px 0 16px auto}
+  .tool-help-dialog{padding:18px}
   body[data-page-section="tools"] .tool-detail-title{font-size:22px!important;margin-bottom:18px!important}
   body[data-page-section="tools"] .tool-detail-surface :is(.game-2048-topbar,.flappy-topbar,.typing-topbar){gap:8px}
   body[data-page-section="tools"] .tool-detail-surface .typing-mode-group{flex:1 1 100%}

@@ -1,0 +1,11 @@
+{{- $name := . -}}
+{{- $restart := dict "2048" "data-2048-new" "snake" "data-snake-start" "flappy-bird" "data-flappy-start" "reaction-test" "data-reaction-start" "typing-practice" "data-typing-restart" "gacha" "data-gacha-reset" "focus-timer" "data-focus-reset" -}}
+{{- $pause := dict "2048" "data-2048-pause" "snake" "data-snake-pause" "flappy-bird" "data-flappy-pause" "focus-timer" "data-focus-toggle" -}}
+{{- $sound := dict "2048" "data-2048-sound-toggle" "snake" "data-snake-sound" "flappy-bird" "data-flappy-sound-toggle" "reaction-test" "data-reaction-sound-toggle" "typing-practice" "data-typing-sound-toggle" "focus-timer" "data-focus-sound" -}}
+<div class="tool-actionbar" data-tool-actionbar role="group" aria-label="工具操作">
+  {{ with index $restart $name }}{{ partial "tool-icon-button.html" (dict "attribute" . "icon" "restart" "label" (cond (eq $name "gacha") "重置记录" (cond (eq $name "focus-timer") "重置倒计时" "重新开始"))) }}{{ end }}
+  {{ with index $pause $name }}{{ partial "tool-icon-button.html" (dict "attribute" . "icon" (cond (eq $name "focus-timer") "play" "pause") "label" (cond (eq $name "focus-timer") "开始" "暂停") "pause" true "idle" (eq $name "focus-timer")) }}{{ end }}
+  {{ if eq $name "typing-practice" }}{{ partial "tool-icon-button.html" (dict "attribute" "data-typing-random" "icon" "shuffle" "label" "随机换文") }}{{ end }}
+  {{ with index $sound $name }}{{ partial "tool-sound-toggle.html" (dict "attribute" . "checkbox" (or (eq $name "snake") (eq $name "focus-timer"))) }}{{ end }}
+  <button class="tool-icon-button" type="button" data-tool-help-open aria-controls="tool-help-{{ $name }}" aria-haspopup="dialog" aria-label="操作说明" title="操作说明">{{ partial "ui-icon.html" "help" }}</button>
+</div>

@@ -130,7 +130,10 @@
       root.classList.toggle('is-finished', next === 'finished');
 
       if(els.toggle){
-        els.toggle.textContent = next === 'running' ? '暂停' : '开始';
+        var label = next === 'running' ? '暂停' : (next === 'paused' ? '继续' : '开始');
+        els.toggle.dataset.toolPaused = String(next !== 'running');
+        els.toggle.setAttribute('aria-label', label);
+        els.toggle.setAttribute('title', label);
       }
 
       if(els.state){

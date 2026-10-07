@@ -21,7 +21,6 @@
     var scoreEl = root.querySelector('[data-flappy-score]');
     var bestEl = root.querySelector('[data-flappy-best]');
     var startBtn = root.querySelector('[data-flappy-start]');
-    var syncBestBtn = root.querySelector('[data-flappy-sync-best]');
     var soundToggle = root.querySelector('[data-flappy-sound-toggle]');
     var topScoresEl = root.querySelector('[data-flappy-top-scores]');
 
@@ -32,6 +31,9 @@
     var height = 520;
     var dpr = 1;
     var running = false;
+    var paused = false;
+    var helpPaused = false;
+    var disposed = false;
     var ended = false;
     var raf = 0;
     var lastTime = 0;
@@ -45,6 +47,30 @@
     var submittedScores = {};
     var autoSyncedLocalBest = false;
     var spaceHeld = false;
+    var pauseBtn = root.querySelector('[data-flappy-pause]');
+
+    function updatePause(){
+      if(!pauseBtn) return;
+      pauseBtn.disabled = !running || ended;
+      pauseBtn.dataset.toolPaused = String(paused);
+      pauseBtn.setAttribute('aria-label', paused ? '继续' : '暂停');
+      pauseBtn.setAttribute('title', paused ? '继续' : '暂停');
+    }
+    function togglePause(){
+      if(!running || ended || disposed) return;
+      paused = !paused;
+      if(paused){
+        if(raf) cancelAnimationFrame(raf);
+        raf = 0;
+        spaceHeld = false;
+        setOverlay(true, '已暂停', '点击继续', '也可点击右上角播放图标。');
+      }else{
+        setOverlay(false);
+        lastTime = performance.now();
+        raf = requestAnimationFrame(loop);
+      }
+      updatePause();
+    }
 
     var bird = {x:160, y:240, vy:0, r:18, rot:0};
     var pipes = [];
@@ -67,14 +93,6 @@
         }
         return id;
       }catch(e){ return 'flappy-guest'; }
-    }
-
-    function setSyncButtonText(text, delay){
-      if(!syncBestBtn) return;
-      syncBestBtn.textContent = text;
-      if(delay){
-        window.setTimeout(function(){ syncBestBtn.textContent = '同步本地最佳'; }, delay);
-      }
     }
 
     function resize(){
@@ -294,10 +312,8 @@
         topScores = normalizeScores(data.scores);
         saveCache();
         renderTopScores();
-        if(reason === 'local-best') setSyncButtonText('已同步本地最佳', 1500);
       }).catch(function(){
         renderTopScores();
-        if(reason === 'local-best') setSyncButtonText('同步失败，重试', 1700);
       });
     }
 
@@ -306,7 +322,6 @@
       if(!manual && autoSyncedLocalBest) return;
       autoSyncedLocalBest = true;
       if(localBest > 0) return recordScore(localBest, 'local-best');
-      if(manual) setSyncButtonText('暂无本地最佳', 1300);
     }
 
     function resetGame(){
@@ -329,6 +344,9 @@
       ensureAudio();
       resetGame();
       running = true;
+      paused = false;
+      helpPaused = false;
+      updatePause();
       lastTime = performance.now();
       play('start');
       if(raf) cancelAnimationFrame(raf);
@@ -337,6 +355,7 @@
 
     function flap(){
       ensureAudio();
+      if(paused) togglePause();
       if(!running || ended){
         startGame();
       }
@@ -381,6 +400,7 @@
       if(ended) return;
       ended = true;
       running = false;
+      updatePause();
       play('hit');
       if(score > best){
         best = score;
@@ -635,12 +655,12 @@
     }
 
     function loop(now){
-      if(!running) return;
+      if(!running || paused || disposed) return;
       var dt = Math.min(0.033, (now - lastTime) / 1000 || 0.016);
       lastTime = now;
       update(dt);
       draw();
-      if(running){
+      if(running && !paused){
         raf = requestAnimationFrame(loop);
       }
     }
@@ -653,6 +673,18 @@
     }
 
     canvas.addEventListener('click', handleAction);
+    root.addEventListener('songline:tool-sync-best', function(){ if(!disposed) syncLocalBest(true); });
+    if(pauseBtn) pauseBtn.addEventListener('click', function(){ togglePause();pauseBtn.blur(); });
+    root.addEventListener('songline:tool-help-change', function(event){
+      if(disposed) return;
+      if(event.detail.open){
+        helpPaused = running && !paused && !ended;
+        if(helpPaused) togglePause();
+      }else if(helpPaused){
+        helpPaused = false;
+        if(running && paused && !ended) togglePause();
+      }
+    });
     if(overlay){
       overlay.addEventListener('click', handleAction);
     }
@@ -663,15 +695,6 @@
         play('button');
         startGame();
         startBtn.blur();
-      });
-    }
-
-    if(syncBestBtn){
-      syncBestBtn.addEventListener('click', function(){
-        ensureAudio();
-        play('button');
-        syncLocalBest(true);
-        syncBestBtn.blur();
       });
     }
 
@@ -690,9 +713,10 @@
     }
 
     function onKey(event){
+      if(disposed || root.querySelector('[data-tool-help-dialog][open]')) return;
       if(event.code !== 'Space' && event.key !== ' ') return;
       // Native controls must receive Space themselves instead of flapping.
-      if(event.target && event.target.closest && event.target.closest('button,input,textarea,select,a,summary,[contenteditable]:not([contenteditable="false"])')) return;
+      if(event.target && event.target.closest && event.target.closest('button,input,textarea,select,a,summary,dialog,[contenteditable]:not([contenteditable="false"])')) return;
       if(!document.documentElement.contains(root)){
         window.removeEventListener('keydown', onKey);
         window.removeEventListener('keyup', onKeyUp);
@@ -715,6 +739,7 @@
     window.addEventListener('keyup', onKeyUp, {passive:true});
     window.addEventListener('resize', resize, {passive:true});
     function cleanup(){
+      disposed = true;
       running = false;
       if(raf){ cancelAnimationFrame(raf); raf = 0; }
       window.removeEventListener('keydown', onKey);
@@ -738,7 +763,7 @@
     function onPageShow(event){
       if(!event.persisted) return;
       resize();
-      if(running && !raf){ lastTime = performance.now(); raf = requestAnimationFrame(loop); }
+      if(running && !paused && !raf){ lastTime = performance.now(); raf = requestAnimationFrame(loop); }
     }
     window.addEventListener('songline:page-transition-start', onTransitionStart);
     window.addEventListener('pagehide', onPageHide);
@@ -747,9 +772,10 @@
 
     setOverlay(true, '准备起飞', '点击开始', '点击屏幕 / 按空格：向上飞一下。');
     updateStats();
+    updatePause();
     updateSoundToggle();
     resize();
-    fetchScores().then(function(){ window.setTimeout(function(){ syncLocalBest(false); }, 320); });
+    fetchScores().then(function(){ window.setTimeout(function(){ if(!disposed) syncLocalBest(false); }, 320); });
   }
 
   function boot(target){

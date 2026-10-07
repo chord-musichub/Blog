@@ -102,7 +102,6 @@
     var bestEl = root.querySelector('[data-typing-best]');
     var topScoresEl = root.querySelector('[data-typing-top-scores]');
     var modeButtons = root.querySelectorAll('[data-typing-mode]');
-    var syncBestBtn = root.querySelector('[data-typing-sync-best]');
     var randomBtn = root.querySelector('[data-typing-random]');
     var restartBtn = root.querySelector('[data-typing-restart]');
     var focusBtn = root.querySelector('[data-typing-focus]');
@@ -122,15 +121,8 @@
     var audioCtx = null;
     var isComposingIME = false;
     var autoSyncedModes = {};
+    var disposed = false;
 
-
-    function setSyncButtonText(text, delay){
-      if(!syncBestBtn) return;
-      syncBestBtn.textContent = text;
-      if(delay){
-        window.setTimeout(function(){ syncBestBtn.textContent = '同步本地最佳'; }, delay);
-      }
-    }
 
     function ensureAudio(){
       if(!soundEnabled) return null;
@@ -243,6 +235,7 @@
     }
 
     function cleanup(){
+      disposed = true;
       stopTimer();
       window.removeEventListener('songline:page-transition-start', onTransitionStart);
       if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
@@ -333,10 +326,8 @@
       }).then(function(data){
         topScores = normalizeScores(data.scores);
         saveCache(); renderTopScores();
-        if(reason === 'local-best') setSyncButtonText('已同步本地最佳', 1500);
       }).catch(function(){
         renderTopScores();
-        if(reason === 'local-best') setSyncButtonText('同步失败，重试', 1700);
       });
     }
 
@@ -345,7 +336,6 @@
       if(!manual && autoSyncedModes[mode]) return;
       autoSyncedModes[mode] = true;
       if(localBest > 0) return recordScore(localBest, 'local-best');
-      if(manual) setSyncButtonText('暂无本地最佳', 1300);
     }
 
     function reset(keepArticle){
@@ -358,7 +348,7 @@
       input.value = '';
       input.dataset.finalTime = '';
       input.disabled = false;
-      renderArticle(); renderStats(); fetchScores().then(function(){ window.setTimeout(function(){ syncLocalBest(false); }, 260); });
+      renderArticle(); renderStats(); fetchScores().then(function(){ window.setTimeout(function(){ if(!disposed) syncLocalBest(false); }, 260); });
     }
 
     function finishIfDone(){
@@ -428,6 +418,7 @@
 
     textEl.addEventListener('copy', blockTypingTransfer);
     textEl.addEventListener('contextmenu', blockTypingTransfer);
+    root.addEventListener('songline:tool-sync-best', function(){ if(!disposed) syncLocalBest(true); });
 
     modeButtons.forEach(function(btn){
       btn.addEventListener('click', function(){
@@ -439,7 +430,6 @@
       });
     });
 
-    if(syncBestBtn) syncBestBtn.addEventListener('click', function(){ play('button'); syncLocalBest(true); syncBestBtn.blur(); });
     if(randomBtn) randomBtn.addEventListener('click', function(){ play('button'); reset(false); input.focus(); randomBtn.blur(); });
     if(restartBtn) restartBtn.addEventListener('click', function(){ play('button'); reset(true); input.focus(); restartBtn.blur(); });
     if(focusBtn) focusBtn.addEventListener('click', function(){ ensureAudio(); play('button'); input.focus(); focusBtn.blur(); });
@@ -455,7 +445,7 @@
     }
 
     chooseArticle();
-    renderArticle(); renderStats(); updateSoundToggle(); fetchScores().then(function(){ window.setTimeout(function(){ syncLocalBest(false); }, 320); });
+    renderArticle(); renderStats(); updateSoundToggle(); fetchScores().then(function(){ window.setTimeout(function(){ if(!disposed) syncLocalBest(false); }, 320); });
   }
 
   function boot(target){

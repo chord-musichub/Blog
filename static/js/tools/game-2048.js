@@ -34,7 +34,7 @@
     var overlayText = root.querySelector('[data-2048-overlay-text]');
     var topScoresEl = root.querySelector('[data-2048-top-scores]');
     var soundToggle = root.querySelector('[data-2048-sound-toggle]');
-    var syncBestBtn = root.querySelector('[data-2048-sync-best]');
+    var pauseBtn = root.querySelector('[data-2048-pause]');
 
     if(!boardEl) return;
 
@@ -45,11 +45,53 @@
     var won = false;
     var ended = false;
     var animating = false;
+    var paused = false;
+    var helpPaused = false;
+    var disposed = false;
+    var generation = 0;
+    var timers = new Set();
+    var frames = new Set();
     var touchStart = null;
     var resizeTimer = 0;
     var scoresCacheKey = 'songline-2048-server-top3-cache';
     var soundKey = 'songline-2048-sound-enabled-v1';
     var soundEnabled = localStorage.getItem(soundKey) !== '0';
+
+    function later(callback, delay){
+      var round = generation;
+      var id = window.setTimeout(function(){
+        timers.delete(id);
+        if(!disposed && round === generation) callback();
+      }, delay);
+      timers.add(id);
+    }
+    function frame(callback){
+      var round = generation;
+      var id = window.requestAnimationFrame(function(){
+        frames.delete(id);
+        if(!disposed && round === generation) callback();
+      });
+      frames.add(id);
+    }
+    function clearWork(){
+      timers.forEach(function(id){ window.clearTimeout(id); });
+      frames.forEach(function(id){ window.cancelAnimationFrame(id); });
+      timers.clear();frames.clear();
+    }
+    function updatePause(){
+      if(!pauseBtn) return;
+      pauseBtn.disabled = ended;
+      pauseBtn.dataset.toolPaused = String(paused);
+      pauseBtn.setAttribute('aria-label', paused ? '继续' : '暂停');
+      pauseBtn.setAttribute('title', paused ? '继续' : '暂停');
+    }
+    function togglePause(){
+      if(ended || disposed) return;
+      paused = !paused;
+      touchStart = null;
+      setOverlay(paused, '已暂停', '点击右上角继续，或按空格键。');
+      updatePause();
+    }
 
     function setOverlay(show, title, text){
       if(!overlay) return;
@@ -81,7 +123,7 @@
     if(!audioEngine) return;
     var ensureAudio=audioEngine.ensureAudio,playTone=audioEngine.playTone,playNoise=audioEngine.playNoise,playSound=audioEngine.playSound;
 
-    var leaderboard=window.SonglineCreate2048Leaderboard&&window.SonglineCreate2048Leaderboard({topScoresEl:topScoresEl,syncBestBtn:syncBestBtn,cacheKey:scoresCacheKey,bestKey:BEST_KEY,getBest:function(){return best;}});
+    var leaderboard=window.SonglineCreate2048Leaderboard&&window.SonglineCreate2048Leaderboard({topScoresEl:topScoresEl,playerKey:PLAYER_KEY,cacheKey:scoresCacheKey,bestKey:BEST_KEY,getBest:function(){return best;}});
     if(!leaderboard) return;
     var renderer = window.SonglineCreate2048Renderer && window.SonglineCreate2048Renderer({
       boardEl: boardEl,
@@ -127,16 +169,17 @@
 
       if(!won && maxTile >= MAX_TILE_VALUE){
         won = true;
-        setOverlay(false);
+        if(!paused) setOverlay(false);
         playSound('win');
         leaderboard.recordTopScore(score, 'reach-2048');
       }
 
       if(!canMove(grid)){
         ended = true;
-        setOverlay(true, '游戏结束', '棋盘已经没有可移动空间了。');
+        setOverlay(true, '游戏结束', '棋盘已无法移动，点击右上角重开。');
         playSound('gameover');
         leaderboard.recordTopScore(score, 'gameover');
+        updatePause();
       }
     }
 
@@ -148,10 +191,10 @@
       score += gained;
       updateScore();
 
-      window.requestAnimationFrame(function(){
+      frame(function(){
         renderer.renderTiles(tiles, {immediate:true});
 
-        window.setTimeout(function(){
+        later(function(){
           var newTile = addRandomTile(true);
           if(newTile){
             renderer.renderTiles(tiles, {immediate:true});
@@ -160,7 +203,7 @@
 
           checkEndState();
 
-          window.setTimeout(function(){
+          later(function(){
             renderer.clearTransientFlags();
             renderer.renderTiles(tiles, {immediate:true});
             animating = false;
@@ -170,7 +213,7 @@
     }
 
     function move(dir){
-      if(animating || ended) return;
+      if(animating || ended || paused || disposed) return;
 
       var vector = vectorFor(dir);
       if(!vector.x && !vector.y) return;
@@ -237,25 +280,31 @@
 
       // 分帧提交移动位置，避免浏览器把创建/定位/过渡合并到同一帧引起闪现。
       renderer.renderTiles(movingTiles, {immediate:false});
-      window.requestAnimationFrame(function(){
-        window.requestAnimationFrame(function(){
+      frame(function(){
+        frame(function(){
           renderer.renderTiles(movingTiles, {immediate:false});
         });
       });
 
       var finalTiles = collectGridTiles();
-      window.setTimeout(function(){
+      later(function(){
         commitAfterMove(finalTiles, consumedIds, gained);
       }, MOVE_MS + 18);
     }
 
     function newGame(){
+      generation++;
+      clearWork();
       grid = emptyGrid();
       tiles = [];
       score = 0;
       won = false;
       ended = false;
       animating = false;
+      paused = false;
+      helpPaused = false;
+      touchStart = null;
+      updatePause();
       leaderboard.resetSubmission();
       setOverlay(false);
       renderer.buildShell();
@@ -264,13 +313,18 @@
       updateScore();
       updateSoundToggle();
       renderer.renderTiles(tiles, {immediate:true});
-      window.setTimeout(function(){
+      later(function(){
         renderer.clearTransientFlags();
         renderer.renderTiles(tiles, {immediate:true});
       }, 240);
     }
 
     function onKeydown(event){
+      if(disposed || root.querySelector('[data-tool-help-dialog][open]')) return;
+      if(event.target && event.target.closest && event.target.closest('button, input, textarea, select, a, summary, dialog, [contenteditable="true"]')) return;
+      if(event.code === 'Space'){
+        event.preventDefault();togglePause();return;
+      }
       var dir = keyToDir(event);
       if(!dir) return;
 
@@ -299,6 +353,9 @@
     window.addEventListener('keydown', onKeydown, {passive:false});
     window.addEventListener('resize', onResize, {passive:true});
     function cleanup(){
+      disposed = true;
+      generation++;
+      clearWork();
       window.clearTimeout(resizeTimer);
       audioEngine.destroy();
       window.removeEventListener('keydown', onKeydown);
@@ -310,28 +367,22 @@
     window.addEventListener('songline:page-transition-start', onTransitionStart);
     window.__songline2048Cleanup = cleanup;
 
-    root.querySelectorAll('[data-2048-new], [data-2048-overlay-new]').forEach(function(btn){
-      btn.addEventListener('click', function(){ ensureAudio(); newGame(); });
+    root.querySelectorAll('[data-2048-new]').forEach(function(btn){
+      btn.addEventListener('click', function(){ ensureAudio(); newGame(); btn.blur(); });
     });
 
-    root.querySelectorAll('[data-2048-move]').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        ensureAudio();
-        move(btn.getAttribute('data-2048-move'));
-        btn.blur();
-      });
+    if(pauseBtn) pauseBtn.addEventListener('click', function(){ togglePause();pauseBtn.blur(); });
+    root.addEventListener('songline:tool-sync-best', function(){ if(!disposed) leaderboard.syncLocalBest(); });
+    root.addEventListener('songline:tool-help-change', function(event){
+      if(disposed) return;
+      if(event.detail.open){
+        helpPaused = !paused && !ended;
+        if(helpPaused) togglePause();
+      }else if(helpPaused){
+        helpPaused = false;
+        if(paused && !ended) togglePause();
+      }
     });
-
-
-
-    if(syncBestBtn){
-      syncBestBtn.addEventListener('click', function(){
-        ensureAudio();
-        playSound('move');
-        leaderboard.syncLocalBest();
-        syncBestBtn.blur();
-      });
-    }
 
     if(soundToggle){
       updateSoundToggle();
@@ -348,11 +399,14 @@
     }
 
     boardEl.addEventListener('touchstart', function(event){
+      if(paused || disposed) return;
       var touch = event.changedTouches && event.changedTouches[0];
       if(!touch) return;
       ensureAudio();
       touchStart = {x:touch.clientX, y:touch.clientY};
     }, {passive:true});
+
+    boardEl.addEventListener('touchcancel', function(){ touchStart = null; }, {passive:true});
 
     boardEl.addEventListener('touchend', function(event){
       var touch = event.changedTouches && event.changedTouches[0];
@@ -373,7 +427,7 @@
 
     newGame();
     leaderboard.fetchTopScores().then(function(){
-      window.setTimeout(function(){ leaderboard.syncLocalBest(); }, 300);
+      window.setTimeout(function(){ if(!disposed) leaderboard.syncLocalBest(); }, 300);
     });
   }
 

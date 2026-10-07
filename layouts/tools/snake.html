@@ -3,6 +3,8 @@
 <section class="card snake-tool-panel tool-detail-surface" data-tool-back-surface>
   {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
   <h1 class="tool-detail-title">贪吃蛇</h1>
+  {{ partial "tool-actionbar.html" "snake" }}
+  {{ partial "tool-help-dialog.html" "snake" }}
   <div class="snake-head">
     <div class="snake-stats" aria-live="polite">
       <span>分数 <b data-snake-score>0</b></span>
@@ -10,7 +12,6 @@
       <span>等级 <b data-snake-level>1</b></span>
       <span data-snake-state>准备开始</span>
     </div>
-    {{ partial "tool-sound-toggle.html" (dict "checkbox" true "attribute" "data-snake-sound") }}
   </div>
 
   <div class="snake-arcade-strip" aria-live="polite">
@@ -28,11 +29,6 @@
     </div>
   </div>
 
-  <div class="snake-controls">
-    <button class="btn" type="button" data-snake-start>开始 / 重新开始</button>
-    <button class="btn secondary" type="button" data-snake-pause>暂停</button>
-    <button class="btn secondary leaderboard-sync-btn" type="button" data-snake-sync-best>同步本地最佳</button>
-  </div>
 
   <div class="snake-mobile-panel" data-snake-mobile-pad aria-label="移动端操作区">
 <div class="snake-mobile-pad" aria-label="移动端方向控制">
@@ -43,15 +39,6 @@
     </div>
   </div>
 
-  <details class="tool-detail-help">
-    <summary>操作说明</summary>
-    <div class="snake-help">
-    <span><kbd>↑↓←→</kbd> / <kbd>WASD</kbd> 移动</span>
-    <span><kbd>Space</kbd> 暂停 / 继续</span>
-    <span><kbd>Shift</kbd> 按住加速</span>
-    <span>18格棋盘 · 粉豆限时连锁 · 棕豆造墙 · 黑豆清墙 · 金盾抵伤</span>
-    </div>
-  </details>
 </section>
   <details class="snake-leaderboard tool-detail-ranking" data-snake-leaderboard aria-label="贪吃蛇前三名成绩">
     <summary><span>排行榜</span></summary>

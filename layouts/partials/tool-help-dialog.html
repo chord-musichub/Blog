@@ -1,0 +1,9 @@
+<dialog class="tool-help-dialog" id="tool-help-{{ . }}" data-tool-help-dialog aria-labelledby="tool-help-title-{{ . }}">
+  <header class="tool-help-heading">
+    <h2 id="tool-help-title-{{ . }}">操作说明</h2>
+    <button class="tool-icon-button" type="button" data-tool-help-close aria-label="关闭说明" title="关闭说明">{{ partial "ui-icon.html" "close" }}</button>
+  </header>
+  <div class="tool-help-content">
+    {{ partial "tools/help-content.html" . }}
+  </div>
+</dialog>

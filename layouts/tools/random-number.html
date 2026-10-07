@@ -3,6 +3,8 @@
 <section class="card random-tool-panel tool-detail-surface" data-random-tool data-tool-back-surface>
   {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
   <h1 class="tool-detail-title">随机数</h1>
+  {{ partial "tool-actionbar.html" "random-number" }}
+  {{ partial "tool-help-dialog.html" "random-number" }}
   <div class="random-form">
     <label>
       <span>最小值</span>

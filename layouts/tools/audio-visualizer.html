@@ -4,6 +4,8 @@
   <section class="tool-detail-layout tool-detail-surface tool-detail-audio" data-tool-back-surface>
     {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
     <h1 class="tool-detail-title">音频可视化</h1>
+    {{ partial "tool-actionbar.html" "audio-visualizer" }}
+    {{ partial "tool-help-dialog.html" "audio-visualizer" }}
   <section class="av-stage" data-av-stage>
     <canvas class="av-canvas" data-av-canvas width="1440" height="900" aria-label="音频可视化画布"></canvas>
     <div class="av-noise" aria-hidden="true"></div>

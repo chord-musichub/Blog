@@ -58,7 +58,7 @@ test('legacy tools use one managed entry and expose repeat-safe initializers',()
 });
 test('focus timer owns exactly one frame chain and releases global listeners on departure',()=>{
  const frames=new Map(),events=new Map();let next=0,click;
- const button={textContent:'',addEventListener(type,fn){click=fn;}};
+ const button={dataset:{},setAttribute(){},addEventListener(type,fn){click=fn;}};
  const root={dataset:{},isConnected:true,classList:{toggle(){}},querySelector:selector=>selector==='[data-focus-toggle]'?button:null,querySelectorAll:()=>[]};
  const window={requestAnimationFrame(fn){frames.set(++next,fn);return next;},cancelAnimationFrame(id){frames.delete(id);},
   addEventListener(type,fn){events.set(type,fn);},removeEventListener(type,fn){if(events.get(type)===fn)events.delete(type);}};

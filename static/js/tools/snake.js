@@ -62,7 +62,6 @@
     const pauseBtn = game.querySelector('[data-snake-pause]');
     const soundToggle = game.querySelector('[data-snake-sound]');
     const topScoresEl = game.querySelector('[data-snake-top-scores]');
-    const syncBestBtn = game.querySelector('[data-snake-sync-best]');
 
     const grid = 18;
     const cell = canvas.width / grid;
@@ -84,6 +83,7 @@
     let topScores = [];
     let running = false;
     let paused = true;
+    let helpPaused = false;
     let dead = false;
     let last = 0;
     let acc = 0;
@@ -103,7 +103,7 @@
     let scorePoll = 0;
 
 
-    const leaderboard=window.SonglineCreateSnakeLeaderboard&&window.SonglineCreateSnakeLeaderboard({topScoresEl:topScoresEl,syncBestBtn:syncBestBtn,bestKey:bestKey,getBest:function(){return best;}});
+    const leaderboard=window.SonglineCreateSnakeLeaderboard&&window.SonglineCreateSnakeLeaderboard({topScoresEl:topScoresEl,playerKey:playerKey,cacheKey:scoresCacheKey,bestKey:bestKey,getBest:function(){return best;}});
     if(!leaderboard) return;
     function reset(){
       const startX = Math.floor(grid / 2);
@@ -131,6 +131,7 @@
       rushUntil = 0;
       running = true;
       paused = false;
+      helpPaused = false;
       dead = false;
       last = performance.now();
       acc = 0;
@@ -184,6 +185,12 @@
 
     function setState(text){
       if(stateEl) stateEl.textContent = text;
+      if(pauseBtn){
+        pauseBtn.disabled = !running || dead;
+        pauseBtn.dataset.toolPaused = String(paused);
+        pauseBtn.setAttribute('aria-label', paused ? '继续' : '暂停');
+        pauseBtn.setAttribute('title', paused ? '继续' : '暂停');
+      }
       updateHud();
     }
 
@@ -755,7 +762,8 @@
     }
 
     function handleKeydown(event){
-      if(event.target && event.target.closest && event.target.closest('button,input,textarea,select,a,summary,[contenteditable]:not([contenteditable="false"])')) return;
+      if(destroyed || game.querySelector('[data-tool-help-dialog][open]')) return;
+      if(event.target && event.target.closest && event.target.closest('button,input,textarea,select,a,summary,dialog,[contenteditable]:not([contenteditable="false"])')) return;
 
       if(event.key === ' '){
         event.preventDefault();
@@ -799,6 +807,7 @@
           unlockAudio();
           beep('tap');
           reset();
+          startBtn.blur();
         });
       }
 
@@ -806,6 +815,7 @@
         pauseBtn.addEventListener('click', function(){
           unlockAudio();
           togglePause();
+          pauseBtn.blur();
         });
       }
 
@@ -896,17 +906,21 @@
       }
     };
 
-    if(syncBestBtn){
-      syncBestBtn.addEventListener('click', function(){
-        beep('default');
-        leaderboard.syncLocalBest(true);
-        syncBestBtn.blur();
-      });
-    }
+    game.addEventListener('songline:tool-help-change', function(event){
+      if(destroyed) return;
+      if(event.detail.open){
+        helpPaused = running && !paused && !dead;
+        if(helpPaused) togglePause();
+      }else if(helpPaused){
+        helpPaused = false;
+        if(running && paused && !dead) togglePause();
+      }
+    });
+    game.addEventListener('songline:tool-sync-best', function(){ if(!destroyed) leaderboard.syncLocalBest(true); });
 
     bestEl.textContent = String(best);
     bind();
-    leaderboard.fetchTopScores().then(function(){ window.setTimeout(function(){ leaderboard.syncLocalBest(false); }, 320); });
+    leaderboard.fetchTopScores().then(function(){ window.setTimeout(function(){ if(!destroyed) leaderboard.syncLocalBest(false); }, 320); });
     initialDraw();
     raf = requestAnimationFrame(loop);
 

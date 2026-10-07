@@ -3,8 +3,9 @@
   function createLeaderboard(options){
     options=options||{};
     const topScoresEl=options.topScoresEl;
-    const syncBestBtn=options.syncBestBtn;
     const bestKey=options.bestKey;
+    const playerKey=options.playerKey || 'songline-snake-player-id-v1';
+    const scoresCacheKey=options.cacheKey || 'songline-snake-server-top3-cache';
     let topScores=[];
     let submittedScores={};
     let autoSyncedLocalBest=false;
@@ -18,14 +19,6 @@
         }
         return id;
       }catch(e){ return 'snake-guest'; }
-    }
-
-    function setSyncButtonText(text, delay){
-      if(!syncBestBtn) return;
-      syncBestBtn.textContent = text;
-      if(delay){
-        window.setTimeout(function(){ syncBestBtn.textContent = '同步本地最佳'; }, delay);
-      }
     }
 
     function snakeScoreEndpoints(){
@@ -118,6 +111,7 @@
       if(!Number.isFinite(value) || value <= 0) return;
       const submitKey = String(value) + ':' + (reason || 'score');
       if(submittedScores[submitKey]) return;
+      submittedScores[submitKey] = true;
       try{
         const payload = {
           method:'POST',
@@ -130,10 +124,9 @@
         topScores = normalizeScores(data.scores);
         cacheTopScores();
         renderTopScores();
-        if(reason === 'local-best') setSyncButtonText('已同步本地最佳', 1500);
       }catch(e){
+        delete submittedScores[submitKey];
         renderTopScores();
-        if(reason === 'local-best') setSyncButtonText('同步失败，重试', 1700);
       }
     }
 
@@ -142,7 +135,6 @@
       if(!manual && autoSyncedLocalBest) return;
       autoSyncedLocalBest = true;
       if(localBest > 0) return recordTopScore(localBest, 'local-best');
-      if(manual) setSyncButtonText('暂无本地最佳', 1300);
     }
 
     return {fetchTopScores:fetchTopScores,recordTopScore:recordTopScore,syncLocalBest:syncLocalBest};

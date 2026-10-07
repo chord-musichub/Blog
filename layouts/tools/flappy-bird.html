@@ -5,6 +5,8 @@
     <section class="flappy-panel tool-detail-surface" data-tool-back-surface>
       {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
       <h1 class="tool-detail-title">管道鸟</h1>
+      {{ partial "tool-actionbar.html" "flappy-bird" }}
+      {{ partial "tool-help-dialog.html" "flappy-bird" }}
       <div class="flappy-topbar">
         <div class="flappy-score-card">
           <span>分数</span>
@@ -14,9 +16,6 @@
           <span>本地最佳</span>
           <strong data-flappy-best>0</strong>
         </div>
-        {{ partial "tool-sound-toggle.html" (dict "class" "flappy-sound-toggle" "attribute" "data-flappy-sound-toggle") }}
-        <button class="flappy-button leaderboard-sync-btn" type="button" data-flappy-sync-best>同步本地最佳</button>
-        <button class="flappy-button" type="button" data-flappy-start>开始 / 重来</button>
       </div>
 
       <div class="flappy-board-wrap">

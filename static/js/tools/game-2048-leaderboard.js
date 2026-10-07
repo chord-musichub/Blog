@@ -1,9 +1,9 @@
-(function(){'use strict';function createLeaderboard(options){options=options||{};var topScoresEl=options.topScoresEl,syncBestBtn=options.syncBestBtn,scoresCacheKey=options.cacheKey,topScores=[],submittedScores={};if(!scoresCacheKey||typeof options.getBest!=='function')return null;    function getPlayerID(){
+(function(){'use strict';function createLeaderboard(options){options=options||{};var topScoresEl=options.topScoresEl,scoresCacheKey=options.cacheKey,playerKey=options.playerKey||'songline-2048-player-id-v1',topScores=[],submittedScores={};if(!scoresCacheKey||typeof options.getBest!=='function')return null;    function getPlayerID(){
       try{
-        var id = localStorage.getItem(PLAYER_KEY);
+        var id = localStorage.getItem(playerKey);
         if(!id){
           id = 'g2048-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-          localStorage.setItem(PLAYER_KEY, id);
+          localStorage.setItem(playerKey, id);
         }
         return id;
       }catch(e){
@@ -122,16 +122,9 @@ function game2048ScoreEndpoints(){
         topScores = normalizeScores(data.scores);
         cacheTopScores();
         renderTopScores();
-        if(syncBestBtn){
-          syncBestBtn.textContent = reason === 'local-best' ? '已同步本地最佳' : '成绩已同步';
-          window.setTimeout(function(){ syncBestBtn.textContent = '同步本地最佳'; }, 1600);
-        }
       }).catch(function(){
+        delete submittedScores[key];
         renderTopScores();
-        if(syncBestBtn){
-          syncBestBtn.textContent = '同步失败，重试';
-          window.setTimeout(function(){ syncBestBtn.textContent = '同步本地最佳'; }, 1800);
-        }
       });
     }
 
@@ -139,10 +132,6 @@ function game2048ScoreEndpoints(){
       var localBest = Number(localStorage.getItem(options.bestKey) || options.getBest() || 0) || 0;
       if(localBest > 0){
         return recordTopScore(localBest, 'local-best');
-      }
-      if(syncBestBtn){
-        syncBestBtn.textContent = '暂无本地最佳';
-        window.setTimeout(function(){ syncBestBtn.textContent = '同步本地最佳'; }, 1400);
       }
     }
 

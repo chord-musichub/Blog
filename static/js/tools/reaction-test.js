@@ -38,7 +38,6 @@
     var textEl = root.querySelector('[data-reaction-text]');
     var kickerEl = root.querySelector('[data-reaction-kicker]');
     var soundToggle = root.querySelector('[data-reaction-sound-toggle]');
-    var syncBestBtn = root.querySelector('[data-reaction-sync-best]');
 
     if(!stage) return;
 
@@ -61,14 +60,6 @@
     }
     window.addEventListener('songline:page-transition-start', cleanup);
 
-
-    function setSyncButtonText(text, delay){
-      if(!syncBestBtn) return;
-      syncBestBtn.textContent = text;
-      if(delay){
-        window.setTimeout(function(){ syncBestBtn.textContent = '同步本地最佳'; }, delay);
-      }
-    }
 
     function setClass(next){
       stage.classList.remove('is-idle', 'is-waiting', 'is-ready', 'is-too-soon', 'is-result');
@@ -279,10 +270,8 @@
         topScores = normalizeScores(data.scores);
         saveCache();
         renderTopScores();
-        if(reason === 'local-best') setSyncButtonText('已同步本地最佳', 1500);
       }).catch(function(){
         renderTopScores();
-        if(reason === 'local-best') setSyncButtonText('同步失败，重试', 1700);
       });
     }
 
@@ -297,7 +286,6 @@
       if(!manual && autoSyncedLocalBest) return;
       autoSyncedLocalBest = true;
       if(localBest > 0) return submitScore(localBest, 'local-best');
-      if(manual) setSyncButtonText('暂无本地最佳', 1300);
     }
 
     function resetTimer(){
@@ -360,6 +348,15 @@
     }
 
     stage.addEventListener('click', handleStageClick);
+    root.addEventListener('songline:tool-sync-best', function(){ if(!disposed) syncLocalBest(true); });
+    root.addEventListener('songline:tool-help-change', function(event){
+      if(!event.detail.open || disposed || (state !== 'waiting' && state !== 'ready')) return;
+      resetTimer();
+      state = 'idle';
+      readyAt = 0;
+      setClass('idle');
+      setMessage('准备测试', '点击开始', '变色前不要点。变色后越快越好。');
+    });
 
     if(startBtn){
       startBtn.addEventListener('click', function(){
@@ -367,15 +364,6 @@
         play('button');
         startTest();
         startBtn.blur();
-      });
-    }
-
-    if(syncBestBtn){
-      syncBestBtn.addEventListener('click', function(){
-        ensureAudio();
-        play('button');
-        syncLocalBest(true);
-        syncBestBtn.blur();
       });
     }
 

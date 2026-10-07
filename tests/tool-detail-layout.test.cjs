@@ -25,17 +25,26 @@ test('all five rankings use native default-closed disclosures',()=>{
   }
   assert(read('static/css/tools/detail-layout.css').includes('grid-template-columns:1fr!important'));
 });
-test('useful explanations are folded, not discarded or silently hidden',()=>{
-  const gacha=read('layouts/tools/gacha.html'),start=gacha.indexOf('<details class="gacha-rules tool-detail-help">');
-  assert(start>0);assert(gacha.indexOf('data-gacha-banner-note')>start);assert(gacha.indexOf('data-gacha-guarantee-note')>start);
-  const snake=read('layouts/tools/snake.html');assert(snake.includes('<details class="tool-detail-help">'));
-  for(const key of ['Space','Shift','WASD','黑豆清墙'])assert(snake.includes(key));
+test('all tools expose useful explanations in the shared native modal',()=>{
+  const help=read('layouts/partials/tools/help-content.html');
+  for(const name of ['random-number','2048','snake','reaction-test','flappy-bird','typing-practice','gacha','focus-timer','audio-visualizer']){
+    const template=read('layouts/tools/'+name+'.html');
+    assert(template.includes('partial "tool-actionbar.html" "'+name+'"'));
+    assert(template.includes('partial "tool-help-dialog.html" "'+name+'"'));
+    assert(!template.includes('sync-best'));
+    assert(help.includes('eq . "'+name+'"'));
+  }
+  for(const key of ['Space','Shift','WASD','黑豆清墙','data-gacha-banner-note','data-gacha-guarantee-note'])assert(help.includes(key));
+  assert(read('layouts/partials/tool-help-dialog.html').includes('<dialog'));
+  assert(!read('layouts/tools/2048.html').includes('data-2048-move'));
   const css=read('static/css/tools/detail-layout.css');
   assert(css.includes('.av-cover [hidden]{display:none!important}'),'Absent album covers use the fallback rather than a broken image');
   assert(css.includes('.av-stage:fullscreen'),'Compact stage cannot override fullscreen height');
 });
 test('icon sound controls retain native toggle semantics in all six tools',()=>{
-  for(const name of ['2048','snake','reaction-test','flappy-bird','typing-practice','focus-timer'])assert(read('layouts/tools/'+name+'.html').includes('partial "tool-sound-toggle.html"'));
+  const actionbar=read('layouts/partials/tool-actionbar.html');
+  assert(actionbar.includes('partial "tool-sound-toggle.html"'));
+  for(const hook of ['data-2048-sound-toggle','data-snake-sound','data-reaction-sound-toggle','data-flappy-sound-toggle','data-typing-sound-toggle','data-focus-sound'])assert(actionbar.includes(hook));
   const partial=read('layouts/partials/tool-sound-toggle.html');
   for(const hook of ['type="checkbox"','type="button"','aria-label','aria-pressed','volume-off'])assert(partial.includes(hook));
   assert(read('layouts/partials/icons.html').includes('eq $name "volume-off"'));

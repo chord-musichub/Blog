@@ -5,14 +5,13 @@
     <section class="typing-panel tool-detail-surface" data-tool-back-surface>
       {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
       <h1 class="tool-detail-title">打字练习</h1>
+      {{ partial "tool-actionbar.html" "typing-practice" }}
+      {{ partial "tool-help-dialog.html" "typing-practice" }}
       <div class="typing-topbar">
         <div class="typing-mode-group" role="group" aria-label="打字模式">
           <button class="typing-mode is-active" type="button" data-typing-mode="english">英文</button>
           <button class="typing-mode" type="button" data-typing-mode="mixed">中文/中英混打</button>
         </div>
-        {{ partial "tool-sound-toggle.html" (dict "class" "typing-sound-toggle" "attribute" "data-typing-sound-toggle") }}
-        <button class="typing-button leaderboard-sync-btn" type="button" data-typing-sync-best>同步本地最佳</button>
-        <button class="typing-button" type="button" data-typing-random>随机换文</button>
       </div>
 
       <div class="typing-stats">
@@ -27,7 +26,6 @@
         <div class="typing-text" data-typing-text aria-label="练习文本"></div>
         <textarea class="typing-input" data-typing-input autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="在这里输入上方文字" aria-label="练习输入" autocorrect="off" inputmode="text"></textarea>
         <div class="typing-actions">
-          <button class="typing-button" type="button" data-typing-restart>重新开始</button>
           <button class="typing-button" type="button" data-typing-focus>开始输入</button>
         </div>
       </article>

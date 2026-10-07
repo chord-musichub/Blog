@@ -4,6 +4,8 @@
   <section class="focus-shell tool-detail-layout tool-detail-surface" aria-label="学习倒计时" data-tool-back-surface>
     {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
     <h1 class="tool-detail-title">专注钟</h1>
+    {{ partial "tool-actionbar.html" "focus-timer" }}
+    {{ partial "tool-help-dialog.html" "focus-timer" }}
     <div class="focus-panel focus-main-card">
       <div class="focus-orbit" data-focus-orbit>
         <svg class="focus-ring" viewBox="0 0 260 260" role="img" aria-label="倒计时进度环">
@@ -22,10 +24,6 @@
         </div>
       </div>
 
-      <div class="focus-controls" aria-label="倒计时控制">
-        <button class="focus-button focus-primary" type="button" data-focus-toggle>开始</button>
-        <button class="focus-button" type="button" data-focus-reset>重置</button>
-      </div>
 
       <fieldset class="focus-duration-panel">
         <legend>时长（分钟）</legend>
@@ -47,10 +45,6 @@
     <aside class="focus-panel focus-side-card" aria-label="专注设置与本地记录">
       <section class="focus-side-section">
         <h2>提示设置</h2>
-        <div class="focus-switch-row">
-          <span>结束提示音</span>
-          {{ partial "tool-sound-toggle.html" (dict "checkbox" true "attribute" "data-focus-sound" "label" "结束提示音") }}
-        </div>
         <label class="focus-range-row">
           <span>提示音音量</span>
           <input type="range" min="0" max="1" step="0.01" value="0.78" data-focus-volume>

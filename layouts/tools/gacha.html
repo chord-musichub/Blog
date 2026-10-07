@@ -3,6 +3,8 @@
 <section class="card gacha-tool-panel tool-detail-surface" data-gacha-tool data-tool-back-surface>
   {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
   <h1 class="tool-detail-title">抽卡模拟器</h1>
+  {{ partial "tool-actionbar.html" "gacha" }}
+  {{ partial "tool-help-dialog.html" "gacha" }}
   <div class="gacha-head">
     <div class="gacha-status">
       <span>抽数 <b data-gacha-total>0</b></span>
@@ -49,7 +51,6 @@
   <div class="gacha-actions">
     <button class="btn gacha-pull-button" type="button" data-gacha-pull-one>单抽</button>
     <button class="btn gacha-pull-button" type="button" data-gacha-pull-ten>十连</button>
-    <button class="btn secondary" type="button" data-gacha-reset>重置记录</button>
   </div>
 
   <div class="gacha-result-box" aria-live="polite">
@@ -62,12 +63,6 @@
     </div>
   </div>
 
-  <details class="gacha-rules tool-detail-help">
-    <summary>机制说明</summary>
-    <p data-gacha-banner-note></p>
-    <p data-gacha-guarantee-note></p>
-    <div data-gacha-rules></div>
-  </details>
 </section>
 </section>
 

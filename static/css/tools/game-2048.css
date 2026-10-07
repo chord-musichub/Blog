@@ -109,12 +109,10 @@ html.dark .game-2048-controls button:focus-visible{
   .game-2048-tile{
     font-size:clamp(1.25rem, 11vw, 2.75rem);
   }
-  .game-2048-tile.tile-10{
+  .game-2048-tile.tile-v-1024{
     font-size:clamp(1rem, 8.6vw, 2.25rem);
   }
-  .game-2048-tile.tile-11,
-  .game-2048-tile.tile-12,
-  .game-2048-tile.tile-13{
+  .game-2048-tile.tile-v-2048{
     font-size:clamp(.86rem, 7.4vw, 2rem);
   }
 }
@@ -546,24 +544,17 @@ html.dark .game-2048-sound-toggle:focus-visible{
   from{ transform:scale(.92); }
   to{ transform:scale(1); }
 }
-.game-2048-tile.tile-1{ background:#e0f2fe; }
-.game-2048-tile.tile-2{ background:#bae6fd; }
-.game-2048-tile.tile-3{ background:#a7f3d0; }
-.game-2048-tile.tile-4{ background:#fde68a; }
-.game-2048-tile.tile-5{ background:#fdba74; }
-.game-2048-tile.tile-6{ background:#fca5a5; color:#7f1d1d; }
-.game-2048-tile.tile-7{ background:#f0abfc; color:#581c87; }
-.game-2048-tile.tile-8{ background:#c4b5fd; color:#312e81; }
-.game-2048-tile.tile-9{ background:#67e8f9; color:#164e63; }
-.game-2048-tile.tile-10{ background:#facc15; color:#422006; font-size:clamp(1.12rem, 6vw, 2.7rem); }
-.game-2048-tile.tile-11{ background:#fb7185; color:#fff1f2; font-size:clamp(1.02rem, 5vw, 2.45rem); }
-.game-2048-tile.tile-12,
-.game-2048-tile.tile-13{
-  background:linear-gradient(135deg, #38bdf8, #a78bfa, #f472b6);
-  color:white;
-  text-shadow:0 2px 12px rgba(15,23,42,.28);
-  font-size:clamp(.92rem, 4.8vw, 2.2rem);
-}
+.game-2048-tile.tile-v-2{ background:#e0f2fe; color:#0c4a6e; }
+.game-2048-tile.tile-v-4{ background:#bae6fd; color:#0c4a6e; }
+.game-2048-tile.tile-v-8{ background:#a7f3d0; color:#064e3b; }
+.game-2048-tile.tile-v-16{ background:#fde68a; color:#713f12; }
+.game-2048-tile.tile-v-32{ background:#fdba74; color:#7c2d12; }
+.game-2048-tile.tile-v-64{ background:#fca5a5; color:#7f1d1d; }
+.game-2048-tile.tile-v-128{ background:#f0abfc; color:#581c87; }
+.game-2048-tile.tile-v-256{ background:#c4b5fd; color:#312e81; }
+.game-2048-tile.tile-v-512{ background:#67e8f9; color:#164e63; }
+.game-2048-tile.tile-v-1024{ background:#facc15; color:#422006; font-size:clamp(1.12rem, 6vw, 2.7rem); }
+.game-2048-tile.tile-v-2048{ background:#fb7185; color:#4c0519; font-size:clamp(1.02rem, 5vw, 2.45rem); }
 .game-2048-overlay{
   position:absolute;
   inset:0;
