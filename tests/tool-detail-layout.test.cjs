@@ -58,3 +58,26 @@ test('rank rail and timer controls have dedicated responsive owners',()=>{
   for(const hook of ['focus-duration-panel','focus-minute-field','focus-switch:checked','::-webkit-slider-thumb','focus-stats-grid'])assert(timer.includes(hook));
   assert(!timer.includes('focus-satellite'),'Unused satellites and layered overrides are removed');
 });
+test('individual workspaces preserve functional hooks and own their responsive compositions',()=>{
+  for(const [tool,workspace,hooks] of [
+    ['random-number','random-workspace',['data-random-result','data-random-min','data-random-max','data-random-generate']],
+    ['gacha','gacha-workspace',['gacha-setup','data-gacha-mode','data-gacha-banner','data-gacha-pull-one','data-gacha-pull-ten','data-gacha-results']],
+    ['typing-practice','typing-workspace',['typing-toolbar','typing-entry','data-typing-text','data-typing-input','data-typing-focus']]
+  ]){
+    const template=read('layouts/tools/'+tool+'.html');
+    assert(template.includes('class="'+workspace+'"'));
+    for(const hook of hooks)assert(template.includes(hook),tool+' retains '+hook);
+    assert(read('static/css/tools/detail-layout.css').includes('.tool-detail-surface .'+workspace));
+  }
+  const mobile=read('static/css/mobile-foundation.css');
+  assert(!mobile.includes('.random-form'),'Range fields are not forced into an unrelated one-column layout');
+  assert(!mobile.includes('.gacha-actions'),'Paired draw actions remain owned by the shared tool styles');
+  assert(read('layouts/partials/tool-actionbar.html').includes('data-tool-actions='));
+  assert(!read('static/css/tools/snake.css').includes('.snake-controls [data-snake-start]'),'Mobile rules cannot hide header game actions');
+});
+test('typing reference wraps at normal spaces and follows the cursor within its own pane',()=>{
+  const script=read('static/js/tools/typing-practice.js');
+  assert(!script.includes("ch === ' ' ? '&nbsp;'"),'English words may wrap naturally');
+  assert(script.includes("textEl.querySelector('.is-current')"));
+  assert(script.includes('textEl.scrollTop +='),'Long exercises keep the next character visible without scrolling the page');
+});

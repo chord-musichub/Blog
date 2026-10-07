@@ -14,13 +14,6 @@
     </div>
   </div>
 
-  <div class="snake-arcade-strip" aria-live="polite">
-    <span class="snake-chip snake-combo" data-snake-combo>连击 x1</span>
-    <span class="snake-chip snake-shield" data-snake-shield>护盾 0</span>
-    <span class="snake-chip snake-slow" data-snake-slow>缓速 0s</span>
-    <span class="snake-chip snake-rush" data-snake-rush>临时豆 待机</span>
-  </div>
-
   <div class="snake-stage-wrap">
     <canvas class="snake-canvas" width="480" height="480" data-snake-canvas aria-label="贪吃蛇游戏区域"></canvas>
     <div class="snake-overlay" data-snake-overlay>
@@ -28,8 +21,12 @@
       <span data-snake-overlay-text hidden></span>
     </div>
   </div>
-
-
+  <div class="snake-arcade-strip" aria-live="polite">
+    <span class="snake-chip snake-combo" data-snake-combo>连击 x1</span>
+    <span class="snake-chip snake-shield" data-snake-shield>护盾 0</span>
+    <span class="snake-chip snake-slow" data-snake-slow>缓速 0s</span>
+    <span class="snake-chip snake-rush" data-snake-rush>临时豆 待机</span>
+  </div>
   <div class="snake-mobile-panel" data-snake-mobile-pad aria-label="移动端操作区">
 <div class="snake-mobile-pad" aria-label="移动端方向控制">
       <button type="button" data-snake-dir="up">{{ partial "ui-icon.html" "arrow-up" }}</button>

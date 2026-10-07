@@ -42,6 +42,10 @@ async function soundControl(p,name){
 async function helpControl(p,name){
   const bar=p.locator('[data-tool-actionbar]'),dialog=p.locator('[data-tool-help-dialog]');
   assert.equal(await bar.count(),1);assert.equal(await bar.textContent().then(s=>s.trim()),'','Toolbar contains no visible labels');
+  assert.equal(await bar.locator(':scope > *:visible').count(),Number(await bar.getAttribute('data-tool-actions')),'All header actions remain visible, including mobile Snake');
+  for(const control of await bar.locator(':scope > *').all()){
+    const hit=await control.boundingBox();assert(hit&&hit.width===44&&hit.height===44,'Header action keeps its 44px hit area: '+name);
+  }
   assert.equal(await p.locator('[data-2048-sync-best],[data-snake-sync-best],[data-flappy-sync-best],[data-reaction-sync-best],[data-typing-sync-best]').count(),0);
   const frame=await p.locator('.tool-detail-surface').boundingBox(),box=await bar.boundingBox();
   assert(box.x>=frame.x&&box.x+box.width<=frame.x+frame.width+1&&box.y>=frame.y,'Toolbar inside the top-right glass: '+name);
@@ -67,6 +71,8 @@ function wav(){
 }
 async function useTool(p,name){
   if(name==='random-number'){
+    const min=await p.locator('[data-random-min]').boundingBox(),max=await p.locator('[data-random-max]').boundingBox();
+    assert.equal(min.y,max.y,'Range inputs remain paired rather than stacking as a legacy form');
     await p.locator('[data-random-min]').fill('10');await p.locator('[data-random-max]').fill('10');
     await p.locator('[data-random-generate]').click();await p.waitForFunction(()=>document.querySelector('[data-random-result]').textContent==='10');
   }else if(name==='2048'){
@@ -95,7 +101,7 @@ async function useTool(p,name){
     await p.locator('[data-2048-new]').click();await p.waitForTimeout(600);
     assert.equal(await p.locator('[data-2048-score]').textContent(),'0');assert.equal(await tiles.count(),2,'Old animation cannot mutate a restarted round');
   }else if(name==='snake'){
-    await p.locator('[data-snake-overlay]').click();
+    await p.locator('[data-snake-start]').click();
     await p.waitForFunction(()=>!document.querySelector('[data-snake-state]').textContent.includes('准备'));
     await p.locator('[data-tool-help-open]').click();assert.equal(await p.locator('[data-snake-pause]').getAttribute('data-tool-paused'),'true');
     await p.locator('[data-tool-help-close]').click();assert.equal(await p.locator('[data-snake-pause]').getAttribute('data-tool-paused'),'false');
@@ -125,9 +131,18 @@ async function useTool(p,name){
     await p.locator('[data-typing-input]').fill(char.replace(/\u00a0/g,' '));
     assert.equal(await p.locator('[data-typing-errors]').textContent(),'0');
     assert.equal(await p.locator('[data-typing-text] .is-correct').count(),1);
+    const text=await p.locator('[data-typing-text] span').allTextContents().then(chars=>chars.join(''));
+    await p.locator('[data-typing-input]').fill(text.slice(0,-2));
+    assert.equal(await p.locator('[data-typing-errors]').textContent(),'0');
+    assert(await p.locator('[data-typing-text]').evaluate(e=>{
+      const pane=e.getBoundingClientRect(),cursor=e.querySelector('.is-current').getBoundingClientRect();
+      return cursor.top>=pane.top&&cursor.bottom<=pane.bottom;
+    }),'Next character remains visible in the bounded reference pane');
     await p.locator('[data-typing-mode="mixed"]').click();
     assert((await p.locator('[data-typing-rank-title]').textContent()).includes('中文'));
   }else if(name==='gacha'){
+    const one=await p.locator('[data-gacha-pull-one]').boundingBox(),ten=await p.locator('[data-gacha-pull-ten]').boundingBox();
+    assert.equal(one.y,ten.y,'Primary gacha actions remain paired on mobile');
     for(const mode of ['starRailLike','wutheringLike','arknightsLike','blueArchiveLike']){
       await p.locator('[data-gacha-mode]').selectOption(mode);await p.locator('[data-gacha-pull-ten]').click();
       assert.equal(await p.locator('[data-gacha-total]').textContent(),'10');

@@ -747,7 +747,7 @@
       renderPlaylist();
 
       setPill(audioState, '等待音频来源', false);
-      setHint('选择音频来源。');
+      setHint('');
 
       try{
         var stage = root.querySelector('.av-stage') || root;
@@ -1058,7 +1058,7 @@
     setHasTrack(false);
     setVisualLive(false);
     showPlaylist();
-    setHint('选择音频来源。');
+    setHint('');
 
     bindBackButton();
     bindSourceCards();

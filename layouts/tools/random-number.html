@@ -5,21 +5,22 @@
   <h1 class="tool-detail-title">随机数</h1>
   {{ partial "tool-actionbar.html" "random-number" }}
   {{ partial "tool-help-dialog.html" "random-number" }}
-  <div class="random-form">
-    <label>
-      <span>最小值</span>
-      <input type="number" data-random-min value="1" inputmode="numeric">
-    </label>
-    <label>
-      <span>最大值</span>
-      <input type="number" data-random-max value="100" inputmode="numeric">
-    </label>
-    <button class="btn random-generate-button" type="button" data-random-generate>生成随机数</button>
-  </div>
-
-  <div class="random-result-box" aria-live="polite">
-    <strong data-random-result>?</strong>
-    <p data-random-note aria-live="polite"></p>
+  <div class="random-workspace">
+    <div class="random-result-box" aria-live="polite">
+      <strong data-random-result>?</strong>
+      <p data-random-note aria-live="polite"></p>
+    </div>
+    <div class="random-form">
+      <label>
+        <span>最小值</span>
+        <input type="number" data-random-min value="1" inputmode="numeric">
+      </label>
+      <label>
+        <span>最大值</span>
+        <input type="number" data-random-max value="100" inputmode="numeric">
+      </label>
+      <button class="btn random-generate-button" type="button" data-random-generate>生成</button>
+    </div>
   </div>
 </section>
 </section>

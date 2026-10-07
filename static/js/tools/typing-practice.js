@@ -199,9 +199,20 @@
         }else if(i === value.length){
           cls = 'is-current';
         }
-        html += '<span class="' + cls + '">' + (ch === ' ' ? '&nbsp;' : escapeHTML(ch)) + '</span>';
+        html += '<span class="' + cls + '">' + escapeHTML(ch) + '</span>';
       }
       textEl.innerHTML = html;
+      // Keep the next character in view inside the reference pane, without
+      // scrolling the entire page away from the typing input.
+      if(startedAt && !finished){
+        var current = textEl.querySelector('.is-current');
+        if(current){
+          var pane = textEl.getBoundingClientRect();
+          var cursor = current.getBoundingClientRect();
+          if(cursor.bottom > pane.bottom - 16) textEl.scrollTop += cursor.bottom - pane.bottom + 16;
+          else if(cursor.top < pane.top + 16) textEl.scrollTop += cursor.top - pane.top - 16;
+        }
+      }
     }
 
     function calcErrors(value){

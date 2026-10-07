@@ -7,26 +7,32 @@
       <h1 class="tool-detail-title">打字练习</h1>
       {{ partial "tool-actionbar.html" "typing-practice" }}
       {{ partial "tool-help-dialog.html" "typing-practice" }}
-      <div class="typing-topbar">
-        <div class="typing-mode-group" role="group" aria-label="打字模式">
-          <button class="typing-mode is-active" type="button" data-typing-mode="english">英文</button>
-          <button class="typing-mode" type="button" data-typing-mode="mixed">中文/中英混打</button>
+      <div class="typing-toolbar">
+        <div class="typing-topbar">
+          <div class="typing-mode-group" role="group" aria-label="打字模式">
+            <button class="typing-mode is-active" type="button" data-typing-mode="english">英文</button>
+            <button class="typing-mode" type="button" data-typing-mode="mixed">中文/中英混打</button>
+          </div>
         </div>
-      </div>
 
-      <div class="typing-stats">
-        <div class="typing-stat-card"><span>时间</span><strong data-typing-time>0.00s</strong></div>
-        <div class="typing-stat-card"><span>进度</span><strong data-typing-progress>0%</strong></div>
-        <div class="typing-stat-card"><span>错误</span><strong data-typing-errors>0</strong></div>
-        <div class="typing-stat-card"><span>本地最佳</span><strong data-typing-best>--</strong></div>
+        <div class="typing-stats">
+          <div class="typing-stat-card"><span>时间</span><strong data-typing-time>0.00s</strong></div>
+          <div class="typing-stat-card"><span>进度</span><strong data-typing-progress>0%</strong></div>
+          <div class="typing-stat-card"><span>错误</span><strong data-typing-errors>0</strong></div>
+          <div class="typing-stat-card"><span>本地最佳</span><strong data-typing-best>--</strong></div>
+        </div>
       </div>
 
       <article class="typing-card">
         <div class="typing-meta"><span data-typing-article-title></span></div>
-        <div class="typing-text" data-typing-text aria-label="练习文本"></div>
-        <textarea class="typing-input" data-typing-input autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入上方文字" aria-label="练习输入" autocorrect="off" inputmode="text"></textarea>
-        <div class="typing-actions">
-          <button class="typing-button" type="button" data-typing-focus>开始输入</button>
+        <div class="typing-workspace">
+          <div class="typing-text" data-typing-text aria-label="练习文本"></div>
+          <div class="typing-entry">
+            <textarea class="typing-input" data-typing-input autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入对应文字" aria-label="练习输入" autocorrect="off" inputmode="text"></textarea>
+            <div class="typing-actions">
+              <button class="typing-button" type="button" data-typing-focus>开始输入</button>
+            </div>
+          </div>
         </div>
       </article>
 

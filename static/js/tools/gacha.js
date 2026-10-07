@@ -109,6 +109,7 @@
     rules: tool.querySelector('[data-gacha-rules]')
   };
 
+  const emptyResults = els.results.innerHTML;
   let state = {
     pity: 0,
     midPity: 0,
@@ -257,11 +258,11 @@
         ? '本次 ' + lastBatch.length + ' 抽：最高稀有 ' + tops + ' 个，UP ' + ups + ' 个。'
         : '本次 ' + lastBatch.length + ' 抽：最高稀有 ' + tops + ' 个。常驻池不判定 UP。';
     }else{
-      els.summary.textContent = state.total ? '已重置显示' : '点击单抽或十连';
+      els.summary.textContent = state.total ? '已重置显示' : '';
     }
 
     if(!state.history.length){
-      els.results.innerHTML = '<div class="gacha-empty">还没有抽卡记录。</div>';
+      els.results.innerHTML = emptyResults;
       return;
     }
 

@@ -12,16 +12,16 @@ body.dark .focus-timer-page{
   --focus-soft:rgba(169,200,188,.10);--focus-line:rgba(167,191,211,.22);
 }
 body[data-page-section="tools"] .focus-shell.tool-detail-surface{
-  display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);
+  display:grid;grid-template-columns:minmax(0,1.4fr) minmax(240px,.8fr);
   align-items:start;column-gap:28px;row-gap:0;max-width:960px;
   margin:clamp(24px,8svh,76px) auto 32px!important;
 }
 .focus-shell > .tool-detail-title{grid-column:1 / -1}
 .focus-panel{min-width:0}
-.focus-main-card{display:flex;flex-direction:column;align-items:center;gap:20px}
+.focus-main-card{display:flex;flex-direction:column;align-items:center;gap:28px;padding:12px 24px 0}
 .focus-orbit{position:relative;display:grid;place-items:center;width:min(310px,100%);aspect-ratio:1}
 .focus-ring{width:100%;height:100%;transform:rotate(-90deg);pointer-events:none}
-.focus-ring-track,.focus-ring-progress{fill:none;stroke-width:7;stroke-linecap:round}
+.focus-ring-track,.focus-ring-progress{fill:none;stroke-width:5;stroke-linecap:round}
 .focus-ring-track{stroke:var(--focus-line)}
 .focus-ring-progress{stroke:url(#focusRingGradient);stroke-dasharray:703.72;stroke-dashoffset:0;transition:stroke-dashoffset .35s ease}
 .focus-core{position:absolute;inset:15%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
@@ -29,7 +29,6 @@ body[data-page-section="tools"] .focus-shell.tool-detail-surface{
 .focus-time.is-long-time{font-size:clamp(28px,4.2vw,48px)}
 .focus-time.is-very-long-time{font-size:clamp(26px,3.8vw,42px)}
 .focus-state{color:var(--focus-muted);font-size:14px;line-height:1.5}
-.focus-controls{display:grid;grid-template-columns:1.3fr 1fr;gap:12px;width:min(340px,100%)}
 .focus-timer-page :where(.focus-button,.focus-mini-button,.focus-presets button){
   min-height:44px;box-sizing:border-box;padding:10px 16px;border:1px solid var(--focus-line);
   border-radius:12px;background:var(--focus-soft);color:var(--focus-ink);font:inherit;
@@ -43,11 +42,11 @@ body.dark .focus-timer-page .focus-primary{color:#14252b}
 .focus-timer-page .focus-primary:is(:hover,:focus-visible){background:var(--focus-accent);color:#fff;filter:brightness(1.08)}
 body.dark .focus-timer-page .focus-primary:is(:hover,:focus-visible){color:#14252b}
 .focus-duration-panel{
-  width:100%;box-sizing:border-box;min-width:0;margin:0;padding:14px 16px 16px;
-  border:1px solid var(--focus-line);border-radius:18px;background:var(--focus-soft);
+  width:100%;box-sizing:border-box;min-width:0;margin:0;padding:0;
+  border:0;border-radius:0;background:none;
 }
 .focus-duration-panel legend{padding:0 6px;font-size:14px;font-weight:600;color:var(--focus-muted)}
-.focus-presets{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.focus-presets{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:var(--focus-soft);margin-top:10px}
 .focus-timer-page .focus-presets button{padding:8px 0;min-width:0;border-color:transparent;background:transparent}
 .focus-timer-page .focus-presets button.is-active{background:var(--focus-accent);color:#fff;border-color:var(--focus-accent)}
 body.dark .focus-timer-page .focus-presets button.is-active{color:#14252b}
@@ -56,8 +55,9 @@ body.dark .focus-timer-page .focus-presets button.is-active{color:#14252b}
 .focus-timer-page .focus-custom-time input{min-width:0;width:66px;min-height:44px;padding:8px 0;border:0;border-radius:8px;background:none;box-shadow:none;color:var(--focus-ink);font:inherit;font-weight:650;text-align:center}
 .focus-minute-field:focus-within{outline:2px solid var(--focus-accent);outline-offset:3px}
 html body[data-page-section="tools"] .focus-minute-field input:focus-visible{outline:0}
-.focus-side-card{display:grid;gap:14px}
-.focus-side-section{padding:18px;border:1px solid var(--focus-line);border-radius:18px;background:var(--focus-soft)}
+.focus-side-card{display:grid;gap:22px;padding-left:28px;border-left:1px solid var(--focus-line)}
+.focus-side-section{padding:0;border:0;border-radius:0;background:none;min-width:0}
+.focus-side-section + .focus-side-section{padding-top:20px;border-top:1px solid var(--focus-line)}
 .focus-side-section h2{margin:0 0 12px;font-size:15px;line-height:1.5;font-weight:650;color:var(--focus-ink)}
 .focus-switch-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px;color:var(--focus-muted);font-size:14px;cursor:pointer}
 .focus-range-row{display:grid;gap:6px;margin:8px 0 12px;color:var(--focus-muted);font-size:14px}
@@ -78,9 +78,10 @@ html body[data-page-section="tools"] .focus-minute-field input:focus-visible{out
 .focus-timer-page .focus-switch:checked{background:var(--focus-accent);border-color:var(--focus-accent)}
 .focus-switch:checked::after{transform:translateX(18px)}
 .focus-switch-row:has(.focus-switch:focus-visible){outline:2px solid var(--focus-accent);outline-offset:3px;border-radius:8px}
-.focus-timer-page .focus-mini-button{width:100%;font-size:14px}
+.focus-timer-page .focus-mini-button{width:auto;padding:8px 0;font-size:13px;background:transparent;border-color:transparent}
 .focus-stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 14px}
-.focus-stats-grid p{display:grid;gap:6px;margin:0;padding:14px 12px;border:1px solid var(--focus-line);border-radius:12px;background:var(--focus-field)}
+.focus-stats-grid p{display:grid;gap:6px;margin:0;padding:12px 0;border:0;border-radius:0;background:none;min-width:0}
+.focus-stats-grid p + p{padding-left:18px;border-left:1px solid var(--focus-line)}
 .focus-stats-grid strong{font-size:28px;line-height:1.2;color:var(--focus-ink);font-variant-numeric:tabular-nums}
 .focus-stats-grid span{color:var(--focus-muted);font-size:13px}
 .focus-timer-page [data-focus-clear-today]{background:transparent}
@@ -94,13 +95,15 @@ html body[data-page-section="tools"] .focus-minute-field input:focus-visible{out
 @media(max-width:980px){body[data-page-section="tools"] .focus-shell.tool-detail-surface{margin:0 auto 24px!important}}
 @media(max-width:700px){
   body[data-page-section="tools"] .focus-shell.tool-detail-surface{grid-template-columns:minmax(0,1fr);row-gap:24px}
-  .focus-side-card{grid-template-columns:1fr}
+  .focus-main-card{padding:0}
+  .focus-side-card{grid-template-columns:repeat(2,minmax(0,1fr));padding:24px 0 0;border-left:0;border-top:1px solid var(--focus-line)}
+  .focus-side-section + .focus-side-section{padding-top:0;border-top:0}
+  .focus-stats{grid-column:1/-1;padding-top:20px!important;border-top:1px solid var(--focus-line)!important}
   .focus-orbit{width:min(280px,100%)}
-  .focus-side-section{padding:16px}
 }
 @media(max-width:360px){
+  .focus-side-card{grid-template-columns:minmax(0,1fr)}
   .focus-presets{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .focus-side-section,.focus-duration-panel{padding-inline:12px}
   .focus-stats-grid{gap:8px}
 }
 @media(prefers-reduced-motion:reduce){

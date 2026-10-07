@@ -5,6 +5,8 @@
   <h1 class="tool-detail-title">抽卡模拟器</h1>
   {{ partial "tool-actionbar.html" "gacha" }}
   {{ partial "tool-help-dialog.html" "gacha" }}
+  <div class="gacha-workspace">
+  <div class="gacha-setup">
   <div class="gacha-head">
     <div class="gacha-status">
       <span>抽数 <b data-gacha-total>0</b></span>
@@ -52,17 +54,18 @@
     <button class="btn gacha-pull-button" type="button" data-gacha-pull-one>单抽</button>
     <button class="btn gacha-pull-button" type="button" data-gacha-pull-ten>十连</button>
   </div>
+  </div>
 
   <div class="gacha-result-box" aria-live="polite">
     <div class="gacha-result-head">
       <h2>抽卡结果</h2>
-      <p data-gacha-summary>点击单抽或十连</p>
+      <p data-gacha-summary></p>
     </div>
     <div class="gacha-results" data-gacha-results>
-      <div class="gacha-empty">还没有抽卡记录。</div>
+      <div class="gacha-empty">{{ partial "ui-icon.html" "grid" }}<span>点击单抽或十连</span></div>
     </div>
   </div>
-
+  </div>
 </section>
 </section>
 

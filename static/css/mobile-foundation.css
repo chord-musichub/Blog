@@ -367,10 +367,7 @@
   .md-tool-panel{
     padding:16px!important;
   }
-  .tools-search-row,
-  .random-form,
-  .gacha-config-grid,
-  .gacha-pity-grid{
+  .tools-search-row{
     grid-template-columns:1fr!important;
   }
   .snake-stage-wrap{
@@ -677,18 +674,15 @@
     grid-template-columns:32px minmax(0,1fr) 56px!important;
   }
 
-  /* 工具页：游戏/抽卡/随机数移动端按钮更好点 */
-  .gacha-actions,
+  /* Legacy action rows and the tools search retain their mobile stack.
+     Current tool workspaces own their responsive layouts in detail-layout. */
   .snake-controls,
-  .random-form,
   .tools-search-row{
     display:grid!important;
     grid-template-columns:1fr!important;
     gap:10px!important;
   }
-  .gacha-actions .btn,
-  .snake-controls .btn,
-  .random-form .btn{
+  .snake-controls .btn{
     width:100%!important;
   }
   .snake-mobile-pad{

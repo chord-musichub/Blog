@@ -40,13 +40,11 @@
 
     <section class="av-source-panel" data-av-source-panel aria-label="音频来源选择">
       <article class="av-source-card is-primary">
-        <strong>系统声音</strong>
-        <button class="av-button" type="button" data-av-browser-audio>授权系统声音</button>
+        <button class="av-button av-source-choice" type="button" data-av-browser-audio aria-label="授权系统声音">{{ partial "ui-icon.html" "volume" }}<span>系统声音</span></button>
       </article>
 
       <article class="av-source-card">
-        <strong>本地音频</strong>
-        <button class="av-button" type="button" data-av-upload>添加音乐</button>
+        <button class="av-button av-source-choice" type="button" data-av-upload aria-label="添加本地音频">{{ partial "ui-icon.html" "upload" }}<span>本地音频</span></button>
       </article>
     </section>
 
