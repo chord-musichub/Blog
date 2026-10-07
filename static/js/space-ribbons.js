@@ -1,12 +1,6 @@
 (function(){
   'use strict';
 
-  var reduced = false;
-  try{
-    reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  }catch(e){}
-  if(reduced) return;
-
   // SPACE_RIBBONS_LAYERED_START v20.20.6：统一运行时调度；保留视觉效果，避免旧帧相位闪现。
 
   var SVG_NS = 'http://www.w3.org/2000/svg';
@@ -24,14 +18,26 @@
   var resizeTimer = 0;
   var lastW = 0;
   var lastH = 0;
+  var startTimer = 0;
+  var resumeTimer = 0;
+  var revealFrame = 0;
+  var phaseFrame = 0;
+  var bootObserver = null;
+  var bootInterval = 0;
+  var idleTask = 0;
+  var idlePending = false;
+  var generation = 0;
+  var transitioning = false;
+  var motionQuery = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
 
   function sceneEnabled(){
-    if(!document.body) return false;
+    if(!document.body || motionQuery && motionQuery.matches) return false;
     var page = document.body.dataset;
     return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageLayout !== 'tools' && page.pageLayout !== 'site-notice';
   }
 
   function releaseLayer(){
+    cancelPending();
     window.clearTimeout(resizeTimer);
     if(layer){
       window.clearTimeout(layer.__starstreamPhaseFallbackTimer);
@@ -42,6 +48,28 @@
     layer = null;
     svg = null;
     started = false;
+  }
+  function stopBootWait(){
+    if(bootObserver) bootObserver.disconnect();
+    bootObserver = null;
+    window.clearInterval(bootInterval);bootInterval = 0;
+  }
+  function cancelPending(){
+    generation++;
+    stopBootWait();
+    window.clearTimeout(startTimer);startTimer = 0;
+    window.clearTimeout(resumeTimer);resumeTimer = 0;
+    window.clearTimeout(resizeTimer);resizeTimer = 0;
+    window.cancelAnimationFrame(revealFrame);revealFrame = 0;
+    window.cancelAnimationFrame(phaseFrame);phaseFrame = 0;
+    if(window.SonglineRuntime && window.SonglineRuntime.cancelIdle) window.SonglineRuntime.cancelIdle('space-ribbons-start');
+    if(idleTask && window.cancelIdleCallback) window.cancelIdleCallback(idleTask);
+    idleTask = 0;idlePending = false;
+    if(layer){
+      window.clearTimeout(layer.__starstreamPhaseFallbackTimer);
+      window.clearTimeout(layer.__softResumeTimer);
+      layer.classList.remove('is-starstream-soft-sync','is-soft-resume');
+    }
   }
 
   function viewport(){
@@ -73,27 +101,26 @@
     }
 
     var done = false;
-    var observer = null;
     var finish = function(){
       if(done || bootIsActive()) return;
       done = true;
-      if(observer) observer.disconnect();
+      stopBootWait();
       cb();
     };
 
     try{
-      observer = new MutationObserver(finish);
-      observer.observe(document.documentElement, {attributes:true, attributeFilter:['class', 'style']});
-      if(document.body) observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['class', 'style']});
+      bootObserver = new MutationObserver(finish);
+      bootObserver.observe(document.documentElement, {attributes:true, attributeFilter:['class']});
+      var overlay = document.querySelector('.site-boot-overlay');
+      if(overlay) bootObserver.observe(overlay, {attributes:true, attributeFilter:['class','style','hidden']});
     }catch(e){}
 
     var tries = 0;
-    var interval = window.setInterval(function(){
+    bootInterval = window.setInterval(function(){
       tries++;
       finish();
       if(done || tries > 90){
-        window.clearInterval(interval);
-        if(observer) observer.disconnect();
+        stopBootWait();
         if(!done){
           done = true;
           cb();
@@ -106,7 +133,7 @@
     var old = document.querySelector('[data-songline-space-ribbons], [data-songline-starstream]');
     if(old){
       layer = old;
-      layer.className = 'songline-starstream-layer songline-starstream-morph-layer';
+      layer.classList.add('songline-starstream-layer','songline-starstream-morph-layer');
       layer.setAttribute('data-songline-starstream', '1');
       layer.setAttribute('data-songline-space-ribbons', '1');
       svg = old.querySelector('svg');
@@ -271,11 +298,13 @@
   }
 
   function revealLayer(){
-    if(!layer) return;
+    if(!layer || layer.classList.contains('is-visible') || revealFrame) return;
+    var target = layer;
     // 下一帧再加 class，保证浏览器先拿到 opacity:0 的初始状态。
-    window.requestAnimationFrame(function(){
-      window.requestAnimationFrame(function(){
-        if(layer) layer.classList.add('is-visible');
+    revealFrame = window.requestAnimationFrame(function(){
+      revealFrame = window.requestAnimationFrame(function(){
+        revealFrame = 0;
+        if(layer === target && sceneEnabled()) target.classList.add('is-visible');
       });
     });
   }
@@ -293,13 +322,15 @@
     layer.__starstreamPhaseFallbackTimer = window.setTimeout(function(){
       if(layer) layer.classList.remove('is-starstream-soft-sync');
     }, 280);
-    window.requestAnimationFrame(function(){
+    window.cancelAnimationFrame(phaseFrame);
+    phaseFrame = window.requestAnimationFrame(function(){
+      phaseFrame = 0;
       if(layer) layer.classList.remove('is-starstream-soft-sync');
     });
   }
 
   function resumeSvgAnimations(){
-    if(!sceneEnabled() || document.hidden) return;
+    if(!sceneEnabled() || document.hidden || transitioning) return;
     prepareSvgPhaseResume();
     if(svg && typeof svg.unpauseAnimations === 'function'){
       try{ svg.unpauseAnimations(); }catch(e){}
@@ -351,6 +382,8 @@
   }
 
   function startNow(){
+    startTimer = 0;
+    if(transitioning || document.hidden) return;
     if(!sceneEnabled()){ releaseLayer(); return; }
     render(!started);
     started = true;
@@ -358,14 +391,25 @@
 
   function start(){
     if(!sceneEnabled()){ releaseLayer(); return; }
+    if(transitioning || document.hidden) return;
+    if(started && layer && layer.isConnected){ render(false); return; }
+    if(startTimer || idlePending || bootObserver || bootInterval) return;
+    var token = generation;
     waitUntilBootDone(function(){
-      var run = function(){ window.setTimeout(startNow, 260); };
+      if(token !== generation || transitioning || !sceneEnabled()) return;
+      idlePending = true;
+      var run = function(){
+        if(token !== generation) return;
+        idleTask = 0;idlePending = false;
+        if(token !== generation || transitioning || !sceneEnabled() || document.hidden) return;
+        startTimer = window.setTimeout(startNow, 260);
+      };
       if(window.SonglineRuntime && typeof window.SonglineRuntime.idle === 'function'){
         window.SonglineRuntime.idle('space-ribbons-start', run, 1200);
         return;
       }
       if('requestIdleCallback' in window){
-        try{ window.requestIdleCallback(run, {timeout:1200}); return; }catch(e){}
+        try{ idleTask = window.requestIdleCallback(run, {timeout:1200}); return; }catch(e){}
       }
       run();
     });
@@ -373,18 +417,26 @@
 
   // 由页面模块按需初始化；全局监听只注册一次，返回可见场景可再次调用。
   window.SonglineInitSpaceRibbons = start;
+  function scheduleResume(delay){
+    window.clearTimeout(resumeTimer);
+    resumeTimer = window.setTimeout(function(){ resumeTimer = 0; resumeSvgAnimations(); }, delay);
+  }
 
   window.addEventListener('resize', scheduleResize);
   window.addEventListener('orientationchange', scheduleResize);
   if(mobileQuery && mobileQuery.addEventListener) mobileQuery.addEventListener('change', function(){ render(true); });
+  if(motionQuery && motionQuery.addEventListener) motionQuery.addEventListener('change', function(){ if(motionQuery.matches) releaseLayer();else start(); });
+  window.addEventListener('pagehide', function(event){
+    if(event.persisted){ cancelPending(); pauseSvgAnimations(); }else releaseLayer();
+  });
   window.addEventListener('pageshow', function(event){
     start();
-    if(event && event.persisted) window.setTimeout(resumeSvgAnimations, 60);
+    if(event && event.persisted) scheduleResume(60);
   });
 
   document.addEventListener('visibilitychange', function(){
-    if(document.hidden) pauseSvgAnimations();
-    else window.setTimeout(resumeSvgAnimations, 40);
+    if(document.hidden){ cancelPending(); pauseSvgAnimations(); }
+    else { start(); scheduleResume(40); }
   });
 
   window.addEventListener('songline:animation-before-resume', function(){
@@ -392,13 +444,16 @@
   });
 
   window.addEventListener('songline:animation-resume', function(){
-    window.setTimeout(resumeSvgAnimations, 40);
+    scheduleResume(40);
   });
 
   // 页面切换不重新生成曲线，只保证背景图层仍在。
+  window.addEventListener('songline:page-transition-start', function(){ transitioning = true;cancelPending(); });
+  window.addEventListener('songline:page-transition-end', function(){ transitioning = false;start();scheduleResume(40); });
   window.addEventListener('songline:page-swap', function(){
+    transitioning = false;
     if(!sceneEnabled()){ releaseLayer(); return; }
-    window.setTimeout(start, 120);
-    window.setTimeout(resumeSvgAnimations, 180);
+    start();
+    scheduleResume(180);
   });
 })();

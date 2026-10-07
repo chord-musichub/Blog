@@ -3,6 +3,8 @@
 
   var VERSION = '20.20.6';
   var pausedAnimations = [];
+  var rateRamps = new Map();
+  var rateFrame = 0;
   var wasHidden = false;
   var syncTimer = 0;
   var resumeTimer = 0;
@@ -15,31 +17,42 @@
   var idleTasks = Object.create(null);
   var rafTasks = Object.create(null);
 
+  function cancelIdle(key){
+    var task = idleTasks[key];
+    if(!task) return;
+    if(task.idle && window.cancelIdleCallback) window.cancelIdleCallback(task.id);
+    else window.clearTimeout(task.id);
+    delete idleTasks[key];
+  }
+  function cancelRaf(key){
+    if(rafTasks[key]) window.cancelAnimationFrame(rafTasks[key]);
+    delete rafTasks[key];
+  }
+
   function scheduleIdle(key, fn, timeout){
     key = key || ('idle-' + Math.random());
-    if(idleTasks[key]){
-      if(window.cancelIdleCallback) window.cancelIdleCallback(idleTasks[key]);
-      else window.clearTimeout(idleTasks[key]);
-    }
+    cancelIdle(key);
     var run = function(){
-      idleTasks[key] = 0;
+      delete idleTasks[key];
       try{ fn(); }catch(err){ setTimeout(function(){ throw err; }, 0); }
     };
     if(window.requestIdleCallback){
       try{
-        idleTasks[key] = window.requestIdleCallback(run, {timeout: timeout || 260});
-        return idleTasks[key];
+        var id = window.requestIdleCallback(run, {timeout: timeout || 260});
+        idleTasks[key] = {id:id,idle:true};
+        return id;
       }catch(e){}
     }
-    idleTasks[key] = window.setTimeout(run, Math.min(80, timeout || 48));
-    return idleTasks[key];
+    var timer = window.setTimeout(run, Math.min(80, timeout || 48));
+    idleTasks[key] = {id:timer,idle:false};
+    return timer;
   }
 
   function scheduleRaf(key, fn){
     key = key || ('raf-' + Math.random());
-    if(rafTasks[key]) window.cancelAnimationFrame(rafTasks[key]);
+    cancelRaf(key);
     rafTasks[key] = window.requestAnimationFrame(function(now){
-      rafTasks[key] = 0;
+      delete rafTasks[key];
       try{ fn(now); }catch(err){ setTimeout(function(){ throw err; }, 0); }
     });
     return rafTasks[key];
@@ -132,6 +145,9 @@
 
   function pauseWaapiAnimations(){
     if(!canUseWaapi()) return;
+    // A rapid hide during the ramp must retain the original rate, not the
+    // temporary .18x rate (which otherwise compounds on every tab switch).
+    stopRateRamps();
 
     pausedAnimations = [];
     try{
@@ -149,33 +165,36 @@
     }catch(e){}
   }
 
+  function setAnimationRate(animation, rate){
+    try{
+      if(typeof animation.updatePlaybackRate === 'function') animation.updatePlaybackRate(rate);
+      else animation.playbackRate = rate;
+    }catch(e){}
+  }
+  function stopRateRamps(){
+    window.cancelAnimationFrame(rateFrame);rateFrame = 0;
+    rateRamps.forEach(function(motion,animation){ setAnimationRate(animation,motion.target); });
+    rateRamps.clear();
+  }
+  function stepRates(now){
+    rateFrame = 0;
+    rateRamps.forEach(function(motion,animation){
+      var target = animation.effect && animation.effect.target;
+      if(animation.playState !== 'running' || target && target.isConnected === false){
+        setAnimationRate(animation,motion.target);rateRamps.delete(animation);return;
+      }
+      var t = Math.max(0, Math.min(1, (now - motion.at) / 520));
+      var eased = 1 - Math.pow(1 - t, 3);
+      setAnimationRate(animation,motion.target * (.18 + .82 * eased));
+      if(t === 1) rateRamps.delete(animation);
+    });
+    if(rateRamps.size) rateFrame = window.requestAnimationFrame(stepRates);
+  }
   function rampAnimationRate(animation, targetRate){
     if(!animation) return;
-    var start = 0.18 * targetRate;
-    var startAt = performance.now();
-    var duration = 520;
-    try{
-      if(typeof animation.updatePlaybackRate === 'function') animation.updatePlaybackRate(start);
-      else animation.playbackRate = start;
-    }catch(e){}
-
-    function step(now){
-      var t = Math.max(0, Math.min(1, (now - startAt) / duration));
-      var eased = 1 - Math.pow(1 - t, 3);
-      var rate = start + (targetRate - start) * eased;
-      try{
-        if(typeof animation.updatePlaybackRate === 'function') animation.updatePlaybackRate(rate);
-        else animation.playbackRate = rate;
-      }catch(e){}
-      if(t < 1) window.requestAnimationFrame(step);
-      else{
-        try{
-          if(typeof animation.updatePlaybackRate === 'function') animation.updatePlaybackRate(targetRate);
-          else animation.playbackRate = targetRate;
-        }catch(e){}
-      }
-    }
-    window.requestAnimationFrame(step);
+    setAnimationRate(animation,.18 * targetRate);
+    rateRamps.set(animation,{target:targetRate,at:performance.now()});
+    if(!rateFrame) rateFrame = window.requestAnimationFrame(stepRates);
   }
 
   function resumeWaapiAnimations(){
@@ -288,6 +307,8 @@
     resetVisualClockBaseline: resetVisualClockBaseline,
     scheduleIdle: scheduleIdle,
     scheduleRaf: scheduleRaf,
+    cancelIdle: cancelIdle,
+    cancelRaf: cancelRaf,
     initOnce: initOnce,
     emitLifecycle: emitLifecycle
   };
@@ -297,6 +318,8 @@
     profile: function(){ return perfProfile || applyPerfProfile(); },
     idle: scheduleIdle,
     raf: scheduleRaf,
+    cancelIdle: cancelIdle,
+    cancelRaf: cancelRaf,
     initOnce: initOnce,
     visualNow: nowVisualSeconds,
     resetVisualClockBaseline: resetVisualClockBaseline,
@@ -333,6 +356,11 @@
   window.addEventListener('blur', scheduleSync);
   window.addEventListener('resize', function(){ window.clearTimeout(syncTimer); syncTimer = window.setTimeout(applyPerfProfile, 220); });
   window.addEventListener('songline:page-swap', function(){
+    // Do not retain old-page animations while new controllers are initialized.
+    pausedAnimations = pausedAnimations.filter(function(item){
+      var target = item.animation.effect && item.animation.effect.target;
+      return !target || target.isConnected !== false;
+    });
     // AJAX 切页后，新 DOM 在显示前先同步一次动画相位，避免轨道/漂流带显示上一帧位置。
     notifyAnimationBeforeResume('page-swap');
     window.setTimeout(sync, 80);

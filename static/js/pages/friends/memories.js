@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  var VERSION = '2.5.0';
+  var VERSION = '2.6.0';
   function parseData(root){
     var node = root.querySelector('#memory-room-data');
     try{return node ? JSON.parse(node.textContent || '[]') : [];}catch(e){return [];}
@@ -18,10 +18,11 @@
     var track = room.querySelector('[data-memory-track]');
     var cards = Array.prototype.slice.call(room.querySelectorAll('[data-memory-card]'));
     var lightbox = document.querySelector('[data-memory-lightbox]');
-    if((!data.length && !cards.length) || !viewport || !track) return;
+    if(!cards.length || !viewport || !track){ delete room.dataset.memoryReady; return; }
     var monthCount = Math.max(1, Number(track.dataset.memoryCount) || data.length);
     var step = 0, position = 0, target = 0, minimum = 0, drag = null, frame = 0, dragFrame = 0, dragNext = 0;
     var suppressUntil = 0, measured = false;
+    var disposed = false, resizeFrame = 0;
     // Stagger dates, not individual cards: every card on a date shares a base.
     cards.forEach(function(card){ card.dataset.memoryLane = String((Number(card.dataset.memoryMonthIndex) || 0) % 3); });
     function reduced(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
@@ -48,6 +49,7 @@
     function clamp(value){ return Math.max(minimum, Math.min(0, value)); }
     function paint(){ track.style.transform = 'translate3d(' + position + 'px,0,0)'; }
     function glide(){
+      if(disposed || document.hidden || !room.isConnected){ frame = 0; return; }
       position += (target - position) * .16;
       if(Math.abs(target - position) < .25){ position = target; paint(); frame = 0; return; }
       paint(); frame = window.requestAnimationFrame(glide);
@@ -140,8 +142,22 @@
     }
     function onLightboxClick(event){ if(event.target === lightbox) close(); }
     function onKeyDown(event){ if(event.key === 'Escape') close(); }
-    function onResize(){ measure(); moveTo(target, true); }
+    function onResize(){
+      if(disposed || resizeFrame) return;
+      resizeFrame = window.requestAnimationFrame(function(){ resizeFrame = 0;if(disposed) return;measure();moveTo(target,true); });
+    }
+    function suspend(){
+      stopDrag();
+      if(frame) window.cancelAnimationFrame(frame);
+      frame = 0;target = position;
+    }
+    function onVisibility(){ if(document.hidden) suspend();else onResize(); }
+    function onPageHide(event){ if(event.persisted) suspend();else cleanup(); }
+    function onPageShow(event){ if(event.persisted) onResize(); }
     function cleanup(){
+      if(disposed) return;
+      disposed = true;delete room.dataset.memoryReady;
+      window.cancelAnimationFrame(resizeFrame);
       if(frame) window.cancelAnimationFrame(frame);
       if(dragFrame) window.cancelAnimationFrame(dragFrame);
       frame = 0; dragFrame = 0; drag = null;
@@ -163,8 +179,12 @@
       }
       document.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('blur', suspend);
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', onPageHide);
+      window.removeEventListener('pageshow', onPageShow);
       window.removeEventListener('songline:page-transition-start', onTransitionStart);
-      document.documentElement.classList.remove('is-memory-lightbox-open');
+      close();
       if(window.__songlineMemoryRoomCleanup === cleanup) window.__songlineMemoryRoomCleanup = null;
     }
     function onTransitionStart(event){
@@ -182,11 +202,13 @@
     }
     document.addEventListener('keydown', onKeyDown);
     window.addEventListener('resize', onResize);
+    window.addEventListener('blur', suspend);
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', onPageHide);
+    window.addEventListener('pageshow', onPageShow);
     window.addEventListener('songline:page-transition-start', onTransitionStart);
     window.__songlineMemoryRoomCleanup = cleanup;
     measure(); focusMemory(Number(cards[cards.length - 1].dataset.memoryMonthIndex) || 0);
   }
   window.SonglineInitMemoryRoom = init;
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){init(document);},{once:true}); else init(document);
-  window.addEventListener('songline:page-swap', function(event){init((event.detail && event.detail.root) || document);});
 })();

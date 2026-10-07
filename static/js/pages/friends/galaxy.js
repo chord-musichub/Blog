@@ -2,7 +2,7 @@
 (function(){
   'use strict';
 
-  var VERSION = '22.15.0';
+  var VERSION = '22.16.0';
   // 新朋友没有配置位置时会顺序使用这些预设，保持构图可预测而不是随机散点。
   // A wide outer ring plus a loose inner ring keeps the growing friend list
   // readable.  The old presets clustered around the core (especially the
@@ -47,6 +47,7 @@
     return found ? found[0].replace(/-/g, '.') : '—';
   }
   function normalize(raw, linkConfig){
+    var seen = Object.create(null);
     return (raw || []).map(function(item, index){
       item = item || {};
       var name = clean(item.name || item.display_name || item.displayName || item.username || ('朋友 ' + (index + 1)));
@@ -66,13 +67,19 @@
         name:name,
         bio:clean(item.bio) || '这个朋友还没有写简介。',
         avatar:url(item.avatar, '/uploads/admin/friends/user-null.png'),
-        href:explicitHref ? profileURL(explicitHref) : '',
+        // Registered members have generated local profiles even when a seed
+        // omits url; external cards without username/URL remain non-navigable.
+        href:explicitHref ? profileURL(explicitHref) : username ? profileURL('/friends/' + encodeURIComponent(username) + '/') : '',
         count:Number(item.post_count || item.postCount || 0),
         updated:date(item.updated_at || item.updatedAt),
         configuredLinks:hasConfiguredLinks,
         links:hasConfiguredLinks ? toArray(linkConfig[linkOwner]) : toArray(item.links || item.relations)
       };
-    }).filter(function(friend){ return friend.id && !/^(admin|root|system|test|demo)$/.test(friend.id); });
+    }).filter(function(friend){
+      if(!friend.id || /^(admin|root|system|test|demo)$/.test(friend.id) || seen[friend.id]) return false;
+      seen[friend.id] = true;
+      return true;
+    });
   }
   function inlineData(){
     var node = document.getElementById('friend-galaxy-data');
@@ -137,7 +144,9 @@
     var input = shell.querySelector('#friendGalaxySearch');
     var submit = shell.querySelector('[data-friend-search-submit]');
     var results = shell.querySelector('[data-galaxy-results]');
-    if(!stage || !world || !lines || !nodeLayer || !core) return;
+    if(!stage || !world || !lines || !nodeLayer || !core){ delete shell.dataset.friendGalaxyReady; return; }
+    // Clear the previous controller's edges once, not on every resize/layout.
+    lines.textContent = '';
 
     if(!friends.length){
       if(empty){ empty.hidden = false; empty.textContent = '还没有可显示的朋友数据。'; }
@@ -153,14 +162,16 @@
     var nodeById = Object.create(null);
     var resizeFrame = 0;
     var settleTimer = 0;
+    var settleFrame = 0;
+    var disposed = false;
     var zoomFrame = 0;
     var zoomAnimation = null;
     var stageObserver = null;
-    var lineFrame = 0;
     var compactQuery = window.matchMedia('(max-width: 980px)');
     // 工作区比视窗更大；只平移这个世界层，背景、回忆入口和 hover 卡片保持固定。
     var pan = { x:0, y:0, targetX:0, targetY:0, zoom:1, inertiaFrame:0, inertiaLast:0, inertiaX:0, inertiaY:0, dragFrame:0, drag:null, nextX:0, nextY:0, suppressUntil:0 };
-    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var reducedMotion = motionQuery.matches;
     var lens = {items:[],edges:[],width:0,height:0,worldWidth:0,worldHeight:0,left:0,top:0};
 
     // One coordinate projection for the real hit targets and SVG edges. No cloned
@@ -172,28 +183,32 @@
       var focusX=lens.width/2, focusY=lens.height/2;
       // 遮罩使用 CSS 中原来的固定中心和模糊半径。只投影头像和连线，
       // 避免拖动/惯性期间每帧改变全屏 backdrop-filter 与 mask 的纹理。
-      var centers=Object.create(null);
+      var gain=reducedMotion ? .28 : .48;
+      var radiusX=lens.width*.54, radiusY=lens.height*.54;
       lens.items.forEach(function(item){
         var screenX=lens.left+lens.worldWidth/2+(item.x-lens.worldWidth/2)*pan.zoom+pan.x;
         var screenY=lens.top+lens.worldHeight/2+(item.y-lens.worldHeight/2)*pan.zoom+pan.y;
         var vx=screenX-focusX, vy=screenY-focusY;
-        var distance=Math.hypot(vx/(lens.width*.54),vy/(lens.height*.54));
+        var distance=Math.hypot(vx/radiusX,vy/radiusY);
         var influence=Math.pow(Math.max(0,1-distance*distance),2);
         // Make the lens unmistakable without changing the world geometry:
         // the avatar at the focus reaches roughly 1.48x, while the reduced
         // motion path still provides a quieter but visible 1.28x emphasis.
-        var gain=reducedMotion ? .28 : .48;
         var ox=vx*influence*.16/pan.zoom, oy=vy*influence*.16/pan.zoom;
-        setStyle(item.element, '--lens-x',ox.toFixed(2)+'px');
-        setStyle(item.element, '--lens-y',oy.toFixed(2)+'px');
-        setStyle(item.element, '--lens-scale',(1+gain*influence).toFixed(3));
-        centers[item.id]={x:item.x+ox,y:item.y+oy};
+        setLensStyle(item, '--lens-x',ox.toFixed(2)+'px');
+        setLensStyle(item, '--lens-y',oy.toFixed(2)+'px');
+        setLensStyle(item, '--lens-scale',(1+gain*influence).toFixed(3));
+        item.projectedX=item.x+ox;item.projectedY=item.y+oy;
       });
       lens.edges.forEach(function(edge){
-        var a=centers[edge.a],b=centers[edge.b];
-        setCoordinate(edge, 'x1',a.x);setCoordinate(edge, 'y1',a.y);
-        setCoordinate(edge, 'x2',b.x);setCoordinate(edge, 'y2',b.y);
+        setCoordinate(edge, 'x1',edge.a.projectedX);setCoordinate(edge, 'y1',edge.a.projectedY);
+        setCoordinate(edge, 'x2',edge.b.projectedX);setCoordinate(edge, 'y2',edge.b.projectedY);
       });
+    }
+    function setLensStyle(item, name, value){
+      if(item.styles[name] === value) return;
+      item.styles[name] = value;
+      item.element.style.setProperty(name, value);
     }
     function setStyle(element, name, value){
       if(element.style.getPropertyValue(name) !== value) element.style.setProperty(name, value);
@@ -208,13 +223,13 @@
     // 星图通过百分比定位，但图片、字体和移动端可视视口会在首帧后继续稳定。
     // 统一收敛到同一轮布局，保证 SVG 线端永远读取头像的最终圆心。
     function scheduleLayout(){
-      if(!stage.isConnected || resizeFrame) return;
+      if(disposed || !stage.isConnected || resizeFrame) return;
       resizeFrame = window.requestAnimationFrame(function(){ resizeFrame = 0; layout(); });
     }
     function settleLayout(){
-      if(!stage.isConnected) return;
+      if(disposed || !stage.isConnected) return;
       scheduleLayout();
-      window.requestAnimationFrame(scheduleLayout);
+      if(!settleFrame) settleFrame = window.requestAnimationFrame(function(){ settleFrame = 0; scheduleLayout(); });
     }
 
     function panBounds(){
@@ -227,18 +242,18 @@
       var bounds = panBounds();
       return { x:Math.max(-bounds.x, Math.min(bounds.x, x)), y:Math.max(-bounds.y, Math.min(bounds.y, y)) };
     }
-    function paintPan(){
+    function paintPan(deferLens){
       world.style.transform = 'translate3d(' + pan.x.toFixed(2) + 'px,' + pan.y.toFixed(2) + 'px,0) scale(' + pan.zoom.toFixed(3) + ')';
       // 透镜必须随画布平移实时更新，否则手机端经过中心的头像不会被放大。
       // 性能削减改由移动端关闭流星、星云漂移与高强度模糊承担。
-      paintLens();
+      if(!deferLens) paintLens();
     }
     function isMoving(){ return !!(pan.drag || pan.inertiaFrame || zoomAnimation); }
     function syncMotionState(){ stage.classList.toggle('is-moving', isMoving()); }
-    function movePan(x, y){
+    function movePan(x, y, deferLens){
       var next = clampPan(x, y);
       pan.targetX = next.x; pan.targetY = next.y;
-      pan.x = next.x; pan.y = next.y; paintPan();
+      pan.x = next.x; pan.y = next.y; paintPan(deferLens);
     }
     function stopInertia(){
       if(pan.inertiaFrame) window.cancelAnimationFrame(pan.inertiaFrame);
@@ -247,6 +262,7 @@
       syncMotionState();
     }
     function coastPan(now){
+      if(disposed || document.hidden || !stage.isConnected){ stopInertia(); return; }
       var elapsed = Math.min(32, Math.max(8, now - pan.inertiaLast));
       pan.inertiaLast = now;
       var next = clampPan(pan.x + pan.inertiaX * elapsed, pan.y + pan.inertiaY * elapsed);
@@ -345,7 +361,7 @@
       if(reducedMotion){ pan.zoom = zoom; movePan(x, y); return; }
       zoomAnimation = {start:performance.now(), zoom:pan.zoom, x:pan.x, y:pan.y, toZoom:zoom, toX:x, toY:y};
       function step(now){
-        if(!stage.isConnected){ stopZoom(); return; }
+        if(disposed || document.hidden || !stage.isConnected){ stopZoom(); return; }
         var motion = zoomAnimation;
         var progress = Math.min(1, Math.max(0, (now - motion.start) / 260));
         var eased = 1 - Math.pow(1 - progress, 3);
@@ -402,6 +418,7 @@
     }
     function setProfile(friend){
       if(!friend) return;
+      if(focused === friend && shell.dataset.focusedFriend === friend.id) return;
       focused = friend;
       if(profileName) profileName.textContent = friend.name;
       if(profileBio) profileBio.textContent = friend.bio;
@@ -434,11 +451,28 @@
     function setHost(){
       safeImage(coreImage, host.avatar);
       if(coreName) coreName.textContent = host.name;
-      core.onclick = function(){ window.location.href = host.href; };
-      core.addEventListener('pointerenter', function(event){ if(event.pointerType !== 'touch') showHoverCard(host, core); });
+      if(host.href) core.href = host.href;
+      else core.removeAttribute('href');
+      // The stage's drag-click guard runs after the document's capture handler.
+      // Route this one link locally so releasing a core-avatar drag cannot navigate.
+      core.setAttribute('data-no-page-transition','');
+      core.addEventListener('click', onCoreClick);
+      core.addEventListener('pointerenter', onCoreEnter);
       core.addEventListener('pointerleave', hideHoverCard);
-      core.addEventListener('focus', function(){ showHoverCard(host, core); });
+      core.addEventListener('focus', onCoreFocus);
       core.addEventListener('blur', hideHoverCard);
+    }
+    function onCoreEnter(event){ if(event.pointerType !== 'touch') showHoverCard(host, core); }
+    function onCoreFocus(){ showHoverCard(host, core); }
+    function onCoreClick(event){
+      if(event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      if(Date.now() >= pan.suppressUntil) openFriend(host);
+    }
+    function openFriend(friend){
+      if(!friend.href) return;
+      if(window.SonglinePageTransition) window.SonglinePageTransition.navigateLink(friend.href);
+      else window.location.href = friend.href;
     }
     function edgeFor(a, b){ return [a.id, b.id].sort().join(':'); }
     function configuredEdges(){
@@ -453,14 +487,14 @@
         edges.push([a,b]);
       }
       friends.forEach(function(friend){
-        if(friend.configuredLinks && friend.links.length) hasConfiguredGraphLinks = true;
+        if(friend.configuredLinks) hasConfiguredGraphLinks = true;
         friend.links.forEach(function(target){ add(friend, byKey[key(target)]); });
       });
       if(!hasConfiguredGraphLinks){
         DEFAULT_CONSTELLATION_EDGES.forEach(function(pair){ add(byKey[key(pair[0])], byKey[key(pair[1])]); });
       }
       // 没有关系数据时，维持一个稀疏、非放射的星座链。
-      if(!edges.length){
+      if(!edges.length && !hasConfiguredGraphLinks){
         var chain = [host].concat(visibleFriends);
         chain.forEach(function(friend, index){ if(index) add(chain[index - 1], friend); });
         if(chain.length > 3) add(chain[0], chain[Math.min(3, chain.length - 1)]);
@@ -491,7 +525,7 @@
           event.preventDefault();
           // 已选中节点只有在明确配置了地址时才可跳转；未填第三方连接的
           // 节点仍可查看悬浮信息和关系线，但不会发生空白/404 跳转。
-          if(selected === friend){ if(friend.href) window.location.href = friend.href; return; }
+          if(selected === friend){ openFriend(friend); return; }
           selected = friend;
           setProfile(friend);
           showHoverCard(friend, node);
@@ -516,14 +550,13 @@
       visibleFriends.forEach(function(friend, index){
         var node = nodeById[friend.id];
         var point = presetFor(index);
-        node.style.left = point[0] + '%';
-        node.style.top = point[1] + '%';
+        setStyle(node, 'left',point[0] + '%');
+        setStyle(node, 'top',point[1] + '%');
       });
     }
     function drawLines(){
-      lineFrame = 0;
-      if(!stage.isConnected) return;
-      lens.items=[];lens.edges=[];
+      if(disposed || !stage.isConnected) return;
+      lens.items=[];
       var elements=[{id:host.id,element:core}].concat(visibleFriends.map(function(friend){return {id:friend.id,element:nodeById[friend.id]};}));
       // 先批量读取图片与按钮位置，再写入 transform-origin，避免读写交错。
       elements.forEach(function(item){
@@ -537,12 +570,12 @@
       var layoutHeight = world.clientHeight || worldRect.height;
       if(!worldRect.width || !worldRect.height || !layoutWidth || !layoutHeight) return;
       lines.setAttribute('viewBox', '0 0 ' + Math.round(layoutWidth) + ' ' + Math.round(layoutHeight));
-      lines.innerHTML = '';
       var centers = Object.create(null);
       centers[host.id] = centerOf(core, worldRect, layoutWidth, layoutHeight);
       visibleFriends.forEach(function(friend){ centers[friend.id] = centerOf(nodeById[friend.id], worldRect, layoutWidth, layoutHeight); });
       lens.width=stage.clientWidth;lens.height=stage.clientHeight;
       lens.worldWidth=layoutWidth;lens.worldHeight=layoutHeight;lens.left=world.offsetLeft;lens.top=world.offsetTop;
+      var itemById=Object.create(null);
       elements.forEach(function(item){
         var img=item.element.querySelector('img');
         // The node's transform is centered on the avatar, not on the full
@@ -555,19 +588,20 @@
         var visualScale = worldRect.height / layoutHeight;
         var originY=(imageRect ? imageRect.top + imageRect.height/2 - elementRect.top : elementRect.height/2) / visualScale;
         item.originY = originY;
-        lens.items.push({id:item.id,element:item.element,x:centers[item.id].x,y:centers[item.id].y});
+        var projected={id:item.id,element:item.element,x:centers[item.id].x,y:centers[item.id].y,styles:Object.create(null)};
+        lens.items.push(projected);itemById[item.id]=projected;
       });
       elements.forEach(function(item){ setStyle(item.element, '--lens-origin-y',item.originY.toFixed(2)+'px'); });
-      edges.forEach(function(edge){
-        var from = centers[edge[0].id], to = centers[edge[1].id];
-        if(!from || !to) return;
-        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', Math.round(from.x)); line.setAttribute('y1', Math.round(from.y));
-        line.setAttribute('x2', Math.round(to.x)); line.setAttribute('y2', Math.round(to.y));
-        line.setAttribute('data-edge', edgeFor(edge[0], edge[1]));
-        line.setAttribute('class', 'friends-constellation__line');
-        lines.appendChild(line);
-        lens.edges.push({line:line,a:edge[0].id,b:edge[1].id});
+      edges.forEach(function(edge,index){
+        var projected=lens.edges[index];
+        if(!projected){
+          var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('data-edge', edgeFor(edge[0], edge[1]));
+          line.setAttribute('class', 'friends-constellation__line');
+          lines.appendChild(line);
+          projected={line:line};lens.edges.push(projected);
+        }
+        projected.a=itemById[edge[0].id];projected.b=itemById[edge[1].id];
       });
       paintLens();
       updateLineState(focused);
@@ -590,14 +624,16 @@
       Object.keys(nodeById).forEach(function(id){ nodeById[id].classList.toggle('is-related', id === friend.id); });
     }
     function layout(){
-      if(!stage.isConnected) return;
+      if(disposed || !stage.isConnected) return;
       lens.width=stage.clientWidth;lens.height=stage.clientHeight;
       lens.worldWidth=world.clientWidth;lens.worldHeight=world.clientHeight;
       lens.left=world.offsetLeft;lens.top=world.offsetTop;
-      movePan(pan.targetX, pan.targetY);
       positionNodes();
-      window.cancelAnimationFrame(lineFrame);
-      lineFrame = window.requestAnimationFrame(drawLines);
+      // Size/positions, lens and SVG edges must commit in the same frame.
+      // Painting the old cached coordinates before a second RAF made lines
+      // detach for a frame when the viewport or mobile browser bar changed.
+      movePan(pan.targetX, pan.targetY, true);
+      drawLines();
     }
     function renderSearch(){
       var query = clean(input && input.value).toLowerCase();
@@ -625,18 +661,17 @@
 
     function onWindowLoad(){ settleLayout(); }
     function onTransitionEnd(){
-      if(!stage.isConnected) return;
-      window.requestAnimationFrame(function(){
-        window.requestAnimationFrame(function(){
-          layout();
-          window.clearTimeout(settleTimer);
-          settleTimer = window.setTimeout(layout, 48);
-        });
-      });
+      if(disposed || !stage.isConnected) return;
+      settleLayout();
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(scheduleLayout, 48);
     }
     function cleanup(){
+      if(disposed) return;
+      disposed = true;
+      delete shell.dataset.friendGalaxyReady;
       window.cancelAnimationFrame(resizeFrame);
-      window.cancelAnimationFrame(lineFrame);
+      window.cancelAnimationFrame(settleFrame);
       window.clearTimeout(settleTimer);
       stopZoom();
       stopInertia();
@@ -655,13 +690,29 @@
       window.removeEventListener('pointerup', stopPan, true);
       window.removeEventListener('pointercancel', stopPan, true);
       window.removeEventListener('blur', cancelPan);
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', onPageHide);
+      window.removeEventListener('pageshow', onPageShow);
+      if(motionQuery.removeEventListener) motionQuery.removeEventListener('change', onMotionChange);
       stage.removeEventListener('lostpointercapture', onLostPointerCapture);
       stage.removeEventListener('dragstart', preventNativeDrag);
       stage.removeEventListener('click', blockDragClick, true);
       stage.removeEventListener('wheel', onWheel);
       if(zoomControls) zoomControls.removeEventListener('click', onZoomControl);
+      core.removeEventListener('pointerenter', onCoreEnter);
+      core.removeEventListener('pointerleave', hideHoverCard);
+      core.removeEventListener('focus', onCoreFocus);
+      core.removeEventListener('blur', hideHoverCard);
+      core.removeEventListener('click', onCoreClick);
+      if(submit) submit.removeEventListener('click', renderSearch);
+      if(input){ input.removeEventListener('input', renderSearch); input.removeEventListener('keydown', onSearchKey); }
       if(window.__songlineFriendGalaxyCleanup === cleanup) window.__songlineFriendGalaxyCleanup = null;
     }
+    function onVisibility(){ if(document.hidden){ cancelPan(); hideHoverCard(); }else settleLayout(); }
+    function onPageHide(event){ if(event.persisted) cancelPan();else cleanup(); }
+    function onPageShow(event){ if(event.persisted) settleLayout(); }
+    function onMotionChange(){ reducedMotion = motionQuery.matches;cancelPan();paintLens(); }
+    function onSearchKey(event){ if(event.key === 'Enter') renderSearch(); }
     function onTransitionStart(event){
       var from = event.detail && event.detail.from || '';
       if(from.indexOf('/friends/') === 0) cleanup();
@@ -692,6 +743,10 @@
     window.addEventListener('pointerup', stopPan, true);
     window.addEventListener('pointercancel', stopPan, true);
     window.addEventListener('blur', cancelPan);
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', onPageHide);
+    window.addEventListener('pageshow', onPageShow);
+    if(motionQuery.addEventListener) motionQuery.addEventListener('change', onMotionChange);
     stage.addEventListener('lostpointercapture', onLostPointerCapture);
     stage.addEventListener('dragstart', preventNativeDrag);
     stage.addEventListener('click', blockDragClick, true);
@@ -699,11 +754,8 @@
     if(zoomControls){ zoomControls.hidden = false; zoomControls.addEventListener('click', onZoomControl); }
     window.__songlineFriendGalaxyCleanup = cleanup;
     if(submit) submit.addEventListener('click', renderSearch);
-    if(input){ input.addEventListener('input', renderSearch); input.addEventListener('keydown', function(event){ if(event.key === 'Enter') renderSearch(); }); }
+    if(input){ input.addEventListener('input', renderSearch); input.addEventListener('keydown', onSearchKey); }
   }
 
   window.SonglineInitFriendGalaxy = init;
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ init(document); }, {once:true});
-  else init(document);
-  window.addEventListener('songline:page-swap', function(event){ init((event.detail && event.detail.root) || document); });
 })();

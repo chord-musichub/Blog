@@ -93,6 +93,7 @@ fs.mkdirSync('local-only/galaxy-lens',{recursive:true});
    await page.waitForTimeout(600);
    const resizedAnimations=await page.locator('.songline-starstream-layer animate').count();
    assert.ok(width<981 ? resizedAnimations>0 : resizedAnimations===0,'Planetary trail mode follows the viewport breakpoint');
+   assert((await inspect()).maxError<2.5,'Resize after zoom keeps line endpoints attached');
    assert.deepEqual(errors,[]);await context.close();
   }
  }finally{await browser.close()}

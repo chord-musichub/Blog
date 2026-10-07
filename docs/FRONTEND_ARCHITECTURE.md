@@ -41,6 +41,7 @@
 - 新建功能不要继续向 `site.css` 追加版本补丁；归入最窄的现有职责文件，必要时新建明确命名的模块。
 - 页面级脚本只暴露初始化函数；不要同时注册 `DOMContentLoaded`、页面切换监听和模块调度三套入口。
 - 页面过场期间不得创建第二个 overlay 或再次写 history；统一通过 `SonglinePageTransition.navigate()` 和内部锁管理。无障碍的减少动态效果会自动退化为短淡入淡出。
+- 朋友星图与回忆时间线仅导出初始化 API，由模块调度器接管；背景轨迹必须重复安全、保留可见状态，切页/隐藏时取消延迟启动和开机等待。公共 keyed idle/RAF 任务使用配对的取消 API，不能只取消外层 timer 而留下已提交的 idle 回调。
 - 修改公共样式后，至少检查首页、档案/公告、单篇阅读、朋友页与工具页的浅色与深色模式；旧标签网址测试兼容跳转，不再测试旧标签 UI。
 
 ## 组件生命周期契约
@@ -55,6 +56,8 @@
 - 阅读目录的 hover 颜色反馈可以变化，但目录和链接的命中区域不能因 hover 位移；键盘折叠只响应目录容器本身，不能拦截子链接的 Enter。
 
 回归入口：`tests/stability.test.cjs`、`tests/article-download.test.cjs`、`tests/stability.browser.cjs`。浏览器测试需指定新构建的 `BLOG_UI_BUILD`，并使用离线请求拦截，禁止测试写入线上数据。
+
+朋友页展示、轨迹与后台恢复的固定序列压力回归见 `tests/stability-performance.test.cjs`、`tests/stability-performance.browser.cjs` 和[运行时稳定性记录](STABILITY_PERFORMANCE_2026-10-07.md)。连线在布局校准时复用节点；透镜与端点同轮更新。全站动画软恢复使用一条共享帧链，暂停时保留原始目标速率，避免快速后台切换后持续减速。
 
 ## 刷新与本地 Markdown 阅读
 
