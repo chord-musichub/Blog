@@ -674,7 +674,7 @@
 
     canvas.addEventListener('click', handleAction);
     root.addEventListener('songline:tool-sync-best', function(){ if(!disposed) syncLocalBest(true); });
-    if(pauseBtn) pauseBtn.addEventListener('click', function(){ togglePause();pauseBtn.blur(); });
+    if(pauseBtn) pauseBtn.addEventListener('click', function(event){ togglePause();if(event.detail > 0) pauseBtn.blur(); });
     root.addEventListener('songline:tool-help-change', function(event){
       if(disposed) return;
       if(event.detail.open){
@@ -690,17 +690,17 @@
     }
 
     if(startBtn){
-      startBtn.addEventListener('click', function(){
+      startBtn.addEventListener('click', function(event){
         ensureAudio();
         play('button');
         startGame();
-        startBtn.blur();
+        if(event.detail > 0) startBtn.blur();
       });
     }
 
     if(soundToggle){
       updateSoundToggle();
-      soundToggle.addEventListener('click', function(){
+      soundToggle.addEventListener('click', function(event){
         soundEnabled = !soundEnabled;
         localStorage.setItem(SOUND_KEY, soundEnabled ? '1' : '0');
         updateSoundToggle();
@@ -708,11 +708,12 @@
           ensureAudio();
           play('button');
         }
-        soundToggle.blur();
+        if(event.detail > 0) soundToggle.blur();
       });
     }
 
     function onKey(event){
+      if(event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.ctrlKey || event.metaKey || event.altKey) return;
       if(disposed || root.querySelector('[data-tool-help-dialog][open]')) return;
       if(event.code !== 'Space' && event.key !== ' ') return;
       // Native controls must receive Space themselves instead of flapping.
@@ -734,9 +735,13 @@
         spaceHeld = false;
       }
     }
+    function releaseKeys(){ spaceHeld = false; }
+    function onVisibility(){ if(document.hidden) releaseKeys(); }
 
     window.addEventListener('keydown', onKey, {passive:false});
     window.addEventListener('keyup', onKeyUp, {passive:true});
+    window.addEventListener('blur', releaseKeys);
+    document.addEventListener('visibilitychange', onVisibility);
     window.addEventListener('resize', resize, {passive:true});
     function cleanup(){
       disposed = true;
@@ -744,6 +749,8 @@
       if(raf){ cancelAnimationFrame(raf); raf = 0; }
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', releaseKeys);
+      document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('resize', resize);
       window.removeEventListener('songline:page-transition-start', onTransitionStart);
       window.removeEventListener('pagehide', onPageHide);

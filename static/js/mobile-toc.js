@@ -156,14 +156,18 @@
     document.body.appendChild(fab);
     document.body.appendChild(drawer);
 
-    fab.addEventListener('click', function(){ openDrawer(); });
+    fab.addEventListener('click', function(event){ openDrawer(event); });
     backdrop.addEventListener('click', closeDrawer);
     drawer.querySelector('[data-mobile-toc-close]').addEventListener('click', closeDrawer);
     drawer.querySelector('[data-mobile-toc-search]').addEventListener('input', function(){
       renderLinks(this.value || '');
     });
 
-    onDocumentKeydown = function(event){ if(event.key === 'Escape') closeDrawer(); };
+    onDocumentKeydown = function(event){
+      if(event.key === 'Escape' && !event.defaultPrevented && !event.isComposing && event.keyCode !== 229 && document.documentElement.classList.contains('mobile-toc-open')){
+        event.preventDefault();closeDrawer();
+      }
+    };
     document.addEventListener('keydown', onDocumentKeydown);
 
     return { fab:fab, drawer:drawer, backdrop:backdrop };
@@ -177,7 +181,7 @@
     document.documentElement.classList.remove('has-mobile-reading-tools');
   }
 
-  function openDrawer(){
+  function openDrawer(event){
     if(!isMobile()) return;
     var ui = ensureUi();
     document.documentElement.classList.add('mobile-toc-open');
@@ -190,7 +194,10 @@
       renderLinks('');
       window.clearTimeout(focusTimer);
       focusTimer = window.setTimeout(function(){
-        if(input.isConnected && document.documentElement.classList.contains('mobile-toc-open')) input.focus({preventScroll:true});
+        // Pointer/touch browsing should not summon the on-screen keyboard.
+        // Keyboard activation keeps the direct search shortcut.
+        var target = event && event.detail > 0 ? ui.drawer.querySelector('[data-mobile-toc-close]') : input;
+        if(target && target.isConnected && document.documentElement.classList.contains('mobile-toc-open')) target.focus({preventScroll:true});
       }, 80);
     }
   }

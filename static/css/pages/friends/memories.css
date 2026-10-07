@@ -76,6 +76,11 @@ body:has(.memory-room) .memory-room__back{position:fixed!important;top:98px!impo
 /* 简介控制为短阅读行宽：完整显示，但不会在大屏变成过长的一行。 */
 .memory-room__caption p{inline-size:min(16em,100%)}
 
+/* Native modality, with the original full-viewport glass presentation. */
+dialog.memory-lightbox{box-sizing:border-box;margin:0;width:100%;height:100%;max-width:none;max-height:none;border:0;color:inherit}
+dialog.memory-lightbox::backdrop{background:transparent}
+dialog.memory-lightbox:not([open]){display:none}
+
 /* 同日卡片共用一个起点，以实际图片高度加留白向上排列。保留各日期间的高低错位。 */
 .memory-room__memory:nth-child(n){--memory-rise:clamp(118px,17vh,204px);--memory-stack-offset:calc(var(--memory-slot,0) * (var(--memory-card-h) + 28px))}
 .memory-room__memory[data-memory-lane="1"]{--memory-rise:clamp(176px,25vh,286px)}

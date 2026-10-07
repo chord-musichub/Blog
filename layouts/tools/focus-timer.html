@@ -75,8 +75,8 @@
     </aside>
   </section>
 
-  <div class="focus-finish-overlay" data-focus-finish hidden>
-    <div class="focus-finish-card" role="dialog" aria-modal="true" aria-labelledby="focusFinishTitle">
+  <dialog class="focus-finish-overlay" data-focus-finish hidden aria-labelledby="focusFinishTitle">
+    <div class="focus-finish-card">
       <h2 id="focusFinishTitle">专注完成</h2>
       <p data-focus-finish-text>本轮专注已完成。</p>
       <div class="focus-finish-actions">
@@ -84,6 +84,6 @@
         <button class="focus-button" type="button" data-focus-close>收起提示</button>
       </div>
     </div>
-  </div>
+  </dialog>
 </main>
 {{ end }}

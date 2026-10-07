@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  var VERSION = '2.6.0';
+  var VERSION = '2.7.0';
   function parseData(root){
     var node = root.querySelector('#memory-room-data');
     try{return node ? JSON.parse(node.textContent || '[]') : [];}catch(e){return [];}
@@ -23,6 +23,7 @@
     var step = 0, position = 0, target = 0, minimum = 0, drag = null, frame = 0, dragFrame = 0, dragNext = 0;
     var suppressUntil = 0, measured = false;
     var disposed = false, resizeFrame = 0;
+    var lightboxOpener = null;
     // Stagger dates, not individual cards: every card on a date shares a base.
     cards.forEach(function(card){ card.dataset.memoryLane = String((Number(card.dataset.memoryMonthIndex) || 0) % 3); });
     function reduced(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
@@ -65,8 +66,9 @@
     function focusMemory(index){
       moveTo(-Math.max(0, Math.min(monthCount - 1, index)) * step, true);
     }
-    function open(item){
+    function open(item, opener){
       if(!item || !lightbox) return;
+      lightboxOpener = opener || document.activeElement;
       lightbox.hidden = false; lightbox.setAttribute('aria-hidden','false');
       lightbox.querySelector('[data-memory-lightbox-image]').src = item.image || '';
       if(window.SonglineResources) window.SonglineResources.image(lightbox.querySelector('[data-memory-lightbox-image]'));
@@ -75,9 +77,17 @@
       lightbox.querySelector('[data-memory-lightbox-title]').textContent = item.title || item.date || '';
       lightbox.querySelector('[data-memory-lightbox-description]').textContent = item.description || '';
       document.documentElement.classList.add('is-memory-lightbox-open');
+      if(!lightbox.open) lightbox.showModal();
       var closeButton = lightbox.querySelector('[data-memory-close]'); if(closeButton) closeButton.focus();
     }
-    function close(){ if(!lightbox) return; lightbox.hidden = true; lightbox.setAttribute('aria-hidden','true'); document.documentElement.classList.remove('is-memory-lightbox-open'); }
+    function close(restoreFocus){
+      if(!lightbox || lightbox.hidden) return;
+      if(lightbox.open) lightbox.close();
+      lightbox.hidden = true; lightbox.setAttribute('aria-hidden','true');
+      document.documentElement.classList.remove('is-memory-lightbox-open');
+      if(restoreFocus !== false && lightboxOpener && lightboxOpener.isConnected) lightboxOpener.focus({preventScroll:true});
+      lightboxOpener = null;
+    }
     function itemFromCard(card){
       return {
         date:card.dataset.memoryDate || '',
@@ -89,7 +99,7 @@
     function onCardClick(event){
       if(Date.now() < suppressUntil){ event.preventDefault(); return; }
       var card = event.currentTarget.closest('[data-memory-card]');
-      if(card) open(itemFromCard(card));
+      if(card) open(itemFromCard(card), event.currentTarget);
     }
     cards.forEach(function(card){
       var button = card.querySelector('[data-memory-open]');
@@ -141,7 +151,8 @@
       if(event.target === viewport) stopDrag(event);
     }
     function onLightboxClick(event){ if(event.target === lightbox) close(); }
-    function onKeyDown(event){ if(event.key === 'Escape') close(); }
+    function onLightboxCancel(event){ event.preventDefault();close(); }
+    function onLightboxClose(){ if(!lightbox.open) close(); }
     function onResize(){
       if(disposed || resizeFrame) return;
       resizeFrame = window.requestAnimationFrame(function(){ resizeFrame = 0;if(disposed) return;measure();moveTo(target,true); });
@@ -174,17 +185,18 @@
       viewport.removeEventListener('wheel', onWheel);
       if(lightbox){
         lightbox.removeEventListener('click', onLightboxClick);
+        lightbox.removeEventListener('cancel', onLightboxCancel);
+        lightbox.removeEventListener('close', onLightboxClose);
         var closeButton = lightbox.querySelector('[data-memory-close]');
         if(closeButton) closeButton.removeEventListener('click', close);
       }
-      document.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('blur', suspend);
       document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('pagehide', onPageHide);
       window.removeEventListener('pageshow', onPageShow);
       window.removeEventListener('songline:page-transition-start', onTransitionStart);
-      close();
+      close(false);
       if(window.__songlineMemoryRoomCleanup === cleanup) window.__songlineMemoryRoomCleanup = null;
     }
     function onTransitionStart(event){
@@ -198,9 +210,10 @@
     viewport.addEventListener('wheel', onWheel, {passive:false});
     if(lightbox){
       lightbox.addEventListener('click', onLightboxClick);
+      lightbox.addEventListener('cancel', onLightboxCancel);
+      lightbox.addEventListener('close', onLightboxClose);
       var closeButton = lightbox.querySelector('[data-memory-close]'); if(closeButton) closeButton.addEventListener('click', close);
     }
-    document.addEventListener('keydown', onKeyDown);
     window.addEventListener('resize', onResize);
     window.addEventListener('blur', suspend);
     document.addEventListener('visibilitychange', onVisibility);

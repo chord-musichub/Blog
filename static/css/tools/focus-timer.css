@@ -87,6 +87,9 @@ html body[data-page-section="tools"] .focus-minute-field input:focus-visible{out
 .focus-timer-page [data-focus-clear-today]{background:transparent}
 .focus-finish-overlay{position:fixed;inset:0;z-index:13000;display:grid;place-items:center;padding:24px;background:rgba(8,20,36,.48);backdrop-filter:blur(12px)}
 .focus-finish-overlay[hidden]{display:none!important}
+dialog.focus-finish-overlay{box-sizing:border-box;margin:0;width:100%;height:100%;max-width:none;max-height:none;border:0;color:inherit}
+dialog.focus-finish-overlay::backdrop{background:transparent}
+dialog.focus-finish-overlay:not([open]){display:none}
 .focus-finish-card{box-sizing:border-box;width:min(420px,100%);padding:28px;border:1px solid var(--focus-line);border-radius:24px;background:var(--focus-field);color:var(--focus-ink);box-shadow:0 24px 64px rgba(0,0,0,.22);text-align:center;animation:focus-pop .22s ease-out}
 .focus-finish-card h2{margin:0;font-size:26px;line-height:1.4}
 .focus-finish-card p{margin:14px 0;color:var(--focus-muted);line-height:1.7}

@@ -7,6 +7,8 @@
   var navigation = window.SonglineCreatePageNavigation && window.SonglineCreatePageNavigation();
   var locked = false;
   var queuedPopState = null;
+  var queuedNavigation = null;
+  var activeURL = '';
   var activePath = window.location.pathname || '/';
   var overlay = null;
 
@@ -136,7 +138,7 @@
     try{
       var url = new URL(link.href, window.location.href);
       if(url.origin !== window.location.origin) return false;
-      if(url.pathname === window.location.pathname && url.search === window.location.search) return false;
+      if(url.pathname === window.location.pathname && url.search === window.location.search) return locked && !url.hash;
       return true;
     }catch(e){
       return false;
@@ -286,7 +288,9 @@
       navigation.bindNavIndicatorHover();
       navigation.setNavActiveByURL(url);
     }
-    if(pushState){
+    // A browser Back/Forward may already have moved the cursor while the
+    // request/styles were loading. Do not push over that traversed entry.
+    if(pushState && !queuedPopState){
       history.pushState({
         songlineTransition:true,
         songlineCanGoBack:true,
@@ -327,14 +331,27 @@
 
   async function navigate(url, options){
     options = options || {};
-    if(locked) return;
+    if(locked){
+      // Keep the latest deliberate destination without interrupting the curtain
+      // or falling through to a native document reload. History traversal wins.
+      if(queuedPopState || (!queuedNavigation && activeURL === url.href)) return;
+      return new Promise(function(resolve){
+        if(!queuedNavigation) queuedNavigation = {waiters:[]};
+        queuedNavigation.url = url;
+        queuedNavigation.options = options;
+        queuedNavigation.waiters.push(resolve);
+      });
+    }
     var main = mainContainer();
     if(!main){ window.location.assign(url.href); return; }
+    if(options.pushState === true) saveCurrentHistoryState();
+    activeURL = url.href;
 
     var fromPath = activePath;
     var direction = priority.getTransitionDirection(fromPath, url.pathname);
     var startedAt = Date.now();
     var loaderTimer = 0;
+    var failed = false;
     var doc = null;
     var controller = new AbortController();
     var requestTimer = setTimeout(function(){ controller.abort(); }, 15000);
@@ -381,7 +398,7 @@
       main.innerHTML = nextMain.innerHTML;
       // Measure the next scene in its final position, not the old exit transform.
       settleMain(main);
-      window.scrollTo({ top:0, behavior:'auto' });
+      window.scrollTo({ top:0, behavior:'instant' });
       var hydration = hydrateDynamicBits(main);
       if(window.SonglineResources){
         var hydrated = await window.SonglineResources.bounded(hydration, 12000);
@@ -390,8 +407,30 @@
       activePath = url.pathname;
 
       var targetY = typeof options.scrollY === 'number' ? options.scrollY : 0;
-      window.scrollTo({ top:targetY, behavior:'auto' });
+      // A linked heading may be produced asynchronously from Markdown. Wait
+      // only for deep links; ordinary article entry retains its current budget.
+      var reader = main.querySelector('[data-article-renderer]');
+      if(url.hash && options.pushState && reader && reader.songlineRenderReady && window.SonglineResources){
+        await window.SonglineResources.bounded(reader.songlineRenderReady, 3000);
+      }
+      window.scrollTo({ top:targetY, behavior:'instant' });
+      function restorePosition(){
+        if(url.hash && options.pushState === true){
+          var id;
+          try{ id = decodeURIComponent(url.hash.slice(1)); }catch(error){ return; }
+          var target = document.getElementById(id);
+          if(target && main.contains(target)){
+            if(window.SonglineReading && window.SonglineReading.scrollToHeading(url.hash, true)) return;
+            target.scrollIntoView({block:'start', behavior:'instant'});
+            return;
+          }
+        }
+        window.scrollTo({top:targetY, behavior:'instant'});
+      }
+      restorePosition();
       if(window.SonglineResources) await window.SonglineResources.prepare(document, {modules:false});
+      // Decoded images/fonts above the destination can change its final offset.
+      restorePosition();
       clearTimeout(loaderTimer);
       closeLoader();
       setEnterState(main, direction);
@@ -403,10 +442,11 @@
       settleMain(main);
       window.dispatchEvent(new CustomEvent('songline:page-transition-end', { detail:{ path:activePath, direction:direction, duration:Date.now() - startedAt } }));
     }catch(error){
+      failed = true;
       // A failed module/style must not silently expose an unusable partial page.
       // Native navigation retries the complete document without another AJAX loop.
       console.warn('[page-transition] document fallback', error);
-      window.location.assign(url.href);
+      window.location.assign(queuedPopState ? queuedPopState.url.href : url.href);
     }finally{
       // These are unused media copies in the parsed response, not the live
       // player inserted into main. Native RemotePlayback activity can retain
@@ -434,10 +474,21 @@
       hideOverlay();
       settleMain(main);
       unlockNavigation();
-      if(queuedPopState){
+      activeURL = '';
+      var next = queuedNavigation;
+      queuedNavigation = null;
+      if(failed){
+        queuedPopState = null;
+        if(next) next.waiters.forEach(function(resolve){ resolve(); });
+      }else if(queuedPopState){
         var pending = queuedPopState;
         queuedPopState = null;
+        if(next) next.waiters.forEach(function(resolve){ resolve(); });
         window.setTimeout(function(){ navigate(pending.url, pending.options); }, 0);
+      }else if(next){
+        if(next.options.pushState && next.url.href === window.location.href){
+          next.waiters.forEach(function(resolve){ resolve(); });
+        }else navigate(next.url, next.options).then(function(){ next.waiters.forEach(function(resolve){ resolve(); }); });
       }
     }
   }
@@ -476,13 +527,11 @@
         return;
       }
     }
-    if(locked) return;
     if(!shouldHandleLink(link)) return;
     var url;
     try{ url = new URL(link.href, window.location.href); }catch(e){ return; }
     event.preventDefault();
     event.stopImmediatePropagation();
-    saveCurrentHistoryState();
     navigate(url, { pushState:true });
   }
 
@@ -516,7 +565,7 @@
         window.location.assign(url.href);
         return;
       }
-      saveCurrentHistoryState();
+      if(!locked && url.href === window.location.href) return Promise.resolve();
       return navigate(url, { pushState:true });
     },
     lockNavigation:lockNavigation,

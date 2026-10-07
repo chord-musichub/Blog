@@ -463,12 +463,12 @@
     if(focusBtn) focusBtn.addEventListener('click', function(){ ensureAudio(); play('button'); input.focus(); focusBtn.blur(); });
     if(soundToggle){
       updateSoundToggle();
-      soundToggle.addEventListener('click', function(){
+      soundToggle.addEventListener('click', function(event){
         soundEnabled = !soundEnabled;
         localStorage.setItem(SOUND_KEY, soundEnabled ? '1' : '0');
         updateSoundToggle();
         if(soundEnabled){ ensureAudio(); play('button'); }
-        soundToggle.blur();
+        if(event.detail > 0) soundToggle.blur();
       });
     }
 

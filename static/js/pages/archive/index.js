@@ -1,7 +1,7 @@
 /* Content Archive：索引、抽屉、双模式和轻量搜索。 */
 (function(){
   'use strict';
-  var VERSION = '23.0.0';
+  var VERSION = '23.1.0';
   function text(value){ return String(value == null ? '' : value).trim().toLowerCase(); }
   function terms(value){ return text(value).split(/[\s,，;；|]+/).filter(Boolean); }
   function isMobile(){ return window.matchMedia && window.matchMedia('(max-width:980px), (hover:none)').matches; }
@@ -20,6 +20,7 @@
     var status = archive.querySelector('[data-archive-status]');
     var projectHint = archive.querySelector('[data-archive-project-hint]');
     var activeMode = 'articles', activeRecord = null, pinnedRecord = null, closeTimer = 0, query = '';
+    var composing = false, searchScheduled = false;
     var recordLists = {};
     panels.forEach(function(panel){ recordLists[panel.dataset.archivePanel] = Array.prototype.slice.call(panel.querySelectorAll('[data-archive-record]')); });
     var searchData = new WeakMap();
@@ -42,6 +43,16 @@
       if(query) url.searchParams.set('q', query); else url.searchParams.delete('q');
       if(url.href !== window.location.href) history.replaceState(history.state, '', url.href);
       runSearch();
+    }
+    function scheduleQuery(){
+      if(composing || searchScheduled) return;
+      searchScheduled = true;
+      // Coalesce a burst of input events without adding a debounce delay to
+      // keyboard input. Never commit a partial IME candidate or a detached page.
+      Promise.resolve().then(function(){
+        searchScheduled = false;
+        if(!composing && archive.isConnected) setQuery(input.value);
+      });
     }
     function records(mode){ return recordLists[mode] || []; }
     function closeRecord(record){
@@ -71,21 +82,22 @@
     function bindRecord(record){
       var button = record.querySelector('[data-archive-trigger]');
       var detail = record.querySelector('[data-archive-open-url]');
-      record.addEventListener('pointerenter', function(){ if(!isMobile()) openRecord(record, false); });
+      record.addEventListener('pointerenter', function(){ if(!isMobile()) openRecord(record, pinnedRecord === record); });
       record.addEventListener('pointerleave', function(){ if(!isMobile()) scheduleClose(record); });
-      record.addEventListener('focusin', function(){ openRecord(record, false); });
+      record.addEventListener('focusin', function(){ openRecord(record, pinnedRecord === record); });
       record.addEventListener('focusout', function(event){ if(!record.contains(event.relatedTarget)) scheduleClose(record); });
       if(button) button.addEventListener('click', function(){ if(activeRecord === record && pinnedRecord === record) closeRecord(record); else openRecord(record, true); });
       if(detail){
         function enterDetail(event){
-          if(event.target.closest('a')) return;
+          if(event.target.closest('a,button,input,select,textarea,[contenteditable]')) return;
+          if(event.type === 'click' && (event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return;
           var href = detail.dataset.archiveOpenUrl;
           if(!href) return;
           if(window.SonglinePageTransition && typeof window.SonglinePageTransition.navigateLink === 'function') window.SonglinePageTransition.navigateLink(href);
           else window.location.assign(new URL(href, window.location.href).href);
         }
         detail.addEventListener('click', enterDetail);
-        detail.addEventListener('keydown', function(event){ if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); enterDetail(event); } });
+        detail.addEventListener('keydown', function(event){ if(event.target === detail && !event.isComposing && (event.key === 'Enter' || event.key === ' ')){ event.preventDefault(); enterDetail(event); } });
       }
     }
     function visibleCount(mode){ return records(mode).filter(function(record){ return !record.hidden; }).length; }
@@ -109,8 +121,9 @@
         var empty = archive.querySelector('[data-archive-empty="' + mode + '"]'); if(empty) empty.hidden = count !== 0;
       });
       var visible = visibleCount(activeMode), total = records(activeMode).length;
-      if(status) status.textContent = (query || tagFilter ? '搜索 / ' : '') + (activeMode === 'articles' ? (archive.dataset.archiveArticleLabel || '文章') : '项目') + ' / ' + visible + ' / ' + total;
-      if(projectHint){ var matchedProjects = visibleCount('projects'); projectHint.hidden = !(activeMode === 'articles' && query && matchedProjects); projectHint.textContent = '项目 / ' + matchedProjects + ' →'; }
+      var statusText = (query || tagFilter ? '搜索 / ' : '') + (activeMode === 'articles' ? (archive.dataset.archiveArticleLabel || '文章') : '项目') + ' / ' + visible + ' / ' + total;
+      if(status && status.textContent !== statusText) status.textContent = statusText;
+      if(projectHint){ var matchedProjects = visibleCount('projects'); projectHint.hidden = !(activeMode === 'articles' && query && matchedProjects); var hintText = '项目 / ' + matchedProjects + ' →'; if(projectHint.textContent !== hintText) projectHint.textContent = hintText; }
     }
     function switchMode(mode){
       if(mode !== 'articles' && mode !== 'projects') return;
@@ -123,7 +136,12 @@
     modeButtons.forEach(function(button){ button.addEventListener('click', function(){ switchMode(button.dataset.archiveMode); }); });
     if(projectHint) projectHint.addEventListener('click', function(){ switchMode('projects'); });
     if(searchTrigger && searchField) searchTrigger.addEventListener('click', function(){ var opening = searchField.hidden; searchField.hidden = !opening; searchTrigger.setAttribute('aria-expanded', opening ? 'true' : 'false'); searchTrigger.classList.toggle('is-open', opening); if(opening && input) input.focus(); });
-    if(input){ input.addEventListener('input', function(){ setQuery(input.value); }); input.addEventListener('keydown', function(event){ if(event.key === 'Escape'){ setQuery(''); input.blur(); } }); }
+    if(input){
+      input.addEventListener('compositionstart', function(){ composing = true; });
+      input.addEventListener('compositionend', function(){ composing = false; scheduleQuery(); });
+      input.addEventListener('input', function(event){ if(!event.isComposing) scheduleQuery(); });
+      input.addEventListener('keydown', function(event){ if(event.key === 'Escape' && !composing && !event.isComposing && event.keyCode !== 229){ setQuery(''); input.blur(); } });
+    }
     searchTerms.forEach(function(term){ term.addEventListener('click', function(){ setQuery(term.dataset.archiveSearchTerm); if(input) input.focus(); }); });
     if(clear) clear.addEventListener('click', function(){ if(!input) return; setQuery(''); input.focus(); });
     if(shouldOpenSearch && searchField && searchTrigger){

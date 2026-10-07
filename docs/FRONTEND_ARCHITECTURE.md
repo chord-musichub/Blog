@@ -40,7 +40,9 @@
 - 迁移既有 CSS 时使用连续区块，并在模板中保持原有的相对加载顺序，以避免改变同优先级选择器的胜负关系。
 - 新建功能不要继续向 `site.css` 追加版本补丁；归入最窄的现有职责文件，必要时新建明确命名的模块。
 - 页面级脚本只暴露初始化函数；不要同时注册 `DOMContentLoaded`、页面切换监听和模块调度三套入口。
-- 页面过场期间不得创建第二个 overlay 或再次写 history；统一通过 `SonglinePageTransition.navigate()` 和内部锁管理。无障碍的减少动态效果会自动退化为短淡入淡出。
+- 页面过场期间不得创建第二个 overlay 或再次写 history；统一通过 `SonglinePageTransition.navigate()` 和内部锁管理。连续站内操作保留最后一个排队目的地，浏览器历史遍历优先；只有真正开始下一次导航才保存当前滚动位置。如果请求期间已经发生 Back/Forward，不得用 pushState 覆盖遍历后的历史。无障碍的减少动态效果会自动退化为短淡入淡出。
+- 转场入场与历史恢复使用 `instant` 滚动，不能用会继承全局 smooth 的 `auto`；用户点击目录和阅读上下按钮继续缓动。新文章深链接可等待有界的 `reader.songlineRenderReady`，资源准备后再校正位置。异步 Markdown 初始化时记录滚动所有权，不能在 AJAX 结束之后用迟到的 hash 跳转覆盖历史位置。
+- 档案搜索在 composition 期间不筛选、不改网址、不处理 Escape；选字结束提交最终文本。同一事件轮次合并重复 input，离开页面不提交。抽屉焦点/hover 保留已锁定状态，父容器键盘处理只接受自身事件，不拦截子链接、表单控件或输入法按键。
 - 朋友星图与回忆时间线仅导出初始化 API，由模块调度器接管；背景轨迹必须重复安全、保留可见状态，切页/隐藏时取消延迟启动和开机等待。公共 keyed idle/RAF 任务使用配对的取消 API，不能只取消外层 timer 而留下已提交的 idle 回调。
 - 修改公共样式后，至少检查首页、档案/公告、单篇阅读、朋友页与工具页的浅色与深色模式；旧标签网址测试兼容跳转，不再测试旧标签 UI。
 
@@ -54,10 +56,15 @@
 - `pagehide.persisted` 是暂存而非永久销毁：保留缓存 DOM 对应的输入监听，仅暂停动画与媒体；`pageshow.persisted` 恢复。永久离开才清理不能重用的控制器。
 - 异步 Markdown 加入首个代码块后再次 `SonglinePageModules.scan(reader)`，避免首扫未发现代码而漏加载增强。浮动阅读控件仅由共享控制器定位，不要在工具中再设 scroll / resize 所有者。
 - 阅读目录的 hover 颜色反馈可以变化，但目录和链接的命中区域不能因 hover 位移；键盘折叠只响应目录容器本身，不能拦截子链接的 Enter。
+- 全局游戏/音频按键不能抢占已处理的事件、输入法或 Ctrl/Meta/Alt 快捷键；空格长按只执行一次切换，方向键连按仍保留。工具按钮只有指针激活才清除焦点，键盘激活保留可预测的焦点；开始/恢复按钮保留焦点时仍允许游戏方向键，Space/Enter 继续由原生按钮处理。失焦/后台清除按住状态，清理时解除新增监听。
+- 回忆详情和番茄钟完成提示使用原生 `dialog.showModal()`，保留现有全屏玻璃与面板样式；外部背景不可交互，Escape/点击背景/按钮关闭均同步清理状态，切页关闭并释放监听。原生 close 事件可能晚到，不能隐藏已经重新打开的弹窗。手机目录的指针打开不强制聚焦搜索，避免唤起软键盘；键盘打开仍聚焦搜索，输入法 Escape 不误关抽屉。
+- 当音频来源面板或纯净展示控件变为不可见时，键盘焦点应交给仍可见的歌曲信息；Escape 退出展示后交回展示按钮。不能为了保留焦点而把用户留在隐藏控件中。
 
 回归入口：`tests/stability.test.cjs`、`tests/article-download.test.cjs`、`tests/stability.browser.cjs`。浏览器测试需指定新构建的 `BLOG_UI_BUILD`，并使用离线请求拦截，禁止测试写入线上数据。
 
 朋友页展示、轨迹与后台恢复的固定序列压力回归见 `tests/stability-performance.test.cjs`、`tests/stability-performance.browser.cjs` 和[运行时稳定性记录](STABILITY_PERFORMANCE_2026-10-07.md)。连线在布局校准时复用节点；透镜与端点同轮更新。全站动画软恢复使用一条共享帧链，暂停时保留原始目标速率，避免快速后台切换后持续减速。
+
+键盘/触屏和弹窗行为回归见 `tests/human-interaction.test.cjs`、`tests/human-interaction.browser.cjs` 和[人机操作记录](HUMAN_INTERACTION_2026-10-07.md)。专项测试在本地响应所有网络请求，不调用线上媒体或账号。
 
 ## 刷新与本地 Markdown 阅读
 

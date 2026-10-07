@@ -762,11 +762,15 @@
     }
 
     function handleKeydown(event){
+      if(event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.ctrlKey || event.metaKey || event.altKey) return;
       if(destroyed || game.querySelector('[data-tool-help-dialog][open]')) return;
-      if(event.target && event.target.closest && event.target.closest('button,input,textarea,select,a,summary,dialog,[contenteditable]:not([contenteditable="false"])')) return;
+      if(event.target && event.target.closest && event.target.closest('button,input,textarea,select,a,summary,dialog,[contenteditable]:not([contenteditable="false"])')){
+        if(!event.target.closest('[data-snake-start],[data-snake-pause]') || !/^(arrowup|arrowdown|arrowleft|arrowright|w|a|s|d)$/i.test(event.key)) return;
+      }
 
       if(event.key === ' '){
         event.preventDefault();
+        if(event.repeat) return;
         unlockAudio();
         togglePause();
         return;
@@ -798,24 +802,30 @@
     }
 
     function handleVisibility(){
+      if(document.hidden) releaseKeys();
       if(!document.hidden) leaderboard.fetchTopScores();
+    }
+    function releaseKeys(){
+      if(!fast) return;
+      fast = false;
+      if(running && !paused && !dead) setState('游戏中');
     }
 
     function bind(){
       if(startBtn){
-        startBtn.addEventListener('click', function(){
+        startBtn.addEventListener('click', function(event){
           unlockAudio();
           beep('tap');
           reset();
-          startBtn.blur();
+          if(event.detail > 0) startBtn.blur();
         });
       }
 
       if(pauseBtn){
-        pauseBtn.addEventListener('click', function(){
+        pauseBtn.addEventListener('click', function(event){
           unlockAudio();
           togglePause();
-          pauseBtn.blur();
+          if(event.detail > 0) pauseBtn.blur();
         });
       }
 
@@ -851,6 +861,7 @@
       document.addEventListener('keydown', handleKeydown);
       document.addEventListener('keyup', handleKeyup);
       document.addEventListener('visibilitychange', handleVisibility);
+      window.addEventListener('blur', releaseKeys);
       window.addEventListener('pageshow', leaderboard.fetchTopScores);
     }
 
@@ -864,6 +875,7 @@
       document.removeEventListener('keydown', handleKeydown);
       document.removeEventListener('keyup', handleKeyup);
       document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('blur', releaseKeys);
       window.removeEventListener('pageshow', leaderboard.fetchTopScores);
       if(game.__songlineSnakeController === controller) delete game.__songlineSnakeController;
     }

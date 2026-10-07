@@ -55,6 +55,7 @@
     var currentIndex = -1;
     var playlistCollapsed = false;
     var playMode = 'list';
+    var keyboardFilePicker = false;
     var displayMode = false;
     var dragAudioDepth = 0;
     var lastMetaUpdateAt = 0;
@@ -904,52 +905,55 @@
     bindAudioDragDrop();
 
     if(browserAudioBtn){
-      browserAudioBtn.addEventListener('click', function(){
+      browserAudioBtn.addEventListener('click', function(event){
         connectBrowserSystemAudio();
-        browserAudioBtn.blur();
+        if(event.detail > 0) browserAudioBtn.blur();
       });
     }
 
     if(openFileBtn){
-      openFileBtn.addEventListener('click', function(){
+      openFileBtn.addEventListener('click', function(event){
+        keyboardFilePicker = event.detail === 0;
         openLocalAudioPicker();
-        openFileBtn.blur();
+        if(event.detail > 0) openFileBtn.blur();
       });
     }
 
     if(uploadBtn){
-      uploadBtn.addEventListener('click', function(){
+      uploadBtn.addEventListener('click', function(event){
+        keyboardFilePicker = event.detail === 0;
         openLocalAudioPicker();
-        uploadBtn.blur();
+        if(event.detail > 0) uploadBtn.blur();
       });
     }
 
     if(prevBtn){
-      prevBtn.addEventListener('click', function(){
+      prevBtn.addEventListener('click', function(event){
         playPrev();
-        prevBtn.blur();
+        if(event.detail > 0) prevBtn.blur();
       });
     }
 
     if(playlistToggleBtn){
-      playlistToggleBtn.addEventListener('click', function(){
+      playlistToggleBtn.addEventListener('click', function(event){
         playlistCollapsed = !playlistCollapsed;
         updatePlaylistCollapse();
-        playlistToggleBtn.blur();
+        if(event.detail > 0) playlistToggleBtn.blur();
       });
     }
 
     if(playModeBtn){
-      playModeBtn.addEventListener('click', function(){
+      playModeBtn.addEventListener('click', function(event){
         cyclePlayMode();
-        playModeBtn.blur();
+        if(event.detail > 0) playModeBtn.blur();
       });
     }
 
     if(displayModeBtn){
-      displayModeBtn.addEventListener('click', function(){
+      displayModeBtn.addEventListener('click', function(event){
         toggleDisplayMode();
-        displayModeBtn.blur();
+        if(displayMode && event.detail === 0 && nowCard){ nowCard.tabIndex = -1;nowCard.focus({preventScroll:true}); }
+        if(event.detail > 0) displayModeBtn.blur();
       });
     }
 
@@ -963,9 +967,9 @@
     }
 
     if(nextBtn){
-      nextBtn.addEventListener('click', function(){
+      nextBtn.addEventListener('click', function(event){
         playNext(true);
-        nextBtn.blur();
+        if(event.detail > 0) nextBtn.blur();
       });
     }
 
@@ -973,6 +977,10 @@
       fileInput.addEventListener('change', function(){
         var files = fileInput.files;
         if(files && files.length) addFilesToPlaylist(files, true);
+        // The source chooser becomes hidden after loading. A keyboard user
+        // needs a visible destination, not focus stranded in that hidden panel.
+        if(keyboardFilePicker && root.classList.contains('is-local-audio-live') && nowCard){ nowCard.tabIndex = -1;nowCard.focus({preventScroll:true}); }
+        keyboardFilePicker = false;
         fileInput.value = '';
       });
     }
@@ -1018,8 +1026,10 @@
     }
 
     function onDocumentKeydown(event){
+      if(event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.ctrlKey || event.metaKey || event.altKey || root.querySelector('[data-tool-help-dialog][open]')) return;
       if(event.key === 'Escape' && displayMode){
         setDisplayMode(false);
+        if(displayModeBtn) displayModeBtn.focus({preventScroll:true});
         event.preventDefault();
         return;
       }
@@ -1027,6 +1037,7 @@
       if(!hasLocalAudioFile()) return;
       if(isTypingOrControlTarget(event.target)) return;
       event.preventDefault();
+      if(event.repeat) return;
       toggleLocalAudioPlayback();
     }
     document.addEventListener('keydown', onDocumentKeydown);
@@ -1043,14 +1054,14 @@
     }
 
     if(fullscreenBtn){
-      fullscreenBtn.addEventListener('click', function(){
+      fullscreenBtn.addEventListener('click', function(event){
         var target = root.querySelector('.av-stage') || root;
         if(!document.fullscreenElement && target.requestFullscreen){
           target.requestFullscreen();
         }else if(document.exitFullscreen){
           document.exitFullscreen();
         }
-        fullscreenBtn.blur();
+        if(event.detail > 0) fullscreenBtn.blur();
       });
     }
 

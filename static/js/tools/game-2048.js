@@ -320,10 +320,15 @@
     }
 
     function onKeydown(event){
+      if(event.defaultPrevented || event.isComposing || event.keyCode === 229 || event.ctrlKey || event.metaKey || event.altKey) return;
       if(disposed || root.querySelector('[data-tool-help-dialog][open]')) return;
-      if(event.target && event.target.closest && event.target.closest('button, input, textarea, select, a, summary, dialog, [contenteditable="true"]')) return;
+      if(event.target && event.target.closest && event.target.closest('button, input, textarea, select, a, summary, dialog, [contenteditable]:not([contenteditable="false"])')){
+        // Restart/resume can keep native button focus without disabling the
+        // next directional move. Space/Enter still belong to that button.
+        if(!event.target.closest('[data-2048-new],[data-2048-pause]') || !keyToDir(event)) return;
+      }
       if(event.code === 'Space'){
-        event.preventDefault();togglePause();return;
+        event.preventDefault();if(!event.repeat) togglePause();return;
       }
       var dir = keyToDir(event);
       if(!dir) return;
@@ -368,10 +373,10 @@
     window.__songline2048Cleanup = cleanup;
 
     root.querySelectorAll('[data-2048-new]').forEach(function(btn){
-      btn.addEventListener('click', function(){ ensureAudio(); newGame(); btn.blur(); });
+      btn.addEventListener('click', function(event){ ensureAudio(); newGame(); if(event.detail > 0) btn.blur(); });
     });
 
-    if(pauseBtn) pauseBtn.addEventListener('click', function(){ togglePause();pauseBtn.blur(); });
+    if(pauseBtn) pauseBtn.addEventListener('click', function(event){ togglePause();if(event.detail > 0) pauseBtn.blur(); });
     root.addEventListener('songline:tool-sync-best', function(){ if(!disposed) leaderboard.syncLocalBest(); });
     root.addEventListener('songline:tool-help-change', function(event){
       if(disposed) return;
@@ -386,7 +391,7 @@
 
     if(soundToggle){
       updateSoundToggle();
-      soundToggle.addEventListener('click', function(){
+      soundToggle.addEventListener('click', function(event){
         soundEnabled = !soundEnabled;
         try{ localStorage.setItem(soundKey, soundEnabled ? '1' : '0'); }catch(e){}
         updateSoundToggle();
@@ -394,22 +399,23 @@
           ensureAudio();
           playTone(720, 0.12, 'sine', 0.13, 0);
         }
-        soundToggle.blur();
+        if(event.detail > 0) soundToggle.blur();
       });
     }
 
     boardEl.addEventListener('touchstart', function(event){
       if(paused || disposed) return;
+      if(event.touches && event.touches.length !== 1){ touchStart = null;return; }
       var touch = event.changedTouches && event.changedTouches[0];
       if(!touch) return;
       ensureAudio();
-      touchStart = {x:touch.clientX, y:touch.clientY};
+      touchStart = {id:touch.identifier, x:touch.clientX, y:touch.clientY};
     }, {passive:true});
 
     boardEl.addEventListener('touchcancel', function(){ touchStart = null; }, {passive:true});
 
     boardEl.addEventListener('touchend', function(event){
-      var touch = event.changedTouches && event.changedTouches[0];
+      var touch = touchStart && Array.prototype.find.call(event.changedTouches || [], function(item){ return item.identifier === touchStart.id; });
       if(!touch || !touchStart) return;
 
       var dx = touch.clientX - touchStart.x;

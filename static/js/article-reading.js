@@ -74,7 +74,9 @@
     const target = document.getElementById(id);
     if(!target) return false;
     const top = Math.max(0, target.getBoundingClientRect().top + window.pageYOffset - articleHeaderOffset());
-    window.scrollTo({top:top, behavior:instant ? 'auto' : 'smooth'});
+    // "auto" inherits html's smooth behavior on desktop. Entry positioning
+    // must finish beneath the curtain, not continue moving after reveal.
+    window.scrollTo({top:top, behavior:instant ? 'instant' : 'smooth'});
     target.classList.remove('toc-target-flash');
     window.requestAnimationFrame(function(){
       target.classList.add('toc-target-flash');

@@ -84,7 +84,10 @@
   }
 
 
-  getMarkdown().then(function(markdown){
+  // Capture ownership at initialization: a late source download must not
+  // restart a hash jump after AJAX history restoration has already finished.
+  const documentEntry = !(document.documentElement && document.documentElement.classList.contains('songline-page-transitioning'));
+  reader.songlineRenderReady = getMarkdown().then(function(markdown){
     if(!reader.isConnected || !sourceElement.isConnected) return;
     if(!markdown){ rebuildToc(); window.dispatchEvent(new Event('songline:article-toc-ready')); return; }
     // Parse inertly, then reuse identical images from the server rendering.
@@ -123,7 +126,7 @@
     if(window.SonglinePageModules) window.SonglinePageModules.scan(reader);
     rebuildToc();
     window.dispatchEvent(new Event('songline:article-toc-ready'));
-    if(window.location.hash) window.setTimeout(function(){
+    if(documentEntry && window.location.hash) window.setTimeout(function(){
       if(reader.isConnected) window.SonglineReading.scrollToHeading(window.location.hash, true);
     }, 90);
   });

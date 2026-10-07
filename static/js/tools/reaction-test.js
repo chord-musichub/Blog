@@ -359,17 +359,17 @@
     });
 
     if(startBtn){
-      startBtn.addEventListener('click', function(){
+      startBtn.addEventListener('click', function(event){
         ensureAudio();
         play('button');
         startTest();
-        startBtn.blur();
+        if(event.detail > 0) startBtn.blur();
       });
     }
 
     if(soundToggle){
       updateSoundToggle();
-      soundToggle.addEventListener('click', function(){
+      soundToggle.addEventListener('click', function(event){
         soundEnabled = !soundEnabled;
         localStorage.setItem(SOUND_KEY, soundEnabled ? '1' : '0');
         updateSoundToggle();
@@ -377,7 +377,7 @@
           ensureAudio();
           play('button');
         }
-        soundToggle.blur();
+        if(event.detail > 0) soundToggle.blur();
       });
     }
 

@@ -231,7 +231,7 @@
       state.targetAt = 0;
       state.finishedOnce = false;
       setStatus('idle');
-      if(els.finish) els.finish.hidden = true;
+      closeFinish();
       document.title = document.title.replace(/^✅\s*/, '');
       render();
     }
@@ -271,6 +271,7 @@
 
       if(settings.showOverlay && els.finish){
         els.finish.hidden = false;
+        if(!els.finish.open) els.finish.showModal();
       }
 
       if(!/^✅/.test(document.title)){
@@ -369,11 +370,22 @@
     }
 
     bindClick(els.testSound, playSound);
-    bindClick(els.close, function(){
-      if(els.finish) els.finish.hidden = true;
-    });
+    function closeFinish(){
+      if(!els.finish) return;
+      if(els.finish.open) els.finish.close();
+      els.finish.hidden = true;
+    }
+    function onFinishCancel(event){ event.preventDefault();closeFinish(); }
+    function onFinishClick(event){ if(event.target === els.finish) closeFinish(); }
+    function onFinishClose(){ if(!els.finish.open) els.finish.hidden = true; }
+    if(els.finish){
+      els.finish.addEventListener('cancel', onFinishCancel);
+      els.finish.addEventListener('click', onFinishClick);
+      els.finish.addEventListener('close', onFinishClose);
+    }
+    bindClick(els.close, closeFinish);
     bindClick(els.next, function(){
-      if(els.finish) els.finish.hidden = true;
+      closeFinish();
       reset();
       start();
     });
@@ -388,6 +400,12 @@
       if(state.status === 'running') render();
     }
     function cleanup(){
+      closeFinish();
+      if(els.finish){
+        els.finish.removeEventListener('cancel', onFinishCancel);
+        els.finish.removeEventListener('click', onFinishClick);
+        els.finish.removeEventListener('close', onFinishClose);
+      }
       if(state.raf) cancelAnimationFrame(state.raf);
       state.raf = 0;
       document.removeEventListener('visibilitychange', onVisibilityChange);
