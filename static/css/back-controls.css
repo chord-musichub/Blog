@@ -26,10 +26,12 @@ body[data-page-section="tools"]{--back-ink:#fff1d2;--back-hover-ink:#fff}
 /* Returns belong to their tool panel, not to the scenery behind it. */
 [data-tool-back-surface]{--back-ink:var(--text);--back-hover-ink:var(--accent-2)}
 html:root body [data-tool-back-surface] > [data-back-icon]{margin:0 0 12px!important;justify-self:start;align-self:start}
+html:root body .tool-detail-surface[data-tool-back-surface] > [data-back-icon]{position:absolute!important;top:24px!important;left:24px!important;right:auto!important;bottom:auto!important;margin:0!important;z-index:10!important}
 .focus-main-card[data-tool-back-surface]{--back-ink:var(--focus-ink);--back-hover-ink:var(--accent-2)}
 html:root body .focus-main-card[data-tool-back-surface] > [data-back-icon]{position:absolute;top:16px;left:16px;margin:0!important;z-index:5}
 .av-stage[data-tool-back-surface]{--back-ink:#f8fafc;--back-hover-ink:#7dd3fc}
 html:root body .av-stage[data-tool-back-surface] > [data-back-icon]{position:absolute!important;top:18px!important;left:18px!important;right:auto!important;bottom:auto!important;margin:0!important;z-index:10000!important}
+@media(max-width:980px){html:root body .tool-detail-surface[data-tool-back-surface] > [data-back-icon]{top:18px!important;left:18px!important}}
 @media(prefers-reduced-motion:reduce){
   html:root body [data-back-icon][data-back-icon],html:root body [data-back-icon][data-back-icon] > .ui-icon{transition:none!important;transform:none!important}
   html:root body [data-back-icon][data-back-icon]:is(:hover,:focus-visible,:active) > .ui-icon{transform:none!important}

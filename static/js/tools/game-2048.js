@@ -34,7 +34,6 @@
     var overlayText = root.querySelector('[data-2048-overlay-text]');
     var topScoresEl = root.querySelector('[data-2048-top-scores]');
     var soundToggle = root.querySelector('[data-2048-sound-toggle]');
-    var soundLabel = root.querySelector('[data-2048-sound-label]');
     var syncBestBtn = root.querySelector('[data-2048-sync-best]');
 
     if(!boardEl) return;
@@ -73,9 +72,9 @@
     function updateSoundToggle(){
       if(soundToggle){
         soundToggle.setAttribute('aria-pressed', soundEnabled ? 'true' : 'false');
+        soundToggle.setAttribute('title', soundEnabled ? '关闭音效' : '开启音效');
         soundToggle.classList.toggle('is-muted', !soundEnabled);
       }
-      if(soundLabel) soundLabel.textContent = soundEnabled ? '音效响' : '音效关';
     }
 
     var audioEngine=window.SonglineCreate2048Audio&&window.SonglineCreate2048Audio({masterGain:SOUND_MASTER_GAIN,isEnabled:function(){return soundEnabled;}});

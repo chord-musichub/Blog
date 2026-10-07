@@ -1,9 +1,10 @@
 {{ define "main" }}
 
 <main class="tool-page tool-2048-page">
-  <section class="tool-2048-shell" data-game-2048>
-    <div class="game-2048-panel" data-tool-back-surface>
+  <section class="tool-2048-shell tool-detail-layout tool-detail-layout--game" data-game-2048>
+    <div class="game-2048-panel tool-detail-surface" data-tool-back-surface>
       {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+      <h1 class="tool-detail-title">2048</h1>
       <div class="game-2048-topbar">
         <div class="game-2048-score-card">
           <span>分数</span>
@@ -13,9 +14,7 @@
           <span>最高</span>
           <strong data-2048-best>0</strong>
         </div>
-        <button class="game-2048-sound-toggle" type="button" data-2048-sound-toggle aria-pressed="true">
-          <span data-2048-sound-label>音效开</span>
-        </button>
+        {{ partial "tool-sound-toggle.html" (dict "class" "game-2048-sound-toggle" "attribute" "data-2048-sound-toggle") }}
         <button class="game-2048-sync" type="button" data-2048-sync-best>同步本地最佳</button>
         <button class="game-2048-new" type="button" data-2048-new>重新开始</button>
       </div>
@@ -39,16 +38,15 @@
       </div>
 
 
-      <details class="snake-leaderboard game-2048-leaderboard" data-2048-leaderboard aria-label="2048 前三名成绩" open>
+    </div>
+      <details class="snake-leaderboard game-2048-leaderboard tool-detail-ranking" data-2048-leaderboard aria-label="2048 前三名成绩">
         <summary>
-          <span>前三名成绩</span>
-          <small>服务器记录</small>
+          <span>排行榜</span>
         </summary>
         <ol data-2048-top-scores>
           <li>暂无记录</li>
         </ol>
       </details>
-    </div>
   </section>
 </main>
 {{ end }}

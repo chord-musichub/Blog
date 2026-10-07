@@ -755,8 +755,7 @@
     }
 
     function handleKeydown(event){
-      const tag = (event.target && event.target.tagName || '').toLowerCase();
-      if(tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      if(event.target && event.target.closest && event.target.closest('button,input,textarea,select,a,summary,[contenteditable]:not([contenteditable="false"])')) return;
 
       if(event.key === ' '){
         event.preventDefault();
@@ -883,7 +882,7 @@
       rushUntil = 0;
       refillFoods(true);
       setState('准备开始');
-      showOverlay('玩法介绍', '18格棋盘；蓝豆得分；粉豆限时连锁，越后越紧；棕豆造墙；黑豆清墙；金盾抵伤。点击开始。');
+      showOverlay('点击开始', '方向键 / WASD 移动，点击棋盘暂停。');
       renderer.draw();
     }
 

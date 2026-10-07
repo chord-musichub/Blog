@@ -68,6 +68,10 @@
         ensureStylesheet(style[0], style[3]);
       }
     });
+    if(query(root, '.tool-detail-surface')){
+      ensureStylesheet('songline-tool-detail-shell-style', '/css/tools/detail-shell.css');
+      ensureStylesheet('songline-tool-detail-layout-style', '/css/tools/detail-layout.css');
+    }
   }
 
   var modules = [

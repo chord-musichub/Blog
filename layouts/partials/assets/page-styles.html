@@ -110,4 +110,7 @@
 {{ end }}
 <link id="songline-touch-layout-style" rel="stylesheet" href="/css/touch-layout.css?v={{ $assetVersion }}">
 <link rel="stylesheet" href="/css/privacy.css?v={{ $assetVersion }}">
+{{ if and $isToolsSurface (ne .RelPermalink "/tools/") (not (hasPrefix .RelPermalink "/tools/markdown-previewer/")) }}
+<link id="songline-tool-detail-layout-style" rel="stylesheet" href="/css/tools/detail-layout.css?v={{ $assetVersion }}">
+{{ end }}
 <link id="songline-back-controls-style" rel="stylesheet" href="/css/back-controls.css?v={{ $assetVersion }}">

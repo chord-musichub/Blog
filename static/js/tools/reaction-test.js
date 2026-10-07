@@ -38,7 +38,6 @@
     var textEl = root.querySelector('[data-reaction-text]');
     var kickerEl = root.querySelector('[data-reaction-kicker]');
     var soundToggle = root.querySelector('[data-reaction-sound-toggle]');
-    var soundLabel = root.querySelector('[data-reaction-sound-label]');
     var syncBestBtn = root.querySelector('[data-reaction-sync-best]');
 
     if(!stage) return;
@@ -90,9 +89,9 @@
     function updateSoundToggle(){
       if(soundToggle){
         soundToggle.setAttribute('aria-pressed', soundEnabled ? 'true' : 'false');
+        soundToggle.setAttribute('title', soundEnabled ? '关闭音效' : '开启音效');
         soundToggle.classList.toggle('is-muted', !soundEnabled);
       }
-      if(soundLabel) soundLabel.textContent = soundEnabled ? '音效开' : '音效关';
     }
 
     function ensureAudio(){

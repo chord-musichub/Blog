@@ -1,0 +1,178 @@
+/* Tool detail composition only. Markdown keeps its article-reader layout.
+   The frame uses the previewer's glass treatment; functional roots also own
+   the external rankings so moving them cannot break scoped game selectors. */
+body[data-page-section="tools"] .tool-detail-layout{
+  --tool-ink:#2d3936;
+  --tool-muted:#62716a;
+  --tool-line:rgba(86,115,102,.27);
+  --tool-accent:#547d6d;
+  --tool-soft:rgba(84,125,109,.10);
+  --tool-field:rgba(237,244,238,.76);
+  width:100%;max-width:960px;margin:clamp(24px,8svh,76px) auto 32px;
+}
+body.dark[data-page-section="tools"] .tool-detail-layout{
+  --tool-ink:#e5edf1;--tool-muted:#a4b2bb;--tool-line:rgba(167,191,211,.22);
+  --tool-accent:#a9c8bc;--tool-soft:rgba(169,200,188,.10);--tool-field:rgba(15,29,49,.86);
+}
+body[data-page-section="tools"] .tool-detail-layout--game,
+body[data-page-section="tools"] .tool-detail-layout--compact{max-width:740px}
+body[data-page-section="tools"] .tool-page{padding:0!important;min-height:0!important;overflow:visible}
+html body[data-page-section="tools"] .tool-detail-surface{
+  --text:var(--tool-ink);--muted:var(--tool-muted);--border:var(--tool-line);
+  --accent-2:var(--tool-accent);--soft-blue:var(--tool-soft);--panel:var(--tool-field);
+  position:relative;box-sizing:border-box;width:100%!important;max-width:none;
+  margin:0!important;padding:24px!important;
+  color:var(--tool-ink);
+  background:linear-gradient(138deg,rgba(218,232,223,.63),rgba(200,220,211,.53))!important;
+  border:1px solid rgba(235,244,237,.42)!important;border-radius:26px!important;
+  box-shadow:0 24px 64px rgba(52,78,66,.20),inset 0 1px rgba(255,255,255,.32)!important;
+  backdrop-filter:blur(18px) saturate(108%)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(108%)!important;
+  transform:none!important;transition:none!important;
+}
+html body.dark[data-page-section="tools"] .tool-detail-surface{
+  background:linear-gradient(138deg,rgba(10,22,40,.82),rgba(12,27,47,.72))!important;border-color:rgba(187,211,232,.15)!important;
+  box-shadow:0 26px 70px rgba(0,0,0,.42),inset 0 1px rgba(229,240,255,.07)!important;
+}
+body[data-page-section="tools"] .tool-detail-title{
+  display:flex;align-items:center;min-height:44px;margin:0 0 24px!important;
+  padding:0 0 0 56px;font-size:clamp(22px,3vw,28px)!important;line-height:1.3;
+  font-weight:700;letter-spacing:0;color:var(--tool-ink);
+}
+/* Flat information rows instead of a card inside every card. */
+body[data-page-section="tools"] .tool-detail-surface :is(.game-2048-topbar,.flappy-topbar,.reaction-stats,.typing-topbar,.typing-stats,.snake-stats,.gacha-status){
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:12px;
+}
+body[data-page-section="tools"] .tool-detail-surface :is(.game-2048-score-card,.flappy-score-card,.reaction-stat-card,.typing-stat-card,.snake-stats span,.snake-chip,.gacha-status span){
+  min-width:0;padding:6px 12px 6px 0;background:none!important;border:0!important;
+  border-radius:0;box-shadow:none!important;color:var(--tool-muted);
+}
+body[data-page-section="tools"] .tool-detail-surface :is(.game-2048-score-card,.flappy-score-card,.reaction-stat-card,.typing-stat-card) strong{
+  color:var(--tool-ink);font-size:1.35rem;line-height:1.3;
+}
+body[data-page-section="tools"] .tool-detail-surface :is(.game-2048-score-card,.flappy-score-card,.reaction-stat-card,.typing-stat-card) span{color:var(--tool-muted);font-size:14px}
+body[data-page-section="tools"] .tool-detail-surface :is(.game-2048-sound-toggle,.flappy-sound-toggle,.typing-sound-toggle){margin-left:auto}
+body[data-page-section="tools"] .tool-detail-surface :is(.btn,.game-2048-new,.game-2048-sync,.game-2048-sound-toggle,.flappy-button,.flappy-sound-toggle,.reaction-button,.reaction-sound-toggle,.typing-button,.typing-mode,.typing-sound-toggle){
+  min-height:44px;padding:10px 16px;border:1px solid var(--tool-line);border-radius:12px;
+  background:var(--tool-soft);color:var(--tool-ink);font:inherit;font-weight:600;
+  box-shadow:none;transition:background-color .18s ease,border-color .18s ease,color .18s ease;
+}
+body[data-page-section="tools"] .tool-detail-surface :is(.btn,.game-2048-new,.game-2048-sync,.game-2048-sound-toggle,.flappy-button,.flappy-sound-toggle,.reaction-button,.reaction-sound-toggle,.typing-button,.typing-mode,.typing-sound-toggle):is(:hover,:focus-visible){
+  background:var(--tool-field)!important;color:var(--tool-accent)!important;
+  border-color:var(--tool-accent)!important;box-shadow:none!important;transform:none!important;
+}
+body[data-page-section="tools"] .tool-detail-surface :is(button,input,textarea,select):focus-visible{outline:2px solid var(--tool-accent);outline-offset:3px}
+body[data-page-section="tools"] .tool-detail-surface .typing-mode.is-active{background:var(--tool-accent);color:var(--tool-field);border-color:var(--tool-accent);box-shadow:none}
+body[data-page-section="tools"] .tool-detail-surface :is(.random-form input,.gacha-config-grid select,.typing-input){background:var(--tool-field);border-color:var(--tool-line);color:var(--tool-ink);border-radius:12px;box-shadow:none}
+body[data-page-section="tools"] .tool-detail-surface :is(.typing-card,.gacha-result-box,.random-result-box){background:none!important;border:0!important;box-shadow:none!important;padding:0;border-radius:0}
+body[data-page-section="tools"] .tool-detail-surface .typing-text{color:var(--tool-ink);background:var(--tool-soft);border-radius:14px}
+body[data-page-section="tools"] .tool-detail-surface .typing-meta{color:var(--tool-ink);font-weight:600}
+body[data-page-section="tools"] .tool-detail-surface .typing-stats{justify-content:space-between}
+body[data-page-section="tools"] .tool-detail-surface .gacha-pity-card{background:var(--tool-soft)!important;border:0;border-radius:14px}
+body[data-page-section="tools"] .tool-detail-surface .gacha-result-head{align-items:center}
+body[data-page-section="tools"] .tool-detail-surface .gacha-result-head h2{font-size:18px}
+body[data-page-section="tools"] .tool-detail-surface .snake-head{margin-bottom:8px}
+body[data-page-section="tools"] .tool-detail-surface .snake-arcade-strip{margin-bottom:16px;background:none;box-shadow:none;border:0}
+body[data-page-section="tools"] .tool-detail-surface .snake-stage-wrap{box-shadow:none;border-radius:18px}
+body[data-page-section="tools"] .tool-detail-surface .snake-overlay span{max-width:30em;padding:0 12px}
+/* Independent right rail; it never participates in the main glass surface. */
+body[data-page-section="tools"] .tool-detail-layout:has(> .tool-detail-ranking){
+  position:relative;display:grid;grid-template-columns:minmax(0,1fr) 220px;
+  align-items:start;gap:22px;max-width:1120px;
+}
+body[data-page-section="tools"] .tool-detail-ranking{
+  position:sticky;top:96px;box-sizing:border-box;width:100%!important;margin:0!important;padding:0!important;
+  background:rgba(12,22,30,.62)!important;color:#e5edf1;border:1px solid rgba(236,249,250,.20);
+  border-radius:16px;box-shadow:none;overflow:hidden;
+}
+body[data-page-section="tools"] :is(.tool-detail-ranking,.tool-detail-help) > summary{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  min-height:48px;padding:12px 18px;box-sizing:border-box;cursor:pointer;list-style:none;
+  font-size:15px;font-weight:600;letter-spacing:0;
+}
+body[data-page-section="tools"] .tool-detail-ranking > summary > span{min-width:0;overflow-wrap:anywhere}
+body[data-page-section="tools"] :is(.tool-detail-ranking,.tool-detail-help) > summary::-webkit-details-marker{display:none}
+body[data-page-section="tools"] :is(.tool-detail-ranking,.tool-detail-help) > summary::after{
+  content:"";width:8px;height:8px;flex:0 0 8px;border-right:1.5px solid currentColor;
+  border-bottom:1.5px solid currentColor;transform:rotate(45deg);transition:transform .18s ease;
+}
+body[data-page-section="tools"] :is(.tool-detail-ranking,.tool-detail-help)[open] > summary::after{transform:rotate(225deg)}
+body[data-page-section="tools"] .tool-detail-ranking > summary:is(:hover,:focus-visible){background:rgba(236,249,250,.08)}
+body[data-page-section="tools"] .tool-detail-ranking > summary:focus-visible{outline:2px solid #a9c8bc;outline-offset:-4px}
+body[data-page-section="tools"] .tool-detail-ranking ol{display:grid;grid-template-columns:1fr!important;gap:0;padding:0 18px 12px;margin:0;list-style:none}
+body[data-page-section="tools"] .tool-detail-ranking li{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-radius:0;background:none;border-top:1px solid rgba(236,249,250,.14);color:#c8d6d8}
+body[data-page-section="tools"] .tool-detail-ranking li b{color:#e5edf1;font-size:18px}
+body[data-page-section="tools"] .tool-detail-help{margin:20px 0 0;padding:0;border:0;border-top:1px solid var(--tool-line);background:none;color:var(--tool-muted);border-radius:0}
+body[data-page-section="tools"] .tool-detail-help > summary{padding-inline:0}
+body[data-page-section="tools"] .tool-detail-help > summary:is(:hover,:focus-visible){color:var(--tool-accent)}
+body[data-page-section="tools"] .tool-detail-help :is(p,ul,.snake-help){font-size:14px;line-height:1.8}
+body[data-page-section="tools"] .tool-detail-help .snake-help{display:grid;justify-content:start;text-align:left;margin:0;padding:0}
+/* Icon-only sound controls: keep the original native states and hit area. */
+html body[data-page-section="tools"] .tool-detail-surface .tool-sound-toggle{
+  position:relative;display:inline-grid;place-items:center;box-sizing:border-box;
+  flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;
+  padding:0;border:1px solid var(--tool-line);border-radius:12px;
+  background:var(--tool-soft)!important;color:var(--tool-ink)!important;box-shadow:none!important;
+  cursor:pointer;transition:background-color .18s ease,border-color .18s ease;
+}
+html body[data-page-section="tools"] .tool-sound-toggle::before,
+html body[data-page-section="tools"] .tool-sound-toggle::after{content:none!important;display:none!important}
+html body[data-page-section="tools"] .tool-sound-toggle > input{
+  position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1;
+}
+html body[data-page-section="tools"] .tool-sound-toggle > .ui-icon{--ui-icon-size:22px;grid-area:1 / 1;pointer-events:none}
+html body[data-page-section="tools"] .tool-sound-toggle > [data-ui-icon="volume-off"]{display:none}
+html body[data-page-section="tools"] .tool-sound-toggle:is([aria-pressed="false"],:has(input:not(:checked))) > [data-ui-icon="volume"]{display:none}
+html body[data-page-section="tools"] .tool-sound-toggle:is([aria-pressed="false"],:has(input:not(:checked))) > [data-ui-icon="volume-off"]{display:grid}
+html body[data-page-section="tools"] .tool-sound-toggle:is(:hover,:focus-visible,:has(input:focus-visible)){background:var(--tool-field)!important;border-color:var(--tool-accent)!important;color:var(--tool-accent)!important;transform:none!important}
+html body[data-page-section="tools"] .tool-sound-toggle:has(input:focus-visible){outline:2px solid var(--tool-accent);outline-offset:3px}
+body[data-page-section="tools"] .tool-detail-surface .snake-head{align-items:center;justify-content:space-between;flex-direction:row;gap:12px}
+body[data-page-section="tools"] .tool-detail-surface .snake-stats{flex:1;min-width:0}
+body[data-page-section="tools"] .tool-detail-surface .snake-head .tool-sound-toggle{align-self:flex-end}
+/* The audio canvas keeps its own dark contrast inside the shared glass. */
+body[data-page-section="tools"] .audio-visualizer-page{background:transparent!important}
+body[data-page-section="tools"] .tool-detail-audio.tool-detail-surface{max-width:960px;margin:clamp(24px,8svh,76px) auto 32px!important}
+body[data-page-section="tools"] .audio-visualizer-page .av-stage{
+  width:100%!important;height:480px!important;min-height:0!important;margin:0!important;
+  border-radius:18px!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+body[data-page-section="tools"] .audio-visualizer-page .av-canvas{position:absolute!important;inset:0!important;border-radius:inherit!important;clip-path:inset(0 round 18px)!important}
+body[data-page-section="tools"] .audio-visualizer-page .av-cover [hidden]{display:none!important}
+body[data-page-section="tools"] .audio-visualizer-page .av-stage:fullscreen{width:100vw!important;height:100dvh!important;min-height:100dvh!important;border-radius:0!important}
+body[data-page-section="tools"] .audio-visualizer-page:not(.is-visual-live) .av-topbar{position:absolute!important;top:28px;right:24px;padding:0!important}
+body[data-page-section="tools"] .audio-visualizer-page:not(.is-visual-live) .av-source-panel{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;transform:none!important;width:min(600px,100%)!important;margin:100px auto 0!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}
+body[data-page-section="tools"] .audio-visualizer-page:not(.is-visual-live) .av-source-card{min-height:0!important;max-height:none!important;padding:24px!important;border-radius:16px!important;box-shadow:none!important}
+body[data-page-section="tools"] .audio-visualizer-page.is-visual-live .av-controls{position:absolute!important;top:18px!important;right:18px!important;left:auto!important;bottom:auto!important;width:auto!important;max-width:calc(100% - 36px);flex-wrap:wrap!important}
+@media(max-width:980px){
+  body[data-page-section="tools"] .tool-detail-layout{margin:0 auto 24px}
+  body[data-page-section="tools"] .tool-detail-layout:has(> .tool-detail-ranking){display:block;padding-top:60px}
+  body[data-page-section="tools"] .tool-detail-ranking{position:absolute;top:0;right:0;width:220px!important;max-width:100%;z-index:30;max-height:calc(100svh - 160px);overflow:auto;background:rgba(12,22,30,.94)!important}
+  body[data-page-section="tools"] .tool-detail-surface{padding:18px!important}
+  body[data-page-section="tools"] .focus-shell.tool-detail-surface{margin:0 auto 24px!important}
+  body[data-page-section="tools"] .tool-detail-audio.tool-detail-surface{margin:0 auto 24px!important}
+}
+@media(max-width:820px){
+  html body[data-page-section="tools"] .tool-detail-surface{background:linear-gradient(145deg,rgba(222,235,226,.74),rgba(202,220,211,.66))!important;border-radius:18px!important}
+  html body.dark[data-page-section="tools"] .tool-detail-surface{background:linear-gradient(145deg,rgba(10,23,42,.88),rgba(13,29,49,.80))!important}
+}
+@media(max-width:640px){
+  body[data-page-section="tools"] .tool-detail-title{font-size:22px!important;margin-bottom:18px!important}
+  body[data-page-section="tools"] .tool-detail-surface :is(.game-2048-topbar,.flappy-topbar,.typing-topbar){gap:8px}
+  body[data-page-section="tools"] .tool-detail-surface .typing-mode-group{flex:1 1 100%}
+  body[data-page-section="tools"] .tool-detail-surface :is(.game-2048-sound-toggle,.flappy-sound-toggle,.typing-sound-toggle){margin-left:0}
+  body[data-page-section="tools"] .tool-detail-surface .reaction-stats{justify-content:space-between}
+  body[data-page-section="tools"] .tool-detail-surface .reaction-stage{min-height:240px;padding:18px}
+  body[data-page-section="tools"] .tool-detail-surface .reaction-stage em{text-align:center;line-height:1.6}
+  body[data-page-section="tools"] .tool-detail-surface :is(.reaction-actions,.snake-controls){gap:8px;flex-wrap:wrap}
+  body[data-page-section="tools"] .tool-detail-surface :is(.typing-stat-card,.gacha-pity-card){padding:8px}
+  body[data-page-section="tools"] .tool-detail-surface .gacha-config-grid{grid-template-columns:1fr}
+  body[data-page-section="tools"] .audio-visualizer-page .av-stage{height:auto!important;min-height:480px!important}
+  body[data-page-section="tools"] .audio-visualizer-page.is-visual-live .av-controls{top:12px!important;left:12px!important;right:12px!important;width:auto!important;max-width:none;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  body[data-page-section="tools"] .audio-visualizer-page.is-visual-live .av-controls .av-button{min-width:0!important;padding:10px 8px!important;font-size:14px!important}
+  body[data-page-section="tools"] .audio-visualizer-page.is-visual-live .av-volume-control{grid-column:1 / -1;width:100%!important;box-sizing:border-box}
+  body[data-page-section="tools"] .audio-visualizer-page.is-visual-live .av-volume-control input{width:100%;min-width:0}
+  body[data-page-section="tools"] .audio-visualizer-page.is-visual-live:not(.is-display-mode) :is(.av-controls,.av-volume-control){opacity:1!important}
+  body[data-page-section="tools"] .audio-visualizer-page:not(.is-visual-live) .av-topbar{top:24px;left:24px;right:auto}
+  body[data-page-section="tools"] .audio-visualizer-page:not(.is-visual-live) .av-source-panel{grid-template-columns:1fr!important;margin:70px auto 28px!important}
+}
+@media(prefers-reduced-motion:reduce){body[data-page-section="tools"] :is(.tool-detail-ranking,.tool-detail-help) > summary::after{transition:none}}

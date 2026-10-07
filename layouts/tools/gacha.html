@@ -1,10 +1,10 @@
 {{ define "main" }}
-<section class="card gacha-tool-panel" data-gacha-tool data-tool-back-surface>
+<section class="tool-detail-layout">
+<section class="card gacha-tool-panel tool-detail-surface" data-gacha-tool data-tool-back-surface>
   {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+  <h1 class="tool-detail-title">抽卡模拟器</h1>
   <div class="gacha-head">
     <div class="gacha-status">
-      <span>当前游戏 <b data-gacha-mode-name>—</b></span>
-      <span>卡池 <b data-gacha-banner-name>UP 池</b></span>
       <span>抽数 <b data-gacha-total>0</b></span>
     </div>
   </div>
@@ -29,10 +29,6 @@
     </label>
   </div>
 
-  <div class="gacha-banner-note" data-gacha-banner-note>
-    UP 池会判定是否命中 UP，并参与大小保底；常驻池只模拟稀有度，不判定 UP。
-  </div>
-
   <div class="gacha-pity-grid">
     <div class="gacha-pity-card">
       <span>最高稀有保底进度</span>
@@ -42,7 +38,6 @@
     <div class="gacha-pity-card">
       <span>UP 状态</span>
       <strong data-gacha-guarantee>小保底</strong>
-      <p data-gacha-guarantee-note>抽到最高稀有时有概率命中 UP。</p>
     </div>
     <div class="gacha-pity-card">
       <span>井 / 兑换进度</span>
@@ -67,10 +62,13 @@
     </div>
   </div>
 
-  <details class="gacha-rules">
-    <summary>查看当前游戏说明</summary>
+  <details class="gacha-rules tool-detail-help">
+    <summary>机制说明</summary>
+    <p data-gacha-banner-note></p>
+    <p data-gacha-guarantee-note></p>
     <div data-gacha-rules></div>
   </details>
+</section>
 </section>
 
 {{ end }}

@@ -134,10 +134,10 @@
       }
 
       if(els.state){
-        if(next === 'running') els.state.textContent = '专注中 · 保持轨道';
-        else if(next === 'paused') els.state.textContent = '已暂停 · 可以喘口气';
-        else if(next === 'finished') els.state.textContent = '完成 · 这段轨道走完了';
-        else els.state.textContent = '准备进入轨道';
+        if(next === 'running') els.state.textContent = '专注中';
+        else if(next === 'paused') els.state.textContent = '已暂停';
+        else if(next === 'finished') els.state.textContent = '专注完成';
+        else els.state.textContent = '准备开始';
       }
     }
 
@@ -188,7 +188,16 @@
       }
 
       if(els.minuteInput) els.minuteInput.value = minutes;
+      syncPresetState();
       render();
+    }
+
+    function syncPresetState(){
+      els.presets.forEach(function(btn){
+        var active = Number(btn.getAttribute('data-focus-preset')) === settings.durationMinutes;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
     }
 
     function start(){
@@ -318,6 +327,7 @@
         var v = clamp(els.minuteInput.value, 1, 1440);
         settings.durationMinutes = v;
         saveSettings();
+        syncPresetState();
         if(state.status !== 'running'){
           state.durationMs = v * 60000;
           state.remainingMs = state.durationMs;

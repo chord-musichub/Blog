@@ -94,8 +94,6 @@
   const els = {
     mode: tool.querySelector('[data-gacha-mode]'),
     banner: tool.querySelector('[data-gacha-banner]'),
-    modeName: tool.querySelector('[data-gacha-mode-name]'),
-    bannerName: tool.querySelector('[data-gacha-banner-name]'),
     bannerNote: tool.querySelector('[data-gacha-banner-note]'),
     total: tool.querySelector('[data-gacha-total]'),
     pity: tool.querySelector('[data-gacha-pity]'),
@@ -223,8 +221,6 @@
   function render(lastBatch){
     const mode = currentMode();
     tool.classList.toggle('is-standard-banner', !isFeatured());
-    els.modeName.textContent = mode.name;
-    els.bannerName.textContent = isFeatured() ? '限定 / UP' : '常驻';
     els.bannerNote.textContent = isFeatured()
       ? '当前为限定 / UP 池：抽到最高稀有后会判定是否为 UP，并根据规则处理小保底 / 大保底。'
       : '当前为常驻池：只模拟稀有度与保底抽数，不判定 UP，也不会触发大小保底。';

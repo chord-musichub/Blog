@@ -1,16 +1,16 @@
 {{ define "main" }}
 <main class="tool-page focus-timer-page" data-focus-timer data-version="20.21.0">
 
-  <section class="focus-shell" aria-label="学习倒计时">
-    <div class="focus-panel focus-main-card" data-tool-back-surface>
-      {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+  <section class="focus-shell tool-detail-layout tool-detail-surface" aria-label="学习倒计时" data-tool-back-surface>
+    {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+    <h1 class="tool-detail-title">专注钟</h1>
+    <div class="focus-panel focus-main-card">
       <div class="focus-orbit" data-focus-orbit>
         <svg class="focus-ring" viewBox="0 0 260 260" role="img" aria-label="倒计时进度环">
           <defs>
             <linearGradient id="focusRingGradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#dbeafe"/>
-              <stop offset="48%" stop-color="#93c5fd"/>
-              <stop offset="100%" stop-color="#c4b5fd"/>
+              <stop offset="0%" stop-color="var(--tool-accent)"/>
+              <stop offset="100%" stop-color="var(--focus-ring-end)"/>
             </linearGradient>
           </defs>
           <circle class="focus-ring-track" cx="130" cy="130" r="112"></circle>
@@ -18,10 +18,8 @@
         </svg>
         <div class="focus-core">
           <div class="focus-time" data-focus-time>25:00</div>
-          <div class="focus-state" data-focus-state>准备进入轨道</div>
+          <div class="focus-state" data-focus-state>准备开始</div>
         </div>
-        <span class="focus-satellite focus-satellite-a" aria-hidden="true"></span>
-        <span class="focus-satellite focus-satellite-b" aria-hidden="true"></span>
       </div>
 
       <div class="focus-controls" aria-label="倒计时控制">
@@ -29,61 +27,64 @@
         <button class="focus-button" type="button" data-focus-reset>重置</button>
       </div>
 
-      <div class="focus-presets" aria-label="快捷时长">
-        <button type="button" data-focus-preset="5">5 分钟</button>
-        <button type="button" data-focus-preset="15">15 分钟</button>
-        <button type="button" data-focus-preset="25">25 分钟</button>
-        <button type="button" data-focus-preset="45">45 分钟</button>
-        <button type="button" data-focus-preset="60">60 分钟</button>
-        <button type="button" data-focus-preset="90">90 分钟</button>
-      </div>
-
-      <label class="focus-custom-time">
-        <span>自定义分钟</span>
-        <input type="number" min="1" max="1440" step="1" inputmode="numeric" data-focus-minutes value="25" aria-label="自定义倒计时分钟数">
-      </label>
+      <fieldset class="focus-duration-panel">
+        <legend>时长（分钟）</legend>
+        <div class="focus-presets" aria-label="快捷时长">
+          <button type="button" data-focus-preset="5" aria-pressed="false">5</button>
+          <button type="button" data-focus-preset="15" aria-pressed="false">15</button>
+          <button type="button" data-focus-preset="25" aria-pressed="true">25</button>
+          <button type="button" data-focus-preset="45" aria-pressed="false">45</button>
+          <button type="button" data-focus-preset="60" aria-pressed="false">60</button>
+          <button type="button" data-focus-preset="90" aria-pressed="false">90</button>
+        </div>
+        <label class="focus-custom-time">
+          <span>自定义</span>
+          <span class="focus-minute-field"><input type="number" min="1" max="1440" step="1" inputmode="numeric" data-focus-minutes value="25" aria-label="自定义倒计时分钟数"><span aria-hidden="true">分钟</span></span>
+        </label>
+      </fieldset>
     </div>
 
     <aside class="focus-panel focus-side-card" aria-label="专注设置与本地记录">
-      <div class="focus-side-section">
+      <section class="focus-side-section">
         <h2>提示设置</h2>
-        <label class="focus-switch-row">
+        <div class="focus-switch-row">
           <span>结束提示音</span>
-          <input type="checkbox" data-focus-sound checked>
-        </label>
+          {{ partial "tool-sound-toggle.html" (dict "checkbox" true "attribute" "data-focus-sound" "label" "结束提示音") }}
+        </div>
         <label class="focus-range-row">
           <span>提示音音量</span>
           <input type="range" min="0" max="1" step="0.01" value="0.78" data-focus-volume>
         </label>
         <button class="focus-mini-button" type="button" data-focus-test-sound>试听提示音</button>
-      </div>
+      </section>
 
-      <div class="focus-side-section">
+      <section class="focus-side-section">
         <h2>显示偏好</h2>
         <label class="focus-switch-row">
           <span>显示秒数</span>
-          <input type="checkbox" data-focus-show-seconds checked>
+          <input class="focus-switch" type="checkbox" role="switch" data-focus-show-seconds checked>
         </label>
         <label class="focus-switch-row">
           <span>完成弹窗</span>
-          <input type="checkbox" data-focus-overlay checked>
+          <input class="focus-switch" type="checkbox" role="switch" data-focus-overlay checked>
         </label>
-      </div>
+      </section>
 
-      <div class="focus-side-section focus-stats">
-        <h2>今日轨迹</h2>
-        <p><strong data-focus-today-count>0</strong><span> 次完成</span></p>
-        <p><strong data-focus-today-minutes>0</strong><span> 分钟专注</span></p>
+      <section class="focus-side-section focus-stats">
+        <h2>今日专注</h2>
+        <div class="focus-stats-grid">
+          <p><strong data-focus-today-count>0</strong><span>完成次数</span></p>
+          <p><strong data-focus-today-minutes>0</strong><span>专注分钟</span></p>
+        </div>
         <button class="focus-mini-button" type="button" data-focus-clear-today>清空今日记录</button>
-      </div>
+      </section>
     </aside>
   </section>
 
   <div class="focus-finish-overlay" data-focus-finish hidden>
     <div class="focus-finish-card" role="dialog" aria-modal="true" aria-labelledby="focusFinishTitle">
-      <p class="focus-finish-mark">✦</p>
       <h2 id="focusFinishTitle">专注完成</h2>
-      <p data-focus-finish-text>这段轨道已经走完了。</p>
+      <p data-focus-finish-text>本轮专注已完成。</p>
       <div class="focus-finish-actions">
         <button class="focus-button focus-primary" type="button" data-focus-next>再来一轮</button>
         <button class="focus-button" type="button" data-focus-close>收起提示</button>

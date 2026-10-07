@@ -23,7 +23,6 @@
     var startBtn = root.querySelector('[data-flappy-start]');
     var syncBestBtn = root.querySelector('[data-flappy-sync-best]');
     var soundToggle = root.querySelector('[data-flappy-sound-toggle]');
-    var soundLabel = root.querySelector('[data-flappy-sound-label]');
     var topScoresEl = root.querySelector('[data-flappy-top-scores]');
 
     if(!canvas) return;
@@ -104,9 +103,9 @@
     function updateSoundToggle(){
       if(soundToggle){
         soundToggle.setAttribute('aria-pressed', soundEnabled ? 'true' : 'false');
+        soundToggle.setAttribute('title', soundEnabled ? '关闭音效' : '开启音效');
         soundToggle.classList.toggle('is-muted', !soundEnabled);
       }
-      if(soundLabel) soundLabel.textContent = soundEnabled ? '音效开' : '音效关';
     }
 
     function ensureAudio(){
@@ -692,6 +691,8 @@
 
     function onKey(event){
       if(event.code !== 'Space' && event.key !== ' ') return;
+      // Native controls must receive Space themselves instead of flapping.
+      if(event.target && event.target.closest && event.target.closest('button,input,textarea,select,a,summary,[contenteditable]:not([contenteditable="false"])')) return;
       if(!document.documentElement.contains(root)){
         window.removeEventListener('keydown', onKey);
         window.removeEventListener('keyup', onKeyUp);

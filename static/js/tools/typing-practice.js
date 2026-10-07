@@ -95,7 +95,6 @@
     var input = root.querySelector('[data-typing-input]');
     var textEl = root.querySelector('[data-typing-text]');
     var titleEl = root.querySelector('[data-typing-article-title]');
-    var modeLabel = root.querySelector('[data-typing-mode-label]');
     var rankTitle = root.querySelector('[data-typing-rank-title]');
     var timeEl = root.querySelector('[data-typing-time]');
     var progressEl = root.querySelector('[data-typing-progress]');
@@ -108,7 +107,6 @@
     var restartBtn = root.querySelector('[data-typing-restart]');
     var focusBtn = root.querySelector('[data-typing-focus]');
     var soundToggle = root.querySelector('[data-typing-sound-toggle]');
-    var soundLabel = root.querySelector('[data-typing-sound-label]');
 
     if(!input || !textEl) return;
 
@@ -175,9 +173,9 @@
     function updateSoundToggle(){
       if(soundToggle){
         soundToggle.setAttribute('aria-pressed', soundEnabled ? 'true' : 'false');
+        soundToggle.setAttribute('title', soundEnabled ? '关闭音效' : '开启音效');
         soundToggle.classList.toggle('is-muted', !soundEnabled);
       }
-      if(soundLabel) soundLabel.textContent = soundEnabled ? '音效开' : '音效关';
     }
 
     function chooseArticle(){
@@ -198,8 +196,7 @@
 
     function renderArticle(){
       if(titleEl) titleEl.textContent = article.title;
-      if(modeLabel) modeLabel.textContent = modeName();
-      if(rankTitle) rankTitle.textContent = modeName() + '前三名';
+      if(rankTitle) rankTitle.textContent = modeName() + '排行榜';
       var value = input.value || '';
       var html = '';
       for(var i = 0; i < article.text.length; i++){

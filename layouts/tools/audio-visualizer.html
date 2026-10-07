@@ -1,14 +1,15 @@
 {{ define "main" }}
 
 <main class="tool-page audio-visualizer-page" data-audio-visualizer>
-  <section class="av-stage" data-av-stage data-tool-back-surface>
+  <section class="tool-detail-layout tool-detail-surface tool-detail-audio" data-tool-back-surface>
     {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+    <h1 class="tool-detail-title">音频可视化</h1>
+  <section class="av-stage" data-av-stage>
     <canvas class="av-canvas" data-av-canvas width="1440" height="900" aria-label="音频可视化画布"></canvas>
     <div class="av-noise" aria-hidden="true"></div>
     <div class="av-vignette" aria-hidden="true"></div>
     <div class="av-drop-overlay" data-av-drop-overlay aria-hidden="true">
       <div class="av-drop-card">
-        <span>Drop Audio</span>
         <strong>松开添加到播放列表</strong>
       </div>
     </div>
@@ -50,7 +51,6 @@
     <section class="av-playlist-panel" data-av-playlist hidden aria-label="本地播放列表">
       <div class="av-playlist-head">
         <div>
-          <span>Local Queue</span>
           <strong>本地音乐列表</strong>
         </div>
         <div class="av-playlist-actions">
@@ -77,6 +77,7 @@
     </section>
 
     <p class="av-hint" data-av-hint aria-live="polite"></p>
+  </section>
   </section>
 </main>
 {{ end }}

@@ -1,6 +1,8 @@
 {{ define "main" }}
-<section class="card random-tool-panel" data-random-tool data-tool-back-surface>
+<section class="tool-detail-layout tool-detail-layout--compact">
+<section class="card random-tool-panel tool-detail-surface" data-random-tool data-tool-back-surface>
   {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
+  <h1 class="tool-detail-title">随机数</h1>
   <div class="random-form">
     <label>
       <span>最小值</span>
@@ -17,6 +19,7 @@
     <strong data-random-result>?</strong>
     <p data-random-note aria-live="polite"></p>
   </div>
+</section>
 </section>
 
 {{ end }}
