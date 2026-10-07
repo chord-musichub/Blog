@@ -747,7 +747,7 @@
       renderPlaylist();
 
       setPill(audioState, '等待音频来源', false);
-      setHint('已回到音频可视化初始界面。可以选择网页登录系统声音，或上传本地音频。');
+      setHint('选择音频来源。');
 
       try{
         var stage = root.querySelector('.av-stage') || root;

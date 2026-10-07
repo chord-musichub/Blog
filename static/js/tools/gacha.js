@@ -257,7 +257,7 @@
         ? '本次 ' + lastBatch.length + ' 抽：最高稀有 ' + tops + ' 个，UP ' + ups + ' 个。'
         : '本次 ' + lastBatch.length + ' 抽：最高稀有 ' + tops + ' 个。常驻池不判定 UP。';
     }else{
-      els.summary.textContent = state.total ? '已重置本页显示。' : '选择机制后开始抽卡。';
+      els.summary.textContent = state.total ? '已重置显示' : '点击单抽或十连';
     }
 
     if(!state.history.length){

@@ -67,9 +67,9 @@
     }
 
     function setMessage(kicker, title, text){
-      if(kickerEl) kickerEl.textContent = kicker;
+      if(kickerEl){ kickerEl.textContent = kicker || ''; kickerEl.hidden = !kicker; }
       if(titleEl) titleEl.textContent = title;
-      if(textEl) textEl.textContent = text;
+      if(textEl){ textEl.textContent = text || ''; textEl.hidden = !text; }
     }
 
     function renderStats(){
@@ -302,7 +302,7 @@
       state = 'waiting';
       readyAt = 0;
       setClass('waiting');
-      setMessage('等待中', '别急，等颜色变化', '现在点击会算提前。看到绿色后立刻点。');
+      setMessage('', '等变绿', '');
       play('start');
 
       var delay = MIN_WAIT + Math.random() * (MAX_WAIT - MIN_WAIT);
@@ -310,7 +310,7 @@
         state = 'ready';
         readyAt = performance.now();
         setClass('ready');
-        setMessage('现在！', '点！', '越快越好。');
+        setMessage('', '点击！', '');
         play('ready');
       }, delay);
     }
@@ -319,7 +319,7 @@
       resetTimer();
       state = 'idle';
       setClass('too-soon');
-      setMessage('太早了', '提前点击', '这次不计入成绩。点击重新开始。');
+      setMessage('', '点早了', '点击重试');
       play('early');
     }
 
@@ -334,7 +334,7 @@
       }
       renderStats();
       setClass('result');
-      setMessage('完成', ms + ' ms', ms < 180 ? '很快欸，这个反应可以。' : (ms < 260 ? '不错，已经挺稳了。' : '还可以继续压一点。'));
+      setMessage('', ms + ' ms', '点击再测');
       play('hit');
       recordScore(ms);
     }
@@ -355,7 +355,7 @@
       state = 'idle';
       readyAt = 0;
       setClass('idle');
-      setMessage('准备测试', '点击开始', '变色前不要点。变色后越快越好。');
+      setMessage('', '点击开始', '');
     });
 
     if(startBtn){
@@ -382,7 +382,7 @@
     }
 
     setClass('idle');
-    setMessage('准备测试', '点击开始', '变色前不要点。变色后越快越好。');
+    setMessage('', '点击开始', '');
     renderStats();
     updateSoundToggle();
     fetchScores().then(function(){ window.setTimeout(function(){ if(!disposed && root.isConnected) syncLocalBest(false); }, 320); });

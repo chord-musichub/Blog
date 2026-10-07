@@ -196,7 +196,7 @@
 
     function showOverlay(title, text){
       if(overlayTitle) overlayTitle.textContent = title;
-      if(overlayText) overlayText.textContent = text;
+      if(overlayText){ overlayText.textContent = text || ''; overlayText.hidden = !text; }
       if(overlay) overlay.classList.add('show');
     }
 
@@ -743,7 +743,7 @@
       beep('tap');
       if(paused){
         setState('已暂停');
-        showOverlay('暂停中', '按 Space 继续，Shift 加速。粉豆限时连锁，黑豆可清墙。');
+        showOverlay('点击继续', '');
       }else{
         setState('游戏中');
         hideOverlay();
@@ -892,7 +892,7 @@
       rushUntil = 0;
       refillFoods(true);
       setState('准备开始');
-      showOverlay('点击开始', '方向键 / WASD 移动，点击棋盘暂停。');
+      showOverlay('点击开始', '');
       renderer.draw();
     }
 

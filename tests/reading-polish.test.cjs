@@ -38,7 +38,7 @@ test('preview uses the actual reader structure and has no old layout stylesheet'
  assert(!css.includes('grid-template-columns'),'Reading uses the article external rail, not an internal directory column');
  assert(!css.includes('position:static'),'Preview cannot move the article rail into the glass panel');
  assert(!css.includes('md-live-preview'),'No independent reader sizing overrides');
- assert(template.includes('拖入 .md 文件，或点击下方选择'),'Import has concise functional guidance');
+ assert(template.includes('拖入或选择 .md 文件'),'Import has concise functional guidance');
  assert(template.includes('data-toc-state="expanded" hidden'),'No blank reading card before import');
  for(const text of ['仅在本机预览','尚未选择文件','选择文件后预览','选择文件后生成目录','data-md-size'])assert(!template.includes(text),'No extra helper text: '+text);
  const controller=read('static/js/tools/markdown-previewer.js');assert(controller.includes('SonglineReading.buildToc'));

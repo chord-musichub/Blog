@@ -140,7 +140,7 @@
         if(next === 'running') els.state.textContent = '专注中';
         else if(next === 'paused') els.state.textContent = '已暂停';
         else if(next === 'finished') els.state.textContent = '专注完成';
-        else els.state.textContent = '准备开始';
+        else els.state.textContent = '点击播放开始';
       }
     }
 

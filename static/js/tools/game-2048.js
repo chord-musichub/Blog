@@ -89,7 +89,7 @@
       if(ended || disposed) return;
       paused = !paused;
       touchStart = null;
-      setOverlay(paused, '已暂停', '点击右上角继续，或按空格键。');
+      setOverlay(paused, '已暂停', '右上角继续');
       updatePause();
     }
 

@@ -63,7 +63,7 @@
         if(raf) cancelAnimationFrame(raf);
         raf = 0;
         spaceHeld = false;
-        setOverlay(true, '已暂停', '点击继续', '也可点击右上角播放图标。');
+        setOverlay(true, '', '点击继续', '');
       }else{
         setOverlay(false);
         lastTime = performance.now();
@@ -108,9 +108,9 @@
 
     function setOverlay(show, state, title, text){
       if(overlay) overlay.hidden = !show;
-      if(stateEl) stateEl.textContent = state || '';
+      if(stateEl){ stateEl.textContent = state || ''; stateEl.hidden = !state; }
       if(titleEl) titleEl.textContent = title || '';
-      if(textEl) textEl.textContent = text || '';
+      if(textEl){ textEl.textContent = text || ''; textEl.hidden = !text; }
     }
 
     function updateStats(){
@@ -408,7 +408,7 @@
       }
       updateStats();
       recordScore(score, 'gameover');
-      setOverlay(true, '飞行结束', '得分 ' + score, '点击重新开始，或者按空格再飞一次。');
+      setOverlay(true, '', '得分 ' + score, '点击重试');
     }
 
     function collidePipe(pipe){
@@ -770,7 +770,7 @@
     window.addEventListener('pageshow', onPageShow);
     window.__songlineFlappyBirdCleanup = cleanup;
 
-    setOverlay(true, '准备起飞', '点击开始', '点击屏幕 / 按空格：向上飞一下。');
+    setOverlay(true, '', '点击开始', '');
     updateStats();
     updatePause();
     updateSoundToggle();

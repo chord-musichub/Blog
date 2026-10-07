@@ -104,6 +104,7 @@ async function useTool(p,name){
   }else if(name==='reaction-test'){
     await p.locator('[data-reaction-start]').click();
     assert(await p.locator('[data-reaction-stage]').evaluate(e=>e.classList.contains('is-waiting')));
+    assert.equal(await p.locator('[data-reaction-stage]').innerText(),'等变绿');
     await p.locator('[data-reaction-stage]').click();
     assert(await p.locator('[data-reaction-stage]').evaluate(e=>e.classList.contains('is-too-soon')));
     await p.locator('[data-reaction-start]').click();await p.locator('[data-tool-help-open]').click();
@@ -113,7 +114,7 @@ async function useTool(p,name){
     await p.locator('[data-flappy-overlay]').click();
     assert.equal(await p.locator('[data-flappy-overlay]').isVisible(),false);
     await p.locator('[data-flappy-pause]').click();assert.equal(await p.locator('[data-flappy-pause]').getAttribute('data-tool-paused'),'true');
-    await p.waitForTimeout(400);assert((await p.locator('[data-flappy-state]').textContent()).includes('暂停'));
+    await p.waitForTimeout(400);assert.equal(await p.locator('[data-flappy-overlay]').innerText(),'点击继续');
     await p.locator('[data-tool-help-open]').click();await p.locator('[data-tool-help-close]').click();
     assert.equal(await p.locator('[data-flappy-pause]').getAttribute('data-tool-paused'),'true');
     await p.locator('[data-flappy-pause]').click();
@@ -245,6 +246,8 @@ async function useTool(p,name){
           await rank.locator('summary').evaluate(e=>e.blur());
         }
         await soundControl(p,name);
+        const waiting={snake:'[data-snake-overlay]','flappy-bird':'[data-flappy-overlay]','reaction-test':'[data-reaction-stage]'}[name];
+        if(waiting)assert.equal(await p.locator(waiting).innerText(),'点击开始','Only one brief central guide: '+name);
         await helpControl(p,name);
         if(width===1440||width===390){
           await p.evaluate(()=>scrollTo({top:0,behavior:'instant'}));
