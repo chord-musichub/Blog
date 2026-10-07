@@ -28,6 +28,21 @@ func TestSyncHugoPublicDataUsesBuildRootAndVisibleDataDir(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = os.Chdir(previousDir) })
+	registry := []byte(`{"C++":{"url":"/tags/c-2/"}}`)
+	legacySource := runtimeDataPath(dataDir, "tag_urls.json")
+	if err := os.MkdirAll(filepath.Dir(legacySource), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(legacySource, registry, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(buildRoot, "hugo-data"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	legacySnapshot := filepath.Join(buildRoot, "hugo-data", "tag_urls.json")
+	if err := os.WriteFile(legacySnapshot, registry, 0600); err != nil {
+		t.Fatal(err)
+	}
 
 	app := &App{
 		cfg:   Config{DataDir: dataDir, HugoContentDir: filepath.Join(root, "shared", "content", "posts")},
@@ -41,5 +56,14 @@ func TestSyncHugoPublicDataUsesBuildRootAndVisibleDataDir(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(root, "shared", "hugo-data", "site.json")); !os.IsNotExist(err) {
 		t.Fatalf("public Hugo data must not be derived from shared content root, err=%v", err)
+	}
+	if _, err := os.Stat(legacySnapshot); !os.IsNotExist(err) {
+		t.Fatalf("retired tag registry must not be loaded into Hugo, err=%v", err)
+	}
+	if got, err := os.ReadFile(legacySource); err != nil || string(got) != string(registry) {
+		t.Fatalf("runtime tag registry must be preserved, got=%q err=%v", got, err)
+	}
+	if err := app.syncHugoPublicData(); err != nil {
+		t.Fatalf("cleanup must be repeatable: %v", err)
 	}
 }

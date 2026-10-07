@@ -7,7 +7,7 @@
 删除前交叉核对模板、公共/后台脚本、Go 服务端、配置与 Markdown 内容中的引用，并检查同内容 Hugo 构建生成的 178 个页面。删除以已退役组件为边界，不根据首屏 CSS 覆盖率或文件名推断无用。保留规则的相对顺序和动态状态选择器，包括六级目录、Markdown 缩进、2048 数字配色和封面模式。
 
 - 清理旧首页推荐卡片、旧工具按钮/说明/同步栏、旧音频桥接界面、旧朋友包装层、横向换页和轨道导航等组件样式，以及它们的空响应式块。
-- 删除无交付入口的 `web/static/admin-control-polish.js`、`web/static/admin-mobile.js`、`web/static/space-ribbons.js`。仍在使用的公共背景实现 `static/js/space-ribbons.js` 保留。
+- 删除无交付入口的 `web/static/admin-control-polish.js`、`web/static/admin-mobile.js`、`web/static/space-ribbons.js`。仍在使用的公共背景实现 `static/js/space-ribbons.js` 保留；用户进一步明确只删除旧标签漂流带，不删除现用行星轨迹，边界见[清理范围说明](RIBBON_CLEANUP_2026-10-07.md)。
 - 删除 `navigation-motion.css` 及其模板入口；仍有效的链接、焦点、投稿按钮反馈合并到紧邻其前的 `navigation.css` 末尾，保持层叠顺序，每页少一个请求。
 - `site-runtime.css` 只保留当前首页开机遮罩基础，删除旧分门开场的面板、读数和进度样式。仅首页加载，非首页再少一个请求；进入/离开首页时通过带 ID 的样式链接准确恢复/移除。
 

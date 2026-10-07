@@ -10,7 +10,7 @@
   {{- if .IsHome -}}
     {{- $light = slice "/uploads/admin/background/qiandai_background.png" -}}
     {{- $dark = slice "/uploads/admin/background/qiandai-background-black.png" -}}
-  {{- else if or (eq .Section "posts") (eq .Layout "site-notice") -}}
+  {{- else if or (eq .Section "posts") (eq .Layout "site-notice") (eq .RelPermalink "/tags/site-notice/") -}}
     {{- $light = slice "/uploads/admin/background/ground-background.png" -}}
     {{- $dark = slice "/uploads/admin/background/ground-back-black.png" -}}
   {{- else -}}

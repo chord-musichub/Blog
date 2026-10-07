@@ -1,4 +1,4 @@
-/* v23：CONTENT ARCHIVE / 索引与档案抽屉。 */
+/* CONTENT ARCHIVE / 索引与档案抽屉（文章、项目与公告共用）。 */
 html:has(.content-archive) body{background-color:#101b2b;}
 html:has(.content-archive) main.container{max-width:1120px!important;padding-top:clamp(42px,7vw,94px)!important;padding-bottom:88px!important;}
 .content-archive{position:relative;overflow-x:clip;color:var(--text);isolation:isolate;}.content-archive::before{content:"";position:absolute;z-index:-1;inset:-42px -8vw -64px;background:linear-gradient(90deg,rgba(6,15,28,.24),rgba(6,15,28,.08) 56%,transparent);pointer-events:none;}

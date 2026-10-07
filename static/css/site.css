@@ -1,13 +1,12 @@
 @media (max-width: 980px){
-  .navbar{padding:0 18px;gap:18px}.nav-links{gap:24px;margin-left:auto;margin-right:0}.container{padding:22px}.page-grid,.article-shell{grid-template-columns:1fr}.sidebar,.article-toc{display:none}.all-friends,.related-grid{grid-template-columns:1fr 1fr}.post-card{grid-template-columns:1fr}.post-thumb{height:190px}.page-hero h1{font-size:42px}.hero-banner,.page-hero{padding:36px 28px}.panel-two,.featured-friends{grid-template-columns:1fr}
+  .navbar{padding:0 18px;gap:18px}.nav-links{gap:24px;margin-left:auto;margin-right:0}.container{padding:22px}.page-grid,.article-shell{grid-template-columns:1fr}.sidebar,.article-toc{display:none}.all-friends{grid-template-columns:1fr 1fr}.post-card{grid-template-columns:1fr}.post-thumb{height:190px}.page-hero h1{font-size:42px}.hero-banner,.page-hero{padding:36px 28px}.panel-two,.featured-friends{grid-template-columns:1fr}
 }
 @media (max-width: 620px){
-  .site-header{height:auto}.navbar{flex-wrap:wrap;padding:16px}.logo{width:100%;font-size:22px}.nav-links{order:3;width:100%;justify-content:space-between;gap:0}.nav-links a{padding:10px 0}.header-icons{margin-left:auto}.all-friends,.related-grid{grid-template-columns:1fr}.toolbar-panel{flex-direction:column;align-items:stretch}.page-hero h1{font-size:38px}.page-hero p{font-size:17px}
+  .site-header{height:auto}.navbar{flex-wrap:wrap;padding:16px}.logo{width:100%;font-size:22px}.nav-links{order:3;width:100%;justify-content:space-between;gap:0}.nav-links a{padding:10px 0}.header-icons{margin-left:auto}.all-friends{grid-template-columns:1fr}.toolbar-panel{flex-direction:column;align-items:stretch}.page-hero h1{font-size:38px}.page-hero p{font-size:17px}
 }
 
 button.pill{font:inherit;cursor:pointer}
 button.pill:hover{border-color:var(--accent);color:var(--accent-2)}
-.post-search-item{display:block}
 
 
 /* v6.6 深色模式可读性优化：保留柔和风格，提高文字对比度 */
@@ -275,7 +274,6 @@ body,
 .featured-card,
 .small-friend,
 .toolbar-panel,
-tag-cloud,
 .article-reader,
 .toc-card,
 .page-hero,
@@ -382,7 +380,6 @@ body.dark .more:hover{
   }
   .all-friends,
   .featured-friends,
-  .related-grid,
   .panel-two{
     grid-template-columns:1fr !important;
   }
@@ -404,7 +401,6 @@ body.dark .more:hover{
     order:-1;
   }
   .post-card,
-  .related-card,
   .featured-card,
   .small-friend{
     min-width:0;
@@ -685,8 +681,7 @@ body.dark .footer-icp:focus-visible{
 
 
 /* v8.5：恢复文章卡片阅读量显示 */
-.post-card .meta-row .real-views,
-.related-card .meta-row .real-views{
+.post-card .meta-row .real-views{
   display:inline-flex;
   align-items:center;
   gap:4px;
@@ -762,41 +757,21 @@ body.dark .post-thumb{
   background-position:center !important;
 }
 .post-thumb.cover-mode-contain,
-.page-hero.cover-mode-contain,
-.related-card .post-thumb.cover-mode-contain{
+.page-hero.cover-mode-contain{
   background-size:contain !important;
   background-repeat:no-repeat !important;
   background-position:center !important;
   background-color:rgba(247,251,254,.92);
 }
 body.dark .post-thumb.cover-mode-contain,
-body.dark .page-hero.cover-mode-contain,
-body.dark .related-card .post-thumb.cover-mode-contain{
+body.dark .page-hero.cover-mode-contain{
   background-color:rgba(15,23,42,.86);
 }
 .post-thumb.cover-mode-cover,
-.page-hero.cover-mode-cover,
-.related-card .post-thumb.cover-mode-cover{
+.page-hero.cover-mode-cover{
   background-size:cover !important;
   background-position:center !important;
 }
-
-
-/* v9.1：tag 详情页使用该 tag 下文章封面，不再强制主题默认图 */
-.tag-detail-hero{
-  background-size:cover !important;
-  background-position:center !important;
-}
-.tag-detail-hero.cover-mode-contain{
-  background-size:contain !important;
-  background-repeat:no-repeat !important;
-  background-color:rgba(247,251,254,.92);
-}
-body.dark .tag-detail-hero.cover-mode-contain{
-  background-color:rgba(15,23,42,.86);
-}
-
-/* v9.2：tag 顶图由 layouts/tags/taxonomy.html 读取文章 cover */
 
 
 /* v9.4：羊皮纸浅色模式 + 保留真实图片背景 */
@@ -827,7 +802,6 @@ body{
 }
 .card,
 .post-card,
-.related-card,
 .featured-card,
 .small-friend,
 .toolbar-panel,
@@ -842,18 +816,14 @@ body{
   background-color:#ead2ae;
 }
 .post-thumb.cover-mode-contain,
-.page-hero.cover-mode-contain,
-.related-card .post-thumb.cover-mode-contain,
-.tag-detail-hero.cover-mode-contain{
+.page-hero.cover-mode-contain{
   background-color:#ead2ae !important;
   background-size:contain !important;
   background-repeat:no-repeat !important;
   background-position:center !important;
 }
 .post-thumb.cover-mode-cover,
-.page-hero.cover-mode-cover,
-.related-card .post-thumb.cover-mode-cover,
-.tag-detail-hero.cover-mode-cover{
+.page-hero.cover-mode-cover{
   background-size:cover !important;
   background-position:center !important;
 }
@@ -904,7 +874,6 @@ body.dark{
 }
 body.dark .card,
 body.dark .post-card,
-body.dark .related-card,
 body.dark .featured-card,
 body.dark .small-friend,
 body.dark .toolbar-panel,
@@ -1019,8 +988,7 @@ body.dark select{
   .page-grid,
   .panel-two,
   .featured-friends,
-  .all-friends,
-  .related-grid{
+  .all-friends{
     grid-template-columns:1fr !important;
     gap:14px;
   }
@@ -1151,10 +1119,6 @@ body.dark select{
   }
   .toc-head{
     flex-direction:row !important;
-  }
-  .related-card .post-thumb{
-    height:150px !important;
-    min-height:150px !important;
   }
 
   .friend-detail-hero{
@@ -1802,24 +1766,6 @@ body.dark .post-card.clickable-card:focus-visible{
   box-shadow:0 22px 52px rgba(0,0,0,.26) !important;
 }
 
-.related-card.clickable-card,
-.related-card[data-card-link]{
-  cursor:pointer;
-  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
-}
-.related-card.clickable-card:hover,
-.related-card.clickable-card:focus-visible,
-.related-card[data-card-link]:hover,
-.related-card[data-card-link]:focus-visible{
-  transform:translateY(-2px);
-  border-color:rgba(14,165,233,.32);
-  box-shadow:0 22px 52px rgba(55,84,120,.12);
-}
-.related-card.clickable-card:hover h3 a,
-.related-card[data-card-link]:hover h3 a{
-  color:var(--accent-2);
-}
-
 .article-toc[data-toc-toggle-card]{
   cursor:pointer;
   user-select:none;
@@ -1859,8 +1805,6 @@ body.dark .article-toc[data-toc-toggle-card] .toc-head::after{
   background:rgba(19,43,66,.86);
   border-color:rgba(125,211,252,.22);
 }
-body.dark .related-card.clickable-card:hover,
-body.dark .related-card[data-card-link]:hover,
 body.dark .article-toc[data-toc-toggle-card]:hover{
   border-color:rgba(125,211,252,.28);
   box-shadow:0 22px 52px rgba(0,0,0,.26);
@@ -1933,32 +1877,6 @@ body.dark .back-icon-link:focus-visible{
 }
 
 
-/* v14.2：标签页热门文章整卡链接 + 公告图片渐变融合 */
-.related-card-link{
-  display:block;
-  color:inherit;
-  text-decoration:none;
-  cursor:pointer;
-  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
-}
-.related-card-link:hover,
-.related-card-link:focus-visible{
-  transform:translateY(-2px);
-  border-color:rgba(14,165,233,.32);
-  box-shadow:0 22px 52px rgba(55,84,120,.12);
-  outline:none;
-}
-.related-card-link:hover h3,
-.related-card-link:focus-visible h3{
-  color:var(--accent-2);
-}
-body.dark .related-card-link:hover,
-body.dark .related-card-link:focus-visible{
-  border-color:rgba(125,211,252,.28);
-  box-shadow:0 22px 52px rgba(0,0,0,.26);
-}
-
-
 /* v14.3：图片加载与整卡点击结构优化 */
 .lazy-bg{
   background-image:
@@ -1978,13 +1896,6 @@ body.dark .lazy-bg{
   background-image:
     radial-gradient(circle at 28% 22%, rgba(255,255,255,.08), transparent 34%),
     linear-gradient(135deg, #132b42, rgba(56,189,248,.10));
-}
-.related-card,
-.related-card-link{
-  cursor:pointer;
-}
-.related-card-link .post-thumb{
-  display:block;
 }
 .clickable-card{
   cursor:pointer;

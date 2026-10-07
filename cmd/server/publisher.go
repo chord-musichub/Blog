@@ -85,8 +85,13 @@ func (app *App) syncHugoPublicData() error {
 	if err := os.MkdirAll(targetDir, 0755); err != nil {
 		return err
 	}
+	// Only retire the generated Hugo snapshot; preserve the legacy runtime
+	// registry and content aliases so existing tag bookmarks can still migrate.
+	if err := os.Remove(filepath.Join(targetDir, "tag_urls.json")); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
 
-	for _, name := range []string{"site.json", "theme.json", "projects.json", "memories.json", "friends.json", "tag_urls.json", "build.json"} {
+	for _, name := range []string{"site.json", "theme.json", "projects.json", "memories.json", "friends.json", "build.json"} {
 		source := runtimeDataPath(app.cfg.DataDir, name)
 		target := filepath.Join(targetDir, name)
 		data, err := os.ReadFile(source)

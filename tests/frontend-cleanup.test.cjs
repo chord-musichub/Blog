@@ -6,7 +6,7 @@ test('retired scripts and the slider stylesheet have no delivery entry',()=>{
   const files=['web/static/admin-control-polish.js','web/static/admin-mobile.js','web/static/space-ribbons.js','static/css/navigation-motion.css'];
   const entry=walk('layouts').concat(walk('web/templates')).map(read).join('\n');
   for(const file of files){assert(!fs.existsSync(path.join(root,file)),file+' is removed');assert(!entry.includes(path.basename(file)),file+' has no template entry');}
-  assert(fs.existsSync(path.join(root,'static/js/space-ribbons.js')),'Active public background implementation remains');
+  assert(fs.existsSync(path.join(root,'static/js/space-ribbons.js')),'Keep the active planetary-trail background');
 });
 test('boot foundation is home-only and navigation feedback stays in the existing cascade slot',()=>{
   const styles=read('layouts/partials/assets/page-styles.html');

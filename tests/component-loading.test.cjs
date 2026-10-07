@@ -12,15 +12,27 @@ function modulesFor(dataset,reduced=false){
  vm.runInNewContext(source,{window,document,URL});
  return window.testModules;
 }
-test('hidden starstream scenes and reduced motion do not load the effect',()=>{
+test('planetary trails remain lazy-loaded in visible scenes and respect reduced motion',()=>{
  for(const dataset of [{pageKind:'home'},{pageSection:'posts'},{pageLayout:'tools'},{pageSection:'tags',pageLayout:'site-notice'}]){
   assert.equal(modulesFor(dataset).find(m=>m.key==='space-ribbons').test(),false);
  }
- for(const dataset of [{pageLayout:'friends-list'},{pageLayout:'memories'},{pageSection:'tags'},{pageLayout:'random-number'}]){
+ for(const dataset of [{pageLayout:'friends-list'},{pageLayout:'memories'},{pageLayout:'random-number'}]){
   assert.equal(modulesFor(dataset).find(m=>m.key==='space-ribbons').test(),true);
   assert.equal(modulesFor(dataset,true).find(m=>m.key==='space-ribbons').test(),false);
  }
+ assert(fs.existsSync(path.join(root,'static/js/space-ribbons.js')));
+ assert(read('static/js/page-modules.js').includes('SonglineInitSpaceRibbons'));
  assert(!read('layouts/partials/assets/core-scripts.html').includes('space-ribbons.js'));
+ assert(read('static/css/site-effects.css').includes('.songline-starstream-layer'));
+});
+test('only retired tag drifting resources are removed, not planetary trails',()=>{
+ for(const file of ['static/js/pages/tags/flow.js','static/css/pages/tags/index.css'])assert(!fs.existsSync(path.join(root,file)));
+ assert(!modulesFor({}).some(m=>m.key==='tag-flow'));
+ const walk=dir=>fs.readdirSync(path.join(root,dir),{withFileTypes:true}).flatMap(entry=>entry.isDirectory()?walk(path.join(dir,entry.name)):[path.join(dir,entry.name)]);
+ const css=walk('static/css').filter(file=>file.endsWith('.css')).map(read).concat(read('web/static/style.css')).join('\n');
+ assert(!/tagRiverSeamlessMove|\.tag-river/.test(css));
+ assert(read('static/js/tools/audio-visualizer.js').includes('songline:animation-before-resume'),'Keep the active audio phase synchronization');
+ assert(read('static/css/site-effects.css').includes('has-fixed-mobile-nav'),'Keep the live mobile navigation rules');
 });
 test('retired home carousel and permanently hidden hero have no loading entry',()=>{
  assert(!modulesFor({}).some(m=>m.key==='home-friend-carousel'));
@@ -43,11 +55,12 @@ test('archive search does not load the unrelated manual-search modules',()=>{
  for(const key of ['search-utils','search']){
   const module=modules.find(m=>m.key===key);
   assert.equal(module.test(surface(['input[type="search"]','[data-content-archive]'])),false);
-  for(const selector of ['[data-search-submit]','[data-tag-search-panel]','[data-tools-search]'])assert.equal(module.test(surface([selector])),true);
+  assert.equal(module.test(surface(['[data-tag-search-panel]'])),false);
+  for(const selector of ['[data-search-submit]','[data-tools-search]'])assert.equal(module.test(surface([selector])),true);
  }
- const archive=modules.find(m=>m.key==='posts-list-flat');
+ const archive=modules.find(m=>m.key==='content-archive');
  assert.equal(archive.test(surface(['#postList'])),false);
  assert.equal(archive.test(surface(['[data-content-archive]'])),true);
- assert(!read('static/js/pages/posts/list.js').includes('SonglineInitPostsListLayout'));
- assert(!read('static/css/pages/posts/list.css').includes('.posts-list'));
+ assert(!read('static/js/pages/archive/index.js').includes('SonglineInitPostsListLayout'));
+ assert(!read('static/css/pages/archive/index.css').includes('.posts-list'));
 });

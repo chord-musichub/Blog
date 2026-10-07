@@ -23,10 +23,6 @@ v20.20.6：页面级 JS 按需加载。
 <script defer data-page-script="memory-room" src="/js/pages/friends/memories.js?v={{ $v }}"></script>
 {{- end }}
 
-{{- if and (ne .Layout "site-notice") (or (eq $section "tags") (hasPrefix $rel "/tags/")) }}
-<script defer data-page-script="tag-flow" src="/js/pages/tags/flow.js?v={{ $v }}"></script>
-{{- end }}
-
 {{- if and (hasPrefix $rel "/tools/snake/") }}
 <script defer data-page-script="snake-leaderboard" src="/js/tools/snake-leaderboard.js?v={{ $v }}"></script>
 <script defer data-page-script="snake-renderer" src="/js/tools/snake-renderer.js?v={{ $v }}"></script>

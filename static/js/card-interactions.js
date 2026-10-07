@@ -1,4 +1,4 @@
-/* v14.3：整卡点击统一事件委托，兜底 related-card */
+/* Explicit card links on friend profiles use shared event delegation. */
 (function(){
   if(window.SonglineInitCardInteractions){ window.SonglineInitCardInteractions(document); return; }
   const interactiveSelector = 'a, button, input, textarea, select, label, summary, [role="button"], [data-no-card-link]';
@@ -25,11 +25,11 @@
   }
 
   function findCard(target){
-    return target && target.closest && target.closest('[data-card-link], .related-card');
+    return target && target.closest && target.closest('[data-card-link]');
   }
 
   function init(root){
-  (root || document).querySelectorAll('[data-card-link], .related-card').forEach(function(card){
+  (root || document).querySelectorAll('[data-card-link]').forEach(function(card){
     if(getHref(card)){
       card.classList.add('clickable-card');
       if(!card.hasAttribute('tabindex')) card.setAttribute('tabindex', '0');

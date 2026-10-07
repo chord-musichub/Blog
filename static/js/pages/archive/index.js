@@ -26,7 +26,23 @@
     var archiveParams = new URLSearchParams(window.location.search);
     var tagFilter = archiveParams.get('tag') || '';
     // 首页“标签”入口直接打开档案页的搜索抽屉，并保留词条按钮。
-    var shouldOpenSearch = /^(1|true|open)$/i.test(archiveParams.get('search') || '');
+    query = archiveParams.get('q') || tagFilter;
+    if(input) input.value = query;
+    if(clear) clear.hidden = !query;
+    var shouldOpenSearch = !!query || /^(1|true|open)$/i.test(archiveParams.get('search') || '');
+    function setQuery(value){
+      query = value || '';
+      tagFilter = '';
+      if(input) input.value = query;
+      if(clear) clear.hidden = !query;
+      // Clearing a migrated tag must not leave an invisible, unremovable filter
+      // or restore that filter on reload. Keep existing navigation metadata.
+      var url = new URL(window.location.href);
+      url.searchParams.delete('tag');
+      if(query) url.searchParams.set('q', query); else url.searchParams.delete('q');
+      if(url.href !== window.location.href) history.replaceState(history.state, '', url.href);
+      runSearch();
+    }
     function records(mode){ return recordLists[mode] || []; }
     function closeRecord(record){
       if(!record) return;
@@ -107,9 +123,9 @@
     modeButtons.forEach(function(button){ button.addEventListener('click', function(){ switchMode(button.dataset.archiveMode); }); });
     if(projectHint) projectHint.addEventListener('click', function(){ switchMode('projects'); });
     if(searchTrigger && searchField) searchTrigger.addEventListener('click', function(){ var opening = searchField.hidden; searchField.hidden = !opening; searchTrigger.setAttribute('aria-expanded', opening ? 'true' : 'false'); searchTrigger.classList.toggle('is-open', opening); if(opening && input) input.focus(); });
-    if(input){ input.addEventListener('input', function(){ query = input.value || ''; if(clear) clear.hidden = !query; runSearch(); }); input.addEventListener('keydown', function(event){ if(event.key === 'Escape'){ input.value = ''; query = ''; if(clear) clear.hidden = true; runSearch(); input.blur(); } }); }
-    searchTerms.forEach(function(term){ term.addEventListener('click', function(){ query = term.dataset.archiveSearchTerm || ''; if(input) input.value = query; if(clear) clear.hidden = !query; runSearch(); if(input) input.focus(); }); });
-    if(clear) clear.addEventListener('click', function(){ if(!input) return; input.value = ''; query = ''; clear.hidden = true; runSearch(); input.focus(); });
+    if(input){ input.addEventListener('input', function(){ setQuery(input.value); }); input.addEventListener('keydown', function(event){ if(event.key === 'Escape'){ setQuery(''); input.blur(); } }); }
+    searchTerms.forEach(function(term){ term.addEventListener('click', function(){ setQuery(term.dataset.archiveSearchTerm); if(input) input.focus(); }); });
+    if(clear) clear.addEventListener('click', function(){ if(!input) return; setQuery(''); input.focus(); });
     if(shouldOpenSearch && searchField && searchTrigger){
       searchField.hidden = false;
       searchTrigger.setAttribute('aria-expanded', 'true');
@@ -117,7 +133,6 @@
     }
     runSearch();
   }
-  window.SonglineInitPostsListFlat = init;
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ init(document); }, {once:true}); else init(document);
-  window.addEventListener('songline:page-swap', function(event){ init((event.detail && event.detail.root) || document); });
+  // Direct entry and AJAX entry share the page-module dispatcher.
+  window.SonglineInitContentArchive = init;
 })();

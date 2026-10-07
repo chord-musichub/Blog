@@ -81,12 +81,11 @@ func (app *App) handleSiteSettings(w http.ResponseWriter, r *http.Request) {
 	if settings.Boot.WelcomeText == "" {
 		settings.Boot.WelcomeText = defaultSiteSettings().Boot.WelcomeText
 	}
-	settings.Pages.TagsHeroTitle = strings.TrimSpace(r.FormValue("tags_hero_title"))
-	settings.Pages.TagsHeroImage = cleanPublicPath(r.FormValue("tags_hero_image"))
+	// Standalone tag presentation fields are retired. Preserve stored values
+	// instead of clearing them when the current form no longer submits them.
 	settings.Pages.FriendsHeroTitle = strings.TrimSpace(r.FormValue("friends_hero_title"))
 	settings.Pages.FriendsHeroImage = cleanPublicPath(r.FormValue("friends_hero_image"))
 	settings.Pages.ArticleDefaultCover = cleanPublicPath(r.FormValue("article_default_cover"))
-	settings.Pages.TagDefaultCover = cleanPublicPath(r.FormValue("tag_default_cover"))
 	settings.Pages.FriendDefaultCover = cleanPublicPath(r.FormValue("friend_default_cover"))
 	settings.Background.Image = cleanPublicPath(r.FormValue("background_image"))
 	settings.Background.Height = safeCSSSize(r.FormValue("background_height"), "420px")

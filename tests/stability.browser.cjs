@@ -170,10 +170,6 @@ async function tools(page,route){
   await page.mouse.wheel(0,-160);await page.waitForTimeout(350);
   assert(await world.evaluate(e=>new DOMMatrixReadOnly(getComputedStyle(e).transform).a)>before);
   await page.mouse.wheel(0,160);
- }else if(route==='/tags/'){
-  await page.locator('#tagRiverSearch').fill('不会存在的标签');await page.locator('#tagRiverSearchSubmit').click();
-  assert.match(await page.locator('[data-tag-search-results]').textContent(),/没有|未找到|暂无/);
-  await page.locator('#tagRiverSearch').press('Escape');
  }
 }
 async function toc(page,width){
@@ -253,7 +249,7 @@ async function toc(page,width){
    page.memoryPhase=true;
    const samples=[],memory=[];const cdp=await context.newCDPSession(page);
    for(let cycle=0;cycle<3;cycle++){
-    for(const route of ['/','/friends/','/friends/memories/','/tags/','/posts/','/tools/',...toolRoutes]){
+    for(const route of ['/','/friends/','/friends/memories/','/posts/','/tools/',...toolRoutes]){
      await navigate(page,route);
      await tools(page,route);
      if(route==='/tools/'){

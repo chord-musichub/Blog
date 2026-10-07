@@ -24,7 +24,7 @@
     // 注入归档页，尤其是在无刷新过场后造成列表样式被污染。
     var isArticleSurface = path.indexOf('/tools/markdown-previewer/') === 0 || !!query(root, '.markdown-body, [data-article-renderer="songline-markdown"]');
     var isToolsPage = path.indexOf('/tools/') === 0 || !!query(root, '.tools-grid, .tool-card, .md-tool-layout, [data-snake-game], [data-game-2048]');
-    var isSearchSurface = isToolsPage || path === '/' || path.indexOf('/posts/') === 0 || path.indexOf('/friends/') === 0 || path.indexOf('/tags/') === 0 || !!query(root, '[data-search-submit], [data-tag-search-panel], [data-tools-search], .home-friends-section');
+    var isSearchSurface = isToolsPage || path === '/' || path.indexOf('/posts/') === 0 || path.indexOf('/friends/') === 0 || !!query(root, '[data-content-archive], [data-search-submit], [data-tools-search], .home-friends-section');
     if(isArticleSurface){
       ensureStylesheet('songline-markdown-renderer-style', '/css/pages/content/markdown-renderer.css');
       ensureStylesheet('songline-article-compat-style', '/css/site-article-compat.css');
@@ -130,7 +130,7 @@
       key:'space-ribbons',
       src:'/js/space-ribbons.js?v=' + VERSION,
       test:function(){
-        // 与 space-ribbons.js 的可见场景条件一致；隐藏背景不下载、不创建动画。
+        // 行星轨迹仍是现用背景；仅在可见场景且未要求减少动画时加载。
         var page = document.body.dataset;
         return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageLayout !== 'tools' && page.pageLayout !== 'site-notice' &&
           !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -181,7 +181,7 @@
       key:'search-utils',
       src:'/js/search-utils.js?v=' + VERSION,
       test:function(root){
-        return !!query(root, '[data-search-submit], [data-tag-search-panel], [data-tools-search]');
+        return !!query(root, '[data-search-submit], [data-tools-search]');
       },
       init:function(){}
     },
@@ -189,7 +189,7 @@
       key:'search',
       src:'/js/search.js?v=' + VERSION,
       test:function(root){
-        return !!query(root, '[data-search-submit], [data-tag-search-panel], [data-tools-search]');
+        return !!query(root, '[data-search-submit], [data-tools-search]');
       },
       init:function(root){
         if(window.SonglineInitSearch) window.SonglineInitSearch(root || document);
@@ -212,16 +212,6 @@
       src:'/js/pages/friends/memories.js?v=' + VERSION,
       test:function(root){ return !!query(root, '[data-memory-room]'); },
       init:function(root){ if(window.SonglineInitMemoryRoom) window.SonglineInitMemoryRoom(root || document); }
-    },
-    {
-      key:'tag-flow',
-      src:'/js/pages/tags/flow.js?v=' + VERSION,
-      test:function(root){
-        return !!query(root, '[data-tag-flow], .tag-flow, .tag-river, .tag-river-stage, .tag-river-canvas, .tag-river-search');
-      },
-      init:function(root){
-        if(window.SonglineInitTagFlow) window.SonglineInitTagFlow(root || document);
-      }
     },
     {
       key:'snake-leaderboard',
@@ -372,13 +362,13 @@
       }
     },
     {
-      key:'posts-list-flat',
-      src:'/js/pages/posts/list.js?v=' + VERSION,
+      key:'content-archive',
+      src:'/js/pages/archive/index.js?v=' + VERSION,
       test:function(root){
         return !!query(root, '[data-content-archive]');
       },
       init:function(root){
-        if(window.SonglineInitPostsListFlat) window.SonglineInitPostsListFlat(root || document);
+        if(window.SonglineInitContentArchive) window.SonglineInitContentArchive(root || document);
       }
     }
   ];
@@ -407,7 +397,7 @@
     'space-ribbons':'SonglineInitSpaceRibbons', 'views':'SonglineInitViews',
     'home-recommendations':'SonglineInitHomeRecommendations', 'home-message-board':'SonglineInitHomeMessageBoard',
     'markdown-code-tools':'SonglineEnhanceMarkdown', 'search-utils':'SonglineSearchUtils', 'search':'SonglineInitSearch',
-    'friend-galaxy':'SonglineInitFriendGalaxy', 'memory-room':'SonglineInitMemoryRoom', 'tag-flow':'SonglineInitTagFlow',
+    'friend-galaxy':'SonglineInitFriendGalaxy', 'memory-room':'SonglineInitMemoryRoom',
     'snake-leaderboard':'SonglineCreateSnakeLeaderboard', 'snake-renderer':'SonglineCreateSnakeRenderer', 'snake':'SonglineInitSnake',
     '2048-engine':'Songline2048Engine', '2048-renderer':'SonglineCreate2048Renderer',
     '2048-leaderboard':'SonglineCreate2048Leaderboard', '2048-audio':'SonglineCreate2048Audio', '2048':'SonglineInit2048',
@@ -415,7 +405,7 @@
     'audio-metadata':'SonglineAudioMetadata', 'home-music':'SonglineInitHomeMusic',
     'audio-visualizer-renderer':'SonglineCreateAudioVisualizerRenderer', 'audio-visualizer':'SonglineInitAudioVisualizer',
     'mobile-toc':'SonglineInitMobileToc', 'reader-floating-controls':'SonglineNormalizeFloatReadingButtons',
-    'posts-list-flat':'SonglineInitPostsListFlat'
+    'content-archive':'SonglineInitContentArchive'
   };
   var dependencies = {
     'search':['search-utils'], 'markdown-previewer':['markdown-renderer','article-reading','article-toc-controls'],

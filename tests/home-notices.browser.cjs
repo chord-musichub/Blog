@@ -19,7 +19,11 @@ function makeFixtures(){
   write('draft-notice','title: Private draft\ndate: 2026-08-01\nis_notice: true\ndraft: true');
   for(let i=1;i<=count;i++)write('notice-'+i,'title: '+JSON.stringify(i===count?longTitle:'公告 '+i)+'\ndate: 2026-07-'+String(i).padStart(2,'0')+'\nis_notice: true\nsummary: '+JSON.stringify('更新内容 '+ '长摘要应当只占两行，点击后查看完整公告。'.repeat(20)));
   fs.mkdirSync(path.join(root,'content/tags/site-notice'),{recursive:true});
-  fs.writeFileSync(path.join(root,'content/tags/site-notice/_index.md'),'---\ntitle: 站点公告\nlayout: site-notice\n---\n');
+  const noticeIndex=path.join(root,'content/tags/site-notice/_index.md');
+  // A taxonomy generated from the protected tag must also keep the live notice
+  // archive, even when its custom frontmatter index is absent.
+  if(count===4){if(fs.existsSync(noticeIndex))fs.unlinkSync(noticeIndex);}
+  else fs.writeFileSync(noticeIndex,'---\ntitle: 站点公告\nlayout: site-notice\n---\n');
   const args=['run','--pull=never','--rm','--network','none','--read-only','--tmpfs','/tmp','--user','1000:1000','--workdir','/src','--entrypoint','hugo','-e','HUGO_RESOURCEDIR=/out/resources'];
   for(const [src,dst] of [['hugo.toml','hugo.toml'],['layouts','layouts'],['assets','assets'],['assets/bootstrap','data'],['static','static']])args.push('--mount',`type=bind,src=${path.join(repo,src)},dst=/src/${dst},readonly`);
   args.push('--mount',`type=bind,src=${root}/content,dst=/src/content,readonly`,'--mount',`type=bind,src=${root}/out,dst=/out`,process.env.BLOG_HUGO_IMAGE||'blog-blog-admin:latest','--source','/src','--destination','/out/public','--minify','--noBuildLock','--cacheDir','/tmp/hugo-cache');
@@ -102,7 +106,7 @@ async function contextFor(browser,build,{width=390,height=844,theme='dark',js=tr
    await page.waitForFunction(()=>location.pathname==='/tags/site-notice/'&&!document.documentElement.classList.contains('songline-page-transitioning'));
    assert(await page.locator('[data-notice-archive]').isVisible());
    await page.evaluate(()=>SonglinePageModules.ready(document));
-   assert.equal(await page.locator('#songline-posts-list-style,#songline-posts-campus-scene-style').count(),2);
+   assert.equal(await page.locator('#songline-archive-style,#songline-posts-campus-scene-style').count(),2);
    assert.equal(await page.locator('#songline-tags-style,.page-hero,.post-card').count(),0);
    const back=page.locator('[data-notice-archive] [data-back-icon]');
    assert.equal((await back.textContent()).trim(),'');
@@ -130,7 +134,7 @@ async function contextFor(browser,build,{width=390,height=844,theme='dark',js=tr
    await page.waitForFunction(()=>location.pathname.startsWith('/posts/')&&!document.documentElement.classList.contains('songline-page-transitioning'));
    await page.goBack();await page.waitForFunction(()=>location.pathname==='/tags/site-notice/'&&!document.documentElement.classList.contains('songline-page-transitioning'));
    await page.locator('[data-notice-archive] [data-back-icon]').click();await page.waitForFunction(()=>location.pathname==='/'&&!document.documentElement.classList.contains('songline-page-transitioning'));
-   assert.equal(await page.locator('#songline-posts-list-style').count(),0,'Archive styles removed on return home');
+   assert.equal(await page.locator('#songline-archive-style').count(),0,'Archive styles removed on return home');
    await page.goto(base+'/posts/');await page.evaluate(()=>SonglinePageModules.ready(document));await page.mouse.move(0,0);await page.waitForTimeout(400);
    assert.deepEqual(await page.evaluate(visualState),noticeStyle,'Notice list and regular archive share the same panel, row, controls and top-right icon styles');
    await page.locator('[data-privacy-open]').click();

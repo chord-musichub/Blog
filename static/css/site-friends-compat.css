@@ -21,7 +21,6 @@ body.dark .page-hero.minimal-page-hero h1{
 }
 
 body .toolbar-panel,
-body .tag-search-panel,
 body .tools-command-center{
   border-color:transparent !important;
   background:color-mix(in srgb, var(--panel) 64%, transparent) !important;
@@ -29,7 +28,6 @@ body .tools-command-center{
   backdrop-filter:blur(18px);
 }
 body.dark .toolbar-panel,
-body.dark .tag-search-panel,
 body.dark .tools-command-center{
   background:rgba(17,28,46,.48) !important;
   border-color:rgba(125,211,252,.08) !important;
@@ -138,7 +136,6 @@ body.dark .modern-tools-grid .tool-card:focus-visible{
 }
 @media(max-width:640px){
   body .toolbar-panel,
-  body .tag-search-panel,
   body .tools-command-center{
     backdrop-filter:none;
   }

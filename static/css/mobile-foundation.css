@@ -124,7 +124,6 @@
   .featured-friends,
   .tools-grid,
   .modern-tools-grid,
-  .related-grid,
   .article-list{
     grid-template-columns:1fr!important;
     gap:14px!important;
@@ -132,16 +131,6 @@
   .post-thumb{
     min-height:165px!important;
   }
-
-  /* 文章列表 / 卡片 */
-  .posts-list{
-    display:grid!important;
-    grid-template-columns:1fr!important;
-    gap:14px!important;
-  }
-  body .posts-list > .post-search-item > article.post-card,
-  body .posts-list > .post-search-item:first-child > article.post-card,
-  body .posts-list > .post-search-item:first-of-type > article.post-card,
   .post-card{
     grid-template-columns:1fr!important;
     min-height:0!important;
@@ -211,17 +200,6 @@
   .back-to-top-button,
   .scroll-to-bottom-button{
     right:12px!important;
-  }
-
-  /* 标签页 */
-  .tag-river-stage{
-    min-height:220px!important;
-    overflow:hidden!important;
-  }
-  .tag-river-head,
-  .tag-river-searchbox{
-    flex-direction:column!important;
-    align-items:stretch!important;
   }
   .pills{
     gap:8px!important;

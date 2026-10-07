@@ -13,10 +13,6 @@ v20.20.6：首屏资源提示。
 <link rel="preload" href="/js/pages/friends/galaxy.js?v={{ $v }}&friends=22.15" as="script">
 {{- end }}
 
-{{- if and (ne .Layout "site-notice") (or (eq $section "tags") (hasPrefix $rel "/tags/")) }}
-<link rel="preload" href="/js/pages/tags/flow.js?v={{ $v }}" as="script">
-{{- end }}
-
 {{- if hasPrefix $rel "/tools/snake/" }}
 <link rel="preload" href="/js/tools/snake-leaderboard.js?v={{ $v }}" as="script">
 <link rel="preload" href="/js/tools/snake-renderer.js?v={{ $v }}" as="script">

@@ -6,7 +6,7 @@ const fs=require('node:fs'),path=require('node:path');
 const repo=path.resolve(__dirname,'..');
 const builds={before:path.resolve(process.env.BLOG_UI_BASELINE||'local-only/cleanup-performance/before/public'),after:path.resolve(process.env.BLOG_UI_BUILD||'local-only/cleanup-performance/after/public')};
 for(const build of Object.values(builds))assert(fs.existsSync(path.join(build,'index.html')),'Provide both Hugo builds');
-const out=path.join(repo,'local-only/cleanup-performance');fs.mkdirSync(out,{recursive:true});
+const out=path.resolve(process.env.CLEANUP_REPORT_DIR||path.join(repo,'local-only/cleanup-performance'));fs.mkdirSync(out,{recursive:true});
 const base='http://cleanup-audit.test';
 const svg='<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" fill="#607d8b"/></svg>';
 const tools=['random-number','2048','snake','reaction-test','flappy-bird','typing-practice','gacha','focus-timer','audio-visualizer','markdown-previewer'];
@@ -33,19 +33,6 @@ async function fixture(browser,mode,width,theme){
 async function ready(page,route){
   await page.goto(base+route);await page.evaluate(()=>SonglinePageModules.ready(document));
   await page.addStyleTag({content:'*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}'});
-  // CSS animation freezing does not stop the tag river's requestAnimationFrame.
-  // Sample the same deterministic initial phase in both builds.
-  await page.evaluate(()=>{
-    const stage=document.querySelector('[data-tag-river-stage]');
-    if(!stage)return;
-    cancelAnimationFrame(stage.__tagRiverMotionFrame);
-    stage.__tagRiverMotionToken=(stage.__tagRiverMotionToken||0)+1;
-    stage.querySelectorAll('.tag-river-strip').forEach(strip=>{
-      const motion=strip.__tagRiverMotion;
-      const x=motion?-(motion.offset/motion.duration*50):0;
-      strip.style.setProperty('transform','translate3d('+x.toFixed(4)+'%,0,0)','important');
-    });
-  });
   await page.mouse.move(0,0);await page.waitForTimeout(250);
 }
 async function snapshot(page){return page.evaluate(()=>{
@@ -91,8 +78,7 @@ async function typingAudit(browser,mode){
   const browser=await chromium.launch({headless:true,channel:'msedge'});
   try{
     const friend=fs.readdirSync(path.join(builds.after,'friends')).find(name=>!['memories','index.html'].includes(name)&&fs.existsSync(path.join(builds.after,'friends',name,'index.html')));
-    const tag=fs.readdirSync(path.join(builds.after,'tags')).find(name=>!['site-notice','index.html','page'].includes(name)&&fs.existsSync(path.join(builds.after,'tags',name,'index.html')));
-    const routes=process.env.CLEANUP_ROUTES?JSON.parse(process.env.CLEANUP_ROUTES):['/','/posts/','/tags/site-notice/','/posts/linux-note/','/friends/','/friends/memories/',`/friends/${friend}/`,'/tools/','/tags/',`/tags/${tag}/`,...tools.map(name=>'/tools/'+name+'/')];
+    const routes=process.env.CLEANUP_ROUTES?JSON.parse(process.env.CLEANUP_ROUTES):['/','/posts/','/tags/site-notice/','/posts/linux-note/','/friends/','/friends/memories/',`/friends/${friend}/`,'/tools/',...tools.map(name=>'/tools/'+name+'/')];
     const cases=process.env.CLEANUP_CASES?JSON.parse(process.env.CLEANUP_CASES):[[1440,'dark'],[1440,'light'],[390,'dark'],[390,'light']];
     for(const [width,theme] of cases)for(const route of routes){
       const pair={width,theme,route};let before;
@@ -112,7 +98,10 @@ async function typingAudit(browser,mode){
       report.push(pair);console.log('PASS',width,theme,route,'saved bytes',pair.before.assetBytes-pair.after.assetBytes,'pixel delta',pair.meanPixelDifference.toFixed(4));
     }
     const typing={before:await typingAudit(browser,'before'),after:await typingAudit(browser,'after')};
-    assert(typing.before.childList>=80);assert.equal(typing.before.retained,false);assert.equal(typing.after.childList,0);assert.equal(typing.after.retained,true);assert(typing.after.attributes<400);
+    // A baseline captured after the typing optimization already reuses nodes.
+    assert(typing.before.childList===0||typing.before.childList>=80);
+    assert.equal(typing.before.retained,typing.before.childList===0);
+    assert.equal(typing.after.childList,0);assert.equal(typing.after.retained,true);assert(typing.after.attributes<400);
     report.push({typing});console.log('PASS typing node reuse',typing);
   }finally{fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

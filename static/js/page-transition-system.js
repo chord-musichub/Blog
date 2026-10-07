@@ -357,6 +357,20 @@
       if(!response.ok) throw new Error('request failed: ' + response.status);
       var html = await response.text();
       doc = new DOMParser().parseFromString(html, 'text/html');
+      // Lightweight retired-tag documents point to the current archive. Follow
+      // within this transition so no obsolete UI, refresh or history entry leaks.
+      var archiveTarget = doc.head.querySelector('meta[name="songline-archive-target"]');
+      if(archiveTarget){
+        var target = new URL(archiveTarget.content, url.href);
+        if(target.origin !== window.location.origin || target.pathname !== '/posts/') throw new Error('invalid archive redirect');
+        url = target;
+        response = await fetch(url.href, {
+          signal:controller.signal, credentials:'same-origin',
+          headers:{ 'X-Requested-With':'songline-page-transition' }
+        });
+        if(!response.ok) throw new Error('archive request failed: ' + response.status);
+        doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+      }
       var nextMain = doc.querySelector('main.container');
       if(!nextMain) throw new Error('next page main container missing');
       if(window.SonglineResources) window.SonglineResources.preloadScene(doc);

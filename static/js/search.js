@@ -1,8 +1,8 @@
-/* v20.0.8：统一搜索。点击搜索/按 Enter 后筛选；文章搜索仅匹配文章标题与作者名；搜索 X 键带 hover。 */
+/* Shared manual search for tools and friend lists; the archive owns its search. */
 (function(){
   var utils=window.SonglineSearchUtils;
   if(!utils) return;
-  var normalize=utils.normalize, termsOf=utils.termsOf, includesAll=utils.includesAll, countTerm=utils.countTerm, showSearchRefresh=utils.showSearchRefresh, setVisible=utils.setVisible, setEmpty=utils.setEmpty, flashEmpty=utils.flashEmpty, installClearButtons=utils.installClearButtons;
+  var normalize=utils.normalize, termsOf=utils.termsOf, includesAll=utils.includesAll, showSearchRefresh=utils.showSearchRefresh, setVisible=utils.setVisible, setEmpty=utils.setEmpty, flashEmpty=utils.flashEmpty, installClearButtons=utils.installClearButtons;
   function bindManualSearch(config){
     var input = document.querySelector(config.input);
     var list = document.querySelector(config.list);
@@ -82,208 +82,6 @@
     runSearch({feedback:false});
   }
 
-  function articleTitleAuthorScore(item, q){
-    var phrase = normalize(q);
-    var terms = termsOf(q);
-    if(!terms.length) return 1;
-    var title = normalize(item.dataset.title || '');
-    var author = normalize(item.dataset.author || '');
-    var hay = normalize([title, author].filter(Boolean).join(' '));
-    if(!hay) return 0;
-    if(!terms.every(function(t){ return hay.indexOf(t) >= 0; })) return 0;
-
-    var score = 10;
-    if(title === phrase) score += 120;
-    if(author === phrase) score += 96;
-    if(title.indexOf(phrase) >= 0) score += 80;
-    if(author.indexOf(phrase) >= 0) score += 64;
-    terms.forEach(function(t){
-      if(title.indexOf(t) >= 0) score += 28;
-      if(author.indexOf(t) >= 0) score += 22;
-    });
-    return score;
-  }
-
-  function initPostSearch(){
-    var input = document.querySelector('#postSearch');
-    var button = document.querySelector('#postSearchSubmit');
-    var list = document.querySelector('#postList');
-    if(!input || !list) return;
-    if(input.dataset.songlinePostSearchBound === '1') return;
-    input.dataset.songlinePostSearchBound = '1';
-
-    var items = Array.from(list.querySelectorAll('.post-search-item'));
-    var count = document.querySelector('#postSearchCount');
-    var empty = document.querySelector('#postEmpty');
-    var sortBtn = document.querySelector('#postSort');
-    var filterButtons = Array.from(document.querySelectorAll('#postFilters [data-filter]'));
-    var tagToggle = document.querySelector('#postTagToggle');
-    var tagPanel = document.querySelector('#postTagExplorer');
-    var tagInput = document.querySelector('#postTagSearch');
-    var tagStatus = document.querySelector('#postTagStatus');
-    var tagButtons = Array.from(document.querySelectorAll('[data-post-tag-filter]'));
-    var sortOrder = sortBtn ? (sortBtn.dataset.order || 'desc') : 'desc';
-    var activeFilter = 'all';
-    if(button) button.setAttribute('data-no-page-loading', '');
-
-    function itemMatchesFilter(item){
-      if(activeFilter === 'all') return true;
-      var f = normalize(activeFilter);
-      var hay = normalize([item.dataset.title, item.dataset.author, item.dataset.tags].filter(Boolean).join(' '));
-      return !!f && hay.indexOf(f) >= 0;
-    }
-
-    function syncFilterControls(){
-      filterButtons.forEach(function(button){ button.classList.toggle('active', (button.dataset.filter || 'all') === activeFilter); });
-      tagButtons.forEach(function(button){ button.classList.toggle('active', (button.dataset.postTagFilter || 'all') === activeFilter); });
-    }
-
-    function setActiveFilter(value, feedback){
-      activeFilter = value || 'all';
-      syncFilterControls();
-      runSearch({feedback:feedback !== false});
-    }
-
-    function updateCount(active, visible){
-      if(!count) return;
-      count.textContent = active ? ('按标题/作者找到 ' + visible + ' / ' + items.length + ' 篇文章') : ('共 ' + items.length + ' 篇文章');
-    }
-
-    function sortItems(){
-      if(!items.length) return;
-      items.sort(function(a,b){
-        var da = Number(a.dataset.date || 0), db = Number(b.dataset.date || 0);
-        return sortOrder === 'desc' ? db - da : da - db;
-      }).forEach(function(item){ list.appendChild(item); });
-    }
-
-    function runSearch(opts){
-      opts = opts || {};
-      var q = input.value || '';
-      var active = !!normalize(q);
-      var visible = 0;
-      var scores = new Map();
-
-      items.forEach(function(item){
-        var s = active ? articleTitleAuthorScore(item, q) : 1;
-        scores.set(item, s);
-      });
-
-      items.forEach(function(item){
-        var show = (!active || scores.get(item) > 0) && itemMatchesFilter(item);
-        setVisible(item, show);
-        item.classList.toggle('is-search-hit', active && show);
-        if(show) visible++;
-      });
-      setEmpty(empty, visible, active);
-      updateCount(active, visible);
-      input.classList.toggle('has-search-value', active);
-      if(opts.feedback){
-        showSearchRefresh('搜索文章中');
-        if(active && visible === 0) flashEmpty(input.closest('.toolbar-panel') || input);
-      }
-    }
-
-    function clearSearch(){
-      input.value = '';
-      items.forEach(function(item){ setVisible(item, itemMatchesFilter(item)); item.classList.remove('is-search-hit'); });
-      var visible = items.filter(itemMatchesFilter).length;
-      setEmpty(empty, visible, false);
-      updateCount(false, visible);
-      input.classList.remove('has-search-value');
-    }
-
-    function submit(e){ if(e){ e.preventDefault(); e.stopPropagation(); } runSearch({feedback:true}); }
-    if(button) button.addEventListener('click', submit, true);
-    input.addEventListener('keydown', function(e){
-      if(e.key === 'Enter') submit(e);
-      else if(e.key === 'Escape'){
-        e.preventDefault(); e.stopPropagation(); clearSearch(); showSearchRefresh('已重置');
-      }
-    }, true);
-    input.addEventListener('search', function(){ if(!input.value) clearSearch(); });
-
-    if(sortBtn && sortBtn.dataset.songlineSortBound !== '1'){
-      sortBtn.dataset.songlineSortBound = '1';
-      sortBtn.setAttribute('data-no-page-loading', '');
-      sortBtn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        sortOrder = sortOrder === 'desc' ? 'asc' : 'desc';
-        sortBtn.dataset.order = sortOrder;
-        sortBtn.textContent = sortOrder === 'desc' ? '排序：最新优先⌄' : '排序：最早优先⌃';
-        sortItems(); showSearchRefresh('排序中');
-      }, true);
-    }
-    filterButtons.forEach(function(btn){
-      if(btn.dataset.songlineFilterBound === '1') return;
-      btn.dataset.songlineFilterBound = '1';
-      btn.setAttribute('data-no-page-loading', '');
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        setActiveFilter(btn.dataset.filter || 'all', true);
-      }, true);
-    });
-    if(tagToggle && tagPanel && tagToggle.dataset.songlineTagToggleBound !== '1'){
-      tagToggle.dataset.songlineTagToggleBound = '1';
-      tagToggle.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        var willOpen = tagPanel.hidden;
-        tagPanel.hidden = !willOpen;
-        tagToggle.classList.toggle('active', willOpen);
-        tagToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-        if(willOpen && tagInput) tagInput.focus();
-      }, true);
-    }
-    tagButtons.forEach(function(btn){
-      if(btn.dataset.songlinePostTagBound === '1') return;
-      btn.dataset.songlinePostTagBound = '1';
-      btn.setAttribute('data-no-page-loading', '');
-      btn.addEventListener('click', function(e){
-        e.preventDefault(); e.stopPropagation();
-        setActiveFilter(btn.dataset.postTagFilter || 'all', true);
-      }, true);
-    });
-    if(tagInput && tagInput.dataset.songlinePostTagSearchBound !== '1'){
-      tagInput.dataset.songlinePostTagSearchBound = '1';
-      function filterTags(){
-        var query = normalize(tagInput.value || '');
-        var visibleTags = 0;
-        tagButtons.forEach(function(button){
-          var isAll = (button.dataset.postTagFilter || 'all') === 'all';
-          var show = isAll || !query || normalize(button.textContent || '').indexOf(query) >= 0;
-          button.hidden = !show;
-          if(show && !isAll) visibleTags++;
-        });
-        if(tagStatus) tagStatus.textContent = query ? ('找到 ' + visibleTags + ' 个标签') : (Math.max(tagButtons.length - 1, 0) + ' 个标签');
-      }
-      tagInput.addEventListener('input', filterTags);
-      tagInput.addEventListener('keydown', function(e){
-        if(e.key === 'Escape'){
-          e.preventDefault();
-          tagInput.value = '';
-          filterTags();
-        }else if(e.key === 'Enter'){
-          e.preventDefault();
-          var first = tagButtons.filter(function(button){ return !button.hidden && (button.dataset.postTagFilter || 'all') !== 'all'; })[0];
-          if(first) first.click();
-        }
-      });
-      filterTags();
-    }
-    var queryParams = new URLSearchParams(window.location.search);
-    var requestedTag = queryParams.get('tag') || '';
-    if(requestedTag && tagButtons.some(function(button){ return (button.dataset.postTagFilter || '') === requestedTag; })){
-      activeFilter = requestedTag;
-      if(tagPanel && tagToggle){
-        tagPanel.hidden = false;
-        tagToggle.classList.add('active');
-        tagToggle.setAttribute('aria-expanded', 'true');
-      }
-    }
-    sortItems();
-    syncFilterControls();
-    runSearch({feedback:false});
-  }
 
   function initFriendListSearch(){
     var input = document.querySelector('#friendSearch');
@@ -347,9 +145,6 @@
     run({feedback:false});
   }
 
-  function initTagSearch(){
-    bindManualSearch({input:'#tagSearch', button:'#tagSearchSubmit', list:'#tagCloud', item:'.tag-search-item', empty:'#tagEmpty', count:'#tagSearchCount', unit:'个标签', feedbackText:'搜索标签中', text:function(item){ return [item.dataset.tagTitle, item.textContent].filter(Boolean).join(' '); }});
-  }
 
   function initToolsSearch(){
     bindManualSearch({input:'[data-tools-search]', button:'[data-tools-search-submit]', list:'.modern-tools-grid', item:'.tool-app-card, .tool-card', count:'[data-tools-search-count]', unit:'个工具', strata:true, live:true, feedbackText:'搜索工具中', text:function(item){ return [item.dataset.toolKeywords, item.textContent].filter(Boolean).join(' '); }});
@@ -357,9 +152,7 @@
 
   function initAllSearch(root){
     installClearButtons(root || document);
-    initPostSearch();
     initFriendListSearch();
-    initTagSearch();
     initToolsSearch();
   }
 

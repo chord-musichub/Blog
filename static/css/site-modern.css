@@ -524,55 +524,9 @@ body.dark .hero-banner{
     max-height:none !important;
   }
 }
-
-/* v17.2：文章列表取消“最新文章突出显示”，所有文章卡片统一 */
-.article-list .post-search-item,
-.article-list .post-search-item:first-child,
-.article-list .post-search-item:first-of-type{
-  transform:none !important;
-}
-.article-list .post-search-item .post-card,
-.article-list .post-search-item:first-child .post-card,
-.article-list .post-search-item:first-of-type .post-card{
-  display:grid;
-  grid-template-columns:450px minmax(0,1fr);
-  min-height:186px;
-  border-color:var(--border) !important;
-  background:var(--glass, rgba(255,253,250,.83)) !important;
-  box-shadow:var(--shadow) !important;
-  transform:none !important;
-}
-.article-list .post-search-item:first-child .post-thumb,
-.article-list .post-search-item:first-of-type .post-thumb{
-  min-height:186px !important;
-}
-.article-list .post-search-item:first-child .post-info,
-.article-list .post-search-item:first-of-type .post-info{
-  padding:24px 30px !important;
-}
-.article-list .post-search-item:first-child h2,
-.article-list .post-search-item:first-of-type h2{
-  font-size:25px !important;
-}
-.article-list .post-search-item:first-child::before,
-.article-list .post-search-item:first-of-type::before,
 .article-list .post-card:first-child::before{
   content:none !important;
   display:none !important;
-}
-body.dark .article-list .post-search-item .post-card,
-body.dark .article-list .post-search-item:first-child .post-card,
-body.dark .article-list .post-search-item:first-of-type .post-card{
-  background:rgba(17,28,46,.82) !important;
-  border-color:var(--border) !important;
-}
-@media(max-width:760px){
-  .article-list .post-search-item .post-card,
-  .article-list .post-search-item:first-child .post-card,
-  .article-list .post-search-item:first-of-type .post-card{
-    display:block !important;
-    grid-template-columns:none !important;
-  }
 }
 /* v17.5：文章阅读页 <br> 兜底可见换行 */
 .markdown-body br,
@@ -585,125 +539,6 @@ body.dark .article-list .post-search-item:first-of-type .post-card{
 .markdown-body li br{
   margin:.28em 0;
 }
-
-
-/* v17.6：文章卡片结构收敛
-   - /posts 继续使用统一的 post-card partial
-   - 只通过 posts-list 作用域取消第一篇特殊显示
-   - 首页推荐区 recommended-card 不受影响，首篇仍可突出
-*/
-.posts-list .post-search-item,
-.posts-list .post-search-item:first-child,
-.posts-list .post-search-item:first-of-type{
-  display:block !important;
-  transform:none !important;
-}
-
-.posts-list .post-card,
-.posts-list .post-search-item:first-child .post-card,
-.posts-list .post-search-item:first-of-type .post-card,
-.posts-list .post-card:first-child{
-  display:grid !important;
-  grid-template-columns:450px minmax(0,1fr) !important;
-  min-height:186px !important;
-  overflow:hidden !important;
-  border-color:var(--border) !important;
-  background:color-mix(in srgb, var(--panel) 86%, transparent) !important;
-  color:var(--text) !important;
-  box-shadow:var(--shadow) !important;
-  transform:none !important;
-}
-
-.posts-list .post-card:hover,
-.posts-list .post-card:focus-visible{
-  transform:translateY(-2px) !important;
-  border-color:rgba(14,165,233,.28) !important;
-}
-
-.posts-list .post-search-item:first-child .post-thumb,
-.posts-list .post-search-item:first-of-type .post-thumb,
-.posts-list .post-card:first-child .post-thumb,
-.posts-list .post-thumb{
-  min-height:186px !important;
-  height:100% !important;
-}
-
-.posts-list .post-search-item:first-child .post-info,
-.posts-list .post-search-item:first-of-type .post-info,
-.posts-list .post-card:first-child .post-info,
-.posts-list .post-info{
-  padding:24px 30px !important;
-  background:transparent !important;
-}
-
-.posts-list .post-search-item:first-child h2,
-.posts-list .post-search-item:first-of-type h2,
-.posts-list .post-card:first-child h2,
-.posts-list .post-info h2{
-  font-size:25px !important;
-  line-height:1.35 !important;
-}
-
-.posts-list .post-search-item:first-child::before,
-.posts-list .post-search-item:first-of-type::before,
-.posts-list .post-card:first-child::before,
-.posts-list .post-card::before{
-  display:none !important;
-  content:none !important;
-}
-
-body.dark .posts-list .post-card,
-body.dark .posts-list .post-search-item:first-child .post-card,
-body.dark .posts-list .post-search-item:first-of-type .post-card,
-body.dark .posts-list .post-card:first-child{
-  background:rgba(17,28,46,.92) !important;
-  border-color:rgba(116,151,188,.32) !important;
-  color:#f2f7ff !important;
-}
-
-body.dark .posts-list .post-card h2,
-body.dark .posts-list .post-card h2 a{
-  color:#f8fbff !important;
-}
-
-body.dark .posts-list .post-card p{
-  color:#dbeafe !important;
-}
-
-body.dark .posts-list .post-card .meta-row,
-body.dark .posts-list .post-card .meta-row span,
-body.dark .posts-list .post-card .views{
-  color:#bfd0e6 !important;
-}
-
-body.dark .posts-list .post-card .tag{
-  background:#203753 !important;
-  color:#e7f1ff !important;
-  border-color:#3a5878 !important;
-}
-
-@media(max-width:760px){
-  .posts-list .post-card,
-  .posts-list .post-search-item:first-child .post-card,
-  .posts-list .post-search-item:first-of-type .post-card,
-  .posts-list .post-card:first-child{
-    display:block !important;
-    grid-template-columns:none !important;
-  }
-  .posts-list .post-thumb{
-    min-height:190px !important;
-  }
-  .posts-list .post-info{
-    padding:20px 18px !important;
-  }
-}
-
-
-/* v17.8：维护说明
-   /posts 第一篇不突出由 layouts/posts/list.html 内的 posts-list-flat-style 局部样式控制。
-   post-card.html 保持单一结构，不维护第二套卡片 partial。
-*/
-/* v18.0：/posts 的扁平化由 layouts/posts/list.html 局部处理，并保留轻量 JS 兜底。 */
 
 
 /* v18.0：文章卡片摘要裁剪 + hover 统一兜底 */
@@ -757,9 +592,6 @@ body.dark .post-card:focus-visible{
 .page-hero.minimal-page-hero p{
   display:none !important;
 }
-.tag-search-panel{
-  margin-bottom:18px;
-}
 @media(max-width:760px){
   .page-hero.minimal-page-hero{
     padding:16px 2px 12px !important;
@@ -805,63 +637,14 @@ body.dark .post-card:focus-visible{
 .preview p.md-indent-6{--md-indent-size:6em;}
 
 
-/* v20.2.4：全站页面标题英文标识统一 + 标签漂流无缝循环修正。 */
-html body .page-hero > .eyebrow,
-html body .tag-detail-hero > .eyebrow{
+/* 全站页面标题英文标识统一。 */
+html body .page-hero > .eyebrow{
   margin:0 0 10px !important;
   letter-spacing:.18em !important;
   text-transform:uppercase !important;
   font-size:12px !important;
   font-weight:900 !important;
   color:color-mix(in srgb, var(--accent) 72%, var(--muted)) !important;
-}
-html body .tag-river-strip-seamless,
-html body .tag-river-shell.is-scattered .tag-river-strip-seamless{
-  display:inline-flex !important;
-  align-items:center !important;
-  width:max-content !important;
-  min-width:max-content !important;
-  gap:0 !important;
-  padding-left:0 !important;
-  transform:none !important;
-  animation-name:tagRiverSeamlessMove !important;
-  animation-duration:var(--tag-river-duration, 56s) !important;
-  animation-delay:var(--tag-river-delay, 0s) !important;
-  animation-timing-function:linear !important;
-  animation-iteration-count:infinite !important;
-  will-change:transform !important;
-}
-html body .tag-river-segment{
-  display:inline-flex !important;
-  align-items:center !important;
-  gap:9px !important;
-  width:max-content !important;
-  min-width:max-content !important;
-  padding-right:clamp(92px, 12vw, 190px) !important;
-}
-@keyframes tagRiverSeamlessMove{
-  from{ transform:translate3d(0,0,0); }
-  to{ transform:translate3d(-50%,0,0); }
-}
-html body .tag-river-lane:hover .tag-river-strip-seamless,
-html body .tag-river-lane:focus-within .tag-river-strip-seamless{
-  animation-play-state:paused !important;
-}
-@media (prefers-reduced-motion: reduce){
-  html body .tag-river-strip-seamless,
-  html body .tag-river-shell.is-scattered .tag-river-strip-seamless{
-    animation:none !important;
-    transform:none !important;
-    flex-wrap:wrap !important;
-    padding:18px !important;
-  }
-  html body .tag-river-segment{
-    flex-wrap:wrap !important;
-    padding-right:0 !important;
-  }
-  html body .tag-river-segment[aria-hidden="true"]{
-    display:none !important;
-  }
 }
 
 
@@ -872,7 +655,6 @@ html body .tag-river-lane:focus-within .tag-river-strip-seamless{
 .section-icon svg,
 .back-icon-link svg,
 .tool-card-arrow svg,
-.tag-river-search-icon svg,
 .meta-icon-item svg,
 .admin-back-icon svg,
 .btn-ico svg,
@@ -949,15 +731,6 @@ html body .tag-river-lane:focus-within .tag-river-strip-seamless{
   width:19px !important;
   height:19px !important;
 }
-.tag-river-search-icon{
-  display:inline-grid;
-  place-items:center;
-  color:var(--muted);
-}
-.tag-river-search-icon svg{
-  width:18px !important;
-  height:18px !important;
-}
 .more{
   display:inline-flex;
   align-items:center;
@@ -979,8 +752,7 @@ body.dark .logo-mark.line-logo-mark{
 
 /* v20.3.5：修正 v20.2.5 图标大改的副作用。
    1) 保留用户自定义 logo 图片，不再替换成系统线条 logo。
-   2) 漂流标签始终保持运动，不因鼠标停在横幅上整行暂停。
-   3) 英文标识在新补齐的页面中使用同一套轻量样式。 */
+   2) 英文标识在新补齐的页面中使用同一套轻量样式。 */
 html body .logo .logo-icon{
   display:inline-block !important;
   width:34px !important;
@@ -991,15 +763,6 @@ html body .logo .logo-icon{
 html body .logo .line-logo-mark{
   display:grid !important;
   place-items:center !important;
-}
-html body .tag-river-strip-seamless,
-html body .tag-river-lane:hover .tag-river-strip-seamless,
-html body .tag-river-lane:focus-within .tag-river-strip-seamless{
-  animation-play-state:running !important;
-}
-html body .tag-river-chip:hover,
-html body .tag-river-result:hover{
-  animation-play-state:running !important;
 }
 html body .hero-banner .eyebrow,
 html body .friend-detail-hero .eyebrow,
@@ -1039,16 +802,6 @@ html body .modern-site-header .logo-line-icon{
   width:21px !important;
   height:21px !important;
 }
-
-/* v20.3.5：标签页英文标识收回 + 图标统一接口。
-   - 标签页/标签详情页不再显示英文 eyebrow。
-   - 以后前台图标统一走 data-ui-icon / ui-icon，搜索图标不会各页面各画一套。 */
-html body .tag-river-hero > .eyebrow,
-html body .tag-river-shell .eyebrow,
-html body .tag-river-search .eyebrow,
-html body .tag-detail-hero > .eyebrow{
-  display:none !important;
-}
 .ui-icon{
   --ui-icon-size:1.05em;
   display:inline-grid;
@@ -1077,16 +830,8 @@ html body .tag-detail-hero > .eyebrow{
 .back-icon-link .ui-icon{ --ui-icon-size:19px; }
 .meta-icon-item .ui-icon{ --ui-icon-size:15px; }
 .tool-card-arrow .ui-icon{ --ui-icon-size:19px; }
-.tag-river-search-icon .ui-icon{ --ui-icon-size:18px; }
 .more .ui-icon{ --ui-icon-size:15px; }
 .snake-mobile-pad .ui-icon{ --ui-icon-size:22px; }
-html body .tag-river-search-icon{
-  width:38px !important;
-  min-width:38px !important;
-  height:38px !important;
-  display:grid !important;
-  place-items:center !important;
-}
 
 
 /* v20.3.5：收回所有页面标题上方的英文 eyebrow 标识。 */
@@ -1097,15 +842,11 @@ html body .eyebrow{
 
 /* v20.3.5：页面标题描述收敛 + 搜索图标接口统一 + 阅读目录层级修正。 */
 html body .page-title-plain > .meta,
-html body .tag-river-head > div > .meta,
-html body .tag-river-search-copy > .meta,
 html body .tools-command-center > div > p,
-html body .page-hero.minimal-page-hero > p,
-html body .tag-detail-hero > p{
+html body .page-hero.minimal-page-hero > p{
   display:none !important;
 }
-html body .site-search-icon,
-html body .tag-river-search-icon{
+html body .site-search-icon{
   width:38px !important;
   min-width:38px !important;
   height:38px !important;
@@ -1118,19 +859,16 @@ html body .tag-river-search-icon{
   font-size:0 !important;
   line-height:1 !important;
 }
-html body .site-search-icon .ui-icon,
-html body .tag-river-search-icon .ui-icon{
+html body .site-search-icon .ui-icon{
   --ui-icon-size:19px !important;
   width:19px !important;
   height:19px !important;
 }
-html body .site-search-icon svg,
-html body .tag-river-search-icon svg{
+html body .site-search-icon svg{
   width:19px !important;
   height:19px !important;
   stroke-width:1.75 !important;
 }
-html body .tag-river-searchbox:focus-within .site-search-icon,
 html body .friend-search-box:focus-within .site-search-icon{
   color:var(--accent) !important;
 }

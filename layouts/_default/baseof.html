@@ -1,6 +1,10 @@
+{{- $archiveTarget := partial "archive/legacy-target.html" . -}}
+{{- if $archiveTarget -}}
+{{ partial "archive/legacy-redirect.html" $archiveTarget }}
+{{- else -}}
 <!doctype html>
 {{ $sceneSection := default "general" .Section }}
-{{ if eq .Layout "site-notice" }}{{ $sceneSection = "posts" }}{{ end }}
+{{ if or (eq .Layout "site-notice") (eq .RelPermalink "/tags/site-notice/") }}{{ $sceneSection = "posts" }}{{ end }}
 {{ $isMarkdownPreview := hasPrefix .RelPermalink "/tools/markdown-previewer/" }}
 {{ if $isMarkdownPreview }}{{ $sceneSection = "posts" }}{{ end }}
 <html lang="zh-CN" data-page-kind="{{ if .IsHome }}home{{ else }}inner{{ end }}" data-page-section="{{ if .IsHome }}home{{ else }}{{ $sceneSection }}{{ end }}" data-page-layout="{{ .Layout }}"{{ if $isMarkdownPreview }} data-page-scene="tools"{{ end }}>
@@ -101,3 +105,4 @@
 <script defer src="/js/page-modules.js?v={{ $assetVersion }}"></script>
 </body>
 </html>
+{{ end }}

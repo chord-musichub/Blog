@@ -1,0 +1,10 @@
+{{- /* Keep old bookmarks without retaining the retired tag UI. Notices remain live. */ -}}
+{{- $target := "" -}}
+{{- if and (hasPrefix .RelPermalink "/tags/") (ne .RelPermalink "/tags/site-notice/") (ne .Layout "site-notice") -}}
+  {{- $target = "/posts/?search=1" -}}
+  {{- if ne .RelPermalink "/tags/" -}}
+    {{- $raw := .Params.tag_raw | default .Title -}}
+    {{- $target = printf "/posts/?search=1&tag=%s" ($raw | urlquery) -}}
+  {{- end -}}
+{{- end -}}
+{{- return $target -}}

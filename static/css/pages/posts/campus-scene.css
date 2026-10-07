@@ -71,8 +71,6 @@ body.dark[data-page-section="posts"] main.container{
 
 /* 浅色阅读层沿用校园的蓝绿日光，而非独立的一整块纯白。 */
 body:not(.dark)[data-page-section="posts"] .toolbar-panel,
-body:not(.dark)[data-page-section="posts"] .posts-tag-explorer,
-body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card,
 body:not(.dark)[data-page-section="posts"] .article-reader,
 body:not(.dark)[data-page-section="posts"] .article-toc{
   background:rgba(235,247,247,.58)!important;
@@ -141,46 +139,24 @@ body.dark[data-page-section="posts"] main.container{
   box-shadow:0 26px 70px rgba(0,0,0,.42), inset 0 1px rgba(229,240,255,.07)!important;
 }
 
-body[data-page-section="posts"] :is(.toolbar-panel,.posts-tag-explorer,.posts-list > .post-search-item > article.post-card,.article-reader,.article-toc,.article-bottom-actions,.nav-card,.related-card,.article-cover-hero + section.card){
+body[data-page-section="posts"] :is(.toolbar-panel,.article-reader,.article-toc,.article-bottom-actions,.nav-card,.article-cover-hero + section.card){
   background:var(--article-surface)!important;
   border-color:var(--article-line)!important;
   box-shadow:0 12px 30px rgba(48,74,65,.09)!important;
   color:var(--article-ink)!important;
 }
-body.dark[data-page-section="posts"] :is(.toolbar-panel,.posts-tag-explorer,.posts-list > .post-search-item > article.post-card,.article-reader,.article-toc,.article-bottom-actions,.nav-card,.related-card,.article-cover-hero + section.card){
+body.dark[data-page-section="posts"] :is(.toolbar-panel,.article-reader,.article-toc,.article-bottom-actions,.nav-card,.article-cover-hero + section.card){
   background:var(--article-surface)!important;
   border-color:var(--article-line)!important;
   box-shadow:0 16px 38px rgba(0,0,0,.20)!important;
   color:var(--article-ink)!important;
 }
-
-/* 列表：让封面之外的文字区像同一张安静的阅读板，而不是独立 Dashboard 卡。 */
-body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card > .post-info{
-  background:linear-gradient(104deg, rgba(239,246,240,.19), rgba(200,220,210,.12))!important;
-}
-body.dark[data-page-section="posts"] .posts-list > .post-search-item > article.post-card > .post-info{
-  background:linear-gradient(104deg, rgba(17,34,56,.48), rgba(10,23,42,.18))!important;
-}
-body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card :is(h2,h2 a,h3,h3 a),
 body[data-page-section="posts"] .article-cover-hero + section.card h1,
 body[data-page-section="posts"] .section-head h2{
   color:var(--article-ink)!important;
 }
-body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card :is(p,.meta-row,.meta-row span,.views),
 body[data-page-section="posts"] .article-cover-hero + section.card > p{
   color:var(--article-muted)!important;
-}
-body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:hover,
-body[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:focus-visible{
-  transform:translateY(-3px)!important;
-  border-color:var(--article-line-strong)!important;
-  box-shadow:0 20px 44px rgba(49,80,69,.16)!important;
-}
-body.dark[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:hover,
-body.dark[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:focus-visible{
-  background:rgba(19,37,61,.84)!important;
-  border-color:rgba(184,211,228,.34)!important;
-  box-shadow:0 22px 48px rgba(0,0,0,.32)!important;
 }
 
 /* 阅读正文：移除旧的棕褐羊皮纸色，文字、引用、表格和代码共享同一套冷静层级。 */
@@ -235,12 +211,6 @@ body[data-page-section="posts"] :is(.tag,.pill,.btn,.toc-toggle,.floating-toc-bu
   border-color:var(--article-line-strong)!important;
   background:var(--article-accent-soft)!important;
 }
-body[data-page-section="posts"] .post-tag-toggle.active,
-body[data-page-section="posts"] .posts-tag-chips .pill.active{
-  color:#f8fcf8!important;
-  background:var(--article-accent)!important;
-  border-color:var(--article-accent)!important;
-}
 
 @media(max-width:820px){
   body[data-page-section="posts"] main.container{
@@ -249,19 +219,4 @@ body[data-page-section="posts"] .posts-tag-chips .pill.active{
   body.dark[data-page-section="posts"] main.container{
     background:linear-gradient(145deg, rgba(10,23,42,.88), rgba(13,29,49,.80))!important;
   }
-}
-
-/* 浅色列表卡片比外层阅读面再压一档，避免每篇文章像独立白色贴片。 */
-body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card{
-  background:linear-gradient(112deg, rgba(184,204,191,.80), rgba(204,219,208,.70))!important;
-  border-color:rgba(73,105,89,.31)!important;
-  box-shadow:0 13px 29px rgba(44,69,59,.15)!important;
-}
-body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card > .post-info{
-  background:linear-gradient(104deg, rgba(205,220,209,.82), rgba(183,203,190,.72))!important;
-}
-body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:hover,
-body:not(.dark)[data-page-section="posts"] .posts-list > .post-search-item > article.post-card:focus-visible{
-  background:linear-gradient(112deg, rgba(194,213,201,.88), rgba(210,224,214,.80))!important;
-  border-color:rgba(70,111,91,.44)!important;
 }

@@ -7,7 +7,7 @@ const sharp=require('sharp');
 const base='http://component-audit.test';
 const builds={before:process.env.BLOG_UI_BASELINE,after:process.env.BLOG_UI_BUILD};
 for(const dir of Object.values(builds))assert(dir&&fs.existsSync(path.join(dir,'index.html')),'Provide BLOG_UI_BASELINE and BLOG_UI_BUILD');
-const out='local-only/component-loading';fs.mkdirSync(out,{recursive:true});
+const out=process.env.COMPONENT_REPORT_DIR||'local-only/component-loading';fs.mkdirSync(out,{recursive:true});
 const svg='<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" fill="#607d8b"/></svg>';
 async function fixture(context,build){
  await context.route('**/*',route=>{
@@ -53,8 +53,8 @@ async function snapshot(page,build){
      await page.goto(base+route);await page.evaluate(()=>SonglinePageModules.ready(document));await page.waitForTimeout(1100);
      pair[mode]=await snapshot(page,build);
      assert.deepEqual(errors,[]);
-     // Friends background animation is independently tested by galaxy suites.
-     // These two routes must be pixel-identical after removing their unused galaxy CSS.
+     // Freeze/mask moving planetary trails for the content-only comparison;
+     // their actual presence and lifecycle are checked without masking below.
      if(route.startsWith('/friends/')&&route!='/friends/'){
       await page.addStyleTag({content:'*,*::before,*::after{animation:none!important;transition:none!important}.songline-starstream-layer{visibility:hidden!important}'});
       screenshots[mode]=await page.screenshot({path:`${out}/${width}-${theme}-${friend}-${route.includes('memories')?'memories':'profile'}-${mode}.png`});
@@ -63,10 +63,14 @@ async function snapshot(page,build){
     }
     assert.deepEqual(pair.after.geometry,pair.before.geometry,'Visible geometry must remain unchanged');
     if(['/','/posts/linux-note/','/tools/'].includes(route)){
-     assert(pair.before.starstreamNodes>0);assert.equal(pair.after.starstreamNodes,0);
+     assert.equal(pair.after.starstreamNodes,0);
      assert(!pair.after.assets.includes('/js/space-ribbons.js'));
-    }else assert(pair.after.starstreamNodes>0,'Keep visible backgrounds');
-    if(route==='/'){assert.equal(pair.before.hiddenHero,1);assert.equal(pair.after.hiddenHero,0);}
+    }else{
+     assert(pair.after.starstreamNodes>0,'Keep planetary trails on '+route);
+     assert(pair.after.assets.includes('/js/space-ribbons.js'));
+    }
+    assert(!pair.after.assets.includes('/js/pages/tags/flow.js'));
+    if(route==='/')assert.equal(pair.after.hiddenHero,0);
     if(route.startsWith('/friends/')&&route!='/friends/'){
      assert(!pair.after.assets.includes('/css/pages/friends/galaxy.css'));
      const a=await sharp(screenshots.before).raw().toBuffer();const b=await sharp(screenshots.after).raw().toBuffer();
@@ -83,14 +87,21 @@ async function snapshot(page,build){
   for(let cycle=0;cycle<2;cycle++)for(const route of ['/friends/','/posts/linux-note/','/friends/memories/','/tools/','/']){
    await page.evaluate(href=>SonglinePageTransition.navigateLink(href),base+route);await page.waitForTimeout(700);
    const count=await page.locator('.songline-starstream-layer').count();
-   assert.equal(count,route.startsWith('/friends/')?1:0,`starstream lifecycle ${route}`);
+   assert.equal(count,route.startsWith('/friends/')?1:0,`Planetary-trail lifecycle ${route}`);
    assert.equal(await page.locator('#songline-friends-galaxy-style').count(),route==='/friends/'?1:0);
   }
-  assert.equal(requests.filter(p=>p==='/js/space-ribbons.js').length,1,'Load once across repeat navigation');
-  for(const route of ['/tags/','/tools/random-number/']){
+  assert.equal(requests.filter(p=>p==='/js/space-ribbons.js').length,1,'Load planetary trails once across repeat navigation');
+  for(const route of ['/friends/songline/','/tools/random-number/']){
    await page.evaluate(href=>SonglinePageTransition.navigateLink(href),base+route);await page.waitForTimeout(700);
-   assert.equal(await page.locator('.songline-starstream-layer').count(),1,'Keep the visible background on '+route);
+   assert.equal(await page.locator('.songline-starstream-layer').count(),1,'Keep planetary trails on '+route);
   }
+  for(const width of [390,1440]){
+   await page.setViewportSize({width,height:900});
+   await page.evaluate(()=>{window.dispatchEvent(new Event('pageshow'));document.dispatchEvent(new Event('visibilitychange'));});
+   await page.waitForTimeout(700);
+   assert.equal(await page.locator('[data-songline-space-ribbons], [data-songline-starstream]').count(),1,'Resize and resume preserve exactly one trail layer');
+  }
+  assert(!requests.includes('/js/pages/tags/flow.js'),'Retired tag drift must not return');
   assert.deepEqual(errors,[]);await context.close();
   const reduced=await browser.newContext({reducedMotion:'reduce'});await fixture(reduced,builds.after);
   const reducedPage=await reduced.newPage();const reducedRequests=[];
@@ -98,6 +109,6 @@ async function snapshot(page,build){
   await reducedPage.goto(base+'/friends/');await reducedPage.evaluate(()=>SonglinePageModules.ready(document));await reducedPage.waitForTimeout(500);
   assert(!reducedRequests.includes('/js/space-ribbons.js'),'Reduced motion must not download the disabled effect');
   assert.equal(await reducedPage.locator('.songline-starstream-layer').count(),0);await reduced.close();
-  console.log('PASS lazy background download, removal/restoration and galaxy CSS lifecycle');
+  console.log('PASS planetary-trail restoration, retired tag drift absence and galaxy CSS lifecycle');
  }finally{await browser.close();fs.writeFileSync(out+'/report.json',JSON.stringify(report,null,2));}
 })().catch(e=>{console.error(e);process.exitCode=1;});

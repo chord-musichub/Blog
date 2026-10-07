@@ -12,9 +12,7 @@
   border-color:rgba(248,113,113,.55) !important;
   box-shadow:0 0 0 4px rgba(248,113,113,.12) !important;
 }
-.post-search-item.is-search-hit,
 .friend-search-item.is-search-hit,
-.tag-search-item.is-search-hit,
 .tool-card.is-search-hit,
 .tool-app-card.is-search-hit{
   animation: songline-search-hit 1.05s ease;
@@ -51,9 +49,7 @@
 .card .meta-row .tag{
   max-width:100%;
 }
-.post-search-item.is-search-filtered,
-.friend-search-item.is-search-filtered,
-.tag-search-item.is-search-filtered{
+.friend-search-item.is-search-filtered{
   display:none !important;
 }
 
@@ -103,15 +99,8 @@ body .section-head::after{
   display:none !important;
   content:none !important;
 }
-
-body .posts-list > .post-search-item.is-search-filtered,
-body .posts-list > .post-search-item[hidden],
-body .article-list > .post-search-item.is-search-filtered,
-body .article-list > .post-search-item[hidden],
 body .friend-search-item.is-search-filtered,
 body .friend-search-item[hidden],
-body .tag-search-item.is-search-filtered,
-body .tag-search-item[hidden],
 body .tool-card.is-search-filtered,
 body .tool-card[hidden],
 body .tool-app-card.is-search-filtered,
@@ -127,8 +116,7 @@ body .tool-app-card[hidden]{
 
 /* v20.0.8：本轮强制兜底。标题区完全无框，搜索触发有刷新动画，筛选隐藏不被旧样式顶掉。 */
 html body .page-hero.minimal-page-hero,
-html body section.page-hero.minimal-page-hero,
-html body section.page-hero.minimal-page-hero.tag-detail-hero{
+html body section.page-hero.minimal-page-hero{
   display:block !important;
   min-height:0 !important;
   height:auto !important;
@@ -179,15 +167,6 @@ html body .page-hero.minimal-page-hero h1{
   margin-top:0 !important;
   margin-bottom:0 !important;
 }
-html body .posts-list > .post-search-item.search-hidden,
-html body .posts-list > .post-search-item.is-search-filtered,
-html body .posts-list > .post-search-item[hidden],
-html body .article-list > .post-search-item.search-hidden,
-html body .article-list > .post-search-item.is-search-filtered,
-html body .article-list > .post-search-item[hidden],
-html body .tag-search-item.search-hidden,
-html body .tag-search-item.is-search-filtered,
-html body .tag-search-item[hidden],
 html body .tool-card.search-hidden,
 html body .tool-card.is-search-filtered,
 html body .tool-card[hidden],
@@ -300,10 +279,6 @@ body.dark .songline-search-clear:focus-visible{
 .toolbar-panel .songline-search-clear{
   align-self:center;
 }
-html body .post-search-item.search-hidden,
-html body .post-search-item.is-search-filtered,
-html body .post-search-item[hidden],
-html body .tag-search-item.search-hidden,
 html body .tool-card.search-hidden,
 html body .tool-app-card.search-hidden{
   display:none !important;

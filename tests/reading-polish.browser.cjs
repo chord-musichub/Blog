@@ -153,7 +153,7 @@ async function settledScroll(page){
   }
   for(const [width,theme] of [[1440,'dark'],[1440,'light'],[390,'dark'],[390,'light']]){
    const f=await fixture(browser,width,theme,false),p=f.page;
-   for(const route of ['/tags/site-notice/','/friends/memories/','/friends/songline/','/tags/','/tools/focus-timer/','/tools/audio-visualizer/','/tools/2048/','/tools/snake/','/tools/gacha/','/tools/random-number/','/tools/reaction-test/','/tools/flappy-bird/','/tools/typing-practice/']){
+   for(const route of ['/tags/site-notice/','/friends/memories/','/friends/songline/','/tools/focus-timer/','/tools/audio-visualizer/','/tools/2048/','/tools/snake/','/tools/gacha/','/tools/random-number/','/tools/reaction-test/','/tools/flappy-bird/','/tools/typing-practice/']){
     await p.goto(base+route);await ready(p,route);await bareBack(p);
     if(route.startsWith('/tools/')){
      const panel=p.locator('[data-tool-back-surface]'),back=p.locator('[data-back-icon]');assert.equal(await panel.count(),1);assert.equal(await panel.locator(':scope > [data-back-icon]').count(),1);

@@ -38,7 +38,7 @@ async function geometry(page){return page.evaluate(()=>[...document.querySelecto
  const browser=await chromium.launch({headless:true,channel:'msedge'});const report=[];
  try{
   if(!process.env.BLOG_UI_LIFECYCLE_ONLY)for(const width of [390,1440])for(const theme of ['light','dark']){
-   for(const route of ['/posts/','/tags/site-notice/','/posts/linux-note/','/','/friends/','/friends/memories/','/tools/','/tools/random-number/','/tags/']){
+   for(const route of ['/posts/','/tags/site-notice/','/posts/linux-note/','/','/friends/','/friends/memories/','/tools/','/tools/random-number/']){
     if(process.env.BLOG_UI_ARCHIVES_ONLY&&route!=='/posts/'&&route!=='/tags/site-notice/')continue;
     const pair={width,theme,route};
     for(const [mode,build] of Object.entries(builds)){

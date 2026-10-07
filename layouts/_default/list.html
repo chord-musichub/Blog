@@ -1,37 +1,51 @@
 {{ define "main" }}
-{{ partial "back-icon.html" (dict "fallback" "/") }}
+{{/* The archive is the sole article/project index, not the retired card list. */}}
 {{ $cfg := .Site.Data.site }}
-<section class="page-hero minimal-page-hero">
-<h1>文章</h1>
-</section>
-<section class="card toolbar-panel">
-  <input id="postSearch" class="searchbox" type="search" autocomplete="off" placeholder="搜索文章标题或作者...">
-  <button class="pill search-submit" id="postSearchSubmit" type="button" data-search-submit="post" data-no-page-loading>搜索</button>
-  <span class="pill search-count" id="postSearchCount">正在统计文章</span>
-  <div class="pills" id="postFilters">
-    <button class="pill active" type="button" data-filter="all">全部</button>
-    <button class="pill" type="button" data-filter="技术">技术</button>
-    <button class="pill" type="button" data-filter="生活">生活</button>
-    <button class="pill" type="button" data-filter="思考">思考</button>
-    <button class="pill" type="button" data-filter="随笔">随笔</button>
-  </div>
-  <span class="pill">最新发布⌄</span>
-</section>
-<section class="article-list" id="postList">
-  {{ range .Paginator.Pages }}
-    <div class="post-search-item" data-title="{{ .Title | plainify }}" data-author="{{ .Params.author_display | default .Params.author | plainify }} {{ .Params.author_username | default .Params.author | plainify }}" data-summary="{{ with .Params.summary }}{{ . | plainify }}{{ else }}{{ .Summary | plainify }}{{ end }}" data-tags="{{ with .Params.tags }}{{ delimit . "," }}{{ end }}" data-search-text="{{ .Plain | plainify }}">
-      {{ partial "post-card.html" . }}
+{{ $posts := sort (where .Site.RegularPages "Section" "posts") "Date" "desc" }}
+{{ $projects := slice }}
+{{ with .Site.Data.projects }}{{ $projects = . }}{{ else }}{{ with resources.Get "data/projects.json" }}{{ $projects = . | transform.Unmarshal }}{{ end }}{{ end }}
+{{ $searchTerms := slice }}{{ range $posts }}{{ range .Params.tags }}{{ $searchTerms = $searchTerms | append . }}{{ end }}{{ end }}
+{{ range $projects }}{{ range .stack }}{{ $searchTerms = $searchTerms | append . }}{{ end }}{{ end }}
+<section class="content-archive" data-content-archive aria-label="内容归档">
+  <header class="content-archive__header">
+    <div class="content-archive__controls">
+      <div class="content-archive__modes" role="tablist" aria-label="档案内容模式">
+        <button class="content-archive__mode is-active" type="button" role="tab" aria-selected="true" aria-controls="archiveArticles" data-archive-mode="articles"><b>01</b><span>文章</span><i aria-hidden="true"></i></button>
+        <button class="content-archive__mode" type="button" role="tab" aria-selected="false" aria-controls="archiveProjects" data-archive-mode="projects"><b>02</b><span>项目</span><i aria-hidden="true"></i></button>
+      </div>
+      <div class="content-archive__search" data-archive-search>
+        <button class="content-archive__search-trigger" type="button" aria-expanded="false" aria-controls="archiveSearchInput" data-archive-search-trigger><span>搜索</span><i aria-hidden="true">+</i></button>
+        <div class="content-archive__search-field" data-archive-search-field hidden><div class="content-archive__search-input-row"><input id="archiveSearchInput" type="search" autocomplete="off" placeholder="搜索文章或项目…" data-archive-search-input><button type="button" aria-label="清除搜索" data-archive-search-clear hidden>×</button></div><div class="content-archive__search-terms" aria-label="标签与技术词条">{{ range sort ($searchTerms | uniq) }}<button type="button" data-archive-search-term="{{ . }}">{{ . }}</button>{{ end }}</div></div>
+      </div>
     </div>
-  {{ else }}
-    <div class="card" style="padding:28px">还没有文章。</div>
-  {{ end }}
+    <div class="content-archive__status content-archive__status--sr" aria-live="polite" data-archive-status>文章 / {{ len $posts }} 篇</div>
+    <button class="content-archive__project-hint" type="button" data-archive-project-hint hidden></button>
+  </header>
+  <div class="content-archive__rule" aria-hidden="true"><i></i></div>
+  <div class="content-archive__panels">
+    <section class="content-archive__panel is-active" id="archiveArticles" role="tabpanel" data-archive-panel="articles">
+      <div class="content-archive__index" data-archive-list>
+        {{ range $index, $post := $posts }}
+          {{ partial "posts/archive-record.html" (dict "post" $post "index" $index) }}
+        {{ else }}<p class="content-archive__empty">还没有可归档的文章。</p>{{ end }}
+      </div>
+      <p class="content-archive__empty" data-archive-empty="articles" hidden>没有匹配的文章记录。</p>
+    </section>
+    <section class="content-archive__panel" id="archiveProjects" role="tabpanel" data-archive-panel="projects" hidden>
+      <div class="content-archive__index" data-archive-list>
+        {{ range $index, $project := $projects }}
+          {{ $title := $project.title | default (printf "PROJECT %02d" (add $index 1)) }}{{ $route := $project.demo | default $project.github | default $project.route }}
+          <article class="archive-record" data-archive-record data-archive-kind="project" data-title="{{ $title }}" data-summary="{{ $project.description }}" data-search-text="{{ delimit ($project.stack | default slice) " " }} {{ $project.role }} {{ $project.status }}">
+            <button class="archive-record__index" type="button" aria-expanded="false" aria-controls="projectDrawer{{ $index }}" data-archive-trigger><span class="archive-record__number">P{{ printf "%02d" (add $index 1) }}</span><span class="archive-record__title">{{ $title }}</span><time>{{ $project.year }}</time><span class="archive-record__arrow" aria-hidden="true">↵</span></button>
+            <div class="archive-record__drawer" id="projectDrawer{{ $index }}" data-archive-drawer><div class="archive-record__drawer-shell"><div class="archive-record__drawer-content archive-record__drawer-content--project{{ with $route }} archive-record__drawer-content--open{{ end }}"{{ with $route }} data-archive-open-url="{{ . }}"{{ end }}>
+              {{ with $project.cover }}<figure class="archive-record__cover"><img src="{{ partial "media-preview-url.html" . }}" alt="" loading="lazy" decoding="async"></figure>{{ end }}
+              <div class="archive-record__detail"><h2>{{ $title }}</h2>{{ with $project.description }}<p class="archive-record__summary">{{ . }}</p>{{ end }}<dl class="archive-project__meta">{{ with $project.status }}<div><dt>状态</dt><dd>{{ . }}</dd></div>{{ end }}{{ with $project.role }}<div><dt>职责</dt><dd>{{ . }}</dd></div>{{ end }}{{ with $project.stack }}<div><dt>技术</dt><dd>{{ delimit . " · " }}</dd></div>{{ end }}</dl><div class="archive-project__links">{{ with $project.demo }}<a href="{{ . }}" target="_blank" rel="noopener">展示页 ↵</a>{{ end }}{{ with $project.github }}<a href="{{ . }}" target="_blank" rel="noopener">源码页 ↵</a>{{ end }}</div></div>
+            </div></div></div>
+          </article>
+        {{ else }}<p class="content-archive__empty">尚未归档项目</p>{{ end }}
+      </div>
+      <p class="content-archive__empty" data-archive-empty="projects" hidden>没有匹配的项目记录。</p>
+    </section>
+  </div>
 </section>
-<div id="postEmpty" class="card" style="display:none;padding:28px;margin-top:18px">没有找到匹配的文章。</div>
-{{ if gt .Paginator.TotalPages 1 }}
-<nav class="pagination">
-  {{ if .Paginator.HasPrev }}<a href="{{ .Paginator.Prev.URL }}">‹</a>{{ end }}
-  {{ range .Paginator.Pagers }}<a class="{{ if eq . $.Paginator }}active{{ end }}" href="{{ .URL }}">{{ .PageNumber }}</a>{{ end }}
-  {{ if .Paginator.HasNext }}<a href="{{ .Paginator.Next.URL }}">›</a>{{ end }}
-</nav>
-{{ end }}
 {{ end }}
