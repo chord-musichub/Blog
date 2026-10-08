@@ -20,6 +20,7 @@
 
   function syncPageStyles(root){
     var path = window.location.pathname || '';
+    var isAudioStudio = path.indexOf('/tools/audio-visualizer/') === 0 || !!query(root, '[data-audio-visualizer]');
     if(query(root, '[data-article-comments]')) ensureStylesheet('songline-article-comments-style', '/css/pages/content/article-comments.css');
     // /posts/ 是档案列表，不是阅读页；用实际阅读容器判断可避免把文章阅读规则
     // 注入归档页，尤其是在无刷新过场后造成列表样式被污染。
@@ -32,7 +33,7 @@
       ensureStylesheet('songline-markdown-compat-style', '/css/site-markdown-compat.css');
       ensureStylesheet('songline-article-overrides-style', '/css/site-article-overrides.css');
     }
-    if(isToolsPage){
+    if(isToolsPage && !isAudioStudio){
       ensureStylesheet('songline-tool-shared-style', '/css/tool-shared.css');
       ensureStylesheet('songline-tool-detail-shell-style', '/css/tools/detail-shell.css');
     }
@@ -133,7 +134,7 @@
       test:function(){
         // 行星轨迹仍是现用背景；仅在可见场景且未要求减少动画时加载。
         var page = document.body.dataset;
-        return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageLayout !== 'tools' && page.pageLayout !== 'site-notice' &&
+        return page.pageKind !== 'home' && page.pageSection !== 'posts' && page.pageScene !== 'audio' && page.pageLayout !== 'tools' && page.pageLayout !== 'site-notice' &&
           !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       },
       init:function(){ if(window.SonglineInitSpaceRibbons) window.SonglineInitSpaceRibbons(); }

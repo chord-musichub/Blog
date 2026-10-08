@@ -54,7 +54,7 @@
       function isInside(rect, x, y){
         return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
       }
-      function isDesktopElevator(){ return !desktopQuery || desktopQuery.matches; }
+      function isDesktopElevator(){ return document.body.dataset.pageScene !== 'audio' && (!desktopQuery || desktopQuery.matches); }
       var hitRegions = null;
       var geometryFrame = 0;
       function invalidateHitRegions(){ hitRegions = null; }
@@ -235,7 +235,7 @@
         window.addEventListener('resize', clearMapRect, {passive:true});
         window.addEventListener('scroll', clearMapRect, {capture:true,passive:true});
         function updateMapProximity(event){
-          if(!window.matchMedia || !window.matchMedia('(min-width:981px)').matches) {
+          if(document.body.dataset.pageScene === 'audio' || !window.matchMedia || !window.matchMedia('(min-width:981px)').matches) {
             siteMap.classList.remove('is-site-map-expanded');
             return;
           }

@@ -1,4 +1,4 @@
-// Offline visual / interaction regression for the non-Markdown tool layouts.
+// Offline visual / interaction regression for shared glass tool layouts.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -6,7 +6,8 @@ const repo=path.resolve(__dirname,'..'),build=path.resolve(process.env.BLOG_UI_B
 assert(fs.existsSync(path.join(build,'index.html')),'Provide a fresh BLOG_UI_BUILD');
 const base='http://tool-layout.test',out=path.join(repo,'local-only/tool-detail-layout');
 fs.mkdirSync(out,{recursive:true});
-const names=['random-number','2048','snake','reaction-test','flappy-bird','typing-practice','gacha','focus-timer','audio-visualizer'];
+// Audio now owns an independent scene; exercised by audio-redesign.browser.cjs.
+const names=['random-number','2048','snake','reaction-test','flappy-bird','typing-practice','gacha','focus-timer'];
 const svg='<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" fill="#607d8b"/></svg>';
 async function ready(page,route){
   await page.waitForFunction(route=>location.pathname===route&&!document.documentElement.classList.contains('is-scene-preparing')&&!document.documentElement.classList.contains('songline-page-transitioning'),route);
@@ -60,14 +61,6 @@ async function helpControl(p,name){
   await bar.locator('[data-tool-help-open]').click();await p.mouse.click(5,5);await dialog.waitFor({state:'hidden'});
   await bar.locator('[data-tool-help-open]').click();await p.keyboard.press('Escape');await dialog.waitFor({state:'hidden'});
   await bar.locator('[data-tool-help-open]').evaluate(e=>e.blur());
-}
-function wav(){
-  const rate=8000,length=rate*10,buffer=Buffer.alloc(44+length*2);
-  buffer.write('RIFF');buffer.writeUInt32LE(buffer.length-8,4);buffer.write('WAVEfmt ',8);buffer.writeUInt32LE(16,16);
-  buffer.writeUInt16LE(1,20);buffer.writeUInt16LE(1,22);buffer.writeUInt32LE(rate,24);buffer.writeUInt32LE(rate*2,28);
-  buffer.writeUInt16LE(2,32);buffer.writeUInt16LE(16,34);buffer.write('data',36);buffer.writeUInt32LE(length*2,40);
-  for(let i=0;i<length;i++)buffer.writeInt16LE(Math.round(1000*Math.sin(i*2*Math.PI*220/rate)),44+i*2);
-  return buffer;
 }
 async function useTool(p,name){
   if(name==='random-number'){
@@ -179,21 +172,6 @@ async function useTool(p,name){
     assert.equal(await p.locator('[data-focus-today-count]').textContent(),'1');
     assert.equal(await p.locator('[data-focus-today-minutes]').textContent(),'5');
     await p.locator('[data-focus-close]').click();assert.equal(await p.locator('[data-focus-finish]').isVisible(),false);
-  }else if(name==='audio-visualizer'){
-    assert(await p.locator('[data-av-upload]').isVisible());assert(await p.locator('[data-av-browser-audio]').isVisible());
-    assert(await p.locator('[data-av-upload]').evaluate(e=>{const b=e.getBoundingClientRect();return e.contains(document.elementFromPoint(b.x+b.width/2,b.y+b.height/2));}),'Audio source is visible and clickable, not clipped below the canvas');
-    await p.locator('[data-av-file]').setInputFiles({name:'layout-test.wav',mimeType:'audio/wav',buffer:wav()});
-    await p.waitForFunction(()=>document.querySelector('[data-audio-visualizer]').classList.contains('has-track'));
-    assert.equal(await p.locator('[data-av-playlist-list]').evaluate(e=>e.children.length),1,'Local queue remains functional');
-    if(await p.evaluate(()=>innerWidth>720))assert(await p.locator('[data-av-playlist]').isVisible());
-    const frame=await p.locator('[data-av-stage]').boundingBox(),controls=await p.locator('.av-controls').boundingBox();
-    assert(controls.x>=frame.x&&controls.x+controls.width<=frame.x+frame.width+1,'Playback controls stay inside the audio stage');
-    await p.screenshot({path:path.join(out,`audio-playing-${await p.evaluate(()=>innerWidth)}-${await p.evaluate(()=>document.body.classList.contains('dark')?'dark':'light')}.png`),fullPage:true});
-    if(await p.evaluate(()=>innerWidth>980)){
-      await p.locator('[data-av-fullscreen]').click();await p.waitForFunction(()=>!!document.fullscreenElement);
-      assert.equal(Math.round((await p.locator('[data-av-stage]').boundingBox()).height),await p.evaluate(()=>innerHeight),'Fullscreen still fills its viewport');
-      await p.evaluate(()=>document.exitFullscreen());
-    }
   }
 }
 (async()=>{

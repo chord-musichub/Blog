@@ -75,7 +75,7 @@ function sameModalDesign(actual,expected,label){
      await (await chooser).setFiles({name:'interaction.wav',mimeType:'audio/wav',buffer:wav});
      const nowCard=page.locator('[data-av-now]');await page.waitForFunction(()=>document.querySelector('[data-audio-visualizer]').classList.contains('is-local-audio-live'));
      assert(await nowCard.evaluate(e=>document.activeElement===e),'Keyboard file selection transfers focus out of the hidden source panel');
-     const display=page.locator('[data-av-display-mode]');await display.focus();await page.keyboard.press('Enter');assert(await nowCard.evaluate(e=>document.activeElement===e));
+     const display=page.locator('[data-av-display-mode]');await display.focus();await page.keyboard.press('Enter');assert(await page.locator('[data-av-exit-display]').evaluate(e=>document.activeElement===e));
      await page.keyboard.press('Escape');assert(await display.evaluate(e=>document.activeElement===e));
     }
     await ready(page,'/friends/memories/');

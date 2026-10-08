@@ -108,7 +108,7 @@
 <link id="songline-gacha-style" rel="stylesheet" href="/css/tools/gacha.css?v={{ $assetVersion }}">
 {{ end }}
 <link rel="stylesheet" href="/css/theme-vars.css?v={{ $assetVersion }}">
-{{ if $isToolsSurface }}
+{{ if and $isToolsSurface (not (hasPrefix .RelPermalink "/tools/audio-visualizer/")) }}
 <link id="songline-tool-detail-shell-style" rel="stylesheet" href="/css/tools/detail-shell.css?v={{ $assetVersion }}">
 {{ end }}
 <link id="songline-touch-layout-style" rel="stylesheet" href="/css/touch-layout.css?v={{ $assetVersion }}">

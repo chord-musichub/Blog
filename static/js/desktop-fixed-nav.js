@@ -37,7 +37,7 @@
     var header = findHeader();
     var root = document.documentElement;
 
-    if(!header || !isDesktop()){
+    if(!header || !isDesktop() || document.body.dataset.pageScene === 'audio'){
       root.classList.remove('has-desktop-fixed-nav');
       root.style.removeProperty('--desktop-fixed-nav-height');
       if(header) header.removeAttribute('data-desktop-fixed-nav');

@@ -1,83 +1,119 @@
 {{ define "main" }}
-
-<main class="tool-page audio-visualizer-page" data-audio-visualizer>
-  <section class="tool-detail-layout tool-detail-surface tool-detail-audio" data-tool-back-surface>
-    {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-    <h1 class="tool-detail-title">音频可视化</h1>
-    {{ partial "tool-actionbar.html" "audio-visualizer" }}
+<div class="audio-visualizer-page" data-audio-visualizer>
     {{ partial "tool-help-dialog.html" "audio-visualizer" }}
-  <section class="av-stage" data-av-stage>
-    <canvas class="av-canvas" data-av-canvas width="1440" height="900" aria-label="音频可视化画布"></canvas>
-    <div class="av-noise" aria-hidden="true"></div>
-    <div class="av-vignette" aria-hidden="true"></div>
-    <div class="av-drop-overlay" data-av-drop-overlay aria-hidden="true">
-      <div class="av-drop-card">
-        <strong>松开添加到播放列表</strong>
+    <section class="av-stage" data-av-stage aria-label="音乐可视化舞台">
+      <canvas class="av-art-backdrop" data-av-backdrop width="256" height="256" hidden aria-hidden="true"></canvas>
+      <div class="av-atmosphere" aria-hidden="true"></div>
+      <div class="av-linework" data-av-linework aria-hidden="true">
+        <svg class="av-linework-plane" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" focusable="false">
+          <defs><pattern id="av-grid-base" width="176" height="176" patternUnits="userSpaceOnUse">
+            <path d="M0 88H76M100 88H176M88 0V76M88 100V176" fill="none" stroke="currentColor" stroke-width="1"/>
+            <circle cx="88" cy="88" r="1.5" fill="currentColor"/>
+          </pattern></defs>
+          <rect width="100%" height="100%" fill="url(#av-grid-base)"/>
+        </svg>
+        <svg class="av-linework-plane av-linework-accent" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" focusable="false">
+          <defs><pattern id="av-grid-accent" width="352" height="352" patternUnits="userSpaceOnUse">
+            <path d="M88 36V76M100 88H148M264 212V252M212 264H252" fill="none" stroke="currentColor" stroke-width="1"/>
+            <circle cx="88" cy="88" r="2" fill="currentColor"/><circle cx="264" cy="264" r="2" fill="currentColor"/>
+          </pattern></defs>
+          <rect width="100%" height="100%" fill="url(#av-grid-accent)"/>
+        </svg>
+        <svg class="av-wave-plane" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="none" focusable="false">
+          <g fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M-120 520C240 280 480 700 840 470S1200 270 1560 460"/>
+            <path d="M-120 536C240 296 480 716 840 486S1200 286 1560 476" opacity=".45"/>
+            <path d="M-120 552C240 312 480 732 840 502S1200 302 1560 492" opacity=".2"/>
+          </g>
+        </svg>
+        <svg class="av-wave-plane av-wave-secondary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="none" focusable="false">
+          <g fill="none" stroke="currentColor" stroke-width="1">
+            <path d="M-120 300C260 560 460 250 800 440S1200 620 1560 400"/>
+            <path d="M-120 316C260 576 460 266 800 456S1200 636 1560 416" opacity=".35"/>
+          </g>
+        </svg>
       </div>
-    </div>
-
-    <header class="av-topbar">
-      <div class="av-status-stack">
-        <div class="av-status-pill is-soft" data-av-audio-state>等待音频来源</div>
-      </div>
-    </header>
-
-    <section class="av-now" data-av-now aria-live="polite">
-      <div class="av-cover" data-av-cover>
-        <img data-av-cover-img alt="当前歌曲封面" hidden>
-        <span data-av-cover-fallback>♫</span>
-      </div>
-      <div class="av-track">
-        <p data-av-source>Local Audio</p>
-        <h2 data-av-title>Audio Visualizer</h2>
-        <p data-av-artist></p>
-        <div class="av-progress" data-av-progressbar role="slider" tabindex="0" aria-label="播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <span data-av-progress></span>
+      <div class="av-drop-overlay" data-av-drop-overlay aria-hidden="true"><strong>松开添加音乐</strong></div>
+      <header class="av-topbar">
+        <a class="av-return" href="/tools/" data-av-return aria-label="返回工具页" title="返回工具页">{{ partial "ui-icon.html" "chevron-left" }}</a>
+        <span class="av-sr-only" data-av-audio-state role="status">等待音频来源</span>
+        <div class="av-controls" role="group" aria-label="舞台设置">
+          <button class="av-icon-button" type="button" data-av-open-file aria-label="添加音乐" title="添加音乐">{{ partial "ui-icon.html" "upload" }}</button>
+          <button class="av-icon-button" type="button" data-av-cover-picker aria-label="更换曲绘" title="更换曲绘">{{ partial "ui-icon.html" "image" }}</button>
+          <button class="av-icon-button" type="button" data-av-display-mode aria-pressed="false" aria-label="进入纯净展示" title="纯净展示">{{ partial "ui-icon.html" "eye" }}</button>
+          <button class="av-icon-button" type="button" data-av-fullscreen aria-label="全屏显示" title="全屏">{{ partial "ui-icon.html" "expand" }}</button>
+          {{ partial "tool-actionbar.html" "audio-visualizer" }}
         </div>
-        <small data-av-time>--:-- / --:--</small>
-      </div>
-    </section>
-
-    <section class="av-source-panel" data-av-source-panel aria-label="音频来源选择">
-      <article class="av-source-card is-primary">
-        <button class="av-button av-source-choice" type="button" data-av-browser-audio aria-label="授权系统声音">{{ partial "ui-icon.html" "volume" }}<span>系统声音</span></button>
-      </article>
-
-      <article class="av-source-card">
-        <button class="av-button av-source-choice" type="button" data-av-upload aria-label="添加本地音频">{{ partial "ui-icon.html" "upload" }}<span>本地音频</span></button>
-      </article>
-    </section>
-
-    <section class="av-playlist-panel" data-av-playlist hidden aria-label="本地播放列表">
-      <div class="av-playlist-head">
-        <div>
-          <strong>本地音乐列表</strong>
+      </header>
+      <section class="av-source-panel" data-av-source-panel aria-label="音频来源选择">
+        <h2>享受你的音乐</h2>
+        <div class="av-source-options">
+          <article class="av-source-card"><button class="av-button av-source-choice" type="button" data-av-upload>{{ partial "ui-icon.html" "upload" }}<span>本地音乐</span></button></article>
+          <article class="av-source-card"><button class="av-button av-source-choice" type="button" data-av-browser-audio>{{ partial "ui-icon.html" "volume" }}<span>系统声音</span></button></article>
         </div>
-        <div class="av-playlist-actions">
-          <button class="av-mini-button" type="button" data-av-playlist-toggle aria-expanded="true">收起</button>
-          <button class="av-mini-button" type="button" data-av-play-mode aria-label="播放模式">列表循环</button>
-          <button class="av-mini-button" type="button" data-av-prev>上一首</button>
-          <button class="av-mini-button" type="button" data-av-next>下一首</button>
+      </section>
+      <section class="av-now" data-av-now aria-label="当前音乐">
+        <div class="av-art-column">
+          <div class="av-art-orbit">
+            <div class="av-orbit-ring" aria-hidden="true"></div>
+            <div class="av-cover" data-av-cover>
+              <img data-av-cover-img alt="当前歌曲曲绘" hidden>
+              <span class="av-cover-placeholder" data-av-cover-fallback aria-hidden="true"><span>♫</span></span>
+            </div>
+          </div>
+          <div class="av-transport" role="group" aria-label="播放控制">
+            <button class="av-icon-button" type="button" data-av-prev aria-label="上一首" title="上一首">{{ partial "ui-icon.html" "previous" }}</button>
+            <button class="av-icon-button av-play-button" type="button" data-av-play aria-label="播放" title="播放">
+              <span data-av-play-icon>{{ partial "ui-icon.html" "play" }}</span><span data-av-pause-icon hidden>{{ partial "ui-icon.html" "pause" }}</span>
+            </button>
+            <button class="av-icon-button" type="button" data-av-next aria-label="下一首" title="下一首">{{ partial "ui-icon.html" "next" }}</button>
+          </div>
         </div>
-      </div>
-      <div class="av-playlist-list" data-av-playlist-list></div>
-    </section>
-
-    <section class="av-controls">
-      <button class="av-button" type="button" data-av-open-file>添加音乐</button>
-      <button class="av-button" type="button" data-av-display-mode aria-pressed="false">全隐藏</button>
-      <button class="av-button" type="button" data-av-fullscreen>全屏显示</button>
-      <label class="av-volume-control" data-av-volume-wrap>
-        <span>音量</span>
-        <input type="range" min="0" max="100" step="1" value="80" data-av-volume aria-label="本地音频音量">
-        <small data-av-volume-value>80%</small>
-      </label>
+        <div class="av-analysis">
+          <div class="av-track">
+            <h2 data-av-title>等待音乐</h2>
+            <div class="av-track-meta">
+              <p data-av-artist></p><span class="av-sample-rate" data-av-sample-rate hidden></span>
+              <button class="av-icon-button av-track-edit" type="button" data-av-track-edit aria-label="设置当前歌曲信息" title="歌曲信息" aria-haspopup="dialog" aria-controls="av-track-editor" hidden>{{ partial "ui-icon.html" "settings" }}</button>
+            </div>
+          </div>
+          <div class="av-spectrum" role="img" aria-label="实时频谱与波形">
+            <canvas class="av-canvas" data-av-canvas width="900" height="380" aria-hidden="true"></canvas>
+          </div>
+          <div class="av-timeline">
+            <div class="av-progress" data-av-progressbar role="slider" tabindex="0" aria-label="播放进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-disabled="true"><span data-av-progress></span></div>
+            <small data-av-time>0:00 / --:--</small>
+          </div>
+        </div>
+      </section>
+      <footer class="av-playback-footer">
+        <div class="av-session-control" role="group" aria-label="播放模式与歌曲列表">
+        <button class="av-icon-button" type="button" data-av-play-mode aria-label="播放模式" title="列表循环">
+          <span data-av-mode-list>{{ partial "ui-icon.html" "repeat" }}</span>
+          <span data-av-mode-single hidden>{{ partial "ui-icon.html" "repeat-one" }}</span>
+          <span data-av-mode-shuffle hidden>{{ partial "ui-icon.html" "shuffle" }}</span>
+        </button>
+        <button class="av-icon-button av-queue-toggle" type="button" data-av-playlist-toggle aria-label="打开歌曲列表" title="歌曲列表" aria-expanded="false" aria-controls="av-queue-panel">{{ partial "ui-icon.html" "menu" }}<span data-av-queue-count></span></button>
+        <section class="av-playlist-panel" id="av-queue-panel" data-av-playlist popover="auto" hidden aria-label="歌曲列表">
+          <div class="av-playlist-list" id="av-queue" data-av-playlist-list hidden></div>
+        </section>
+        </div>
+        <label class="av-volume-control" data-av-volume-wrap>{{ partial "ui-icon.html" "volume" }}<input type="range" min="0" max="100" step="1" value="80" data-av-volume aria-label="本地音频音量"></label>
+      </footer>
+      <dialog class="av-track-dialog" id="av-track-editor" data-av-track-dialog aria-labelledby="av-track-editor-title">
+        <form data-av-track-form>
+          <header class="av-track-dialog-header"><h2 id="av-track-editor-title">歌曲信息</h2><button class="av-icon-button" type="button" data-av-track-close aria-label="关闭并保存歌曲信息" title="关闭并保存">{{ partial "ui-icon.html" "close" }}</button></header>
+          <label class="av-track-field" for="av-edit-title">曲名<input id="av-edit-title" data-av-edit-title type="text" maxlength="240" autocomplete="off" placeholder="自动识别"></label>
+          <label class="av-track-field" for="av-edit-artist">作者<input id="av-edit-artist" data-av-edit-artist type="text" maxlength="160" autocomplete="off" placeholder="未知作者"></label>
+          <label class="av-track-field" for="av-edit-rate">采样率标注（Hz）<input id="av-edit-rate" data-av-edit-rate type="number" min="1" max="768000" step="1" inputmode="numeric" autocomplete="off" placeholder="自动识别" title="仅修改展示标注，不改变音频采样率"></label>
+          <button class="av-track-reset" type="button" data-av-track-reset>恢复自动识别</button>
+        </form>
+      </dialog>
+      <button class="av-exit-display av-mini-button" type="button" data-av-exit-display aria-label="退出纯净展示" title="退出纯净展示" hidden>{{ partial "ui-icon.html" "chevron-left" }}</button>
+      <p class="av-hint" data-av-hint aria-live="polite"></p>
       <input type="file" accept="audio/*,.mp3,.flac,.wav,.m4a,.aac,.ogg" data-av-file multiple hidden>
+      <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-av-cover-file hidden>
       <audio data-av-audio preload="metadata" hidden></audio>
     </section>
-
-    <p class="av-hint" data-av-hint aria-live="polite"></p>
-  </section>
-  </section>
-</main>
+</div>
 {{ end }}

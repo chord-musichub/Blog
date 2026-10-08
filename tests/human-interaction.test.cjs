@@ -5,7 +5,8 @@ function key(extra={}){return Object.assign({key:' ',code:'Space',target:{closes
 function controller(file,name,end){
  const source=read(file),calls=[];
  const root={querySelector:()=>null};
- const context={disposed:false,destroyed:false,root,game:root,spaceHeld:false,displayMode:false,
+ const context={disposed:false,destroyed:false,root,game:root,spaceHeld:false,displayMode:false,playlistCollapsed:true,nativeQueue:true,
+  updatePlaylistCollapse:()=>calls.push('queue'),playlistToggleBtn:{focus:()=>calls.push('focus')},
   document:{documentElement:{contains:()=>true}},window:{removeEventListener(){}},
   togglePause:()=>calls.push('pause'),ensureAudio(){},unlockAudio(){},flap:()=>calls.push('flap'),
   keyToDir:()=> 'left',move:()=>calls.push('move'),turn:()=>calls.push('turn'),
@@ -13,6 +14,18 @@ function controller(file,name,end){
  vm.createContext(context);vm.runInContext(source.slice(source.indexOf('    function '+name+'('),source.indexOf(end,source.indexOf('    function '+name+'('))),context);
  return {context,calls,handle:event=>context[name](event)};
 }
+test('audio queue owns Escape and Space without toggling playback behind it',()=>{
+ const f=controller('tools/audio-visualizer.js','onDocumentKeydown',"    document.addEventListener('keydown'");
+ f.context.playlistCollapsed=false;
+ f.handle(key());f.handle(key({key:'Escape',code:'Escape'}));assert.deepEqual(f.calls,[],'Native popover handles dismissal');
+ f.context.nativeQueue=false;const escape=key({key:'Escape',code:'Escape'});f.handle(escape);
+ assert.deepEqual(f.calls,['queue','focus']);assert.equal(escape.defaultPrevented,true);assert.equal(f.context.playlistCollapsed,true);
+});
+test('audio track editor owns shortcuts so typing cannot pause playback',()=>{
+ const f=controller('tools/audio-visualizer.js','onDocumentKeydown',"    document.addEventListener('keydown'");
+ f.context.root.querySelector=selector=>selector.includes('[data-av-track-dialog][open]')?{}:null;
+ f.handle(key());f.handle(key({key:'Escape',code:'Escape'}));assert.deepEqual(f.calls,[]);
+});
 for(const [file,name,end,action] of [
  ['tools/game-2048.js','onKeydown','    function onResize(', 'pause'],
  ['tools/snake.js','handleKeydown','    function handleKeyup(', 'pause'],

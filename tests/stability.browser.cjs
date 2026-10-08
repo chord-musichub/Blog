@@ -132,6 +132,8 @@ async function tools(page,route){
   await page.locator('[data-av-display-mode]').click();assert.equal(await page.locator('[data-av-display-mode]').getAttribute('aria-pressed'),'true');
   await page.keyboard.press('Escape');assert.equal(await page.locator('[data-av-display-mode]').getAttribute('aria-pressed'),'false');
   if(await page.locator('[data-av-playlist-toggle]').isVisible()){
+   assert.equal(await page.locator('[data-av-playlist-toggle]').getAttribute('aria-expanded'),'false','Queue begins collapsed');
+   await page.locator('[data-av-playlist-toggle]').click();assert.equal(await page.locator('[data-av-playlist-toggle]').getAttribute('aria-expanded'),'true');
    await page.locator('[data-av-playlist-toggle]').click();assert.equal(await page.locator('[data-av-playlist-toggle]').getAttribute('aria-expanded'),'false');
   }
  }else if(route==='/'){

@@ -2,13 +2,15 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
 const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
 test('only non-Markdown tool details opt into the compact shared frame',()=>{
-  for(const name of ['random-number','2048','snake','reaction-test','flappy-bird','typing-practice','gacha','focus-timer','audio-visualizer']){
+  for(const name of ['random-number','2048','snake','reaction-test','flappy-bird','typing-practice','gacha','focus-timer']){
     const template=read('layouts/tools/'+name+'.html');
     assert.equal((template.match(/tool-detail-surface/g)||[]).length,1,name+' has one primary frame');
     assert(template.includes('class="tool-detail-title"'));
   }
   assert(!read('layouts/tools/markdown-previewer.html').includes('tool-detail-surface'));
   assert(!read('layouts/tools/tools.html').includes('tool-detail-surface'));
+  assert(!read('layouts/tools/audio-visualizer.html').includes('tool-detail-surface'),'Audio is an independent studio, not a glass room');
+  assert(read('layouts/_default/baseof.html').includes('data-page-scene="audio"'));
   assert(read('layouts/partials/assets/page-styles.html').includes('(not (hasPrefix .RelPermalink "/tools/markdown-previewer/"))'));
   const modules=read('static/js/page-modules.js');
   assert(modules.includes("query(root, '.tool-detail-surface')"));

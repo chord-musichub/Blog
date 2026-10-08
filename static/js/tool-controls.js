@@ -21,7 +21,7 @@
   function init(root){
     (root || document).querySelectorAll('[data-tool-actionbar]').forEach(function(bar){
       if(bar.dataset.toolControlsBound) return;
-      var surface=bar.closest('.tool-detail-surface');
+      var surface=bar.closest('.tool-detail-surface, [data-audio-visualizer]');
       var dialog=surface && surface.querySelector('[data-tool-help-dialog]');
       var trigger=bar.querySelector('[data-tool-help-open]');
       if(!dialog || !trigger) return;

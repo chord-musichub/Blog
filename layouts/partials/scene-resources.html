@@ -3,7 +3,9 @@
 {{- $light := slice -}}
 {{- $dark := slice -}}
 {{- $friends := hasPrefix .RelPermalink "/friends/" -}}
-{{- if hasPrefix .RelPermalink "/tools/" -}}
+{{- if hasPrefix .RelPermalink "/tools/audio-visualizer/" -}}
+  {{- /* The studio owns its local artwork; do not preload the underground scene. */ -}}
+{{- else if hasPrefix .RelPermalink "/tools/" -}}
   {{- $light = slice "/uploads/admin/background/under-ground.png" "/uploads/admin/background/tools-underground-soil-light-v1.png" -}}
   {{- $dark = slice "/uploads/admin/background/under-ground-black.png" "/uploads/admin/background/tools-underground-soil-dark-v1.png" -}}
 {{- else if $background -}}

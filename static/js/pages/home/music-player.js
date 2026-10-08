@@ -337,7 +337,7 @@
       var token = ++metadataToken;
       var result = null;
       try{
-        if(window.SonglineAudioMetadata && typeof window.SonglineAudioMetadata.read === 'function') result = await window.SonglineAudioMetadata.read(track.file);
+        if(window.SonglineAudioMetadata && typeof window.SonglineAudioMetadata.read === 'function') result = await window.SonglineAudioMetadata.read(track.file, {cover:false});
       }catch(e){}
       if(disposed || token !== metadataToken || index !== current) return;
       result = result || {};
