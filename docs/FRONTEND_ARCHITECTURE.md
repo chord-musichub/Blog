@@ -43,6 +43,7 @@
 - 页面过场期间不得创建第二个 overlay 或再次写 history；统一通过 `SonglinePageTransition.navigate()` 和内部锁管理。连续站内操作保留最后一个排队目的地，浏览器历史遍历优先；只有真正开始下一次导航才保存当前滚动位置。如果请求期间已经发生 Back/Forward，不得用 pushState 覆盖遍历后的历史。无障碍的减少动态效果会自动退化为短淡入淡出。
 - 转场入场与历史恢复使用 `instant` 滚动，不能用会继承全局 smooth 的 `auto`；用户点击目录和阅读上下按钮继续缓动。新文章深链接可等待有界的 `reader.songlineRenderReady`，资源准备后再校正位置。异步 Markdown 初始化时记录滚动所有权，不能在 AJAX 结束之后用迟到的 hash 跳转覆盖历史位置。
 - 档案搜索在 composition 期间不筛选、不改网址、不处理 Escape；选字结束提交最终文本。同一事件轮次合并重复 input，离开页面不提交。抽屉焦点/hover 保留已锁定状态，父容器键盘处理只接受自身事件，不拦截子链接、表单控件或输入法按键。
+- 档案文章与项目每页 10 条，先全量筛选再截取当前页；结果统计与项目提示使用全部匹配数，不能使用当前页条数。两种模式独立保存页码，搜索变更重置两者；`article_page`、`project_page`、`mode=projects` 随搜索一起 replaceState，保留原历史元数据及无关参数，让刷新和详情返回恢复当前页。复用原记录 DOM 与抽屉，切页关闭旧抽屉；只有模板包含 `archive/pagination.html` 才分页，公告保持全列表，没有 JavaScript 时也保留全部记录。分页测试见 `tests/archive-pagination.test.cjs` 与 `tests/archive-pagination.browser.cjs`。
 - 朋友星图与回忆时间线仅导出初始化 API，由模块调度器接管；背景轨迹必须重复安全、保留可见状态，切页/隐藏时取消延迟启动和开机等待。公共 keyed idle/RAF 任务使用配对的取消 API，不能只取消外层 timer 而留下已提交的 idle 回调。
 - 修改公共样式后，至少检查首页、档案/公告、单篇阅读、朋友页与工具页的浅色与深色模式；旧标签网址测试兼容跳转，不再测试旧标签 UI。
 

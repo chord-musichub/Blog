@@ -48,7 +48,7 @@ async function filtering(page,tag){
     const norm=s=>s.trim().toLowerCase();
     return {total:records.length,visible:records.filter(r=>!r.hidden).length,expected:records.filter(r=>!tag||(r.dataset.tags||'').split(',').map(norm).includes(norm(tag))).length};
   },tag||'');
-  assert.equal(state.visible,state.expected,'Exact migrated tag filtering: '+tag);
+  assert.equal(state.visible,Math.min(10,state.expected),'Exact migrated tag filtering and first page: '+tag);
   assert(await page.locator('[data-archive-search-field]').isVisible());
   assert.equal(await page.locator('[data-archive-search-input]').inputValue(),tag||'');
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
@@ -67,7 +67,7 @@ async function filtering(page,tag){
         if(tag){
           const historyState=await page.evaluate(()=>history.state);
           await page.locator('[data-archive-search-clear]').click();
-          assert.equal(await page.locator('[data-archive-kind="article"]:not([hidden])').count(),state.total);
+          assert.equal(await page.locator('[data-archive-kind="article"]:not([hidden])').count(),Math.min(10,state.total));
           assert.equal(new URL(page.url()).searchParams.get('tag'),null);
           assert.deepEqual(await page.evaluate(()=>history.state),historyState);
           await page.reload();await ready(page);await filtering(page,null);

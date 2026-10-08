@@ -1,10 +1,21 @@
-/* Content Archive：索引、抽屉、双模式和轻量搜索。 */
+/* Content Archive：索引、抽屉、双模式、轻量搜索和分页。 */
 (function(){
   'use strict';
-  var VERSION = '23.1.0';
+  var VERSION = '23.2.0';
   function text(value){ return String(value == null ? '' : value).trim().toLowerCase(); }
   function terms(value){ return text(value).split(/[\s,，;；|]+/).filter(Boolean); }
   function isMobile(){ return window.matchMedia && window.matchMedia('(max-width:980px), (hover:none)').matches; }
+  function pageNumber(value){ return /^\d+$/.test(String(value || '')) && Number.isSafeInteger(Number(value)) && Number(value) > 0 ? Number(value) : 1; }
+  function pageNumbers(current, total){
+    var numbers = [], start = Math.max(2, Math.min(current - 1, total - 3));
+    if(total <= 5){ for(var i = 1; i <= total; i++) numbers.push(i); return numbers; }
+    numbers.push(1);
+    if(start > 2) numbers.push(null);
+    for(var j = start; j < start + 3; j++) numbers.push(j);
+    if(start + 3 < total) numbers.push(null);
+    numbers.push(total);
+    return numbers;
+  }
   function init(root){
     root = root || document;
     var archive = root.querySelector ? root.querySelector('[data-content-archive]') : null;
@@ -23,8 +34,14 @@
     var composing = false, searchScheduled = false;
     var recordLists = {};
     panels.forEach(function(panel){ recordLists[panel.dataset.archivePanel] = Array.prototype.slice.call(panel.querySelectorAll('[data-archive-record]')); });
+    var pagers = {}, matchedCounts = {}, pageCounts = {}, currentPages = {};
+    var pageSize = Math.min(100, pageNumber(archive.dataset.archivePageSize || 10));
+    ['articles','projects'].forEach(function(mode){ pagers[mode] = archive.querySelector('[data-archive-pagination="' + mode + '"]'); });
     var searchData = new WeakMap();
     var archiveParams = new URLSearchParams(window.location.search);
+    currentPages.articles = pageNumber(archiveParams.get('article_page'));
+    currentPages.projects = pageNumber(archiveParams.get('project_page'));
+    if(archiveParams.get('mode') === 'projects' && recordLists.projects) activeMode = 'projects';
     var tagFilter = archiveParams.get('tag') || '';
     // 首页“标签”入口直接打开档案页的搜索抽屉，并保留词条按钮。
     query = archiveParams.get('q') || tagFilter;
@@ -32,16 +49,11 @@
     if(clear) clear.hidden = !query;
     var shouldOpenSearch = !!query || /^(1|true|open)$/i.test(archiveParams.get('search') || '');
     function setQuery(value){
+      if(query !== (value || '') || tagFilter){ currentPages.articles = 1; currentPages.projects = 1; }
       query = value || '';
       tagFilter = '';
       if(input) input.value = query;
       if(clear) clear.hidden = !query;
-      // Clearing a migrated tag must not leave an invisible, unremovable filter
-      // or restore that filter on reload. Keep existing navigation metadata.
-      var url = new URL(window.location.href);
-      url.searchParams.delete('tag');
-      if(query) url.searchParams.set('q', query); else url.searchParams.delete('q');
-      if(url.href !== window.location.href) history.replaceState(history.state, '', url.href);
       runSearch();
     }
     function scheduleQuery(){
@@ -100,7 +112,65 @@
         detail.addEventListener('keydown', function(event){ if(event.target === detail && !event.isComposing && (event.key === 'Enter' || event.key === ' ')){ event.preventDefault(); enterDetail(event); } });
       }
     }
-    function visibleCount(mode){ return records(mode).filter(function(record){ return !record.hidden; }).length; }
+    function visibleCount(mode){ return matchedCounts[mode] || 0; }
+    function syncPagesURL(){
+      // Replace only archive parameters, preserving Back metadata and unrelated
+      // parameters. Returning from a detail page restores this exact slice.
+      var url = new URL(window.location.href);
+      // Clearing a migrated tag must not restore it on reload. Commit search
+      // and paging together, with only one history write per input batch.
+      if(!tagFilter){
+        url.searchParams.delete('tag');
+        if(query) url.searchParams.set('q', query); else url.searchParams.delete('q');
+      }
+      ['articles','projects'].forEach(function(mode){
+        if(!pagers[mode]) return;
+        var key = mode === 'articles' ? 'article_page' : 'project_page';
+        if(currentPages[mode] > 1) url.searchParams.set(key, currentPages[mode]); else url.searchParams.delete(key);
+      });
+      if(recordLists.projects){ if(activeMode === 'projects') url.searchParams.set('mode', 'projects'); else url.searchParams.delete('mode'); }
+      if(url.href !== window.location.href) history.replaceState(history.state, '', url.href);
+    }
+    function renderPager(mode){
+      var pager = pagers[mode]; if(!pager) return;
+      var total = pageCounts[mode], current = currentPages[mode];
+      pager.hidden = total <= 1;
+      pager.querySelector('[data-archive-page-step="-1"]').disabled = current <= 1;
+      pager.querySelector('[data-archive-page-step="1"]').disabled = current >= total;
+      var numbers = pager.querySelector('[data-archive-page-numbers]');
+      var signature = current + '/' + total;
+      if(numbers.dataset.pageSignature === signature) return;
+      var restoreFocus = numbers.contains(document.activeElement);
+      var fragment = document.createDocumentFragment();
+      pageNumbers(current, total).forEach(function(number){
+        var item = document.createElement(number === null ? 'span' : 'button');
+        if(number === null){ item.textContent = '…'; item.setAttribute('aria-hidden', 'true'); }
+        else {
+          item.type = 'button'; item.textContent = number; item.dataset.archivePage = number;
+          item.setAttribute('aria-label', '第 ' + number + ' 页，共 ' + total + ' 页');
+          if(number === current) item.setAttribute('aria-current', 'page');
+        }
+        fragment.appendChild(item);
+      });
+      numbers.replaceChildren(fragment); numbers.dataset.pageSignature = signature;
+      if(restoreFocus && !pager.hidden) numbers.querySelector('[aria-current="page"]').focus({preventScroll:true});
+    }
+    function goToPage(mode, page){
+      if(mode !== activeMode || !pagers[mode]) return;
+      var next = Math.max(1, Math.min(pageNumber(page), pageCounts[mode] || 1));
+      if(next === currentPages[mode]) return;
+      window.clearTimeout(closeTimer); if(activeRecord) closeRecord(activeRecord);
+      currentPages[mode] = next;
+      runSearch();
+      // A bottom pager should not leave the new list above the viewport.
+      var header = document.querySelector('.site-header');
+      var offset = (header ? header.getBoundingClientRect().height : 72) + 20;
+      var top = archive.getBoundingClientRect().top;
+      if(top < offset){
+        var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+        window.scrollTo({top:Math.max(0, window.scrollY + top - offset), behavior:reduced ? 'instant' : 'smooth'});
+      }
+    }
     function matches(record, queryTerms, normalizedTag){
       if(!queryTerms.length && (!normalizedTag || record.dataset.archiveKind !== 'article')) return true;
       var data = searchData.get(record);
@@ -116,14 +186,23 @@
       var queryTerms = terms(query), normalizedTag = text(tagFilter);
       searchTerms.forEach(function(term){ term.setAttribute('aria-pressed', text(query) === text(term.dataset.archiveSearchTerm) ? 'true' : 'false'); });
       ['articles','projects'].forEach(function(mode){
-        var count = 0;
-        records(mode).forEach(function(record){ var show = matches(record, queryTerms, normalizedTag); if(record.hidden !== !show) record.hidden = !show; if(!show && activeRecord === record) closeRecord(record); if(show) count++; });
-        var empty = archive.querySelector('[data-archive-empty="' + mode + '"]'); if(empty) empty.hidden = count !== 0;
+        var matched = records(mode).filter(function(record){ return matches(record, queryTerms, normalizedTag); });
+        matchedCounts[mode] = matched.length;
+        pageCounts[mode] = Math.max(1, Math.ceil(matched.length / pageSize));
+        currentPages[mode] = Math.min(currentPages[mode], pageCounts[mode]);
+        var start = (currentPages[mode] - 1) * pageSize;
+        // Archives without a pager (e.g. notices) keep their existing full list.
+        var shown = new Set(pagers[mode] ? matched.slice(start, start + pageSize) : matched);
+        records(mode).forEach(function(record){ var show = shown.has(record); if(record.hidden !== !show) record.hidden = !show; if(!show && activeRecord === record) closeRecord(record); });
+        var empty = archive.querySelector('[data-archive-empty="' + mode + '"]'); if(empty) empty.hidden = matched.length !== 0;
+        renderPager(mode);
       });
       var visible = visibleCount(activeMode), total = records(activeMode).length;
       var statusText = (query || tagFilter ? '搜索 / ' : '') + (activeMode === 'articles' ? (archive.dataset.archiveArticleLabel || '文章') : '项目') + ' / ' + visible + ' / ' + total;
+      if(pagers[activeMode] && visible) statusText += ' / 第 ' + currentPages[activeMode] + ' 页，共 ' + pageCounts[activeMode] + ' 页';
       if(status && status.textContent !== statusText) status.textContent = statusText;
       if(projectHint){ var matchedProjects = visibleCount('projects'); projectHint.hidden = !(activeMode === 'articles' && query && matchedProjects); var hintText = '项目 / ' + matchedProjects + ' →'; if(projectHint.textContent !== hintText) projectHint.textContent = hintText; }
+      syncPagesURL();
     }
     function switchMode(mode){
       if(mode !== 'articles' && mode !== 'projects') return;
@@ -133,6 +212,14 @@
       runSearch();
     }
     records('articles').concat(records('projects')).forEach(bindRecord);
+    ['articles','projects'].forEach(function(mode){
+      var pager = pagers[mode]; if(!pager) return;
+      pager.addEventListener('click', function(event){
+        var button = event.target.closest('button'); if(!button || !pager.contains(button) || button.disabled) return;
+        if(button.dataset.archivePage) goToPage(mode, button.dataset.archivePage);
+        else if(button.dataset.archivePageStep) goToPage(mode, currentPages[mode] + Number(button.dataset.archivePageStep));
+      });
+    });
     modeButtons.forEach(function(button){ button.addEventListener('click', function(){ switchMode(button.dataset.archiveMode); }); });
     if(projectHint) projectHint.addEventListener('click', function(){ switchMode('projects'); });
     if(searchTrigger && searchField) searchTrigger.addEventListener('click', function(){ var opening = searchField.hidden; searchField.hidden = !opening; searchTrigger.setAttribute('aria-expanded', opening ? 'true' : 'false'); searchTrigger.classList.toggle('is-open', opening); if(opening && input) input.focus(); });
@@ -149,7 +236,7 @@
       searchTrigger.setAttribute('aria-expanded', 'true');
       searchTrigger.classList.add('is-open');
     }
-    runSearch();
+    switchMode(activeMode);
   }
   // Direct entry and AJAX entry share the page-module dispatcher.
   window.SonglineInitContentArchive = init;

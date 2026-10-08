@@ -6,7 +6,7 @@
 {{ with .Site.Data.projects }}{{ $projects = . }}{{ else }}{{ with resources.Get "data/projects.json" }}{{ $projects = . | transform.Unmarshal }}{{ end }}{{ end }}
 {{ $searchTerms := slice }}{{ range $posts }}{{ range .Params.tags }}{{ $searchTerms = $searchTerms | append . }}{{ end }}{{ end }}
 {{ range $projects }}{{ range .stack }}{{ $searchTerms = $searchTerms | append . }}{{ end }}{{ end }}
-<section class="content-archive" data-content-archive aria-label="内容归档">
+<section class="content-archive" data-content-archive data-archive-page-size="10" aria-label="内容归档">
   <header class="content-archive__header">
     <div class="content-archive__controls">
       <div class="content-archive__modes" role="tablist" aria-label="档案内容模式">
@@ -30,6 +30,7 @@
         {{ else }}<p class="content-archive__empty">还没有可归档的文章。</p>{{ end }}
       </div>
       <p class="content-archive__empty" data-archive-empty="articles" hidden>没有匹配的文章记录。</p>
+      {{ partial "archive/pagination.html" "articles" }}
     </section>
     <section class="content-archive__panel" id="archiveProjects" role="tabpanel" data-archive-panel="projects" hidden>
       <div class="content-archive__index" data-archive-list>
@@ -45,6 +46,7 @@
         {{ else }}<p class="content-archive__empty">尚未归档项目</p>{{ end }}
       </div>
       <p class="content-archive__empty" data-archive-empty="projects" hidden>没有匹配的项目记录。</p>
+      {{ partial "archive/pagination.html" "projects" }}
     </section>
   </div>
 </section>
