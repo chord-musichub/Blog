@@ -39,6 +39,17 @@ test('keyed idle/RAF tasks can be replaced and cancelled, including idle fallbac
   r.cancelRaf('test');f.tick(100);assert.equal(calls,0);
  }
 });
+test('optional tool storage tolerates blocked access and quota errors without stale reads',()=>{
+ const f=runtime(),storage=f.window.SonglineRuntime.storage;
+ Object.defineProperty(f.window,'localStorage',{configurable:true,get(){throw Error('SecurityError');}});
+ assert.equal(storage.getItem('best'),null);storage.setItem('best',128);assert.equal(storage.getItem('best'),'128');
+ storage.removeItem('best');assert.equal(storage.getItem('best'),null);
+ const saved=new Map([['best','64']]);let full=true;
+ Object.defineProperty(f.window,'localStorage',{value:{getItem:key=>saved.get(key)||null,setItem(key,value){if(full)throw Error('QuotaExceededError');saved.set(key,value);},removeItem:key=>saved.delete(key)}});
+ storage.setItem('best',256);assert.equal(storage.getItem('best'),'256','Failed persistence must not restore the older best');
+ full=false;storage.setItem('best',512);assert.equal(saved.get('best'),'512');
+ saved.delete('best');assert.equal(storage.getItem('best'),null,'External clearing does not resurrect old fallback data');
+});
 test('galaxy has one managed initializer and ignores duplicate identities',()=>{
  const window={};
  const source=read('static/js/pages/friends/galaxy.js').replace('  window.SonglineInitFriendGalaxy = init;','  window.normalizeForTest = normalize; window.SonglineInitFriendGalaxy = init;');

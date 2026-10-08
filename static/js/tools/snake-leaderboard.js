@@ -1,5 +1,6 @@
 (function(){
   'use strict';
+  var storage = window.SonglineRuntime.storage;
   function createLeaderboard(options){
     options=options||{};
     const topScoresEl=options.topScoresEl;
@@ -12,10 +13,10 @@
     if(!bestKey||typeof options.getBest!=='function') return null;
     function getPlayerID(){
       try{
-        let id = localStorage.getItem(playerKey);
+        let id = storage.getItem(playerKey);
         if(!id){
           id = 'snake-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-          localStorage.setItem(playerKey, id);
+          storage.setItem(playerKey, id);
         }
         return id;
       }catch(e){ return 'snake-guest'; }
@@ -54,11 +55,11 @@
     }
 
     function cacheTopScores(){
-      try{ localStorage.setItem(scoresCacheKey, JSON.stringify(topScores)); }catch(e){}
+      try{ storage.setItem(scoresCacheKey, JSON.stringify(topScores)); }catch(e){}
     }
 
     function loadCachedTopScores(){
-      try{ topScores = normalizeScores(JSON.parse(localStorage.getItem(scoresCacheKey) || '[]')); }
+      try{ topScores = normalizeScores(JSON.parse(storage.getItem(scoresCacheKey) || '[]')); }
       catch(e){ topScores = []; }
     }
 
@@ -131,7 +132,7 @@
     }
 
     function syncLocalBest(manual){
-      const localBest = Number(localStorage.getItem(bestKey) || options.getBest() || 0) || 0;
+      const localBest = Number(storage.getItem(bestKey) || options.getBest() || 0) || 0;
       if(!manual && autoSyncedLocalBest) return;
       autoSyncedLocalBest = true;
       if(localBest > 0) return recordTopScore(localBest, 'local-best');

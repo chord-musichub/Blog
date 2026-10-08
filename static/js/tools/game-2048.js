@@ -1,5 +1,6 @@
 (function(){
   'use strict';
+  var storage = window.SonglineRuntime.storage;
 
   var VERSION = '20.20.6';
   var core = window.Songline2048Engine;
@@ -41,7 +42,7 @@
     var grid = emptyGrid();
     var tiles = [];
     var score = 0;
-    var best = Number(localStorage.getItem(BEST_KEY) || 0) || 0;
+    var best = Number(storage.getItem(BEST_KEY) || 0) || 0;
     var won = false;
     var ended = false;
     var animating = false;
@@ -55,7 +56,7 @@
     var resizeTimer = 0;
     var scoresCacheKey = 'songline-2048-server-top3-cache';
     var soundKey = 'songline-2048-sound-enabled-v1';
-    var soundEnabled = localStorage.getItem(soundKey) !== '0';
+    var soundEnabled = storage.getItem(soundKey) !== '0';
 
     function later(callback, delay){
       var round = generation;
@@ -103,7 +104,7 @@
     function updateScore(){
       if(score > best){
         best = score;
-        localStorage.setItem(BEST_KEY, String(best));
+        storage.setItem(BEST_KEY, String(best));
       }
       if(scoreEl) scoreEl.textContent = String(score);
       if(bestEl) bestEl.textContent = String(best);
@@ -393,7 +394,7 @@
       updateSoundToggle();
       soundToggle.addEventListener('click', function(event){
         soundEnabled = !soundEnabled;
-        try{ localStorage.setItem(soundKey, soundEnabled ? '1' : '0'); }catch(e){}
+        try{ storage.setItem(soundKey, soundEnabled ? '1' : '0'); }catch(e){}
         updateSoundToggle();
         if(soundEnabled){
           ensureAudio();

@@ -1,5 +1,6 @@
 (function(){
   'use strict';
+  var storage = window.SonglineRuntime.storage;
 
   const VERSION = '20.20.6';
   let activeController = null;
@@ -78,7 +79,7 @@
     let dir = {x:1, y:0};
     let nextDir = {x:1, y:0};
     let score = 0;
-    let best = Number(localStorage.getItem(bestKey) || 0);
+    let best = Number(storage.getItem(bestKey) || 0);
     let level = 1;
     let topScores = [];
     let running = false;
@@ -417,7 +418,7 @@
         score += finalBonus;
         if(score > best){
           best = score;
-          localStorage.setItem(bestKey, String(best));
+          storage.setItem(bestKey, String(best));
         }
         renderer.spawnParticles(eaten.x, eaten.y, '#fb7185', '+' + finalBonus);
         setTip('临时豆全收集！完成奖励 +' + finalBonus);
@@ -576,7 +577,7 @@
       score += gained;
       if(score > best){
         best = score;
-        localStorage.setItem(bestKey, String(best));
+        storage.setItem(bestKey, String(best));
       }
 
       const text = combo > 1 ? '+' + gained + ' x' + combo : '+' + gained;

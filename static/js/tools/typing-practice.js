@@ -1,5 +1,6 @@
 (function(){
   'use strict';
+  var storage = window.SonglineRuntime.storage;
 
   var VERSION = '20.20.6';
   var SOUND_KEY = 'songline-typing-sound-enabled-v1';
@@ -72,10 +73,10 @@
 
   function getPlayerID(){
     try{
-      var id = localStorage.getItem(PLAYER_KEY);
+      var id = storage.getItem(PLAYER_KEY);
       if(!id){
         id = 't-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-        localStorage.setItem(PLAYER_KEY, id);
+        storage.setItem(PLAYER_KEY, id);
       }
       return id;
     }catch(e){ return 'typing-guest'; }
@@ -111,7 +112,7 @@
     var errors = 0;
     var lastValue = '';
     var topScores = [];
-    var soundEnabled = localStorage.getItem(SOUND_KEY) !== '0';
+    var soundEnabled = storage.getItem(SOUND_KEY) !== '0';
     var audioCtx = null;
     var isComposingIME = false;
     var autoSyncedModes = {};
@@ -120,6 +121,8 @@
     var characterNodes = [];
     var renderedValue = '';
     var renderedCursor = -1;
+    var bestCache = Object.create(null);
+    var scoreRevision = 0, scoreController = new AbortController();
 
 
     function ensureAudio(){
@@ -183,6 +186,17 @@
     function bestKey(){ return BEST_PREFIX + mode; }
     function cacheKey(){ return CACHE_PREFIX + mode; }
     function modeName(){ return mode === 'mixed' ? '中文/中英混打' : '英文'; }
+    function localBest(refresh){
+      if(refresh || bestCache[mode] === undefined){
+        var value = Number(storage.getItem(bestKey()) || 0);
+        bestCache[mode] = Number.isFinite(value) && value > 0 ? value : 0;
+      }
+      return bestCache[mode];
+    }
+    function onBestStorage(event){
+      if(!disposed && (event.key === bestKey() || event.key === null)){ localBest(true); renderStats(); }
+    }
+    window.addEventListener('storage', onBestStorage);
 
     function renderArticle(){
       if(renderedArticle !== article){
@@ -243,7 +257,7 @@
       var pct = Math.min(100, Math.round((input.value.length / article.text.length) * 100));
       setStat(progressEl, pct + '%');
       setStat(errorsEl, String(errors));
-      var best = Number(localStorage.getItem(bestKey()) || 0) || 0;
+      var best = localBest();
       setStat(bestEl, best ? fmt(best) : '--');
     }
 
@@ -263,8 +277,10 @@
 
     function cleanup(){
       disposed = true;
+      scoreController.abort();
       stopTimer();
       window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      window.removeEventListener('storage', onBestStorage);
       if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
       if(window.__songlineTypingPracticeCleanup === cleanup) window.__songlineTypingPracticeCleanup = null;
     }
@@ -307,11 +323,11 @@
     function requestScore(url, options){
       var absolute = /^https?:\/\//i.test(url);
       var baseOptions = absolute ? {mode:'cors', credentials:'omit'} : {credentials:'same-origin'};
-      return fetch(url, Object.assign(baseOptions, options || {})).then(function(res){
+      return fetch(url, Object.assign(baseOptions, options || {}, {signal:scoreController.signal})).then(function(res){
         if(!res.ok) throw new Error('bad status ' + res.status + ' @ ' + url);
         return res.json();
       }).then(function(data){
-        window.SonglineTypingScoresDebug = {endpoint:url, data:data, time:new Date().toISOString()};
+        if(!disposed) window.SonglineTypingScoresDebug = {endpoint:url, data:data, time:new Date().toISOString()};
         return data;
       });
     }
@@ -323,46 +339,59 @@
       function next(){
         if(index >= list.length) throw lastError || new Error('all typing score endpoints failed');
         var url = list[index++];
-        return requestScore(url, options).catch(function(err){ lastError = err; return next(); });
+        return requestScore(url, options).catch(function(err){ if(disposed || err.name === 'AbortError') throw err; lastError = err; return next(); });
       }
       return next();
     }
 
     function loadCache(){
-      try{ topScores = normalizeScores(JSON.parse(localStorage.getItem(cacheKey()) || '[]')); }
+      try{ topScores = normalizeScores(JSON.parse(storage.getItem(cacheKey()) || '[]')); }
       catch(e){ topScores = []; }
     }
-    function saveCache(){ try{ localStorage.setItem(cacheKey(), JSON.stringify(topScores)); }catch(e){} }
+    function saveCache(){ try{ storage.setItem(cacheKey(), JSON.stringify(topScores)); }catch(e){} }
 
     function fetchScores(){
+      var revision = ++scoreRevision, requestedMode = mode;
       loadCache(); renderTopScores();
       return requestAny().then(function(data){
+        if(disposed || revision !== scoreRevision || requestedMode !== mode) return false;
         topScores = normalizeScores(data.scores);
         saveCache(); renderTopScores();
-      }).catch(function(){ renderTopScores(); });
+        return true;
+      }).catch(function(){ if(!disposed && revision === scoreRevision) renderTopScores(); return false; });
+    }
+    function refreshScoresAndSync(delay){
+      var requestedMode = mode;
+      fetchScores().then(function(active){
+        if(!active) return;
+        var revision = scoreRevision;
+        window.setTimeout(function(){ if(!disposed && requestedMode === mode && revision === scoreRevision) syncLocalBest(false); }, delay);
+      });
     }
 
     function recordScore(ms, reason){
       ms = Math.round(Number(ms || 0));
       if(!Number.isFinite(ms) || ms <= 0) return;
+      var revision = ++scoreRevision, requestedMode = mode;
       return requestAny({
         method:'POST',
         headers:{'Content-Type':'application/json'},
         credentials:'same-origin',
         body:JSON.stringify({score:ms, mode:mode, article_id:reason === 'local-best' ? 'local-best' : article.id, player_id:getPlayerID()})
       }).then(function(data){
+        if(disposed || revision !== scoreRevision || requestedMode !== mode) return;
         topScores = normalizeScores(data.scores);
         saveCache(); renderTopScores();
       }).catch(function(){
-        renderTopScores();
+        if(!disposed && revision === scoreRevision) renderTopScores();
       });
     }
 
     function syncLocalBest(manual){
-      var localBest = Number(localStorage.getItem(bestKey()) || 0) || 0;
+      var best = localBest(true);
       if(!manual && autoSyncedModes[mode]) return;
       autoSyncedModes[mode] = true;
-      if(localBest > 0) return recordScore(localBest, 'local-best');
+      if(best > 0) return recordScore(best, 'local-best');
     }
 
     function reset(keepArticle){
@@ -376,7 +405,7 @@
       input.dataset.finalTime = '';
       input.disabled = false;
       textEl.scrollTop = 0;
-      renderArticle(); renderStats(); fetchScores().then(function(){ window.setTimeout(function(){ if(!disposed) syncLocalBest(false); }, 260); });
+      localBest(true); renderArticle(); renderStats(); refreshScoresAndSync(260);
     }
 
     function finishIfDone(){
@@ -388,8 +417,8 @@
         input.dataset.finalTime = String(finalTime);
         stopTimer();
         input.disabled = true;
-        var best = Number(localStorage.getItem(bestKey()) || 0) || 0;
-        if(!best || finalTime < best) localStorage.setItem(bestKey(), String(Math.round(finalTime)));
+        var best = localBest();
+        if(!best || finalTime < best){ bestCache[mode] = Math.round(finalTime); storage.setItem(bestKey(), String(bestCache[mode])); }
         renderStats(); renderArticle(); play('done'); recordScore(finalTime, 'finish');
       }
     }
@@ -465,7 +494,7 @@
       updateSoundToggle();
       soundToggle.addEventListener('click', function(event){
         soundEnabled = !soundEnabled;
-        localStorage.setItem(SOUND_KEY, soundEnabled ? '1' : '0');
+        storage.setItem(SOUND_KEY, soundEnabled ? '1' : '0');
         updateSoundToggle();
         if(soundEnabled){ ensureAudio(); play('button'); }
         if(event.detail > 0) soundToggle.blur();
@@ -473,7 +502,7 @@
     }
 
     chooseArticle();
-    renderArticle(); renderStats(); updateSoundToggle(); fetchScores().then(function(){ window.setTimeout(function(){ if(!disposed) syncLocalBest(false); }, 320); });
+    renderArticle(); renderStats(); updateSoundToggle(); refreshScoresAndSync(320);
   }
 
   function boot(target){

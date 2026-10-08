@@ -9,7 +9,7 @@ for(const [name,script,factory,bestKey,playerKey,cacheKey] of [
   test(name+' automatically syncs under a stable player ID, preserves cache and retries failures',async()=>{
     const storage=new Map([[bestKey,'64']]),posts=[];
     let offline=false;
-    const window={};
+    const window={SonglineRuntime:{storage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)}}};
     vm.runInNewContext(fs.readFileSync(path.join(repo,'static/js/tools',script),'utf8'),{
       window,localStorage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)},
       fetch:async(url,options)=>{

@@ -19,6 +19,7 @@
     var status = panel.querySelector('[data-home-message-compose-status]');
     var list = panel.querySelector('[data-home-message-list]');
     var count = panel.querySelector('[data-home-message-count]');
+    var loadStatus = panel.querySelector('[data-home-message-load-status]');
     var previewToggle = panel.querySelector('[data-home-message-preview-toggle]');
     var preview = panel.querySelector('[data-home-message-preview]');
     var contentField = panel.querySelector('[data-home-message-content-field]');
@@ -31,6 +32,7 @@
     var disposed = false;
     var requestController = new AbortController();
     var pendingMessages = null;
+    var saving = false, hasLoaded = false, messagesRevision = 0, focusTimer = 0;
     var tickerObserver = ticker && typeof ResizeObserver === 'function' ? new ResizeObserver(function(){
       if(tickerMessages.length && !ticker.hidden) renderMessageTicker(tickerMessages);
     }) : null;
@@ -84,6 +86,8 @@
     }
 
     function setState(state, focusTarget){
+      if(disposed) return;
+      window.clearTimeout(focusTimer);
       panel.dataset.homePanelState = state;
       board.setAttribute('aria-hidden', state === 'system' ? 'true' : 'false');
       if(form) form.hidden = state !== 'compose';
@@ -92,7 +96,7 @@
       board.inert = state === 'system';
       window.dispatchEvent(new CustomEvent('songline:home-panel-state', { detail:{ state:state } }));
       if(focusTarget){
-        window.setTimeout(function(){ if(!disposed && focusTarget.isConnected) focusTarget.focus(); }, 260);
+        focusTimer = window.setTimeout(function(){ if(!disposed && panel.dataset.homePanelState === state && focusTarget.isConnected) focusTarget.focus({preventScroll:true}); }, 260);
       }
     }
 
@@ -108,22 +112,40 @@
     function requestAny(options){
       var tries = endpoints();
       var index = 0;
+      var reading = !options || options.method === 'GET';
       function next(lastError){
         if(index >= tries.length) return Promise.reject(lastError || new Error('request failed'));
         var url = tries[index++];
         var absolute = /^https?:\/\//i.test(url);
-        var requestOptions = Object.assign(absolute ? {mode:'cors', credentials:'omit'} : {credentials:'same-origin'}, {signal:requestController.signal}, options || {});
+        var controller = new AbortController(), timedOut = false;
+        function abort(){ controller.abort(); }
+        requestController.signal.addEventListener('abort', abort, {once:true});
+        if(requestController.signal.aborted) abort();
+        var timeout = window.setTimeout(function(){ timedOut = true; abort(); }, 8000);
+        var requestOptions = Object.assign(absolute ? {mode:'cors', credentials:'omit'} : {credentials:'same-origin'}, options || {}, {signal:controller.signal});
         return fetch(url, requestOptions).then(function(response){
           return response.json().catch(function(){ return {}; }).then(function(data){
             if(!response.ok){
               var error = new Error(data.error || 'request failed');
               error.status = response.status;
-              error.noFallback = response.status >= 400 && response.status < 500;
+              // A missing endpoint can be tried elsewhere. Never replay a
+              // possibly accepted write after a timeout/network/5xx failure.
+              error.noFallback = response.status !== 404 && response.status !== 405 && (!reading || response.status < 500);
               throw error;
+            }
+            if(!data || !Object.prototype.hasOwnProperty.call(data, 'messages') || data.messages !== null && !Array.isArray(data.messages)){
+              var invalid = new Error(reading ? '留言服务返回格式异常，请稍后重新打开。' : '提交响应异常，请先重新打开留言板确认是否已发布。');
+              invalid.noFallback = !reading; throw invalid;
             }
             return data;
           });
-        }).catch(function(error){ return disposed || (error && (error.noFallback || error.name === 'AbortError')) ? Promise.reject(error) : next(error); });
+        }).finally(function(){ window.clearTimeout(timeout); requestController.signal.removeEventListener('abort', abort); }).catch(function(error){
+          if(timedOut) error = new Error(reading ? '留言加载超时，请稍后重新打开。' : '提交超时，请先重新打开留言板确认是否已发布，避免重复提交。');
+          else if(!reading && !disposed && error && !error.status && !error.noFallback) error = new Error('提交结果未确认，请重新打开留言板检查后再试。');
+          var missingEndpoint = error && (error.status === 404 || error.status === 405);
+          if(disposed || (error && error.noFallback) || (!reading && !missingEndpoint)) return Promise.reject(error);
+          return next(error);
+        });
       }
       return next();
     }
@@ -160,12 +182,13 @@
     function focusLayer(){
       var layer = document.querySelector('[data-home-message-focus]');
       if(layer) return layer;
-      layer = document.createElement('section');
+      layer = document.createElement('dialog');
       layer.className = 'songline-home-message-focus';
       layer.hidden = true;
       layer.setAttribute('data-home-message-focus', '');
       layer.setAttribute('aria-hidden', 'true');
-      layer.innerHTML = '<article class="songline-home-message-focus-panel" role="dialog" aria-modal="true" aria-label="留言详情" tabindex="-1">' +
+      layer.setAttribute('aria-label', '留言详情');
+      layer.innerHTML = '<article class="songline-home-message-focus-panel" tabindex="-1">' +
         '<button class="songline-home-message-focus-close" type="button" data-home-message-focus-close aria-label="关闭留言">×</button>' +
         '<header data-home-message-focus-meta></header><div class="songline-home-message-focus-content" data-home-message-focus-content></div></article>';
       document.body.appendChild(layer);
@@ -174,17 +197,18 @@
 
     var focus = focusLayer();
     var focusReturn = null;
-    function closeFocus(){
+    function closeFocus(restoreFocus){
       if(focus.hidden) return;
+      if(focus.open) focus.close();
       focus.hidden = true;
       focus.setAttribute('aria-hidden', 'true');
       document.documentElement.classList.remove('is-home-message-focus-open');
-      if(focusReturn) focusReturn.focus();
+      if(restoreFocus !== false && focusReturn && focusReturn.isConnected) focusReturn.focus({preventScroll:true});
       focusReturn = null;
     }
 
     function openFocus(message, trigger){
-      if(!message) return;
+      if(disposed || !message) return;
       var avatar = message.avatar || '/uploads/admin/friends/user-null.png';
       focus.querySelector('[data-home-message-focus-meta]').innerHTML = '<img src="' + escapeHTML(avatar) + '" alt="" referrerpolicy="no-referrer">' +
         '<div><b>' + escapeHTML(message.name || '匿名') + '</b><time>' + escapeHTML(formatTime(message.created_at)) + '</time></div>';
@@ -193,36 +217,51 @@
       focus.hidden = false;
       focus.setAttribute('aria-hidden', 'false');
       document.documentElement.classList.add('is-home-message-focus-open');
-      window.setTimeout(function(){ focus.querySelector('.songline-home-message-focus-panel').focus(); }, 0);
+      if(!focus.open) focus.showModal();
+      focus.querySelector('.songline-home-message-focus-panel').focus({preventScroll:true});
     }
 
     var closeFocusButton = focus.querySelector('[data-home-message-focus-close]');
     function onFocusLayerClick(event){ if(event.target === focus) closeFocus(); }
-    function onFocusKeydown(event){ if(event.key === 'Escape') closeFocus(); }
+    function onFocusCancel(event){ event.preventDefault(); closeFocus(); }
+    function onFocusClose(){ if(!focus.open) closeFocus(); }
+    function onFocusDismiss(){ closeFocus(); }
     focus.addEventListener('click', onFocusLayerClick);
-    closeFocusButton.addEventListener('click', closeFocus);
-    document.addEventListener('keydown', onFocusKeydown);
+    closeFocusButton.addEventListener('click', onFocusDismiss);
+    focus.addEventListener('cancel', onFocusCancel);
+    focus.addEventListener('close', onFocusClose);
 
     function cleanup(){
+      if(disposed) return;
       disposed = true;
       requestController.abort();
-      closeFocus();
+      closeFocus(false);
+      window.clearTimeout(focusTimer);
       window.clearTimeout(tickerTimer);
       window.cancelAnimationFrame(tickerFrame);
       tickerTimer = 0;
       if(tickerObserver) tickerObserver.disconnect();
       focus.removeEventListener('click', onFocusLayerClick);
-      closeFocusButton.removeEventListener('click', closeFocus);
-      document.removeEventListener('keydown', onFocusKeydown);
+      closeFocusButton.removeEventListener('click', onFocusDismiss);
+      focus.removeEventListener('cancel', onFocusCancel);
+      focus.removeEventListener('close', onFocusClose);
       if(ticker) ticker.removeEventListener('click', openMessageBoard);
       goto.removeEventListener('click', openMessageBoard);
       back.removeEventListener('click', closeMessageBoard);
       window.removeEventListener('songline:page-swap', onPageSwap);
+      window.removeEventListener('songline:page-transition-start', onDeparture);
+      window.removeEventListener('pagehide', onPageHide);
       if(focus.parentNode) focus.parentNode.removeChild(focus);
       if(window.__songlineHomeMessageBoardCleanup === cleanup) window.__songlineHomeMessageBoardCleanup = null;
     }
     function onPageSwap(){ if(!panel.isConnected) cleanup(); }
+    // Close the modal before the transition: a native top-layer dialog would
+    // otherwise cover the loading scene until main is finally replaced.
+    function onDeparture(){ closeFocus(false); window.clearTimeout(focusTimer); }
+    function onPageHide(event){ if(event.persisted) onDeparture(); else cleanup(); }
     window.addEventListener('songline:page-swap', onPageSwap);
+    window.addEventListener('songline:page-transition-start', onDeparture);
+    window.addEventListener('pagehide', onPageHide);
     window.__songlineHomeMessageBoardCleanup = cleanup;
 
     function updatePreview(){
@@ -232,6 +271,7 @@
 
     function renderMessages(messages){
       if(disposed) return;
+      hasLoaded = true; messagesRevision++;
       messages = Array.isArray(messages) ? messages : [];
       var currentMessages = messages;
       if(count) count.textContent = String(messages.length);
@@ -249,13 +289,22 @@
       Array.prototype.forEach.call(list.querySelectorAll('[data-home-message-entry]'), function(entry){
         function open(){ openFocus(currentMessages[Number(entry.dataset.homeMessageIndex)], entry); }
         entry.addEventListener('click', open);
-        entry.addEventListener('keydown', function(event){ if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); open(); } });
+        entry.addEventListener('keydown', function(event){ if(!event.defaultPrevented && !event.isComposing && event.keyCode !== 229 && !event.repeat && (event.key === 'Enter' || event.key === ' ')){ event.preventDefault(); open(); } });
       });
     }
 
     function loadMessages(){
       if(pendingMessages) return pendingMessages;
-      pendingMessages = requestAny({method:'GET'}).then(function(data){ renderMessages(data.messages); return data.messages || []; })
+      var revision = messagesRevision;
+      if(loadStatus){ loadStatus.hidden = false; loadStatus.textContent = '正在加载留言…'; }
+      if(count && !hasLoaded) count.textContent = '—';
+      pendingMessages = requestAny({method:'GET'}).then(function(data){
+        if(!disposed){ if(revision === messagesRevision) renderMessages(data.messages); if(loadStatus) loadStatus.hidden = true; }
+        return data.messages || [];
+      }).catch(function(error){
+        if(!disposed && loadStatus){ loadStatus.hidden = false; loadStatus.textContent = '留言暂时无法加载，请稍后重新打开。'; }
+        throw error;
+      })
         .finally(function(){ pendingMessages = null; });
       return pendingMessages;
     }
@@ -280,6 +329,9 @@
     if(previewToggle && preview && contentField){
       previewToggle.addEventListener('click', function(){
         var active = preview.hidden;
+        if(active && messageInput && !messageInput.value.trim()){
+          if(status) status.textContent = '请先写下留言。'; messageInput.focus(); return;
+        }
         updatePreview();
         preview.hidden = !active;
         contentField.hidden = active;
@@ -291,15 +343,19 @@
     if(form){
       form.addEventListener('submit', function(event){
         event.preventDefault();
+        if(disposed || saving) return;
         var submit = form.querySelector('button[type="submit"]');
         var payload = {
           qq: (form.elements.qq && form.elements.qq.value || '').trim(),
           name: (form.elements.name && form.elements.name.value || '').trim(),
           content: (form.elements.content && form.elements.content.value || '').trim()
         };
+        if(!payload.content){ if(status) status.textContent = '请先写下留言。'; return; }
+        saving = true;
         if(submit) submit.disabled = true;
         if(status) status.textContent = '正在保存…';
         requestAny({method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(function(data){
+          if(disposed) return;
           renderMessages(data.messages);
           form.reset();
           if(preview){ preview.hidden = true; preview.innerHTML = ''; }
@@ -308,8 +364,8 @@
           if(status) status.textContent = '';
           setState('message', openCompose);
         }).catch(function(error){
-          if(status) status.textContent = error && error.message ? error.message : '保存失败，请稍后重试。';
-        }).finally(function(){ if(submit) submit.disabled = false; });
+          if(!disposed && status) status.textContent = error && error.message ? error.message : '保存失败，请稍后重试。';
+        }).finally(function(){ saving = false; if(!disposed && submit) submit.disabled = false; });
       });
     }
     board.inert = true;

@@ -1,5 +1,6 @@
 (function(){
   'use strict';
+  var storage = window.SonglineRuntime.storage;
 
   var VERSION = '20.20.6';
   var BEST_KEY = 'songline-reaction-best-v1';
@@ -13,11 +14,11 @@
 
   function getPlayerID(){
     try{
-      var id = localStorage.getItem(PLAYER_KEY);
+      var id = storage.getItem(PLAYER_KEY);
       if(!id){
         var rnd = Math.random().toString(36).slice(2, 10);
         id = 'r-' + Date.now().toString(36) + '-' + rnd;
-        localStorage.setItem(PLAYER_KEY, id);
+        storage.setItem(PLAYER_KEY, id);
       }
       return id;
     }catch(e){
@@ -45,11 +46,11 @@
     var readyAt = 0;
     var timer = 0;
     var lastResult = 0;
-    var best = Number(localStorage.getItem(BEST_KEY) || 0) || 0;
+    var best = Number(storage.getItem(BEST_KEY) || 0) || 0;
     var topScores = [];
     var scoreRecorded = false;
     var audioCtx = null;
-    var soundEnabled = localStorage.getItem(SOUND_KEY) !== '0';
+    var soundEnabled = storage.getItem(SOUND_KEY) !== '0';
     var autoSyncedLocalBest = false;
     var disposed = false;
     function cleanup(){
@@ -210,12 +211,12 @@
     }
 
     function loadCache(){
-      try{ topScores = normalizeScores(JSON.parse(localStorage.getItem(CACHE_KEY) || '[]')); }
+      try{ topScores = normalizeScores(JSON.parse(storage.getItem(CACHE_KEY) || '[]')); }
       catch(e){ topScores = []; }
     }
 
     function saveCache(){
-      try{ localStorage.setItem(CACHE_KEY, JSON.stringify(topScores)); }catch(e){}
+      try{ storage.setItem(CACHE_KEY, JSON.stringify(topScores)); }catch(e){}
     }
 
     function requestScore(url, options){
@@ -282,7 +283,7 @@
     }
 
     function syncLocalBest(manual){
-      var localBest = Number(localStorage.getItem(BEST_KEY) || best || 0) || 0;
+      var localBest = Number(storage.getItem(BEST_KEY) || best || 0) || 0;
       if(!manual && autoSyncedLocalBest) return;
       autoSyncedLocalBest = true;
       if(localBest > 0) return submitScore(localBest, 'local-best');
@@ -330,7 +331,7 @@
       lastResult = ms;
       if(!best || ms < best){
         best = ms;
-        localStorage.setItem(BEST_KEY, String(best));
+        storage.setItem(BEST_KEY, String(best));
       }
       renderStats();
       setClass('result');
@@ -371,7 +372,7 @@
       updateSoundToggle();
       soundToggle.addEventListener('click', function(event){
         soundEnabled = !soundEnabled;
-        localStorage.setItem(SOUND_KEY, soundEnabled ? '1' : '0');
+        storage.setItem(SOUND_KEY, soundEnabled ? '1' : '0');
         updateSoundToggle();
         if(soundEnabled){
           ensureAudio();

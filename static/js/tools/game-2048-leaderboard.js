@@ -1,9 +1,9 @@
-(function(){'use strict';function createLeaderboard(options){options=options||{};var topScoresEl=options.topScoresEl,scoresCacheKey=options.cacheKey,playerKey=options.playerKey||'songline-2048-player-id-v1',topScores=[],submittedScores={};if(!scoresCacheKey||typeof options.getBest!=='function')return null;    function getPlayerID(){
+(function(){'use strict';var storage=window.SonglineRuntime.storage;function createLeaderboard(options){options=options||{};var topScoresEl=options.topScoresEl,scoresCacheKey=options.cacheKey,playerKey=options.playerKey||'songline-2048-player-id-v1',topScores=[],submittedScores={};if(!scoresCacheKey||typeof options.getBest!=='function')return null;    function getPlayerID(){
       try{
-        var id = localStorage.getItem(playerKey);
+        var id = storage.getItem(playerKey);
         if(!id){
           id = 'g2048-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-          localStorage.setItem(playerKey, id);
+          storage.setItem(playerKey, id);
         }
         return id;
       }catch(e){
@@ -44,11 +44,11 @@ function game2048ScoreEndpoints(){
     }
 
     function cacheTopScores(){
-      try{ localStorage.setItem(scoresCacheKey, JSON.stringify(topScores)); }catch(e){}
+      try{ storage.setItem(scoresCacheKey, JSON.stringify(topScores)); }catch(e){}
     }
 
     function loadCachedTopScores(){
-      try{ topScores = normalizeScores(JSON.parse(localStorage.getItem(scoresCacheKey) || '[]')); }
+      try{ topScores = normalizeScores(JSON.parse(storage.getItem(scoresCacheKey) || '[]')); }
       catch(e){ topScores = []; }
     }
 
@@ -129,7 +129,7 @@ function game2048ScoreEndpoints(){
     }
 
     function syncLocalBest(){
-      var localBest = Number(localStorage.getItem(options.bestKey) || options.getBest() || 0) || 0;
+      var localBest = Number(storage.getItem(options.bestKey) || options.getBest() || 0) || 0;
       if(localBest > 0){
         return recordTopScore(localBest, 'local-best');
       }

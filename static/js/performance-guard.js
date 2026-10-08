@@ -17,6 +17,29 @@
   var idleTasks = Object.create(null);
   var rafTasks = Object.create(null);
 
+  // Optional persistence must never prevent a tool from starting or finishing.
+  // Only failed writes are shadowed; normal reads still observe external edits.
+  function createSafeStorage(){
+    var fallback = new Map();
+    return {
+      getItem:function(key){
+        key = String(key);
+        if(fallback.has(key)) return fallback.get(key);
+        try{ return window.localStorage.getItem(key); }catch(e){ return null; }
+      },
+      setItem:function(key,value){
+        key = String(key); value = String(value);
+        try{ window.localStorage.setItem(key,value); fallback.delete(key); }
+        catch(e){ fallback.set(key,value); }
+      },
+      removeItem:function(key){
+        key = String(key);
+        try{ window.localStorage.removeItem(key); fallback.delete(key); }
+        catch(e){ fallback.set(key,null); }
+      }
+    };
+  }
+
   function cancelIdle(key){
     var task = idleTasks[key];
     if(!task) return;
@@ -315,6 +338,7 @@
 
   window.SonglineRuntime = {
     version: VERSION,
+    storage: createSafeStorage(),
     profile: function(){ return perfProfile || applyPerfProfile(); },
     idle: scheduleIdle,
     raf: scheduleRaf,
