@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -53,6 +54,17 @@ func TestSyncHugoPublicDataUsesBuildRootAndVisibleDataDir(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(buildRoot, "hugo-data", "site.json")); err != nil {
 		t.Fatalf("public Hugo data was not written into build root: %v", err)
+	}
+	publicSite, err := os.ReadFile(filepath.Join(buildRoot, "hugo-data", "site.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var settings SiteSettings
+	if err := json.Unmarshal(publicSite, &settings); err != nil {
+		t.Fatal(err)
+	}
+	if settings.Comments != defaultCommentSettings() {
+		t.Fatalf("legacy settings did not expose comment configuration: %+v", settings.Comments)
 	}
 	if _, err := os.Stat(filepath.Join(root, "shared", "hugo-data", "site.json")); !os.IsNotExist(err) {
 		t.Fatalf("public Hugo data must not be derived from shared content root, err=%v", err)

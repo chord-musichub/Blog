@@ -1,4 +1,11 @@
 {
+  "comments": {
+    "enabled": true,
+    "repo": "chord-musichub/Blog-comments",
+    "repo_id": "R_kgDOVAXXbA",
+    "category": "Announcements",
+    "category_id": "DIC_kwDOVAXXbM4DHTm4"
+  },
   "site": {
     "title": "Welcome home",
     "display_name": "songline-blog",

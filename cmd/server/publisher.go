@@ -104,6 +104,12 @@ func (app *App) syncHugoPublicData() error {
 		if err != nil {
 			return err
 		}
+		if name == "site.json" {
+			data, err = app.publicSiteComments(data)
+			if err != nil {
+				return err
+			}
+		}
 		if err := os.WriteFile(target, data, 0644); err != nil {
 			return err
 		}

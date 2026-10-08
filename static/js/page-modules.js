@@ -20,6 +20,7 @@
 
   function syncPageStyles(root){
     var path = window.location.pathname || '';
+    if(query(root, '[data-article-comments]')) ensureStylesheet('songline-article-comments-style', '/css/pages/content/article-comments.css');
     // /posts/ 是档案列表，不是阅读页；用实际阅读容器判断可避免把文章阅读规则
     // 注入归档页，尤其是在无刷新过场后造成列表样式被污染。
     var isArticleSurface = path.indexOf('/tools/markdown-previewer/') === 0 || !!query(root, '.markdown-body, [data-article-renderer="songline-markdown"]');
@@ -176,6 +177,12 @@
       init:function(root){
         if(window.SonglineEnhanceMarkdown) window.SonglineEnhanceMarkdown(root || document);
       }
+    },
+    {
+      key:'article-comments',
+      src:'/js/pages/content/article-comments.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-article-comments]'); },
+      init:function(root){ window.SonglineInitArticleComments(root || document); }
     },
     {
       key:'search-utils',
@@ -405,7 +412,7 @@
     'audio-metadata':'SonglineAudioMetadata', 'home-music':'SonglineInitHomeMusic',
     'audio-visualizer-renderer':'SonglineCreateAudioVisualizerRenderer', 'audio-visualizer':'SonglineInitAudioVisualizer',
     'mobile-toc':'SonglineInitMobileToc', 'reader-floating-controls':'SonglineNormalizeFloatReadingButtons',
-    'content-archive':'SonglineInitContentArchive'
+    'content-archive':'SonglineInitContentArchive', 'article-comments':'SonglineInitArticleComments'
   };
   var dependencies = {
     'search':['search-utils'], 'markdown-previewer':['markdown-renderer','article-reading','article-toc-controls'],

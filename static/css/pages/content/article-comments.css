@@ -1,0 +1,18 @@
+/* Isolated from the reader/previewer; match the centered reading column. */
+html body .article-comments{
+  width:min(100%,960px);margin:24px auto;padding:clamp(18px,3vw,30px);
+  box-sizing:border-box;min-width:0;
+}
+.article-comments__heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.article-comments__heading h2{margin:0;font-size:1.2rem}
+.article-comments__heading a{font-size:.88rem;color:var(--muted);text-decoration:none;white-space:nowrap}
+.article-comments__heading a:hover{color:var(--accent)}
+.article-comments__status{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;min-height:64px}
+.article-comments__status p{margin:0;color:var(--muted);font-size:.94rem}
+.article-comments__status button{min-height:44px;padding:8px 16px;border:1px solid var(--border);border-radius:999px;background:transparent;color:inherit;cursor:pointer;transition:background .18s ease}
+.article-comments__status button:hover{background:rgba(128,128,128,.12)}
+.article-comments :is(a,button):focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.article-comments iframe{display:block;width:100%;min-height:150px;border:0;color-scheme:normal;opacity:0;transition:opacity .2s ease}
+.article-comments[data-state="ready"] iframe{opacity:1}
+.article-comments [hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){.article-comments iframe,.article-comments__status button{transition:none}}

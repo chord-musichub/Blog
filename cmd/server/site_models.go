@@ -28,7 +28,17 @@ type SiteSettings struct {
 	Background   BackgroundSettings `json:"background"`
 	AboutCard    AboutCard          `json:"about_card"`
 	Social       SocialSettings     `json:"social"`
+	Comments     CommentSettings    `json:"comments"`
 	ContentAreas []ContentArea      `json:"content_areas"`
+}
+
+// CommentSettings contains public giscus identifiers only, never OAuth secrets.
+type CommentSettings struct {
+	Enabled    bool   `json:"enabled"`
+	Repo       string `json:"repo"`
+	RepoID     string `json:"repo_id"`
+	Category   string `json:"category"`
+	CategoryID string `json:"category_id"`
 }
 
 type SiteBasic struct {

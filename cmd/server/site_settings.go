@@ -97,6 +97,7 @@ func defaultSiteSettings() SiteSettings {
 		Background: BackgroundSettings{Image: "", Height: "420px", Blur: "18px", Opacity: "0.38"},
 		AboutCard:  AboutCard{Title: "关于本站", AvatarText: "B", Name: "Blog", Body: "这是一个记录学习、创作与生活的个人博客。\n在这里，分享思考，沉淀成长，遇见更好的自己。"},
 		Social:     SocialSettings{GitHub: "https://github.com/", Email: "mailto:hello@example.com", Bilibili: "https://space.bilibili.com/", ShowGitHub: true, ShowEmail: true, ShowBilibili: true, BilibiliIcon: "/uploads/admin/logo/bilibili.png"},
+		Comments:   defaultCommentSettings(),
 		ContentAreas: []ContentArea{
 			{Title: "技术笔记", Description: "记录开发过程中的知识、踩坑与解决方案。", Icon: "code", Link: "/tags/技术笔记/"},
 			{Title: "创作记录", Description: "设计、写作、摄影等创作过程与灵感。", Icon: "pen", Link: "/tags/创作记录/"},

@@ -58,6 +58,8 @@
 <script defer src="/js/article-toc-controls.js?v={{ partial "asset-version.html" . }}"></script>
 <script defer src="/js/article-download.js?v={{ partial "asset-version.html" . }}"></script>
 
+{{ partial "article-comments.html" . }}
+
 {{ $pages := where .Site.RegularPages "Section" "posts" }}
 <section class="article-explore" aria-label="继续阅读">
   <div class="article-explore__sequence">

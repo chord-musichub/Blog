@@ -61,6 +61,19 @@
     </section>
 
     <section class="card admin-settings-card">
+      <h2>文章留言</h2>
+      <input type="hidden" name="comments_present" value="1">
+      <label class="check"><input type="checkbox" name="comments_enabled" {{if .Settings.Comments.Enabled}}checked{{end}}> 启用 GitHub 留言</label>
+      <div class="grid2">
+        <label>公开仓库<input name="comments_repo" value="{{.Settings.Comments.Repo}}" placeholder="用户名/仓库名"></label>
+        <label>仓库 ID<input name="comments_repo_id" value="{{.Settings.Comments.RepoID}}"></label>
+        <label>讨论分类<input name="comments_category" value="{{.Settings.Comments.Category}}"></label>
+        <label>分类 ID<input name="comments_category_id" value="{{.Settings.Comments.CategoryID}}"></label>
+      </div>
+      <p>从 <a href="https://giscus.app/zh-CN" target="_blank" rel="noopener noreferrer">giscus 配置页</a>复制公开配置，无需 Token。留言默认公开，在 GitHub Discussions 管理。</p>
+    </section>
+
+    <section class="card admin-settings-card">
       <h2>联系我</h2>
       <div class="grid2">
         <label>GitHub 链接<input name="github" value="{{.Settings.Social.GitHub}}"></label>

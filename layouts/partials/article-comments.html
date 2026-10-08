@@ -1,0 +1,20 @@
+{{ $comments := .Site.Data.site.comments }}
+{{ if and (eq .Section "posts") $comments.enabled $comments.repo $comments.repo_id $comments.category $comments.category_id }}
+{{ $id := .Params.comment_id | default .Params.article_id | default .File.UniqueID }}
+<section class="card article-comments" id="article-comments" aria-labelledby="article-comments-title"
+  data-article-comments data-repo="{{ $comments.repo }}" data-repo-id="{{ $comments.repo_id }}"
+  data-category="{{ $comments.category }}" data-category-id="{{ $comments.category_id }}"
+  data-term="{{ printf "songline:article:%s" $id }}" data-backlink="{{ .Permalink }}"
+  data-description="{{ .Title }}" data-state="idle">
+  <header class="article-comments__heading">
+    <h2 id="article-comments-title">留言</h2>
+    <a href="https://github.com/{{ $comments.repo }}/discussions" target="_blank" rel="noopener noreferrer" data-no-page-transition>GitHub ↗</a>
+  </header>
+  <div class="article-comments__status" data-comments-status hidden>
+    <p data-comments-message role="status">使用 GitHub 登录留言</p>
+    <button type="button" data-comments-load>加载留言</button>
+  </div>
+  <div data-comments-mount></div>
+  <noscript><p>请启用 JavaScript 加载留言，或前往上方 GitHub 讨论区。</p></noscript>
+</section>
+{{ end }}

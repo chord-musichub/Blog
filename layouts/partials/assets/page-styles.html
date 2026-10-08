@@ -53,6 +53,10 @@
 <link id="songline-article-reader-style" rel="stylesheet" href="/css/pages/content/article-reader.css?v={{ $assetVersion }}">
 <link id="songline-reader-floating-controls-style" rel="stylesheet" href="/css/pages/content/reader-floating-controls.css?v={{ $assetVersion }}">
 {{ end }}
+{{ $comments := .Site.Data.site.comments }}
+{{ if and .IsPage (eq .Section "posts") $comments.enabled $comments.repo $comments.repo_id $comments.category $comments.category_id }}
+<link id="songline-article-comments-style" rel="stylesheet" href="/css/pages/content/article-comments.css?v={{ $assetVersion }}">
+{{ end }}
 {{ if hasPrefix .RelPermalink "/tools/markdown-previewer/" }}
 <link id="songline-markdown-previewer-style" rel="stylesheet" href="/css/tools/markdown-previewer.css?v={{ $assetVersion }}">
 {{ end }}

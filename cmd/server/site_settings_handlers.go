@@ -98,6 +98,20 @@ func (app *App) handleSiteSettings(w http.ResponseWriter, r *http.Request) {
 	settings.Social.ShowGitHub = r.FormValue("show_github") == "on"
 	settings.Social.ShowEmail = r.FormValue("show_email") == "on"
 	settings.Social.ShowBilibili = r.FormValue("show_bilibili") == "on"
+	// An older open settings form must not silently reset the new feature.
+	if r.FormValue("comments_present") == "1" {
+		settings.Comments, err = normalizeCommentSettings(CommentSettings{
+			Enabled: r.FormValue("comments_enabled") == "on",
+			Repo:    r.FormValue("comments_repo"), RepoID: r.FormValue("comments_repo_id"),
+			Category: r.FormValue("comments_category"), CategoryID: r.FormValue("comments_category_id"),
+		})
+		if err != nil {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.WriteHeader(http.StatusBadRequest)
+			app.render(w, "site_settings.html", map[string]any{"User": u, "Settings": settings, "Error": err.Error(), "SettingsSection": "site"})
+			return
+		}
+	}
 
 	if err := app.saveSiteSettings(settings); err != nil {
 		http.Error(w, "保存站点设置失败: "+err.Error(), 500)
