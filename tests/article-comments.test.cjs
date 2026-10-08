@@ -1,6 +1,11 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 const code=fs.readFileSync(path.join(__dirname,'../static/js/pages/content/article-comments.js'),'utf8');
+test('widget canvas supports transparency independently of browser color preference',()=>{
+ const css=fs.readFileSync(path.join(__dirname,'../static/css/pages/content/article-comments.css'),'utf8');
+ assert.match(css,/\.article-comments iframe\s*\{[^}]*color-scheme\s*:\s*light dark\s*[;}]/);
+ assert.doesNotMatch(css,/color-scheme\s*:\s*normal\b/);
+});
 function fixture({url='https://blog.test/posts/one/',stored,blocked=false,io=true}={}){
  const listeners=new Map(),timers=new Map(),observers=[],replaces=[],posts=[],storage=new Map();let clock=0;
  if(stored!==undefined)storage.set('giscus-session',stored);

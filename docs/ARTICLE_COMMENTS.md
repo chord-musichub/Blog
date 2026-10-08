@@ -24,6 +24,7 @@
 - 消息必须来自 `https://giscus.app` 且 source 为当前 iframe；合法高度才显示 iframe，避免空白闪屏。`Discussion not found` 是首评前正常状态；错误、过期登录和限流有独立处理。
 - 登录使用 giscus 的 `giscus-session` 存储约定。OAuth 返回立即去掉网址中的 `giscus` 参数，保留原 history.state、其他查询参数和锚点。禁用浏览器存储时本页面内存仍可用；刷新后需再次登录。
 - 深色使用 `transparent_dark`，浅色使用 `light`，网站切换主题时通过 `setConfig` 同步。离页/pagehide 释放 iframe、监听、观察器和 timer；离场 DOM 标记防止过场中的迟到扫描重新绑定，BFCache 回来由调度器重新初始化。
+- iframe 使用官方 `default.css` 的 `color-scheme:light dark`，允许透明画布。不能改成 `normal` 或仅指定网站当前配色；浏览器偏好与网站主题不同时可能强制绘制黑/白底，遮住外层玻璃面板。测试需覆盖系统深色下的网站浅色及相反组合。
 - 阅读统计开关不控制第三方留言请求。国内网络可能无法连接 giscus/GitHub；错误降级不代表网络问题已经消除，不代理登录、不自动重试轰炸服务。
 
 ## 验证

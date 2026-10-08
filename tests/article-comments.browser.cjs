@@ -12,7 +12,9 @@ addEventListener('message',e=>{if(e.source!==parent||e.origin!==parentOrigin||!e
 if(params.get('session')==='expired')send({error:'Bad credentials'});else {send({error:'Discussion not found'});send({resizeHeight:220});}
 </script></body></html>`;
 async function fixture(browser,width,theme,{blocked=false,silent=false,disabled=false,live=false,noJS=false}={}){
- const context=await browser.newContext({viewport:{width,height:900},hasTouch:width<981,isMobile:width<981,reducedMotion:'reduce',javaScriptEnabled:!noJS});
+ // Deliberately oppose the site's theme: matching OS/site preferences missed
+ // opaque cross-origin iframe canvases in the original regression matrix.
+ const context=await browser.newContext({viewport:{width,height:900},colorScheme:theme==='light'?'dark':'light',hasTouch:width<981,isMobile:width<981,reducedMotion:'reduce',javaScriptEnabled:!noJS});
  const errors=[],requests=[],writes=[];
  await context.addInitScript(({theme,blocked})=>{
   localStorage.setItem('songline-theme',theme);sessionStorage.setItem('songline-home-boot-v21.4','1');
@@ -59,6 +61,7 @@ async function navigate(page,url){await page.evaluate(url=>SonglinePageTransitio
    assert.equal(firstTerm,'songline:article:2588cc774d5795c2');
    await page.locator('[data-article-comments]').scrollIntoViewIfNeeded();await commentsReady(page);
    assert.equal(f.requests.length,1);assert.equal(f.requests[0].searchParams.get('term'),firstTerm);
+   assert.equal(await page.locator('iframe.giscus-frame').evaluate(el=>getComputedStyle(el).colorScheme),'light dark','Transparent widget supports both browser color schemes');
    assert.equal(await page.evaluate(()=>commentListeners.size),1);
    await page.evaluate(()=>{SonglineInitArticleComments(document);SonglineInitArticleComments(document);});
    assert.equal(f.requests.length,1);assert.equal(await page.locator('iframe.giscus-frame').count(),1);
@@ -113,12 +116,31 @@ async function navigate(page,url){await page.evaluate(url=>SonglinePageTransitio
   assert.equal(noJS.requests.length,0);assert.equal(await noJS.page.locator('[data-comments-load]').isVisible(),false);
   assert.equal(await noJS.page.locator('.article-comments noscript p').isVisible(),true);assert.equal(await noJS.page.locator('.article-comments a').getAttribute('href'),'https://github.com/chord-musichub/Blog-comments/discussions');await noJS.context.close();
   if(process.env.RUN_GISCUS_LIVE==='1'){
-   const live=await fixture(browser,390,'dark',{live:true});await live.page.goto(base+'/posts/c-note/#article-comments');await ready(live.page);await commentsReady(live.page);
+   for(const theme of ['dark','light']){
+   const live=await fixture(browser,390,theme,{live:true});await live.page.goto(base+'/posts/c-note/#article-comments');await ready(live.page);await live.page.locator('[data-article-comments]').scrollIntoViewIfNeeded();await commentsReady(live.page);
    const frame=live.page.frames().find(frame=>frame.url().startsWith('https://giscus.app'));
    await frame.waitForFunction(()=>document.body.innerText.includes('GitHub'),{},{timeout:20000}).catch(async error=>{console.error('Live widget text:',await frame.locator('body').innerText());throw error;});
    assert((await frame.locator('body').innerText()).includes('GitHub'));
-   await live.page.screenshot({path:path.join(out,'live-comments-390-dark.png')});
-   console.log('PASS live public giscus rendering; no login/comment submission');await live.context.close();
+   assert.equal(await live.page.locator('iframe.giscus-frame').evaluate(el=>getComputedStyle(el).colorScheme),'light dark');
+   assert((await frame.locator('#giscus-theme').getAttribute('href')).endsWith('/'+(theme==='dark'?'transparent_dark':'light')+'.css'));
+   const panel=live.page.locator('[data-article-comments]'),iframe=live.page.locator('iframe.giscus-frame');
+   const panelBox=await panel.boundingBox(),frameBox=await iframe.boundingBox();
+   const screenshot=await panel.screenshot({path:path.join(out,'live-comments-390-'+theme+'.png')});
+   // Compare the empty corner of the actual third-party canvas to its adjacent
+   // glass panel. Computed backgroundColor alone stays transparent even when
+   // Chromium paints an opaque black/white cross-origin canvas underneath.
+   const png=require('pngjs').PNG.sync.read(screenshot);
+   const x=Math.floor(frameBox.x-panelBox.x),y=Math.floor(frameBox.y-panelBox.y)+2;
+   const at=(x,y)=>[...png.data.subarray((y*png.width+x)*4,(y*png.width+x)*4+3)];
+   const canvas=at(x+2,y),glass=at(x-4,y);
+   assert(canvas.every((v,i)=>Math.abs(v-glass[i])<40),'Widget canvas must show the glass panel: '+JSON.stringify({theme,canvas,glass}));
+   // Theme changes must update the existing widget without reloading it.
+   const target=theme==='light'?'dark':'light';
+   await live.page.evaluate(theme=>document.documentElement.setAttribute('data-theme',theme),target);
+   await frame.waitForFunction(target=>document.querySelector('#giscus-theme')?.href.endsWith('/'+(target==='dark'?'transparent_dark':'light')+'.css'),target);
+   assert.equal(live.requests.length,1);assert.deepEqual(live.errors,[]);assert.deepEqual(live.writes,[]);
+   console.log('PASS live public giscus rendering/theme switch, opposite browser preference:',theme);await live.context.close();
+   }
   }
   fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({cases:report,oauth:true,storageDenied:true,expiredSession:true,timeout:true,disabled:true,noJavaScript:true,bfcacheLifecycle:true,liveReadOnly:process.env.RUN_GISCUS_LIVE==='1'},null,2));
   console.log('PASS error/retry/expired session/disabled. No external writes.');

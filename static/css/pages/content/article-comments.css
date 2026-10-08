@@ -12,7 +12,9 @@ html body .article-comments{
 .article-comments__status button{min-height:44px;padding:8px 16px;border:1px solid var(--border);border-radius:999px;background:transparent;color:inherit;cursor:pointer;transition:background .18s ease}
 .article-comments__status button:hover{background:rgba(128,128,128,.12)}
 .article-comments :is(a,button):focus-visible{outline:2px solid var(--accent);outline-offset:4px}
-.article-comments iframe{display:block;width:100%;min-height:150px;border:0;color-scheme:normal;opacity:0;transition:opacity .2s ease}
+/* Match giscus/default.css: both schemes allow its transparent canvas even
+   when the site's selected theme differs from the browser's preference. */
+.article-comments iframe{display:block;width:100%;min-height:150px;border:0;color-scheme:light dark;opacity:0;transition:opacity .2s ease}
 .article-comments[data-state="ready"] iframe{opacity:1}
 .article-comments [hidden]{display:none!important}
 @media(prefers-reduced-motion:reduce){.article-comments iframe,.article-comments__status button{transition:none}}
