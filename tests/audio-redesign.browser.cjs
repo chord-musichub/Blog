@@ -166,6 +166,9 @@ async function trackSettings(p,width,theme,titleBefore){
    if(motion!=='reduce')assert.equal(await p.locator('.av-linework-plane').first().evaluate(e=>getComputedStyle(e).animationPlayState),'paused','Pausing freezes grid phase');
    assert.equal(await p.locator('[data-av-play]').getAttribute('aria-label'),'播放');
    await p.locator('[data-av-play]').click();await p.waitForFunction(()=>!document.querySelector('[data-av-audio]').paused);
+   // play() changes paused synchronously; the play event updates the UI later.
+   // Wait for that contract instead of racing a computed animation assertion.
+   await p.waitForFunction(()=>document.querySelector('[data-audio-visualizer]').classList.contains('is-playing'));
    assert.equal(await p.locator('[data-av-motion]').count(),0,'Motion is enabled by default without a redundant control');
    if(motion==='reduce'){
     assert.equal(await p.locator('[data-av-cover]').evaluate(e=>getComputedStyle(e).transform),'none');

@@ -19,7 +19,10 @@ async function fixture(browser,mode,width,theme){
     if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:svg,contentType:'image/svg+xml'});
     if(/^\/(?:write\/|static\/)?api\//.test(u.pathname))return route.fulfill({json:{views:83,items:[],messages:[],scores:[{score:300},{score:200},{score:100}]}});
     const root=u.pathname.startsWith('/static/')?(mode==='before'?path.join(out,'before/admin-static'):path.join(repo,'web/static')):build;
-    const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
+    const file=mode==='after' && u.pathname==='/static/markdown-renderer.js'
+      ?path.join(repo,'static/js/markdown-renderer.js')
+      :path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
+    if(mode==='after' && u.pathname==='/static/markdown-renderer.js')return route.fulfill({body:fs.readFileSync(file),contentType:'application/javascript'});
     if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
     return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream'});
   });

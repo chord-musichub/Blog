@@ -36,18 +36,6 @@
     });
   }
 
-  async function saveDirectoryHandle(handle){
-    try{
-      var db = await openDatabase();
-      await new Promise(function(resolve, reject){
-        var request = db.transaction(DB_STORE, 'readwrite').objectStore(DB_STORE).put(handle, DB_KEY);
-        request.onsuccess = resolve;
-        request.onerror = function(){ reject(request.error); };
-      });
-      db.close();
-    }catch(e){}
-  }
-
   async function readDirectoryHandle(){
     try{
       var db = await openDatabase();
@@ -105,7 +93,9 @@
     var spectrumData = null;
     var spectrumFrame = 0;
     var bars = [];
+    var barValues = [], barBands = [];
     var tracks = [];
+    var listTracks = null, listRows = [], listCurrent = -1;
     var current = -1;
     var activeUrl = '';
     var metadataToken = 0;
@@ -193,23 +183,51 @@
 
     function renderList(){
       if(!list) return;
-      list.innerHTML = '';
-      tracks.forEach(function(track, index){
-        var button = document.createElement('button');
-        button.type = 'button';
-        button.className = index === current ? 'is-current' : '';
-        button.innerHTML = '<span></span><small></small>';
-        button.querySelector('span').textContent = track.title || displayName(track.file);
-        button.querySelector('small').textContent = track.artist || '本地音频';
-        button.addEventListener('click', function(){ loadTrack(index, true); });
-        list.appendChild(button);
-      });
+      if(listTracks !== tracks){
+        var fragment = document.createDocumentFragment();
+        listRows = tracks.map(function(track, index){
+          var button = document.createElement('button');
+          var name = document.createElement('span'), author = document.createElement('small');
+          button.type = 'button';
+          button.dataset.homeTrackIndex = String(index);
+          name.textContent = track.title || displayName(track.file);
+          author.textContent = track.artist || '本地音频';
+          button.appendChild(name);button.appendChild(author);fragment.appendChild(button);
+          return {button:button,name:name,author:author};
+        });
+        list.replaceChildren(fragment);
+        listTracks = tracks;listCurrent = -1;
+      }
+      if(listCurrent !== current){
+        if(listRows[listCurrent]) listRows[listCurrent].button.classList.remove('is-current');
+        if(listRows[current]) listRows[current].button.classList.add('is-current');
+        listCurrent = current;
+      }
+      var row = listRows[current], track = tracks[current];
+      if(row && track){
+        var name = track.title || displayName(track.file), author = track.artist || '本地音频';
+        if(row.name.textContent !== name) row.name.textContent = name;
+        if(row.author.textContent !== author) row.author.textContent = author;
+      }
+    }
+
+    function onPlaylistClick(event){
+      var button = event.target.closest && event.target.closest('[data-home-track-index]');
+      if(disposed || !button || !list.contains(button)) return;
+      var index = Number(button.dataset.homeTrackIndex);
+      if(Number.isInteger(index) && index >= 0 && index < tracks.length) loadTrack(index, true);
+    }
+
+    function setBarScale(index, value){
+      if(barValues[index] === value) return;
+      bars[index].style.setProperty('--bar-scale', value);
+      barValues[index] = value;
     }
 
     function resetSpectrum(){
       bars.forEach(function(bar, index){
         var idle = .20 + ((index * 17 + 11) % 31) / 100;
-        bar.style.setProperty('--bar-scale', idle.toFixed(2));
+        setBarScale(index, idle.toFixed(2));
       });
     }
 
@@ -241,6 +259,12 @@
         sourceNode.connect(analyser);
         analyser.connect(audioContext.destination);
         spectrumData = new Uint8Array(analyser.frequencyBinCount);
+        var usable = Math.max(12, Math.floor(spectrumData.length * .72));
+        barBands = bars.map(function(bar, index){
+          var from = Math.floor(index * usable / bars.length);
+          var to = Math.max(from + 1, Math.floor((index + 1) * usable / bars.length));
+          return {from:from,to:to,weight:.66 + ((index * 29 + 17) % 47) / 100};
+        });
         return true;
       }catch(e){
         analyser = null;
@@ -257,12 +281,10 @@
 
     function renderSpectrum(){
       spectrumFrame = 0;
-      if(disposed || audio.paused || !analyser || !spectrumData){ stopSpectrum(); return; }
+      if(disposed || document.hidden || audio.paused || !analyser || !spectrumData){ stopSpectrum(); return; }
       analyser.getByteFrequencyData(spectrumData);
-      var usable = Math.max(12, Math.floor(spectrumData.length * .72));
       bars.forEach(function(bar, index){
-        var from = Math.floor(index * usable / bars.length);
-        var to = Math.max(from + 1, Math.floor((index + 1) * usable / bars.length));
+        var band = barBands[index], from = band.from, to = band.to;
         var total = 0;
         var peak = 0;
         for(var bin = from; bin < to; bin++){
@@ -274,14 +296,14 @@
         var average = total / Math.max(1, to - from) / 255;
         var localPeak = peak / 255;
         var amplitude = average * .42 + localPeak * .58;
-        var bandWeight = .66 + ((index * 29 + 17) % 47) / 100;
-        var scale = Math.max(.08, Math.min(1, .08 + Math.pow(amplitude, .56) * bandWeight));
-        bar.style.setProperty('--bar-scale', scale.toFixed(3));
+        var scale = Math.max(.08, Math.min(1, .08 + Math.pow(amplitude, .56) * band.weight));
+        setBarScale(index, scale.toFixed(3));
       });
       spectrumFrame = window.requestAnimationFrame(renderSpectrum);
     }
 
     function startSpectrum(){
+      if(disposed || document.hidden) return;
       createBars();
       if(!ensureAnalyser() || spectrumFrame) return;
       if(audioContext && audioContext.state === 'suspended') audioContext.resume().catch(function(){});
@@ -291,6 +313,7 @@
     function destroySpectrum(){
       stopSpectrum();
       bars = [];
+      barValues = [];barBands = [];
       if(spectrumBars) spectrumBars.innerHTML = '';
       try{ if(sourceNode) sourceNode.disconnect(); }catch(e){}
       try{ if(analyser) analyser.disconnect(); }catch(e){}
@@ -452,24 +475,6 @@
       if(volumeInput && document.activeElement === volumeInput && !volumeInput.matches(':focus-visible')) volumeInput.blur();
     }
 
-    async function chooseDirectory(){
-      if(typeof window.showDirectoryPicker === 'function'){
-        try{
-          setStatus('正在读取音乐文件夹…');
-          var handle = await window.showDirectoryPicker({mode:'read'});
-          await saveDirectoryHandle(handle);
-          var files = await collectDirectoryFiles(handle);
-          setTracks(files, '已选择文件夹', 0);
-          setStatus('已记住音乐文件夹 · 下次会自动恢复');
-          return;
-        }catch(e){
-          if(e && e.name !== 'AbortError') setStatus('无法读取该文件夹');
-          return;
-        }
-      }
-      if(folderInput) folderInput.click();
-    }
-
     async function restoreDirectory(){
       var handle = await readDirectoryHandle();
       if(!handle || disposed) return;
@@ -494,6 +499,7 @@
       if(fileInput) fileInput.click();
     });
     listToggle.addEventListener('click', function(){ togglePlaylist(); });
+    if(list) list.addEventListener('click', onPlaylistClick);
     host.querySelector('[data-home-music-list-close]').addEventListener('click', function(){ togglePlaylist(false); });
     fileInput.addEventListener('change', function(){ setTracks(fileInput.files, '已选择单曲', 0); fileInput.value = ''; });
     folderInput.addEventListener('change', function(){ setTracks(folderInput.files, '已选择文件夹', 0); setStatus('已加载文件夹（此浏览器不会保留目录授权）'); folderInput.value = ''; });
@@ -506,7 +512,8 @@
     audio.addEventListener('error', function(){ if(current >= 0) setStatus('该音频暂时无法播放'); });
     function onVisibilityChange(){
       if(disposed) return;
-      if(!document.hidden) return;
+      if(!document.hidden){ if(!audio.paused) startSpectrum(); return; }
+      stopSpectrum();
       cancelVolumeFade();
       if(audio.paused) audio.volume = preferredVolume;
       else audio.volume = isMuted ? 0 : preferredVolume;
@@ -539,6 +546,8 @@
         document.removeEventListener('pointerdown', closePlaylistOnOutside);
         document.removeEventListener('visibilitychange', onVisibilityChange);
         if(volumeControl) volumeControl.removeEventListener('pointerleave', closeVolumeControl);
+        if(list){ list.removeEventListener('click', onPlaylistClick);list.replaceChildren(); }
+        listTracks = null;listRows = [];listCurrent = -1;
         try{ audio.pause(); }catch(e){}
         revokeActiveUrl();
         audio.removeAttribute('src');

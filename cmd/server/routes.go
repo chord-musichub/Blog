@@ -11,6 +11,16 @@ import (
 
 func (app *App) router() http.Handler {
 	mux := http.NewServeMux()
+	// Keep the editor's existing URL, but maintain one renderer for both surfaces.
+	// Read the source asset directly: the admin must also work before a Hugo build.
+	mux.HandleFunc("/static/markdown-renderer.js", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet && r.Method != http.MethodHead {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		w.Header().Set("Cache-Control", "public, no-cache")
+		http.ServeFile(w, r, "static/js/markdown-renderer.js")
+	})
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 	mux.HandleFunc("/uploads/", app.handlePublicMedia)
 	// Markdown 源文件属于运行时数据，不能依赖公开站的静态目录或 SPA 兜底规则。

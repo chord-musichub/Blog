@@ -70,17 +70,6 @@ func fillOrbitEntry(v *OrbitEntry, d OrbitEntry) {
 	}
 }
 
-func cleanOrbitHref(raw string, fallback string) string {
-	v := strings.TrimSpace(raw)
-	if v == "" {
-		return fallback
-	}
-	if strings.HasPrefix(v, "#") || strings.HasPrefix(v, "/") || strings.HasPrefix(v, "http://") || strings.HasPrefix(v, "https://") {
-		return v
-	}
-	return fallback
-}
-
 func defaultSiteSettings() SiteSettings {
 	return SiteSettings{
 		Site: SiteBasic{Title: "Songline Blog", DisplayName: "Blog", FooterText: "由热爱驱动，持续记录", ICP: "暂无", Logo: "Songline Blog", LogoIcon: "/uploads/admin/logo/main_logo.png", Favicon: "/uploads/admin/logo/main_logo.png", EnableDarkToggle: true},

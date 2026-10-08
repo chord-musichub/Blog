@@ -90,7 +90,6 @@ func (app *App) writeHugoArticle(a Article) error {
 	}
 	authorDisplay := a.Author
 	accountType := accountFriend
-	showInFriends := true
 	authorBio := ""
 	authorHomepage := ""
 	authorAvatar := defaultUserAvatar
@@ -98,14 +97,12 @@ func (app *App) writeHugoArticle(a Article) error {
 	if u, ok := app.store.GetUser(a.Author); ok {
 		authorDisplay = firstNonEmpty(u.DisplayName, u.Username)
 		accountType = normalizeAccountType(u.Role, u.AccountType)
-		showInFriends = u.ShowInFriends || accountType == accountFriend
 		authorBio = u.Bio
 		authorHomepage = u.Homepage
 		authorAvatar = normalizeUserAvatar(u.Avatar)
 		authorCover = u.Cover
 	}
 	// 朋友主页从账号资料生成，不再依赖文章 taxonomy。
-	_ = showInFriends
 	friendsList := []string{}
 	friends, _ := json.Marshal(friendsList)
 	isNotice := accountType == accountSystem

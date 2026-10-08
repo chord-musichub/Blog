@@ -2,8 +2,9 @@
 {{ $assetVersion := partial "asset-version.html" . }}
   {{ $isArticleSurface := or (and .IsPage (eq .Section "posts")) (hasPrefix .RelPermalink "/tools/markdown-previewer/") }}
   {{ $isToolsSurface := hasPrefix .RelPermalink "/tools/" }}
+  {{ $isAudioStudio := hasPrefix .RelPermalink "/tools/audio-visualizer/" }}
   {{ $isNoticeSurface := or (eq .Layout "site-notice") (eq .RelPermalink "/tags/site-notice/") }}
-  {{ $isSearchSurface := or .IsHome (eq .Section "posts") (eq .Section "friends") $isNoticeSurface $isToolsSurface }}
+  {{ $isSearchSurface := or .IsHome (eq .Section "posts") (eq .Section "friends") $isNoticeSurface (and $isToolsSurface (not $isAudioStudio)) }}
   <link rel="stylesheet" href="/css/foundation.css?v={{ $assetVersion }}">
   <link rel="stylesheet" href="/css/site.css?v={{ $assetVersion }}">
   {{ if .IsHome }}
@@ -78,7 +79,7 @@
 {{ if hasPrefix .RelPermalink "/tools/random-number/" }}
 <link id="songline-random-number-style" rel="stylesheet" href="/css/tools/random-number.css?v={{ $assetVersion }}">
 {{ end }}
-{{ if hasPrefix .RelPermalink "/tools/" }}
+{{ if and $isToolsSurface (not $isAudioStudio) }}
 <link id="songline-tool-shared-style" rel="stylesheet" href="/css/tool-shared.css?v={{ $assetVersion }}">
 {{ end }}
 {{ if eq .RelPermalink "/tools/" }}
@@ -113,7 +114,10 @@
 {{ end }}
 <link id="songline-touch-layout-style" rel="stylesheet" href="/css/touch-layout.css?v={{ $assetVersion }}">
 <link rel="stylesheet" href="/css/privacy.css?v={{ $assetVersion }}">
-{{ if and $isToolsSurface (ne .RelPermalink "/tools/") (not (hasPrefix .RelPermalink "/tools/markdown-previewer/")) }}
+{{ if and $isToolsSurface (ne .RelPermalink "/tools/") (not (hasPrefix .RelPermalink "/tools/markdown-previewer/")) (not $isAudioStudio) }}
 <link id="songline-tool-detail-layout-style" rel="stylesheet" href="/css/tools/detail-layout.css?v={{ $assetVersion }}">
+{{ end }}
+{{ if and $isToolsSurface (ne .RelPermalink "/tools/") (not (hasPrefix .RelPermalink "/tools/markdown-previewer/")) }}
+<link id="songline-tool-dialog-style" rel="stylesheet" href="/css/tools/tool-dialog.css?v={{ $assetVersion }}">
 {{ end }}
 <link id="songline-back-controls-style" rel="stylesheet" href="/css/back-controls.css?v={{ $assetVersion }}">

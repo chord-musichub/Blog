@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -247,8 +246,4 @@ func (app *App) handleCreatorMemories(w http.ResponseWriter, r *http.Request) {
 
 func memoryFromRequest(r *http.Request) Memory {
 	return Memory{Date: strings.TrimSpace(r.FormValue("date")), Title: strings.TrimSpace(r.FormValue("title")), Image: cleanPublicPath(r.FormValue("image")), Description: strings.TrimSpace(r.FormValue("description"))}
-}
-
-func creatorContentSummary(items int, kind string) string {
-	return fmt.Sprintf("%d 条%s", items, kind)
 }

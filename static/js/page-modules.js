@@ -26,7 +26,7 @@
     // 注入归档页，尤其是在无刷新过场后造成列表样式被污染。
     var isArticleSurface = path.indexOf('/tools/markdown-previewer/') === 0 || !!query(root, '.markdown-body, [data-article-renderer="songline-markdown"]');
     var isToolsPage = path.indexOf('/tools/') === 0 || !!query(root, '.tools-grid, .tool-card, .md-tool-layout, [data-snake-game], [data-game-2048]');
-    var isSearchSurface = isToolsPage || path === '/' || path.indexOf('/posts/') === 0 || path.indexOf('/friends/') === 0 || !!query(root, '[data-content-archive], [data-search-submit], [data-tools-search], .home-friends-section');
+    var isSearchSurface = !isAudioStudio && (isToolsPage || path === '/' || path.indexOf('/posts/') === 0 || path.indexOf('/friends/') === 0 || !!query(root, '[data-content-archive], [data-search-submit], [data-tools-search], .home-friends-section'));
     if(isArticleSurface){
       ensureStylesheet('songline-markdown-renderer-style', '/css/pages/content/markdown-renderer.css');
       ensureStylesheet('songline-article-compat-style', '/css/site-article-compat.css');
@@ -74,6 +74,9 @@
     if(query(root, '.tool-detail-surface')){
       ensureStylesheet('songline-tool-detail-shell-style', '/css/tools/detail-shell.css');
       ensureStylesheet('songline-tool-detail-layout-style', '/css/tools/detail-layout.css');
+    }
+    if(query(root, '[data-tool-actionbar]')){
+      ensureStylesheet('songline-tool-dialog-style', '/css/tools/tool-dialog.css');
     }
   }
 
@@ -381,17 +384,24 @@
     }
   ];
 
+  var moduleByKey = Object.create(null);
+  modules.forEach(function(mod){ moduleByKey[mod.key] = mod; });
+  var scanQueries = null, scanQueryRoot = null;
+
   function query(root, selector){
     root = root || document;
+    if(scanQueries && root === scanQueryRoot && scanQueries.has(selector)) return scanQueries.get(selector);
+    var found = false;
     try{
-      if(root.querySelector && root.querySelector(selector)) return true;
+      found = !!(root.querySelector && root.querySelector(selector));
     }catch(e){}
-    if(root !== document && document.querySelector){
+    if(!found && root !== document && document.querySelector){
       try{
-        return !!document.querySelector(selector);
+        found = !!document.querySelector(selector);
       }catch(e){}
     }
-    return false;
+    if(scanQueries && root === scanQueryRoot) scanQueries.set(selector, found);
+    return found;
   }
 
   // A DOM script tag is not proof of execution (inert main HTML, failed loads,
@@ -427,11 +437,14 @@
     if(root !== document && root.isConnected === false) return;
     mod.init(root);
   }
-  function loadScript(mod, root){
+  function loadScript(mod, root, scanLoads){
+    if(scanLoads && scanLoads.has(mod.key)) return scanLoads.get(mod.key);
     var deps = dependencies[mod.key] || [];
-    return Promise.all(deps.map(function(key){
-      return loadScript(modules.find(function(candidate){ return candidate.key === key; }), root);
+    var task = Promise.all(deps.map(function(key){
+      return loadScript(moduleByKey[key], root, scanLoads);
     })).then(function(){ return loadScriptFile(mod, root); });
+    if(scanLoads) scanLoads.set(mod.key, task);
+    return task;
   }
   function loadScriptFile(mod, root){
     if(loaded[mod.key]){
@@ -462,7 +475,7 @@
         loaded[mod.key] = true;
         resolve();
       }
-      catch(error){ reject(error); }
+      catch(error){ script.remove(); reject(error); }
     };
     script.onerror = function(){
       loading[mod.key] = false;
@@ -476,23 +489,48 @@
   }
 
   var scanTimer = 0;
+  var scanType = '', scanGeneration = 0;
   var pendingRoot = null;
   var activeScans = new WeakMap();
 
   function mergeRoot(root){
-    if(!pendingRoot || root === document) pendingRoot = root || document;
+    root = root || document;
+    if(!pendingRoot) pendingRoot = root;
+    else if(pendingRoot !== root) pendingRoot = document;
+  }
+
+  function cancelScheduledScan(){
+    scanGeneration++;
+    if(scanType === 'runtime') window.SonglineRuntime.cancelIdle('page-modules-scan');
+    else if(scanType === 'idle' && window.cancelIdleCallback) window.cancelIdleCallback(scanTimer);
+    else if(scanType === 'raf') window.cancelAnimationFrame(scanTimer);
+    else if(scanType === 'timer') window.clearTimeout(scanTimer);
+    scanTimer = 0; scanType = '';
   }
 
   function scanNow(root){
     root = root || pendingRoot || document;
+    if(pendingRoot && pendingRoot !== root) root = document;
+    cancelScheduledScan();
     pendingRoot = null;
     if(root !== document && root.isConnected === false) return Promise.resolve();
     if(activeScans.has(root)) return activeScans.get(root);
     var now = Date.now();
     if(window.SonglinePageModules) window.SonglinePageModules.lastScanAt = now;
     var task = Promise.resolve().then(function(){
-      syncPageStyles(root);
-      return Promise.all(modules.filter(function(mod){ return mod.test(root); }).map(function(mod){ return loadScript(mod, root); }));
+      if(root !== document && root.isConnected === false) return;
+      // Share DOM feature queries only during this synchronous selection pass.
+      // Never retain answers across initialization, navigation or injected Markdown.
+      var previousQueries = scanQueries, previousRoot = scanQueryRoot, selected;
+      scanQueries = new Map(); scanQueryRoot = root;
+      try{
+        syncPageStyles(root);
+        selected = modules.filter(function(mod){ return mod.test(root); });
+      }finally{
+        scanQueries = previousQueries; scanQueryRoot = previousRoot;
+      }
+      var scanLoads = new Map();
+      return Promise.all(selected.map(function(mod){ return loadScript(mod, root, scanLoads); }));
     });
     activeScans.set(root, task);
     task.then(function(){ activeScans.delete(root); }, function(){ activeScans.delete(root); });
@@ -501,17 +539,24 @@
 
   function scan(root){
     mergeRoot(root || document);
-    window.clearTimeout(scanTimer);
-    var run = function(){ scanNow(pendingRoot || document).catch(function(error){ console.warn('[page-modules]', error); }); };
-    if(window.SonglineRuntime && typeof window.SonglineRuntime.idle === 'function'){
-      window.SonglineRuntime.idle('page-modules-scan', run, 260);
-      return;
-    }
-    if(window.requestIdleCallback){
-      scanTimer = window.setTimeout(function(){ window.requestIdleCallback(run, {timeout: 260}); }, 0);
+    cancelScheduledScan();
+    var generation = scanGeneration;
+    var run = function(){
+      if(generation !== scanGeneration) return;
+      scanTimer = 0; scanType = '';
+      scanNow(pendingRoot || document).catch(function(error){ console.warn('[page-modules]', error); });
+    };
+    if(window.SonglineRuntime && typeof window.SonglineRuntime.idle === 'function' && typeof window.SonglineRuntime.cancelIdle === 'function'){
+      scanType = 'runtime';
+      scanTimer = window.SonglineRuntime.idle('page-modules-scan', run, 260);
+    }else if(window.requestIdleCallback){
+      scanType = 'idle';
+      scanTimer = window.requestIdleCallback(run, {timeout: 260});
     }else if(window.requestAnimationFrame){
+      scanType = 'raf';
       scanTimer = window.requestAnimationFrame(run);
     }else{
+      scanType = 'timer';
       scanTimer = window.setTimeout(run, 0);
     }
   }
@@ -532,6 +577,7 @@
   }
 
   window.addEventListener('pageshow', function(event){ if(event.persisted) scan(document); });
+  window.addEventListener('songline:page-transition-start', function(){ cancelScheduledScan(); pendingRoot = null; });
   window.addEventListener('songline:page-swap', function(event){
     var root = event.detail && event.detail.root ? event.detail.root : document;
     if(!(event.detail && event.detail.modulesManaged)) scan(root);

@@ -61,13 +61,11 @@ func (app *App) writeFriendContentPages(friends []PublicFriend) error {
 	}
 
 	settings, _ := app.loadSiteSettings()
-	listCover := firstNonEmpty(settings.Pages.FriendsHeroImage, "/uploads/admin/background/qiandai_background.png")
 	defaultFriendCover := firstNonEmpty(settings.Pages.FriendDefaultCover, settings.Pages.FriendsHeroImage, "/uploads/admin/background/qiandai_background.png")
 	indexMD := fmt.Sprintf("---\ntitle: %q\nlayout: %q\ngenerated_by: %q\ndraft: false\n---\n\n", "朋友", "friends-list", "songline-friends-sync")
 	if err := os.WriteFile(filepath.Join(friendsRoot, "_index.md"), []byte(indexMD), 0644); err != nil {
 		return err
 	}
-	_ = listCover
 
 	// 清理旧的自动生成朋友页，避免改名后残留旧 URL。
 	old, _ := filepath.Glob(filepath.Join(friendsRoot, "*", "index.md"))

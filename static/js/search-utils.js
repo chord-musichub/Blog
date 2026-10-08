@@ -1,9 +1,4 @@
 (function(){
-  function ready(fn){
-    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, {once:true});
-    else fn();
-  }
-
   function normalize(value){
     return String(value == null ? '' : value)
       .toLowerCase()
@@ -16,24 +11,6 @@
   }
 
   function termsOf(q){ return normalize(q).split(' ').filter(Boolean); }
-
-  function includesAll(hay, terms){
-    hay = normalize(hay);
-    return terms.every(function(t){ return hay.indexOf(t) >= 0; });
-  }
-
-  function countTerm(hay, term){
-    hay = normalize(hay);
-    term = normalize(term);
-    if(!hay || !term) return 0;
-    var n = 0;
-    var pos = hay.indexOf(term);
-    while(pos >= 0 && n < 20){
-      n++;
-      pos = hay.indexOf(term, pos + term.length);
-    }
-    return n;
-  }
 
   function showSearchRefresh(text){
     var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -128,6 +105,6 @@
     });
   }
 
-  window.SonglineSearchUtils={ready:ready,normalize:normalize,termsOf:termsOf,includesAll:includesAll,countTerm:countTerm,showSearchRefresh:showSearchRefresh,setVisible:setVisible,setEmpty:setEmpty,flashEmpty:flashEmpty,installClearButtons:installClearButtons};
+  window.SonglineSearchUtils={normalize:normalize,termsOf:termsOf,showSearchRefresh:showSearchRefresh,setVisible:setVisible,setEmpty:setEmpty,flashEmpty:flashEmpty,installClearButtons:installClearButtons};
   window.SonglineSearchRefresh=showSearchRefresh;
 })();

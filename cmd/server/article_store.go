@@ -22,28 +22,6 @@ func (s *Store) AllArticles() []Article {
 	return out
 }
 
-func (s *Store) ArticlesByStatus(status string) []Article {
-	all := s.AllArticles()
-	out := []Article{}
-	for _, a := range all {
-		if a.Status == status {
-			out = append(out, a)
-		}
-	}
-	return out
-}
-
-func (s *Store) ArticlesExceptStatus(status string) []Article {
-	all := s.AllArticles()
-	out := []Article{}
-	for _, a := range all {
-		if a.Status != status {
-			out = append(out, a)
-		}
-	}
-	return out
-}
-
 func (s *Store) ArticlesByAuthor(author string) []Article {
 	all := s.AllArticles()
 	out := []Article{}

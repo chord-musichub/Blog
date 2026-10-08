@@ -44,6 +44,15 @@
     var paused = false;
     var copyTipTimer = 0;
     var switchRequest = 0;
+    var disposed = false, suspended = false;
+    var readyFrame = 0, directFrame = 0, focusTimer = 0;
+    var bindings = [];
+
+    function bind(target, type, handler){
+      if(!target) return;
+      target.addEventListener(type, handler);
+      bindings.push([target, type, handler]);
+    }
 
     if(!cards.length) return;
     panel.dataset.recommendationsReady = '1';
@@ -70,7 +79,7 @@
 
     function schedule(delay){
       clearTimer();
-      if(paused || cards.length < 2 || document.visibilityState === 'hidden') return;
+      if(disposed || suspended || paused || cards.length < 2 || document.visibilityState === 'hidden') return;
       timer = window.setTimeout(function(){
         show((current + 1) % cards.length);
         schedule(5200);
@@ -78,6 +87,7 @@
     }
 
     async function show(next, immediate){
+      if(disposed || suspended) return;
       next = Number(next);
       if(next === current || next < 0 || next >= cards.length) return;
       var request = ++switchRequest;
@@ -86,7 +96,7 @@
         var result = await window.SonglineResources.image(img);
         if(result && result.failed) return;
       }
-      if(request !== switchRequest || !panel.isConnected) return;
+      if(disposed || suspended || request !== switchRequest || !panel.isConnected) return;
       var previous = cards[current];
       if(immediate) panel.classList.add('is-direct-switch');
       if(leavingTimer) window.clearTimeout(leavingTimer);
@@ -95,18 +105,21 @@
       current = next;
       updateControls();
       if(immediate){
-        window.requestAnimationFrame(function(){ panel.classList.remove('is-direct-switch'); });
+        window.cancelAnimationFrame(directFrame);
+        directFrame = window.requestAnimationFrame(function(){ directFrame = 0; panel.classList.remove('is-direct-switch'); });
       }
       leavingTimer = window.setTimeout(function(){ previous.classList.remove('is-leaving'); }, reduced ? 120 : 680);
     }
 
     function pause(){
+      if(disposed || suspended) return;
       paused = true;
       if(releaseTimer){ window.clearTimeout(releaseTimer); releaseTimer = 0; }
       clearTimer();
     }
 
     function resume(){
+      if(disposed || suspended) return;
       if(releaseTimer) window.clearTimeout(releaseTimer);
       releaseTimer = window.setTimeout(function(){
         paused = false;
@@ -121,7 +134,7 @@
     }
 
     function showCopyTip(message, failed){
-      if(!copyTip) return;
+      if(disposed || suspended || !panel.isConnected || !copyTip) return;
       if(copyTipTimer) window.clearTimeout(copyTipTimer);
       copyTip.textContent = message;
       copyTip.classList.toggle('is-error', !!failed);
@@ -144,32 +157,33 @@
       return copied;
     }
 
-    panel.addEventListener('mouseenter', pause);
-    panel.addEventListener('mouseleave', resume);
-    panel.addEventListener('focusin', pause);
-    panel.addEventListener('focusout', function(){
-      window.setTimeout(function(){ if(!panel.contains(document.activeElement)) resume(); }, 0);
+    bind(panel, 'mouseenter', pause);
+    bind(panel, 'mouseleave', resume);
+    bind(panel, 'focusin', pause);
+    bind(panel, 'focusout', function(){
+      window.clearTimeout(focusTimer);
+      focusTimer = window.setTimeout(function(){ focusTimer = 0; if(!panel.contains(document.activeElement)) resume(); }, 0);
     });
     indicators.forEach(function(indicator){
-      indicator.addEventListener('click', function(){
+      bind(indicator, 'click', function(){
         show(indicator.dataset.homeRecommendIndex, true);
         schedule(5200);
       });
     });
     if(previous){
-      previous.addEventListener('click', function(){
+      bind(previous, 'click', function(){
         show((current - 1 + cards.length) % cards.length, true);
         schedule(5200);
       });
     }
     if(next){
-      next.addEventListener('click', function(){
+      bind(next, 'click', function(){
         show((current + 1) % cards.length, true);
         schedule(5200);
       });
     }
     if(copyButton){
-      copyButton.addEventListener('click', function(){
+      bind(copyButton, 'click', function(){
         var email = copyButton.dataset.homeCopyEmail || '';
         if(!email) return;
         var copy = navigator.clipboard && window.isSecureContext
@@ -178,6 +192,7 @@
         Promise.resolve(copy).then(function(){
           showCopyTip('邮箱已复制');
         }).catch(function(){
+          if(disposed || suspended || !panel.isConnected) return;
           if(fallbackCopy(email)) showCopyTip('邮箱已复制');
           else showCopyTip('复制失败，请重试', true);
         });
@@ -187,29 +202,52 @@
       if(document.visibilityState === 'hidden') clearTimer();
       else if(!paused) schedule(1400);
     }
-    function cleanup(){
+    function cancelWork(){
       switchRequest++;
       clearTimer();
       if(releaseTimer) window.clearTimeout(releaseTimer);
       if(leavingTimer) window.clearTimeout(leavingTimer);
       if(copyTipTimer) window.clearTimeout(copyTipTimer);
-      window.removeEventListener('songline:home-panel-state', onPanelState);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('pagehide', cleanup);
-      window.removeEventListener('songline:page-transition-start', onTransitionStart);
+      window.clearTimeout(focusTimer);
+      window.cancelAnimationFrame(readyFrame);
+      window.cancelAnimationFrame(directFrame);
+      releaseTimer = leavingTimer = copyTipTimer = focusTimer = readyFrame = directFrame = 0;
+    }
+    function cleanup(){
+      if(disposed) return;
+      disposed = true;
+      cancelWork();
+      bindings.forEach(function(binding){ binding[0].removeEventListener(binding[1], binding[2]); });
+      bindings = [];
+      delete panel.dataset.recommendationsReady;
       if(window.__songlineHomeRecommendationsCleanup === cleanup) window.__songlineHomeRecommendationsCleanup = null;
     }
+    function onPageHide(event){
+      if(event.persisted){ suspended = true; cancelWork(); }
+      else cleanup();
+    }
+    function onPageShow(event){
+      if(!event.persisted || disposed || !suspended) return;
+      suspended = false;
+      panel.classList.add('is-ready');
+      panel.classList.remove('is-direct-switch');
+      cards.forEach(function(card){ card.classList.remove('is-leaving'); });
+      if(copyTip) copyTip.classList.remove('is-visible', 'is-error');
+      paused = panel.matches(':hover, :focus-within') || !!(homePanel && homePanel.dataset.homePanelState !== 'system');
+      schedule(1400);
+    }
     function onTransitionStart(event){ if((event.detail && event.detail.from) === '/') cleanup(); }
-    window.addEventListener('songline:home-panel-state', onPanelState);
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    window.addEventListener('pagehide', cleanup, { once:true });
-    window.addEventListener('songline:page-transition-start', onTransitionStart);
+    bind(window, 'songline:home-panel-state', onPanelState);
+    bind(document, 'visibilitychange', onVisibilityChange);
+    bind(window, 'pagehide', onPageHide);
+    bind(window, 'pageshow', onPageShow);
+    bind(window, 'songline:page-transition-start', onTransitionStart);
     window.__songlineHomeRecommendationsCleanup = cleanup;
 
     updateControls();
     var homePanel = panel.closest && panel.closest('[data-home-panel]');
     if(homePanel && homePanel.dataset.homePanelState !== 'system') pause();
-    window.requestAnimationFrame(function(){ panel.classList.add('is-ready'); });
+    readyFrame = window.requestAnimationFrame(function(){ readyFrame = 0; if(!disposed && !suspended) panel.classList.add('is-ready'); });
     schedule(5200);
   }
 

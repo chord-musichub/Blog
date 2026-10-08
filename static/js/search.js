@@ -2,7 +2,10 @@
 (function(){
   var utils=window.SonglineSearchUtils;
   if(!utils) return;
-  var normalize=utils.normalize, termsOf=utils.termsOf, includesAll=utils.includesAll, showSearchRefresh=utils.showSearchRefresh, setVisible=utils.setVisible, setEmpty=utils.setEmpty, flashEmpty=utils.flashEmpty, installClearButtons=utils.installClearButtons;
+  var normalize=utils.normalize, termsOf=utils.termsOf, showSearchRefresh=utils.showSearchRefresh, setVisible=utils.setVisible, setEmpty=utils.setEmpty, flashEmpty=utils.flashEmpty, installClearButtons=utils.installClearButtons;
+  function matchesTerms(text, terms){
+    return terms.every(function(term){ return text.indexOf(term) >= 0; });
+  }
   function bindManualSearch(config){
     var input = document.querySelector(config.input);
     var list = document.querySelector(config.list);
@@ -32,6 +35,9 @@
       if(config.text) return config.text(item);
       return [item.dataset.searchText, item.dataset.title, item.dataset.summary, item.dataset.tags, item.dataset.name, item.dataset.bio, item.dataset.posts, item.dataset.tagTitle, item.dataset.toolKeywords, item.textContent].filter(Boolean).join(' ');
     }
+    // These cards are immutable within a page. Rebuild the index on page entry,
+    // not on each keystroke; URL/search state and visibility remain live.
+    var searchText = items.map(function(item){ return normalize(allText(item)); });
     function updateCount(active, visible){
       if(!count) return;
       count.textContent = active ? ('找到 ' + visible + ' / ' + items.length + ' ' + (config.unit || '项')) : ('共 ' + items.length + ' ' + (config.unit || '项'));
@@ -39,10 +45,11 @@
     function runSearch(opts){
       opts = opts || {};
       var q = input.value || '';
-      var active = !!normalize(q);
+      var terms = termsOf(q);
+      var active = terms.length > 0;
       var visible = 0;
-      items.forEach(function(item){
-        var show = !active || includesAll(allText(item), termsOf(q));
+      items.forEach(function(item, index){
+        var show = !active || matchesTerms(searchText[index], terms);
         if(show && config.extraMatch) show = !!config.extraMatch(item, q);
         setVisible(item, show);
         item.classList.toggle('is-search-hit', active && show);
@@ -102,6 +109,7 @@
     function textOf(item){
       return [item.dataset.name, item.dataset.bio, item.dataset.posts, item.textContent].filter(Boolean).join(' ');
     }
+    var searchText = items.map(function(item){ return normalize(textOf(item)); });
     function update(active, visible){
       if(count) count.textContent = active ? ('找到 ' + visible + ' / ' + items.length + ' 位朋友') : ('共 ' + items.length + ' 位朋友');
       if(empty){
@@ -113,11 +121,11 @@
     function run(opts){
       opts = opts || {};
       var q = input.value || '';
-      var active = !!normalize(q);
       var terms = termsOf(q);
+      var active = terms.length > 0;
       var visible = 0;
-      items.forEach(function(item){
-        var show = !active || includesAll(textOf(item), terms);
+      items.forEach(function(item, index){
+        var show = !active || matchesTerms(searchText[index], terms);
         setVisible(item, show);
         item.classList.toggle('is-search-hit', active && show);
         if(show) visible++;

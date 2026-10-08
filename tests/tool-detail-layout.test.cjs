@@ -39,8 +39,8 @@ test('all tools expose useful explanations in the shared native modal',()=>{
   for(const key of ['Space','Shift','WASD','黑豆清墙','data-gacha-banner-note','data-gacha-guarantee-note'])assert(help.includes(key));
   assert(read('layouts/partials/tool-help-dialog.html').includes('<dialog'));
   assert(!read('layouts/tools/2048.html').includes('data-2048-move'));
-  const css=read('static/css/tools/detail-layout.css');
-  assert(css.includes('.av-cover [hidden]{display:none!important}'),'Absent album covers use the fallback rather than a broken image');
+  const css=read('static/css/tools/audio-visualizer-foundation.css');
+  assert(css.includes('.audio-visualizer-page [hidden]{display:none!important}'),'Absent album covers use the fallback rather than a broken image');
   assert(css.includes('.av-stage:fullscreen'),'Compact stage cannot override fullscreen height');
 });
 test('icon sound controls retain native toggle semantics in all six tools',()=>{

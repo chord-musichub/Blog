@@ -1,0 +1,19 @@
+/* Shared tool icon states and native help modal; no game/room layout. */
+html body[data-page-section="tools"] .tool-icon-button:disabled{opacity:.35;cursor:default}
+html body[data-page-section="tools"] .tool-icon-button > .ui-icon{--ui-icon-size:22px;grid-area:1 / 1;pointer-events:none}
+.tool-icon-button[data-tool-paused="false"] > [data-ui-icon="play"],
+.tool-icon-button[data-tool-paused="true"] > [data-ui-icon="pause"]{display:none}
+/* Native modal top layer stays above the site's fixed dock and glass surfaces. */
+html:has(.tool-help-dialog[open]){overflow:hidden!important}
+.tool-help-dialog{box-sizing:border-box;width:min(520px,calc(100% - 32px));max-height:calc(100dvh - 48px);margin:auto;padding:24px;border:1px solid var(--tool-line);border-radius:22px;background:var(--tool-field);color:var(--tool-ink);box-shadow:0 24px 72px rgba(0,0,0,.3);overflow-y:auto;overscroll-behavior:contain}
+.tool-help-dialog::backdrop{background:rgba(5,14,25,.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.tool-help-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 16px}
+.tool-help-heading h2{margin:0;font-size:22px;line-height:1.4;color:var(--tool-ink)}
+.tool-help-content{font-size:15px;line-height:1.8;overflow-wrap:anywhere}
+.tool-help-content p{margin:0 0 14px}
+.tool-help-content p:last-child{margin-bottom:0}
+.tool-help-content kbd{display:inline-block;padding:0 5px;border:1px solid var(--tool-line);border-radius:5px;background:var(--tool-soft);font:inherit;font-size:.92em}
+.tool-help-content :is(ul,ol){padding-left:22px}
+.tool-help-content table{width:100%;border-collapse:collapse;font-size:14px}
+.tool-help-content :is(th,td){padding:6px;border-bottom:1px solid var(--tool-line);text-align:left}
+@media(max-width:640px){.tool-help-dialog{padding:18px}}

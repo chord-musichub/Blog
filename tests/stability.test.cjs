@@ -38,6 +38,7 @@ test('API-less successful responses are rejected rather than exposing inert UI',
  const f=loader();const task=f.window.testLoad('gacha');await settle();
  const rejected=assert.rejects(task,/Module API missing: gacha/);f.scripts[0].onload();await rejected;
  assert.equal(f.window.testLoaded.gacha,undefined);
+ assert.equal(f.scripts[0].removed,true,'API-less script tags do not accumulate on retry');
 });
 test('late module responses cannot initialize a detached page but remain reusable',async()=>{
  const f=loader(),oldRoot={isConnected:true},newRoot={isConnected:true};let calls=0;

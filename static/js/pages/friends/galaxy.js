@@ -101,8 +101,6 @@
     // 服务端的头像保底节点，而星链和悬浮卡片从未开始构建。
     return { friends:inlineData(), linkConfig:inlineLinkConfig() };
   }
-  function escapeHtml(value){ return clean(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
   function init(root){
     root = root || document;
     var shell = root.querySelector ? root.querySelector('[data-friend-galaxy]') : null;

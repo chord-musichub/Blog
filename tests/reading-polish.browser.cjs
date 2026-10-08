@@ -46,8 +46,8 @@ async function design(page){return page.locator('.article-reader').evaluate(e=>{
 async function readingGeometry(page){const result={};for(const selector of ['main.container','.article-reader','.article-toc-rail']){const box=await page.locator(selector).boundingBox();if(box)result[selector]={x:box.x,width:box.width};}return result;}
 async function scene(page){await page.locator('body').evaluate(e=>Promise.all(e.getAnimations().filter(a=>a instanceof CSSTransition).map(a=>a.finished.catch(()=>{}))));return page.evaluate(()=>{const c=getComputedStyle(document.body);return Object.fromEntries(['backgroundImage','backgroundSize','backgroundRepeat','backgroundPosition','backgroundColor'].map(k=>[k,c[k]]));});}
 async function whiteIcon(icon){await icon.evaluate(e=>new Promise((resolve,reject)=>{const start=performance.now();function check(){if(getComputedStyle(e).color==='rgb(255, 255, 255)')return resolve();if(performance.now()-start>1500)return reject(new Error('Header icon did not settle to white'));requestAnimationFrame(check);}check();}));}
-async function bareBack(page){
- const back=page.locator('[data-back-icon]').first();await back.waitFor();
+async function bareBack(page,selector='[data-back-icon]'){
+ const back=page.locator(selector).first();await back.waitFor();
  assert.equal(await back.locator('[data-ui-icon="chevron-left"] svg path').count(),1);
  let normal;
  for(const interaction of ['normal','hover','focus']){
@@ -154,11 +154,16 @@ async function settledScroll(page){
   for(const [width,theme] of [[1440,'dark'],[1440,'light'],[390,'dark'],[390,'light']]){
    const f=await fixture(browser,width,theme,false),p=f.page;
    for(const route of ['/tags/site-notice/','/friends/memories/','/friends/songline/','/tools/focus-timer/','/tools/audio-visualizer/','/tools/2048/','/tools/snake/','/tools/gacha/','/tools/random-number/','/tools/reaction-test/','/tools/flappy-bird/','/tools/typing-practice/']){
-    await p.goto(base+route);await ready(p,route);await bareBack(p);
+    const audio=route==='/tools/audio-visualizer/';
+    const backSelector=audio?'[data-av-return]':'[data-back-icon]';
+    await p.goto(base+route);await ready(p,route);await bareBack(p,backSelector);
     if(route.startsWith('/tools/')){
-     const panel=p.locator('[data-tool-back-surface]'),back=p.locator('[data-back-icon]');assert.equal(await panel.count(),1);assert.equal(await panel.locator(':scope > [data-back-icon]').count(),1);
+     // The standalone studio intentionally has its own return contract and no
+     // underground glass surface; verify it rather than the retired selectors.
+     const panel=p.locator(audio?'[data-av-stage]':'[data-tool-back-surface]'),back=p.locator(backSelector);assert.equal(await panel.count(),1);assert.equal(await panel.locator(audio?'[data-av-return]':':scope > [data-back-icon]').count(),1);
+     if(audio)assert.equal(await back.getAttribute('href'),'/tools/');
      const surface=await panel.boundingBox(),button=await back.boundingBox();assert(button.x>=surface.x&&button.y>=surface.y&&button.x+button.width<=surface.x+surface.width&&button.y+button.height<=surface.y+surface.height,'Return stays inside the actual tool surface: '+route);
-     const color=await back.evaluate(e=>getComputedStyle(e).color);assert.equal(color,await back.evaluate(e=>{const sample=document.createElement('span');sample.style.color=getComputedStyle(e).getPropertyValue('--back-ink');e.appendChild(sample);const color=getComputedStyle(sample).color;sample.remove();return color;}),'Return ink follows its surface');
+     const color=await back.evaluate(e=>getComputedStyle(e).color);assert.equal(color,await back.evaluate((e,variable)=>{const sample=document.createElement('span');sample.style.color=getComputedStyle(e).getPropertyValue(variable);e.appendChild(sample);const color=getComputedStyle(sample).color;sample.remove();return color;},audio?'--av-ink':'--back-ink'),'Return ink follows its surface');
      if(['/tools/random-number/','/tools/audio-visualizer/','/tools/focus-timer/'].includes(route))await p.screenshot({path:path.join(out,`back-${width}-${theme}-${route.split('/')[2]}.png`)});
     }
     console.log('PASS bare chevron / hit area / hover / focus',width,theme,route);

@@ -302,15 +302,3 @@ func mediaDirectoryForCategory(media mediaLibraryContext, category string) (stri
 	}
 	return dir, category, nil
 }
-
-func mediaNameFromPublicPath(p string) (string, error) {
-	v := strings.TrimSpace(p)
-	if !strings.HasPrefix(v, "/uploads/") {
-		return "", fmt.Errorf("invalid media path")
-	}
-	rest := strings.TrimPrefix(v, "/uploads/")
-	if rest == "" || strings.Contains(rest, "\\") || strings.Contains(rest, "..") {
-		return "", fmt.Errorf("invalid media name")
-	}
-	return rest, nil
-}
