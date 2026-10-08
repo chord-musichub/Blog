@@ -37,20 +37,25 @@ func TestCreatorCenterRoleShellAndPages(t *testing.T) {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = os.Chdir(previous) })
-	app := newApp(Config{AdminBasePath: "/write"}, &Store{})
+	app := newApp(Config{AdminBasePath: "/write", PublicBaseURL: "https://blog.test/"}, &Store{})
 	for _, role := range []string{roleUser, roleOwner, roleAdmin} {
 		data := creatorCenterFixture(role)
 		for _, page := range []string{"home.html", "editor.html", "account.html", "settings_hub.html", "admin.html", "media.html", "creator_projects.html", "creator_memories.html", "new_user.html", "site_settings.html", "theme_settings.html", "manuscript_settings.html"} {
+			data["IsDashboard"] = page == "home.html"
 			var body bytes.Buffer
 			if err := app.tpl.ExecuteTemplate(&body, page, data); err != nil {
 				t.Fatalf("%s / %s: %v", role, page, err)
 			}
 			html := body.String()
-			if !strings.Contains(html, "creator-center.css?v=22.9.2") || strings.Contains(html, "href=\"/static/style.css") {
+			if !strings.Contains(html, "creator-center.css?v=22.9.3") || strings.Contains(html, "href=\"/static/style.css") {
 				t.Fatalf("%s must use exactly the new style entry", page)
 			}
 			if !strings.Contains(html, `data-base="/write/"`) {
 				t.Fatalf("missing prefixed navigation: %s", page)
+			}
+			headerEnd := strings.Index(html, "</header>")
+			if headerEnd < 0 || strings.Count(html[:headerEnd], `class="admin-client-home icon-button"`) != 1 || !strings.Contains(html[:headerEnd], `href="https://blog.test/" data-document-transition aria-label="返回网站主页"`) {
+				t.Fatalf("%s / %s missing unique public-home action in top bar", role, page)
 			}
 			if role != roleOwner && strings.Contains(html, `data-cc-page="memories"`) {
 				t.Fatalf("%s sees owner-only navigation", role)
@@ -199,7 +204,7 @@ func TestCreatorCenterVisualPreview(t *testing.T) {
 		data["IsDashboard"] = page == "home.html"
 		var body bytes.Buffer
 		// Reload templates while refining the UI; production still uses cached templates.
-		app := newApp(Config{AdminBasePath: "/write"}, &Store{})
+		app := newApp(Config{AdminBasePath: "/write", PublicBaseURL: "/"}, &Store{})
 		if err := app.tpl.ExecuteTemplate(&body, page, data); err != nil {
 			http.Error(w, err.Error(), 500)
 			return

@@ -5,7 +5,7 @@
   <title>{{.Title}} · 创作中心</title>
   {{template "admin-favicon" .Data}}
   <script>(function(){try{document.documentElement.dataset.adminTheme=localStorage.getItem('songline-theme')||localStorage.getItem('gexian-admin-theme')||'dark'}catch(e){document.documentElement.dataset.adminTheme='dark'}})();</script>
-  <link rel="stylesheet" href="/static/creator-center.css?v=22.9.2">
+  <link rel="stylesheet" href="/static/creator-center.css?v=22.9.3">
   <script defer src="/static/admin-theme.js?v=21.1.0"></script>
   {{if .Navigation}}<script defer src="/static/admin-nav.js?v=22.9.2"></script>{{end}}
   <script defer src="/static/creator-center.js?v=21.1.0"></script>
@@ -18,9 +18,9 @@
 {{define "admin-client-nav"}}
 <header class="admin-client-nav" data-admin-client-nav data-base="{{adminURL "/"}}">
   <button class="rail-toggle icon-button" type="button" aria-label="展开导航" aria-expanded="false" aria-controls="creatorRail">{{template "admin-icon" "menu"}}</button>
-  <a class="admin-client-brand" href="{{adminURL "/"}}"><img class="creator-brand-mark" src="{{default "/uploads/admin/logo/main_logo.png" .Settings.Site.LogoIcon}}" alt="" data-image-fallback="/uploads/admin/logo/main_logo.png">{{if isAdminUser .User}}管理中心{{else}}创作中心{{end}}</a>
+  <a class="admin-client-brand" href="{{adminURL "/"}}"><img class="creator-brand-mark" src="{{default "/uploads/admin/logo/main_logo.png" .Settings.Site.LogoIcon}}" alt="" data-image-fallback="/uploads/admin/logo/main_logo.png"><span>{{if isAdminUser .User}}管理中心{{else}}创作中心{{end}}</span></a>
   <div class="admin-client-actions">
-    {{if .IsDashboard}}<a class="admin-client-home icon-button" href="{{publicURL}}" data-document-transition aria-label="回主页" title="回主页">{{template "admin-icon" "home"}}</a>{{end}}
+    <a class="admin-client-home icon-button" href="{{publicURL}}" data-document-transition aria-label="返回网站主页" title="返回网站主页">{{template "admin-icon" "home"}}</a>
     <button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换主题" title="切换主题">◐</button>
     <a class="admin-client-identity" href="{{adminURL "/account"}}" title="账号设置"><img class="identity-avatar" src="{{userAvatar .User.Avatar}}" alt="" data-image-fallback="/uploads/admin/friends/user-null.png"><span><strong>{{default .User.Username .User.DisplayName}}</strong><small>{{.User.Username}} · {{roleText .User.Role}}</small></span></a>
     <a class="admin-client-logout icon-button" href="{{adminURL "/logout"}}" aria-label="退出登录" title="退出登录">{{template "admin-icon" "logout"}}</a>

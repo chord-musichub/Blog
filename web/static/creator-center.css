@@ -316,7 +316,7 @@ td .actions{gap:8px}
   .editor-publishbar{position:static;flex-wrap:wrap;padding-bottom:calc(14px + env(safe-area-inset-bottom))}
   .cover-crop-dialog{max-height:calc(100dvh - 24px)}
   .admin-client-nav{padding:0 14px;gap:10px}.admin-client-brand{font-size:16px;gap:8px}.creator-brand-mark{width:27px;height:27px;font-size:16px}
-  .rail-toggle{display:inline-flex}.admin-client-actions{gap:8px}.admin-client-identity>span,.admin-client-home{display:none}
+  .rail-toggle{display:inline-flex}.admin-client-actions{gap:8px}.admin-client-identity>span{display:none}
   .creator-rail{transform:translateX(-100%);transition:transform .2s;box-shadow:12px 0 35px #0001}.rail-open .creator-rail{transform:translateX(0)}
   body:has(.creator-rail)>main.wrap{margin-left:0;padding:calc(var(--header-height) + 22px) 16px 30px}
   h1{font-size:22px}.dashboard-welcome{align-items:start}.dashboard-welcome .btn{padding:9px 12px}.dashboard-welcome .meta{font-size:12px}
@@ -332,6 +332,9 @@ td .actions{gap:8px}
   .cover-crop-dialog__bar,.cover-crop-dialog__controls{flex-wrap:wrap;padding:16px}.cover-crop-stage{padding:16px}.cover-crop-dialog__controls input{width:45vw}
   .mini-form{flex-wrap:wrap}th,td{padding:12px;white-space:nowrap}
 }
+/* Keep all top-bar actions reachable on narrow phones; the logo remains and
+   the brand's text is still available to assistive technology. */
+@media(max-width:460px){.admin-client-brand>span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
 /* Shared line icons; every icon-only action retains a name and hover/focus feedback. */
 .admin-icon{width:20px;height:20px;flex-shrink:0;vertical-align:middle}
