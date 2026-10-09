@@ -32,7 +32,8 @@
   function collect(){
     clearLayers();
     if(reduced || compactQuery.matches || !document.body || document.body.dataset.pageKind !== 'home') return;
-    layers = Array.prototype.slice.call(document.querySelectorAll('[data-home-parallax]'));
+    // A restored document already has the background marker. Add it only once.
+    layers = Array.prototype.slice.call(document.querySelectorAll('[data-home-parallax]:not(.site-bg-layer)'));
     backgroundLayer = document.querySelector('.site-bg-layer');
     if(backgroundLayer){
       backgroundLayer.dataset.homeParallax = 'background';
