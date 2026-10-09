@@ -66,10 +66,14 @@ async function navigate(page,url){await page.evaluate(url=>SonglinePageTransitio
    await page.evaluate(()=>{SonglineInitArticleComments(document);SonglineInitArticleComments(document);});
    assert.equal(f.requests.length,1);assert.equal(await page.locator('iframe.giscus-frame').count(),1);
    if(width===320&&theme==='dark'){
+    await page.evaluate(()=>window.cachedCommentFrame=document.querySelector('iframe.giscus-frame'));
+    const beforeCacheRequests=f.requests.length;
     await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true})));
-    assert.equal(await page.evaluate(()=>commentListeners.size),0);assert.equal(await page.locator('iframe.giscus-frame').count(),0);
+    assert.equal(await page.evaluate(()=>commentListeners.size),1);assert.equal(await page.locator('iframe.giscus-frame').count(),1);
     await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));await ready(page);await commentsReady(page);
     assert.equal(await page.evaluate(()=>commentListeners.size),1);assert.equal(await page.locator('iframe.giscus-frame').count(),1);
+    assert.equal(await page.evaluate(()=>cachedCommentFrame===document.querySelector('iframe.giscus-frame')),true,'BFCache preserves the widget instead of fetching another iframe');
+    assert.equal(f.requests.length,beforeCacheRequests);await page.evaluate(()=>delete window.cachedCommentFrame);
    }
    const geometry=await page.locator('[data-article-comments]').evaluate(node=>({left:node.getBoundingClientRect().left,right:node.getBoundingClientRect().right,width:Math.min(document.documentElement.clientWidth,document.body.clientWidth),overflow:document.documentElement.scrollWidth>innerWidth+2}));
    assert.equal(geometry.overflow,false);assert(Math.abs((geometry.left+geometry.right)/2-geometry.width/2)<2,'Comments stay centered: '+JSON.stringify(geometry));

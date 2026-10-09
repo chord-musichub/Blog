@@ -52,7 +52,7 @@
     var button = panel.querySelector('[data-comments-load]');
     if(!mount || !status || !message || !button) return;
     var session = readSession();
-    var frame = null, timer = 0, observer = null, disposed = false;
+    var frame = null, timer = 0, observer = null, disposed = false, sentTheme = '';
     function theme(){ return document.documentElement.getAttribute('data-theme') === 'dark' ? 'transparent_dark' : 'light'; }
     function state(value, text){
       panel.dataset.state = value;
@@ -64,6 +64,7 @@
     }
     function clearFrame(){
       window.clearTimeout(timer); timer = 0;
+      sentTheme = '';
       if(frame){
         frame.removeEventListener('load', syncTheme);
         frame.removeEventListener('error', fail);
@@ -75,9 +76,12 @@
       clearFrame();
       state('error', '留言暂时无法加载，可重试或前往 GitHub');
     }
-    function syncTheme(){
+    function syncTheme(event){
       if(frame && frame.contentWindow){
-        frame.contentWindow.postMessage({giscus:{setConfig:{theme:theme()}}}, ORIGIN);
+        var next = theme();
+        if(sentTheme === next && !(event && event.type === 'load')) return;
+        frame.contentWindow.postMessage({giscus:{setConfig:{theme:next}}}, ORIGIN);
+        sentTheme = next;
       }
     }
     function load(){
@@ -125,14 +129,19 @@
         if(data.error.indexOf('Discussion not found') < 0){ fail(); return; }
       }
       if(typeof data.resizeHeight === 'number' && Number.isFinite(data.resizeHeight) && data.resizeHeight > 0 && data.resizeHeight <= 100000){
-        frame.style.height = Math.max(150, Math.ceil(data.resizeHeight)) + 'px';
+        var height = Math.max(150, Math.ceil(data.resizeHeight)) + 'px';
+        if(frame.style.height !== height) frame.style.height = height;
         window.clearTimeout(timer); timer = 0;
-        state('ready');
+        if(panel.dataset.state !== 'ready') state('ready');
       }
     }
     var themeObserver = new MutationObserver(syncTheme);
     themeObserver.observe(document.documentElement, {attributes:true,attributeFilter:['data-theme']});
     function cleanup(event){
+      // A persisted document retains the widget, its observers and listeners.
+      // Destroying it here leaves BFCache returns without an initializer.
+      if(event && event.type === 'pagehide' && event.persisted) return;
+      if(disposed) return;
       disposed = true;
       if(event && event.type === 'songline:page-transition-start') panel.songlineCommentsDeparting = true;
       clearFrame();
@@ -142,15 +151,18 @@
       window.removeEventListener('message', receive);
       window.removeEventListener('songline:page-transition-start', cleanup);
       window.removeEventListener('pagehide', cleanup);
+      window.removeEventListener('pageshow', onPageShow);
       delete panel.songlineCommentsCleanup;
       state('idle', '使用 GitHub 登录留言');
     }
     panel.songlineCommentsCleanup = cleanup;
+    function onPageShow(event){ if(event.persisted && !disposed) syncTheme(); }
     state('idle', '使用 GitHub 登录留言');
     button.addEventListener('click', load);
     window.addEventListener('message', receive);
     window.addEventListener('songline:page-transition-start', cleanup);
     window.addEventListener('pagehide', cleanup);
+    window.addEventListener('pageshow', onPageShow);
     if('IntersectionObserver' in window){
       observer = new IntersectionObserver(function(entries){
         if(entries.some(function(entry){ return entry.isIntersecting; })) load();

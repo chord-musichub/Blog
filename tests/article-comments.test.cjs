@@ -59,3 +59,16 @@ test('corrupt session, first comment, auth expiry, failure and finite retries',(
  const auth=fixture({stored:JSON.stringify('expired')});auth.init();auth.load();auth.reply({error:'Bad credentials'});
  assert.equal(new URL(auth.mount.children[0].src).searchParams.get('session'),'');auth.reply({error:'Bad credentials'});assert.equal(auth.panel.dataset.state,'error');assert.equal(auth.timers.size,0);
 });
+test('persisted pagehide keeps the widget usable and permanent departure removes every listener',()=>{
+ const f=fixture();f.init();f.load();f.reply({resizeHeight:380});const frame=f.mount.children[0];
+ for(let i=0;i<3;i++){f.emit('pagehide',{persisted:true});f.emit('pageshow',{persisted:true});assert.equal(f.mount.children[0],frame);assert.equal(f.listeners.get('message').size,1);}
+ f.reply({resizeHeight:410});assert.equal(frame.style.height,'410px');assert.equal(f.panel.dataset.state,'ready');
+ f.emit('pagehide',{persisted:false});assert.equal(f.mount.children.length,0);assert.equal(f.listeners.get('pageshow').size,0);assert.equal(f.listeners.get('message').size,0);assert(f.observers.every(o=>o.disconnected));
+});
+test('same-theme observations do not repeat messages; iframe load and retries resynchronize',()=>{
+ const f=fixture();f.init();f.load();const observer=f.observers[0],frame=f.mount.children[0];
+ observer.callback();for(let i=0;i<20;i++)observer.callback();assert.equal(f.posts.length,1);
+ frame.events.get('load')({type:'load'});assert.equal(f.posts.length,2,'Load resends config if an earlier message preceded the iframe listener');
+ f.document.documentElement.theme='light';observer.callback();observer.callback();assert.equal(f.posts.length,3);
+ f.reply({error:'offline'});f.load();observer.callback();assert.equal(f.posts.length,4,'A fresh iframe owns a fresh theme state');
+});

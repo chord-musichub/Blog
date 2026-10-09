@@ -6,7 +6,6 @@
 
   const modes = {
     starRailLike: {
-      name: '原神 / 星穹铁道角色池',
       topName: '五星',
       midName: '四星',
       lowName: '三星',
@@ -27,7 +26,6 @@
       ]
     },
     wutheringLike: {
-      name: '鸣潮角色池',
       topName: '五星',
       midName: '四星',
       lowName: '三星',
@@ -48,7 +46,6 @@
       ]
     },
     arknightsLike: {
-      name: '明日方舟标准寻访',
       topName: '六星',
       midName: '五星',
       lowName: '四星及以下',
@@ -69,7 +66,6 @@
       ]
     },
     blueArchiveLike: {
-      name: '蔚蓝档案招募',
       topName: '三星',
       midName: '二星',
       lowName: '一星',
@@ -110,6 +106,8 @@
   };
 
   const emptyResults = els.results.innerHTML;
+  const historyCards = new Map();
+  let renderedMode = null, renderedFeatured = null;
   let state = {
     pity: 0,
     midPity: 0,
@@ -221,10 +219,19 @@
 
   function render(lastBatch){
     const mode = currentMode();
-    tool.classList.toggle('is-standard-banner', !isFeatured());
-    els.bannerNote.textContent = isFeatured()
-      ? '当前为限定 / UP 池：抽到最高稀有后会判定是否为 UP，并根据规则处理小保底 / 大保底。'
-      : '当前为常驻池：只模拟稀有度与保底抽数，不判定 UP，也不会触发大小保底。';
+    const featured = isFeatured();
+    tool.classList.toggle('is-standard-banner', !featured);
+    if(mode !== renderedMode || featured !== renderedFeatured){
+      els.bannerNote.textContent = featured
+        ? '当前为限定 / UP 池：抽到最高稀有后会判定是否为 UP，并根据规则处理小保底 / 大保底。'
+        : '当前为常驻池：只模拟稀有度与保底抽数，不判定 UP，也不会触发大小保底。';
+      const bannerRule = featured
+        ? '当前选择的是限定 / UP 池：会显示 UP 标签，并按该游戏规则处理大小保底。'
+        : '当前选择的是常驻池：不会显示 UP 标签，也不会累积或触发大保底。';
+      els.rules.innerHTML = '<ul>' + mode.rules.concat([bannerRule]).map(function(rule){ return '<li>' + rule + '</li>'; }).join('') + '</ul>';
+      renderedMode = mode;
+      renderedFeatured = featured;
+    }
     els.total.textContent = String(state.total);
     els.pity.textContent = String(state.pity);
     els.hardPity.textContent = mode.hardPity ? String(mode.hardPity) : '递增';
@@ -246,11 +253,6 @@
     els.sparkTarget.textContent = mode.sparkTarget ? String(mode.sparkTarget) : '—';
     els.sparkBar.style.width = mode.sparkTarget ? Math.min(100, state.spark / mode.sparkTarget * 100) + '%' : '0%';
 
-    const bannerRule = isFeatured()
-      ? '当前选择的是限定 / UP 池：会显示 UP 标签，并按该游戏规则处理大小保底。'
-      : '当前选择的是常驻池：不会显示 UP 标签，也不会累积或触发大保底。';
-    els.rules.innerHTML = '<ul>' + mode.rules.concat([bannerRule]).map(function(rule){ return '<li>' + rule + '</li>'; }).join('') + '</ul>';
-
     if(lastBatch && lastBatch.length){
       const tops = lastBatch.filter(x => x.rarity === 'top').length;
       const ups = lastBatch.filter(x => x.up).length;
@@ -262,19 +264,33 @@
     }
 
     if(!state.history.length){
-      els.results.innerHTML = emptyResults;
+      historyCards.clear();
+      if(els.results.innerHTML !== emptyResults) els.results.innerHTML = emptyResults;
       return;
     }
-
-    els.results.innerHTML = state.history.map(function(item){
-      const cls = item.rarity === 'top' ? 'top' : (item.rarity === 'mid' ? 'mid' : 'low');
-      const up = item.up ? '<span class="gacha-up">UP</span>' : '';
-      return '<div class="gacha-card ' + cls + '">' +
-        '<span class="gacha-rarity">' + item.label + '</span>' +
-        up +
-        '<small>#' + item.index + ' · ' + item.note + '</small>' +
-      '</div>';
-    }).join('');
+    const retained = new Set(state.history);
+    historyCards.forEach(function(card, item){
+      if(!retained.has(item)){ card.remove(); historyCards.delete(item); }
+    });
+    if(!historyCards.size) els.results.replaceChildren();
+    state.history.forEach(function(item, index){
+      let card = historyCards.get(item);
+      if(!card){
+        card = document.createElement('div');
+        card.className = 'gacha-card ' + item.rarity;
+        const rarity = document.createElement('span');
+        rarity.className = 'gacha-rarity'; rarity.textContent = item.label;
+        card.appendChild(rarity);
+        if(item.up){
+          const up = document.createElement('span');
+          up.className = 'gacha-up'; up.textContent = 'UP'; card.appendChild(up);
+        }
+        const note = document.createElement('small');
+        note.textContent = '#' + item.index + ' · ' + item.note; card.appendChild(note);
+        historyCards.set(item, card);
+      }
+      if(els.results.children[index] !== card) els.results.insertBefore(card, els.results.children[index] || null);
+    });
   }
 
   tool.querySelector('[data-gacha-pull-one]').addEventListener('click', function(){ pull(1); });

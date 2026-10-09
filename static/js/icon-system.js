@@ -63,22 +63,37 @@
     name = String(name || '').trim().toLowerCase();
     return icons[name] || icons.circle;
   }
+  var canonicalMarkup = new Map();
+  function normalizedMarkup(markup){
+    if(canonicalMarkup.has(markup)) return canonicalMarkup.get(markup);
+    // SVG self-closing tags serialize as explicit closing tags in HTML. Compare
+    // like with like so unchanged icons do not rebuild on every refresh.
+    var template = document.createElement('template');
+    template.innerHTML = markup;
+    var normalized = template.innerHTML;
+    canonicalMarkup.set(markup, normalized);
+    return normalized;
+  }
+  function replaceIcon(el){
+    var html = normalizedMarkup(get(el.getAttribute('data-ui-icon')));
+    if(el.innerHTML !== html) el.innerHTML = html;
+    el.classList.add('ui-icon');
+  }
   function replace(root){
     root = root || document;
+    if(root.isConnected === false) return;
+    if(root.matches && root.matches('[data-ui-icon]')) replaceIcon(root);
     var nodes = root.querySelectorAll ? root.querySelectorAll('[data-ui-icon]') : [];
-    nodes.forEach(function(el){
-      var name = el.getAttribute('data-ui-icon');
-      var html = get(name);
-      if(el.innerHTML !== html) el.innerHTML = html;
-      el.classList.add('ui-icon');
-    });
+    nodes.forEach(replaceIcon);
   }
   window.SonglineIcons = {
     version: VERSION,
     svg: get,
     render: get,
     replace: replace,
-    register: function(name, markup){ if(name && markup) icons[String(name).trim().toLowerCase()] = String(markup); }
+    register: function(name, markup){
+      if(name && markup){ icons[String(name).trim().toLowerCase()] = String(markup); canonicalMarkup.clear(); }
+    }
   };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ replace(document); });
   else replace(document);
@@ -87,9 +102,13 @@
     replace(document);
   });
 
+  var refreshTimers = [];
+  function cancelRefresh(){ refreshTimers.forEach(window.clearTimeout); refreshTimers = []; }
+  window.addEventListener('songline:page-transition-start', cancelRefresh);
+  window.addEventListener('pagehide', cancelRefresh);
   window.addEventListener('songline:page-swap', function(event){
+    cancelRefresh();
     var root = event.detail && event.detail.root ? event.detail.root : document;
-    window.setTimeout(function(){ replace(root); }, 20);
-    window.setTimeout(function(){ replace(document); }, 120);
+    refreshTimers = [window.setTimeout(function(){ replace(root); }, 20), window.setTimeout(function(){ replace(document); }, 120)];
   });
 })();

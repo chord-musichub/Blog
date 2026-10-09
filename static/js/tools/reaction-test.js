@@ -51,15 +51,32 @@
     var scoreRecorded = false;
     var audioCtx = null;
     var soundEnabled = storage.getItem(SOUND_KEY) !== '0';
-    var autoSyncedLocalBest = false;
+    var lastSyncedBest = 0;
+    var pendingSubmissions = new Map();
+    var requestControllers = new Set();
+    var scoreGeneration = 0, syncTimer = 0;
+    var scoreEndpoints = endpoints(), preferredEndpoint = '';
+    var bindings = [];
     var disposed = false;
-    function cleanup(){
+    function bind(target, type, handler){
+      target.addEventListener(type, handler);
+      bindings.push([target, type, handler]);
+    }
+    function cleanup(event){
+      if(event && event.type === 'pagehide' && event.persisted) return;
+      if(disposed) return;
       disposed = true;
       resetTimer();
+      window.clearTimeout(syncTimer); syncTimer = 0;
+      requestControllers.forEach(function(controller){ controller.abort(); });
+      requestControllers.clear(); pendingSubmissions.clear();
+      bindings.forEach(function(binding){ binding[0].removeEventListener(binding[1], binding[2]); });
+      bindings = [];
       if(audioCtx && audioCtx.state !== 'closed') audioCtx.close().catch(function(){});
-      window.removeEventListener('songline:page-transition-start', cleanup);
+      delete root.dataset.reactionBooted;
     }
-    window.addEventListener('songline:page-transition-start', cleanup);
+    bind(window, 'songline:page-transition-start', cleanup);
+    bind(window, 'pagehide', cleanup);
 
 
     function setClass(next){
@@ -188,8 +205,7 @@
       }).map(function(item){
         return {
           score:Number(item.score || 0),
-          created_at:item.created_at || '',
-          display_name:item.display_name || item.username || item.player_id || ''
+          created_at:item.created_at || ''
         };
       }).filter(function(item){
         return Number.isFinite(item.score) && item.score >= 1 && item.score <= 5000;
@@ -200,14 +216,11 @@
     }
 
     function renderTopScores(){
-      if(!topScoresEl) return;
-      if(!topScores.length){
-        topScoresEl.innerHTML = '<li>暂无记录</li>';
-        return;
-      }
-      topScoresEl.innerHTML = topScores.map(function(item, index){
+      if(disposed || !topScoresEl) return;
+      var markup = topScores.length ? topScores.map(function(item, index){
         return '<li><span>第 ' + (index + 1) + ' 名</span><b>' + item.score + ' ms</b></li>';
-      }).join('');
+      }).join('') : '<li>暂无记录</li>';
+      if(topScoresEl.innerHTML !== markup) topScoresEl.innerHTML = markup;
     }
 
     function loadCache(){
@@ -220,19 +233,33 @@
     }
 
     function requestScore(url, options){
+      if(disposed) return Promise.reject(new Error('reaction test disposed'));
       var absolute = /^https?:\/\//i.test(url);
       var baseOptions = absolute ? {mode:'cors', credentials:'omit'} : {credentials:'same-origin'};
+      var controller = typeof AbortController === 'function' ? new AbortController() : null;
+      if(controller){ requestControllers.add(controller); baseOptions.signal = controller.signal; }
       return fetch(url, Object.assign(baseOptions, options || {})).then(function(res){
-        if(!res.ok) throw new Error('bad status ' + res.status + ' @ ' + url);
+        if(disposed) throw new Error('reaction test disposed');
+        if(!res.ok){
+          var error = new Error('bad status ' + res.status + ' @ ' + url);
+          error.routeMissing = res.status === 404 || res.status === 405;
+          throw error;
+        }
         return res.json();
       }).then(function(data){
+        if(disposed) throw new Error('reaction test disposed');
+        if(!data || !Array.isArray(data.scores)) throw new Error('invalid reaction score response');
+        preferredEndpoint = url;
         window.SonglineReactionScoresDebug = {endpoint:url, data:data, time:new Date().toISOString()};
         return data;
+      }).finally(function(){
+        if(controller) requestControllers.delete(controller);
       });
     }
 
     function requestAny(options){
-      var list = endpoints();
+      var list = preferredEndpoint ? [preferredEndpoint].concat(scoreEndpoints.filter(function(url){ return url !== preferredEndpoint; })) : scoreEndpoints;
+      var posting = options && options.method === 'POST';
       var index = 0;
       var lastError = null;
       function next(){
@@ -241,6 +268,9 @@
         }
         var url = list[index++];
         return requestScore(url, options).catch(function(err){
+          // A failed POST may already have been accepted. Only an explicitly
+          // missing route permits another endpoint; GET fallback remains safe.
+          if(disposed || err.name === 'AbortError' || (posting && !err.routeMissing)) throw err;
           lastError = err;
           return next();
         });
@@ -251,7 +281,9 @@
     function fetchScores(){
       loadCache();
       renderTopScores();
+      var generation = ++scoreGeneration;
       return requestAny().then(function(data){
+        if(disposed || generation !== scoreGeneration) return;
         topScores = normalizeScores(data.scores);
         saveCache();
         renderTopScores();
@@ -260,33 +292,40 @@
       });
     }
 
-    function submitScore(ms, reason){
-      if(!Number.isFinite(ms) || ms < 1 || ms > 5000) return;
-      return requestAny({
+    function submitScore(ms){
+      if(disposed || !Number.isFinite(ms) || ms < 1 || ms > 5000) return;
+      if(pendingSubmissions.has(ms)) return pendingSubmissions.get(ms);
+      var generation = ++scoreGeneration;
+      var pending = requestAny({
         method:'POST',
         headers:{'Content-Type':'application/json'},
         credentials:'same-origin',
         body:JSON.stringify({score:ms, player_id:getPlayerID()})
       }).then(function(data){
+        if(disposed) return;
+        if(!lastSyncedBest || ms < lastSyncedBest) lastSyncedBest = ms;
+        if(generation !== scoreGeneration) return;
         topScores = normalizeScores(data.scores);
         saveCache();
         renderTopScores();
       }).catch(function(){
         renderTopScores();
+      }).finally(function(){
+        if(pendingSubmissions.get(ms) === pending) pendingSubmissions.delete(ms);
       });
+      pendingSubmissions.set(ms, pending);
+      return pending;
     }
 
     function recordScore(ms){
       if(scoreRecorded) return;
       scoreRecorded = true;
-      return submitScore(ms, 'result');
+      return submitScore(ms);
     }
 
-    function syncLocalBest(manual){
+    function syncLocalBest(){
       var localBest = Number(storage.getItem(BEST_KEY) || best || 0) || 0;
-      if(!manual && autoSyncedLocalBest) return;
-      autoSyncedLocalBest = true;
-      if(localBest > 0) return submitScore(localBest, 'local-best');
+      if(localBest > 0 && (!lastSyncedBest || localBest < lastSyncedBest)) return submitScore(localBest);
     }
 
     function resetTimer(){
@@ -348,9 +387,9 @@
       startTest();
     }
 
-    stage.addEventListener('click', handleStageClick);
-    root.addEventListener('songline:tool-sync-best', function(){ if(!disposed) syncLocalBest(true); });
-    root.addEventListener('songline:tool-help-change', function(event){
+    bind(stage, 'click', handleStageClick);
+    bind(root, 'songline:tool-sync-best', function(){ if(!disposed) syncLocalBest(); });
+    bind(root, 'songline:tool-help-change', function(event){
       if(!event.detail.open || disposed || (state !== 'waiting' && state !== 'ready')) return;
       resetTimer();
       state = 'idle';
@@ -360,7 +399,7 @@
     });
 
     if(startBtn){
-      startBtn.addEventListener('click', function(event){
+      bind(startBtn, 'click', function(event){
         ensureAudio();
         play('button');
         startTest();
@@ -370,7 +409,7 @@
 
     if(soundToggle){
       updateSoundToggle();
-      soundToggle.addEventListener('click', function(event){
+      bind(soundToggle, 'click', function(event){
         soundEnabled = !soundEnabled;
         storage.setItem(SOUND_KEY, soundEnabled ? '1' : '0');
         updateSoundToggle();
@@ -386,7 +425,10 @@
     setMessage('', '点击开始', '');
     renderStats();
     updateSoundToggle();
-    fetchScores().then(function(){ window.setTimeout(function(){ if(!disposed && root.isConnected) syncLocalBest(false); }, 320); });
+    fetchScores().then(function(){
+      if(disposed || !root.isConnected) return;
+      syncTimer = window.setTimeout(function(){ syncTimer = 0; if(!disposed && root.isConnected) syncLocalBest(); }, 320);
+    });
   }
 
   function boot(target){

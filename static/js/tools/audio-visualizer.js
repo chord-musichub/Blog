@@ -42,6 +42,8 @@
     var backdrop = root.querySelector('[data-av-backdrop]');
     var paintedCover = '';
     var playBtn = root.querySelector('[data-av-play]');
+    var playIcon = root.querySelector('[data-av-play-icon]');
+    var pauseIcon = root.querySelector('[data-av-pause-icon]');
     var coverPicker = root.querySelector('[data-av-cover-picker]');
     var coverFile = root.querySelector('[data-av-cover-file]');
     var exitDisplay = root.querySelector('[data-av-exit-display]');
@@ -56,6 +58,8 @@
     var playModeBtn = root.querySelector('[data-av-play-mode]');
     var prevBtn = root.querySelector('[data-av-prev]');
     var nextBtn = root.querySelector('[data-av-next]');
+    var queueCount = root.querySelector('[data-av-queue-count]');
+    var modeIcons = ['list','single','shuffle'].map(function(mode){ return root.querySelector('[data-av-mode-' + mode + ']'); });
 
     if(!canvas) return;
 
@@ -71,6 +75,7 @@
     var fileUrl = '';
     var uploadToken = 0;
     var playlist = [];
+    var playlistRows = new Map(), playlistDirty = true, activePlaylistRow = null;
     var currentIndex = -1;
     var playlistCollapsed = true;
     var queueKeyboard = false;
@@ -139,16 +144,13 @@
 
     function updatePlayModeButton(){
       if(!playModeBtn) return;
-      ['list','single','shuffle'].forEach(function(mode){
-        var icon = playModeBtn.querySelector('[data-av-mode-' + mode + ']');
+      ['list','single','shuffle'].forEach(function(mode, index){
+        var icon = modeIcons[index];
         if(icon) icon.hidden = mode !== playMode;
       });
       playModeBtn.setAttribute('aria-label', '播放模式：' + modeLabel(playMode));
       playModeBtn.title = modeLabel(playMode);
       playModeBtn.dataset.mode = playMode;
-      root.classList.toggle('is-play-mode-single', playMode === 'single');
-      root.classList.toggle('is-play-mode-shuffle', playMode === 'shuffle');
-      root.classList.toggle('is-play-mode-list', playMode === 'list');
     }
 
     function cyclePlayMode(){
@@ -160,7 +162,6 @@
     }
 
     function syncQueueControls(){
-      root.classList.toggle('is-playlist-collapsed', !!playlistCollapsed);
       if(playlistList) playlistList.hidden = playlistCollapsed;
       if(playlistToggleBtn){
         playlistToggleBtn.setAttribute('aria-label',playlistCollapsed ? '打开歌曲列表' : '关闭歌曲列表');
@@ -379,7 +380,7 @@
           else if(editRate.validity.valid) draft.sampleRate = Number(values[key]);
         });
         editItem.overrides = draft;
-        renderPlaylist();
+        renderPlaylist(editItem);
         refreshCurrentTrackText();
       }
       editItem = editDraft = editInitial = null;
@@ -410,8 +411,8 @@
         playBtn.disabled = !local;
         playBtn.setAttribute('aria-label', playing ? '暂停' : '播放');
         playBtn.title = playing ? '暂停' : '播放';
-        root.querySelector('[data-av-play-icon]').hidden = playing;
-        root.querySelector('[data-av-pause-icon]').hidden = !playing;
+        if(playIcon) playIcon.hidden = playing;
+        if(pauseIcon) pauseIcon.hidden = !playing;
       }
       if(prevBtn) prevBtn.disabled = !local || playlist.length < 2;
       if(nextBtn) nextBtn.disabled = !local || playlist.length < 2;
@@ -466,7 +467,7 @@
       var metadata = window.SonglineAudioMetadata;
       if(!metadata || typeof metadata.read !== 'function'){
         console.warn('[audio-visualizer] audio metadata module is unavailable');
-        return {title:'', artist:'', album:'', cover:''};
+        return {title:'', artist:'', cover:''};
       }
       return metadata.read(file, {independent:true});
     }
@@ -489,55 +490,78 @@
       if(!playlist.length){playlistCollapsed = true;updatePlaylistCollapse();}
       if(playlistPanel) playlistPanel.hidden = playlist.length === 0;
       root.classList.toggle('has-local-playlist', playlist.length > 0);
-      var count = root.querySelector('[data-av-queue-count]');
-      if(count) count.textContent = String(playlist.length);
+      if(queueCount && queueCount.textContent !== String(playlist.length)) queueCount.textContent = String(playlist.length);
       updatePlaylistCollapse();
       updatePlayModeButton();
     }
 
-    function renderPlaylist(){
-      showPlaylist();
-      if(!playlistList) return;
-      playlistList.innerHTML = '';
-
-      playlist.forEach(function(item, index){
-        var info = trackFields(item);
+    function createPlaylistRow(){
         var row = document.createElement('div');
         row.className = 'av-playlist-item';
-        row.classList.toggle('is-active', index === currentIndex);
-        row.dataset.index = String(index);
-
         var main = document.createElement('button');
         main.type = 'button';
         main.className = 'av-playlist-main';
-        main.setAttribute('aria-label', '播放 ' + info.title);
-
         var title = document.createElement('strong');
-        title.textContent = info.title;
-
         var meta = document.createElement('span');
-        meta.textContent = info.artist;
-        if(index === currentIndex) main.setAttribute('aria-current','true');
-
         main.appendChild(title);
-        if(info.artist) main.appendChild(meta);
-        main.addEventListener('click', function(){ playPlaylistIndex(index); });
-
         var remove = document.createElement('button');
         remove.type = 'button';
         remove.className = 'av-playlist-remove';
         remove.textContent = '移出';
-        remove.setAttribute('aria-label', '从列表移出 ' + info.title);
-        remove.addEventListener('click', function(event){
-          event.stopPropagation();
-          removePlaylistItem(index);
-        });
-
         row.appendChild(main);
         row.appendChild(remove);
-        playlistList.appendChild(row);
-      });
+        return {row:row, main:main, title:title, meta:meta, remove:remove};
+    }
+
+    function updatePlaylistRow(item){
+      var entry = playlistRows.get(item);
+      if(!entry) return;
+      var info = trackFields(item);
+      if(entry.title.textContent !== info.title) entry.title.textContent = info.title;
+      if(entry.main.getAttribute('aria-label') !== '播放 ' + info.title){
+        entry.main.setAttribute('aria-label', '播放 ' + info.title);
+        entry.remove.setAttribute('aria-label', '从列表移出 ' + info.title);
+      }
+      if(entry.meta.textContent !== info.artist) entry.meta.textContent = info.artist;
+      if(info.artist){ if(entry.meta.parentNode !== entry.main) entry.main.appendChild(entry.meta); }
+      else if(entry.meta.parentNode) entry.meta.remove();
+    }
+
+    function renderPlaylist(changedItem){
+      showPlaylist();
+      if(!playlistList) return;
+      if(playlistDirty){
+        var retained = new Set(playlist);
+        playlistRows.forEach(function(entry, item){
+          if(!retained.has(item)){ entry.row.remove(); playlistRows.delete(item); }
+        });
+        playlist.forEach(function(item, index){
+          var entry = playlistRows.get(item);
+          if(!entry){ entry = createPlaylistRow(); playlistRows.set(item, entry); updatePlaylistRow(item); }
+          entry.row.dataset.index = String(index);
+          if(playlistList.children[index] !== entry.row) playlistList.insertBefore(entry.row, playlistList.children[index] || null);
+        });
+        playlistDirty = false;
+      }
+      if(changedItem) updatePlaylistRow(changedItem);
+      var active = playlistRows.get(playlist[currentIndex]) || null;
+      if(active !== activePlaylistRow){
+        if(activePlaylistRow){ activePlaylistRow.row.classList.remove('is-active'); activePlaylistRow.main.removeAttribute('aria-current'); }
+        if(active){ active.row.classList.add('is-active'); active.main.setAttribute('aria-current', 'true'); }
+        activePlaylistRow = active;
+      }
       updatePlaybackState();
+    }
+
+    function onPlaylistClick(event){
+      if(disposed) return;
+      var control = event.target.closest && event.target.closest('.av-playlist-main, .av-playlist-remove');
+      var row = control && control.closest('.av-playlist-item');
+      if(!row || !playlistList.contains(row)) return;
+      var index = Number(row.dataset.index), entry = playlistRows.get(playlist[index]);
+      if(!Number.isInteger(index) || !entry || entry.row !== row) return;
+      if(control === entry.remove){ event.stopPropagation(); removePlaylistItem(index); }
+      else if(control === entry.main) playPlaylistIndex(index);
     }
 
     function releaseCover(item){
@@ -553,12 +577,10 @@
         }
         item.title = tags.title || item.title;
         item.artist = tags.artist || item.artist;
-        item.album = tags.album || '';
         item.sampleRate = Number(tags.sampleRate) || 0;
         if(item.customCover){ if(tags.cover) URL.revokeObjectURL(tags.cover); }
         else item.cover = tags.cover || '';
-        item.parsed = true;
-        renderPlaylist();
+        renderPlaylist(item);
         return tags;
       }).catch(function(){ return {}; });
       return item.tagsPromise;
@@ -570,6 +592,7 @@
       var removedCurrent = index === currentIndex;
       releaseCover(playlist[index]);
       playlist.splice(index, 1);
+      playlistDirty = true;
 
       if(!playlist.length){
         currentIndex = -1;
@@ -625,12 +648,10 @@
           file:file,
           title:file.name.replace(/\.[^.]+$/, ''),
           artist:'',
-          album:'',
-          cover:'',
-          parsed:false
+          cover:''
         });
       });
-
+      playlistDirty = true;
       renderPlaylist();
       setHint('');
 
@@ -732,7 +753,6 @@
         browserStreamSource.connect(analyser);
 
         renderTrack({
-          source:'实时捕获',
           title:'系统声音',
           artist:'',
           progress:0,
@@ -792,13 +812,10 @@
       audio.hidden = true;
       setVolume(volumeInput ? volumeInput.value : 80);
 
-      var baseTitle = file.name.replace(/\.[^.]+$/, '');
       var info = trackFields(playlistItem);
       renderTrack({
-        source:playlist.length ? '本地播放列表' : '本地音频文件',
-        title:info.title || baseTitle,
+        title:info.title,
         artist:info.artist,
-        album:playlistItem.album || '',
         progress:0,
         positionText:'--:--',
         durationText:'--:--',
@@ -818,10 +835,8 @@
 
       info = trackFields(playlistItem);
       renderTrack({
-        source:playlist.length ? '本地播放列表' : '本地音频文件',
-        title:info.title || baseTitle,
+        title:info.title,
         artist:info.artist,
-        album:playlistItem.album || '',
         progress:Number.isFinite(audio.duration) && audio.duration > 0 ? audio.currentTime / audio.duration * 100 : 0,
         positionText:formatTime(audio.currentTime * 1000),
         durationText:Number.isFinite(audio.duration) ? formatTime(audio.duration * 1000) : '--:--',
@@ -945,6 +960,7 @@
       playlistCollapsed = true;updatePlaylistCollapse();
       playlist.forEach(releaseCover);
       playlist = [];
+      playlistDirty = true;
       currentIndex = -1;
       pendingCovers.forEach(function(url){URL.revokeObjectURL(url);});
       pendingCovers.clear();
@@ -1108,6 +1124,7 @@
     }
 
     if(playBtn) playBtn.addEventListener('click', toggleLocalAudioPlayback);
+    if(playlistList) playlistList.addEventListener('click', onPlaylistClick);
     if(exitDisplay) exitDisplay.addEventListener('click', function(){
       setDisplayMode(false);
       if(displayModeBtn) displayModeBtn.focus({preventScroll:true});
@@ -1354,7 +1371,6 @@
     showPlaylist();
     setHint('');
 
-    bindSourceCards();
     renderer.resize();
 
     function onVisibilityChange(){ renderer.handleVisibility(document.hidden); }
@@ -1395,6 +1411,8 @@
       revokeUrls();
       playlist.forEach(releaseCover);
       playlist = [];
+      playlistRows.clear(); activePlaylistRow = null;
+      if(playlistList){ playlistList.removeEventListener('click', onPlaylistClick); playlistList.replaceChildren(); }
       pendingCovers.forEach(function(url){ URL.revokeObjectURL(url); });
       pendingCovers.clear();
       if(coverImg) coverImg.removeAttribute('src');
