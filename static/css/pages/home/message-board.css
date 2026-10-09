@@ -1,17 +1,6 @@
 /* HOME 右侧终端的内部留言板；不改变首页 URL 或全站楼层状态。 */
 .songline-terminal-frame{ position:relative; }
 .songline-home-system-panel{ display:grid; gap:clamp(14px,1.6vh,20px); min-height:100%; }
-.songline-home-message-goto{
-  position:absolute; z-index:3; right:clamp(18px,2.2vw,32px); bottom:clamp(15px,1.7vw,23px);
-  display:inline-flex; align-items:baseline; gap:7px; padding:6px 0; border:0;
-  color:rgba(235,243,250,.74); background:transparent; cursor:pointer;
-  font:740 13px/1 ui-serif,Georgia,"Noto Serif SC",serif; letter-spacing:.1em;
-  transition:color .2s ease,transform .2s ease;
-}
-.songline-home-message-goto b{ color:rgba(255,208,151,.96); font:500 21px/.5 Georgia,serif; }
-.songline-home-message-goto i{ font-style:normal; color:rgba(255,221,183,.85); font-size:9px; }
-.songline-home-message-goto:hover,.songline-home-message-goto:focus-visible{ color:#fff; outline:0; transform:translateX(3px); }
-
 .songline-home-message-board{
   position:absolute; inset:0; z-index:6; display:grid; grid-template-rows:auto minmax(0,1fr) auto;
   min-height:0; padding:clamp(18px,2vw,28px) clamp(18px,2.2vw,32px) clamp(15px,1.7vw,23px);
@@ -188,7 +177,6 @@ body.dark[data-page-kind="home"] .songline-home-message-focus-close:focus-visibl
 @media(max-width:760px){
   .songline-home-message-board{ min-height:clamp(440px,72vh,580px); }
   .songline-home-message-entry.is-offset{ margin-left:16px; }
-  .songline-home-message-goto{ right:15px; bottom:14px; }
 }
 @media(prefers-reduced-motion:reduce){
   .songline-home-message-board,.songline-home-system-panel{ transition:opacity .16s linear!important; transform:none!important; }

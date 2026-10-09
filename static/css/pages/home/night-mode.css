@@ -23,8 +23,7 @@ body.dark[data-page-kind="home"] .site-bg-layer::after{
   background:linear-gradient(90deg, rgba(2,8,25,.02) 0%, rgba(2,8,25,.06) 34%, rgba(2,8,25,.14) 58%, rgba(2,8,25,.20) 100%)!important;
 }
 
-/* 顶部保持悬浮，颜色服从夜空而不是白天的暖色覆写。 */
-body.dark[data-page-kind="home"] .modern-site-header,
+/* 顶栏玻璃由公共导航层负责，内部容器保持透明。 */
 body.dark[data-page-kind="home"] .modern-site-header .modern-navbar{ background:transparent!important; }
 body.dark[data-page-kind="home"] .modern-site-header .logo,
 body.dark[data-page-kind="home"] .modern-site-header .logo-text{ color:#edf3ff!important; }

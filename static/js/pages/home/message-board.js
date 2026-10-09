@@ -19,6 +19,7 @@
     var status = panel.querySelector('[data-home-message-compose-status]');
     var list = panel.querySelector('[data-home-message-list]');
     var count = panel.querySelector('[data-home-message-count]');
+    var statCount = panel.querySelector('[data-home-message-stat-count]');
     var loadStatus = panel.querySelector('[data-home-message-load-status]');
     var previewToggle = panel.querySelector('[data-home-message-preview-toggle]');
     var preview = panel.querySelector('[data-home-message-preview]');
@@ -275,6 +276,7 @@
       messages = Array.isArray(messages) ? messages : [];
       var currentMessages = messages;
       if(count) count.textContent = String(messages.length);
+      if(statCount) statCount.textContent = String(messages.length);
       renderMessageTicker(messages);
       if(!list) return;
       list.innerHTML = messages.map(function(message, index){

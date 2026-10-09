@@ -16,14 +16,9 @@
   html .site-boot-overlay,html.document-cover::after{
     height:100vh!important;height:100lvh!important;
   }
-  /* 顶栏以原首页为基准：一整条玻璃，不让历史规则额外叠出亮白渐变和内缩空边。 */
-  html.has-fixed-mobile-nav body .modern-site-header,
-  html body .modern-site-header{position:fixed!important;top:0!important;left:0!important;right:0!important;height:60px!important;padding:0!important;background:rgba(10,22,38,.62)!important;border:0!important;box-shadow:none!important;backdrop-filter:blur(14px) saturate(104%)!important;-webkit-backdrop-filter:blur(14px) saturate(104%)!important;z-index:12000!important}
+  /* 共用玻璃顶栏，只在这里调整紧凑视口的排布。 */
   html.has-fixed-mobile-nav body .modern-site-header .modern-navbar,
   html body .modern-site-header .modern-navbar{width:100%!important;max-width:none!important;height:60px!important;min-height:60px!important;box-sizing:border-box;padding:8px 14px!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;flex-wrap:nowrap!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-  html.has-fixed-mobile-nav body:not(.dark) .modern-site-header,
-  html body:not(.dark) .modern-site-header{background:rgba(75,66,75,.48)!important;border-bottom-color:rgba(241,215,205,.20)!important}
-  html body:not(.dark) .modern-site-header :is(.logo,.logo-text),html:root body:not(.dark):not([data-page-kind="home"]) .modern-site-header .header-icons .icon-btn{color:rgba(250,244,240,.94)!important;text-shadow:0 1px 10px rgba(31,30,39,.22)!important}
   /* 浅色移动端不再沿用旧系统接近纯白的 --border；玻璃靠色块区分，不靠亮边框切割。 */
   html body:not(.dark){--border:rgba(102,83,92,.24)!important}
   html body:not(.dark) :is(.card,.area-card,.page-hero,.content-archive,.archive-record__drawer-shell,.article-shell,.article-intro,.article-reader,.tools-search-station,.tool-card,.typing-panel,.typing-card){border-color:transparent!important}
@@ -73,7 +68,6 @@
   html body[data-page-kind="home"] .songline-home-music-actions{display:flex!important;justify-content:space-between;transform:none!important;margin:0!important;gap:2px}
   html body[data-page-kind="home"] .songline-home-music-actions .ui-icon{--ui-icon-size:18px}
   html body[data-page-kind="home"] .songline-home-music-status{position:static!important;margin:6px 0!important}
-  html body[data-page-kind="home"] .songline-home-message-goto{position:static;justify-self:end;min-height:44px}
   /* Mobile panels participate in document flow: a swipe never gets trapped in a tiny list. */
   html body[data-page-kind="home"] .songline-home-message-board{display:none;position:relative;inset:auto;min-height:0;padding:14px;grid-template-rows:auto auto auto}
   html body[data-page-kind="home"] [data-home-panel-state="message"] .songline-home-system-panel,

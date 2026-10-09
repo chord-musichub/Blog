@@ -61,5 +61,5 @@ test('page-history chevrons are registered in both static and live icon systems'
  const audio=read('layouts/tools/audio-visualizer.html');assert(audio.includes('href="/tools/" data-av-return'));assert(audio.includes('"chevron-left"'));assert(!audio.includes('data-back-icon'),'Studio return targets tools rather than unrelated page history');
  for(const file of ['web/templates/upload.html','web/templates/request_password.html']){assert(read(file).includes('m15 5-7 7 7 7'));assert(!read(file).includes('M8.5 12H21'));}
  assert(read('static/js/page-transition-system.js').includes("'pageLayout', 'pageScene'"),'AJAX shell owns scene marker changes');
- assert(read('static/css/touch-layout.css').includes(':not(.dark):not([data-page-kind="home"]) .modern-site-header .header-icons'),'Mobile light-mode fallback cannot override the white home icons');
+ assert(read('static/css/site-navigation-overrides.css').includes(':not(.dark):not([data-page-kind="home"]) .modern-site-header .header-icons'),'Shared light-mode fallback cannot override the white home icons');
 });

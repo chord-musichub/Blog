@@ -732,6 +732,16 @@ body.dark[data-page-kind="home"] .songline-notice-latest{background:linear-gradi
   border-top:1px solid rgba(232,243,255,.2);
   border-bottom:1px solid rgba(232,243,255,.2);
 }
+.songline-terminal-stat-grid button.songline-terminal-stat{
+  width:100%;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  appearance:none;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
 .songline-terminal-stat-grid .songline-terminal-stat{
   display:grid;
   align-content:start;
@@ -762,7 +772,6 @@ body.dark[data-page-kind="home"] .songline-notice-latest{background:linear-gradi
   font:620 clamp(28px, 2.8vw, 46px)/.82 ui-monospace, SFMono-Regular, Consolas, monospace!important;
   letter-spacing:-.07em;
 }
-.songline-terminal-stat-grid .songline-terminal-stat:last-child .songline-terminal-stat-value{ font-size:clamp(19px, 1.8vw, 29px)!important; letter-spacing:-.04em; white-space:nowrap; }
 .songline-terminal-uptime{
   display:flex;
   align-items:center;
