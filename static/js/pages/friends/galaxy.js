@@ -1,3 +1,8 @@
+(function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
 /* Friends 星座场景：数据、节点、连线与轻量交互相互独立。 */
 (function(){
   'use strict';
@@ -144,7 +149,7 @@
     lines.textContent = '';
 
     if(!friends.length){
-      if(empty){ empty.hidden = false; empty.textContent = '还没有可显示的朋友数据。'; }
+      if(empty){ empty.hidden = false; uiText(empty, '还没有可显示的朋友数据。'); }
       return;
     }
 
@@ -724,4 +729,6 @@
   }
 
   window.SonglineInitFriendGalaxy = init;
+})();
+
 })();

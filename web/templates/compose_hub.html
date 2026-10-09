@@ -3,15 +3,15 @@
 {{with .Settings.Background.Image}}<div class="admin-site-bg-layer" aria-hidden="true"></div>{{end}}
 {{template "admin-client-nav" .}}
 <main class="wrap wide workspace-shell compose-hub">
-  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Flash}}<div class="flash" data-i18n-text>{{.Flash}}</div>{{end}}
   {{template "workspace-sidebar" .}}
   <section class="workspace-detail compose-hub__detail">
-    <header class="workspace-detail-header"><h1>投稿</h1></header>
-    <section class="workspace-list" aria-label="创作类型">
-    <a href="{{adminURL "/articles/new"}}"><span>01</span><b>文章</b><i aria-hidden="true">↵</i></a>
+    <header class="workspace-detail-header"><h1 data-i18n-ui>投稿</h1></header>
+    <section class="workspace-list" aria-label="创作类型" data-i18n-attrs="aria-label">
+    <a href="{{adminURL "/articles/new"}}"><span>01</span><b data-i18n-ui>文章</b><i aria-hidden="true">↵</i></a>
     {{if isOwnerUser .User}}
-    <a href="{{adminURL "/compose/projects"}}"><span>02</span><b>项目</b><i aria-hidden="true">↵</i></a>
-    <a href="{{adminURL "/compose/memories"}}"><span>03</span><b>回忆</b><i aria-hidden="true">↵</i></a>
+    <a href="{{adminURL "/compose/projects"}}"><span>02</span><b data-i18n-ui>项目</b><i aria-hidden="true">↵</i></a>
+    <a href="{{adminURL "/compose/memories"}}"><span>03</span><b data-i18n-ui>回忆</b><i aria-hidden="true">↵</i></a>
     {{end}}
     </section>
   </section>

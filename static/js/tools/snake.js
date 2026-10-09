@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
   var storage = window.SonglineRuntime.storage;
 
@@ -157,7 +162,7 @@
       if(bestEl) bestEl.textContent = String(best);
       if(levelEl) levelEl.textContent = String(level);
       if(comboEl){
-        comboEl.textContent = combo > 1 ? '连击 x' + combo : '连击 x1';
+        uiText(comboEl, combo > 1 ? '连击 x' + combo : '连击 x1');
         comboEl.classList.toggle('is-hot', combo > 1);
       }
       if(shieldEl){
@@ -174,7 +179,7 @@
         if(rushActive){
           rushEl.textContent = '临时豆 ' + rushStep + '/' + rushTarget + ' · ' + rushLeft + 's';
         }else{
-          rushEl.textContent = '临时豆 待机';
+          uiText(rushEl, '临时豆 待机');
         }
         rushEl.classList.toggle('is-hot', rushActive && rushLeft > 0);
       }
@@ -945,4 +950,6 @@
 
     return controller;
   }
+})();
+
 })();

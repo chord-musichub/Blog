@@ -20,7 +20,7 @@
     if(!tocBody) return;
     const headings = Array.from(reader.querySelectorAll('h1,h2,h3,h4,h5,h6'));
     if(!headings.length){
-      tocBody.innerHTML = '<nav><ul><li><span class="meta">暂无目录</span></li></ul></nav>';
+      tocBody.innerHTML = '<nav><ul><li><span class="meta"><!--ui-->暂无目录<!--/ui--></span></li></ul></nav>';
       return;
     }
     const used = Object.create(null);

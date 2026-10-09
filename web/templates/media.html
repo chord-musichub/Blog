@@ -5,36 +5,36 @@
 {{template "admin-client-nav" .}}
 
 <main class="wrap wide workspace-shell media-workspace" data-media-url="{{.MediaURL}}">
-  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Flash}}<div class="flash" data-i18n-text>{{.Flash}}</div>{{end}}
   {{if .Error}}<div class="flash error">{{.Error}}</div>{{end}}
   {{template "workspace-sidebar" .}}
   <section class="workspace-detail">
-  <header class="workspace-detail-header"><h1>{{if eq .Owner "admin"}}站点素材{{else}}媒体库{{end}}</h1>{{if isOwnerUser .User}}<nav class="media-library-switch" aria-label="媒体库范围">{{if eq .Owner "admin"}}<a class="btn small ghost" href="{{adminURL "/admin/media"}}">我的素材</a>{{else}}<a class="btn small ghost" href="{{adminURL "/admin/media"}}?library=admin">站点素材</a>{{end}}</nav>{{end}}</header>
+  <header class="workspace-detail-header"><h1>{{if eq .Owner "admin"}}<span class="i18n-copy" data-i18n-ui>站点素材</span>{{else}}<span class="i18n-copy" data-i18n-ui>媒体库</span>{{end}}</h1>{{if isOwnerUser .User}}<nav class="media-library-switch" aria-label="媒体库范围" data-i18n-attrs="aria-label">{{if eq .Owner "admin"}}<a class="btn small ghost" href="{{adminURL "/admin/media"}}" data-i18n-ui>我的素材</a>{{else}}<a class="btn small ghost" href="{{adminURL "/admin/media"}}?library=admin" data-i18n-ui>站点素材</a>{{end}}</nav>{{end}}</header>
 
   <section class="card workspace-section">
-    <h2>添加素材</h2>
+    <h2 data-i18n-ui>添加素材</h2>
     <form method="post" action="{{.MediaURL}}" enctype="multipart/form-data" class="media-upload-form">
       <input type="file" name="media" accept=".jpg,.jpeg,.png,.webp,.svg,.gif,.ico,.pdf,.zip,.mp3,.wav,.m4a,.ogg,.mp4,.webm,.mov,.txt,.md,.markdown,image/*,application/pdf,audio/*,video/mp4,video/webm,video/quicktime">
-      <label class="media-name-field">文件名（选填）
-        <input name="filename" placeholder="留空使用原文件名">
+      <label class="media-name-field"><span class="i18n-copy" data-i18n-ui>文件名（选填）
+        </span><input name="filename" placeholder="留空使用原文件名" data-i18n-attrs="placeholder">
       </label>
-      <label class="media-category-field">归类
-        <select name="category">
-          {{range .Categories}}<option value="{{.Key}}">{{.Label}}</option>{{end}}
+      <label class="media-category-field"><span class="i18n-copy" data-i18n-ui>归类
+        </span><select name="category">
+          {{range .Categories}}<option data-i18n-ui value="{{.Key}}">{{.Label}}</option>{{end}}
         </select>
       </label>
-      <button><span class="btn-ico" aria-hidden="true">⇧</span><span class="btn-text">上传素材</span></button>
+      <button><span class="btn-ico" aria-hidden="true">⇧</span><span class="btn-text" data-i18n-ui>上传素材</span></button>
     </form>
   </section>
 
   <section class="card workspace-section">
     <div class="toolbar media-library-toolbar">
-      <h2>{{if eq .Owner "admin"}}站点素材{{else}}我的素材{{end}} <span class="soft-count">{{len .Files}}</span></h2>
-      <label class="media-search"><span class="sr-only">搜索素材</span><input id="mediaSearch" type="search" placeholder="搜索文件名"></label>
+      <h2>{{if eq .Owner "admin"}}<span class="i18n-copy" data-i18n-ui>站点素材</span>{{else}}<span class="i18n-copy" data-i18n-ui>我的素材</span>{{end}} <span class="soft-count">{{len .Files}}</span></h2>
+      <label class="media-search"><span class="sr-only" data-i18n-ui>搜索素材</span><input id="mediaSearch" type="search" placeholder="搜索文件名" data-i18n-attrs="placeholder"></label>
     </div>
     {{range $groupIndex, $group := .Groups}}
     <section class="media-group" data-media-group>
-      <h3>{{$group.Label}} <span class="soft-count">{{len $group.Files}}</span></h3>
+      <h3><span class="i18n-copy" data-i18n-ui>{{$group.Label}}</span> <span class="soft-count">{{len $group.Files}}</span></h3>
       <div class="media-grid">
     {{range $index, $file := $group.Files}}
       <div class="media-item" data-media-item data-media-search="{{$file.Name}} {{$group.Label}}">
@@ -47,30 +47,30 @@
         </a>
         <p class="media-filename" title="{{$file.Name}}">{{$file.Name}}</p>
         <div class="media-actions">
-          <button class="btn small secondary copy-media-path" type="button" data-path="{{$file.Path}}">{{template "admin-icon" "copy"}}<span class="btn-text">复制路径</span></button>
+          <button class="btn small secondary copy-media-path" type="button" data-path="{{$file.Path}}">{{template "admin-icon" "copy"}}<span class="btn-text" data-i18n-ui>复制路径</span></button>
           {{if or (eq $file.Ext "jpg") (or (eq $file.Ext "jpeg") (or (eq $file.Ext "png") (eq $file.Ext "webp")))}}
           <input id="mediaCropSource{{$groupIndex}}-{{$index}}" type="hidden" value="{{$file.Path}}">
-          <button class="btn small secondary media-crop-button" type="button" data-crop-source="#mediaCropSource{{$groupIndex}}-{{$index}}" data-crop-target="#mediaCropSource{{$groupIndex}}-{{$index}}" data-crop-ratio="16x9" data-crop-label="图片" data-crop-status="#mediaCropStatus{{$groupIndex}}-{{$index}}" data-crop-refresh="true"><span class="btn-ico" aria-hidden="true">✂</span><span class="btn-text">裁剪 16:9</span></button>
+          <button class="btn small secondary media-crop-button" type="button" data-crop-source="#mediaCropSource{{$groupIndex}}-{{$index}}" data-crop-target="#mediaCropSource{{$groupIndex}}-{{$index}}" data-crop-ratio="16x9" data-crop-label="图片" data-crop-status="#mediaCropStatus{{$groupIndex}}-{{$index}}" data-crop-refresh="true"><span class="btn-ico" aria-hidden="true">✂</span><span class="btn-text" data-i18n-ui>裁剪 16:9</span></button>
           <span id="mediaCropStatus{{$groupIndex}}-{{$index}}" class="meta media-crop-status" role="status" aria-live="polite"></span>
           {{end}}
-          <details class="media-more"><summary>管理</summary><code>{{$file.Path}}</code>
+          <details class="media-more"><summary data-i18n-ui>管理</summary><code>{{$file.Path}}</code>
           <form method="post" action="{{$.MediaURL}}" class="media-rename-form media-category-form">
             <input type="hidden" name="action" value="categorize">
             <input type="hidden" name="old_path" value="{{$file.Path}}">
-            <label>分类 <select name="category" aria-label="素材分类">{{range $.Categories}}<option value="{{.Key}}"{{if eq .Key $file.Category}} selected{{end}}>{{.Label}}</option>{{end}}</select></label>
-            <button class="btn small" type="submit">修改分类</button>
-            <small class="meta">只调整分组，不改变图片路径。</small>
+            <label><span class="i18n-copy" data-i18n-ui>分类 </span><select name="category" aria-label="素材分类" data-i18n-attrs="aria-label">{{range $.Categories}}<option data-i18n-ui value="{{.Key}}"{{if eq .Key $file.Category}} selected{{end}}>{{.Label}}</option>{{end}}</select></label>
+            <button class="btn small" type="submit" data-i18n-ui>修改分类</button>
+            <small class="meta" data-i18n-ui>只调整分组，不改变图片路径。</small>
           </form>
           <form method="post" action="{{$.MediaURL}}" class="media-rename-form">
             <input type="hidden" name="action" value="rename">
             <input type="hidden" name="old_path" value="{{$file.Path}}">
-            <input name="new_name" value="{{$file.Name}}" aria-label="新文件名">
-            <button class="btn small" type="submit"><span class="btn-ico" aria-hidden="true">✎</span><span class="btn-text">重命名</span></button>
+            <input name="new_name" value="{{$file.Name}}" aria-label="新文件名" data-i18n-attrs="aria-label">
+            <button class="btn small" type="submit"><span class="btn-ico" aria-hidden="true">✎</span><span class="btn-text" data-i18n-ui>重命名</span></button>
           </form>
-          <form method="post" action="{{$.MediaURL}}" class="media-delete-form" onsubmit="return confirm('确定删除这个媒体文件吗？如果文章或站点设置仍在使用它，图片会失效。');">
+          <form method="post" action="{{$.MediaURL}}" class="media-delete-form" onsubmit="return confirm(window.SonglineI18n ? window.SonglineI18n.t('确定删除这个媒体文件吗？如果文章或站点设置仍在使用它，图片会失效。') : '确定删除这个媒体文件吗？如果文章或站点设置仍在使用它，图片会失效。');">
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="old_path" value="{{$file.Path}}">
-            <button class="icon-button danger" type="submit" title="删除文件" aria-label="删除文件">{{template "admin-icon" "trash"}}</button>
+            <button class="icon-button danger" type="submit" title="删除文件" aria-label="删除文件" data-i18n-attrs="title aria-label">{{template "admin-icon" "trash"}}</button>
           </form>
           </details>
         </div>
@@ -78,8 +78,8 @@
     {{end}}
       </div>
     </section>
-    {{else}}<p class="meta">还没有上传文件。</p>{{end}}
-    <p id="mediaSearchEmpty" class="meta media-search-empty" hidden>没有找到匹配的素材。</p>
+    {{else}}<p class="meta" data-i18n-ui>还没有上传文件。</p>{{end}}
+    <p id="mediaSearchEmpty" class="meta media-search-empty" hidden data-i18n-ui>没有找到匹配的素材。</p>
   </section>
   </section>
 </main>

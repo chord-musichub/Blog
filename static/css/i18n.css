@@ -1,0 +1,30 @@
+/* Language controls share theme control dimensions on both surfaces. */
+.language-toggle{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-width:36px;height:42px;padding:0 8px;border:0;border-radius:6px;background:transparent;color:inherit;font:600 15px/1 system-ui,sans-serif;letter-spacing:.01em;cursor:pointer;transition:color .18s,background .18s,transform .18s}
+.language-toggle:hover{background:color-mix(in srgb,currentColor 10%,transparent);transform:translateY(-1px)}
+.language-toggle:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.admin-client-actions .language-toggle{height:36px;color:var(--admin-muted)}
+.auth-preferences{position:fixed;top:22px;right:26px;display:flex;align-items:center;gap:6px;z-index:10}
+.auth-preferences .language-toggle{color:var(--admin-muted)}
+.audio-language-controls{display:flex;align-items:center;gap:4px;margin-left:auto}
+.audio-language-controls .icon-btn{width:36px;height:42px;padding:8px;background:transparent;border:0;color:inherit;cursor:pointer}
+html[lang="en"] .songline-site-map__toggle{font-size:14px;gap:6px;padding-inline:10px}
+html[lang="en"] .songline-site-map__label{font-size:12px;letter-spacing:.01em}
+html[lang="en"] .songline-terminal-stat-label{font-size:12px}
+html[lang="en"] .rail-label{letter-spacing:.04em}
+html[lang="en"] .rail-publish{white-space:normal;text-align:center}
+@media(max-width:760px), (max-width:980px) and (hover:none){
+  html body header.modern-site-header .header-icons{top:9px!important;right:10px!important;gap:2px!important}
+  html body header.modern-site-header .header-icons .icon-btn{box-sizing:border-box!important;width:32px!important;min-width:32px!important;max-width:32px!important;height:42px!important;padding:6px!important}
+  html body .songline-site-map__toggle{max-width:calc(100vw - 224px);padding-inline:8px}
+  html body .songline-site-map__toggle [data-site-map-current]{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  html[lang="en"] .songline-site-map__toggle{gap:4px;font-size:13px}
+}
+@media(max-width:700px){
+  .admin-client-actions{gap:3px!important}
+  .admin-client-actions .language-toggle,.admin-client-actions .icon-button,.admin-client-actions .admin-theme-icon-button{width:32px;min-width:32px;height:44px;padding:5px}
+  .admin-client-brand span{max-width:78px;font-size:12px;white-space:normal;line-height:1.15}
+  .admin-client-identity{display:none}
+  .auth-preferences{top:14px;right:16px}
+}
+@media(prefers-reduced-motion:reduce){.language-toggle{transition:none}.language-toggle:hover{transform:none}}
+.i18n-copy{display:contents;font:inherit;color:inherit;letter-spacing:inherit}

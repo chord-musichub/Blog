@@ -9,29 +9,29 @@
       {{ partial "tool-help-dialog.html" "2048" }}
       <div class="game-2048-topbar">
         <div class="game-2048-score-card">
-          <span>分数</span>
+          <span data-i18n-ui>分数</span>
           <strong data-2048-score>0</strong>
         </div>
         <div class="game-2048-score-card">
-          <span>最高</span>
+          <span data-i18n-ui>最高</span>
           <strong data-2048-best>0</strong>
         </div>
       </div>
 
       <div class="game-2048-board-wrap">
-        <div class="game-2048-board" data-2048-board aria-label="2048 游戏棋盘"></div>
+        <div class="game-2048-board" data-2048-board aria-label="2048 游戏棋盘" data-i18n-attrs="aria-label"></div>
         <div class="game-2048-overlay" data-2048-overlay hidden>
-          <strong data-2048-overlay-title>2048</strong>
-          <span data-2048-overlay-text>合并数字，冲到 2048。</span>
+          <strong data-2048-overlay-title data-i18n-ui>2048</strong>
+          <span data-2048-overlay-text data-i18n-ui>合并数字，冲到 2048。</span>
         </div>
       </div>
     </div>
-      <details class="snake-leaderboard game-2048-leaderboard tool-detail-ranking" data-2048-leaderboard aria-label="2048 前三名成绩">
+      <details class="snake-leaderboard game-2048-leaderboard tool-detail-ranking" data-2048-leaderboard aria-label="2048 前三名成绩" data-i18n-attrs="aria-label">
         <summary>
-          <span>排行榜</span>
+          <span data-i18n-ui>排行榜</span>
         </summary>
         <ol data-2048-top-scores>
-          <li>暂无记录</li>
+          <li data-i18n-ui>暂无记录</li>
         </ol>
       </details>
   </section>

@@ -8,25 +8,25 @@
 {{- with resources.Get "data/tools/external.json" }}{{ $externalTools = . | transform.Unmarshal }}{{ end -}}
 {{- $toolCount := add (len $localTools) (len $externalTools) -}}
 {{- $featuredPosts := first 5 $posts -}}
-<aside class="sidebar songline-home-system" aria-label="站点信息终端" data-home-parallax="system" data-home-panel data-home-panel-state="system">
+<aside class="sidebar songline-home-system" aria-label="站点信息终端" data-home-parallax="system" data-home-panel data-home-panel-state="system" data-i18n-attrs="aria-label">
   <div class="songline-terminal-frame">
     <div class="songline-home-system-panel" data-home-panel-system>
-    <header class="songline-terminal-status" aria-label="站点信息">
+    <header class="songline-terminal-status" aria-label="站点信息" data-i18n-attrs="aria-label">
       <div class="songline-terminal-live">
-        <button class="songline-home-message-ticker" type="button" data-home-message-ticker hidden aria-label="查看留言">
+        <button class="songline-home-message-ticker" type="button" data-home-message-ticker hidden aria-label="查看留言" data-i18n-attrs="aria-label">
           <span data-home-message-ticker-text></span>
         </button>
       </div>
-      <h1 class="songline-terminal-brand" id="songline-home-title"><a class="songline-terminal-brand-link" href="/friends/songline/" aria-label="进入 Songline 站内主页">Songline</a></h1>
+      <h1 class="songline-terminal-brand" id="songline-home-title"><a class="songline-terminal-brand-link" href="/friends/songline/" aria-label="进入 Songline 站内主页" data-i18n-attrs="aria-label">Songline</a></h1>
       {{ partial "desktop-pet.html" . }}
     </header>
 
     <div class="songline-terminal-main">
       <div class="songline-terminal-feature">
-      <section class="songline-terminal-recommendations" aria-label="精选文章" data-home-recommendations>
+      <section class="songline-terminal-recommendations" aria-label="精选文章" data-home-recommendations data-i18n-attrs="aria-label">
         {{ $pool := slice }}{{ range $posts }}{{ $pool = $pool | append (dict "url" .RelPermalink "title" .Title "cover" (partial "media-preview-url.html" (.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png")) "date" (.Date.Format "2006-01-02") "displayDate" (.Date.Format "2006.01.02")) }}{{ end }}
         <script type="application/json" data-home-recommendation-pool>{{ $pool | jsonify | safeJS }}</script>
-        <div class="songline-terminal-heading"><span>推荐文章</span><i></i></div>
+        <div class="songline-terminal-heading"><span data-i18n-ui>推荐文章</span><i></i></div>
         <div class="songline-terminal-feature-stage">
           {{ range $index, $post := $featuredPosts }}
             {{ $cover := $post.Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png" }}
@@ -39,15 +39,15 @@
               </span>
             </a>
           {{ else }}
-            <div class="songline-terminal-feature-empty"><span>暂无文章</span><strong>还没有可展示的文章</strong></div>
+            <div class="songline-terminal-feature-empty"><span data-i18n-ui>暂无文章</span><strong data-i18n-ui>还没有可展示的文章</strong></div>
           {{ end }}
           {{ if gt (len $featuredPosts) 1 }}
-            <button class="songline-terminal-feature-switch songline-terminal-feature-switch--previous" type="button" data-home-recommend-previous aria-label="上一章" title="上一章">{{ partial "ui-icon.html" "arrow-left" }}</button>
-            <button class="songline-terminal-feature-switch songline-terminal-feature-switch--next" type="button" data-home-recommend-next aria-label="下一章" title="下一章">{{ partial "ui-icon.html" "arrow-right" }}</button>
+            <button class="songline-terminal-feature-switch songline-terminal-feature-switch--previous" type="button" data-home-recommend-previous aria-label="上一章" title="上一章" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "arrow-left" }}</button>
+            <button class="songline-terminal-feature-switch songline-terminal-feature-switch--next" type="button" data-home-recommend-next aria-label="下一章" title="下一章" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "arrow-right" }}</button>
           {{ end }}
         </div>
         {{ if gt (len $featuredPosts) 1 }}
-          <div class="songline-terminal-indicators" aria-label="切换推荐文章">
+          <div class="songline-terminal-indicators" aria-label="切换推荐文章" data-i18n-attrs="aria-label">
             {{ range $index, $post := $featuredPosts }}
               <button type="button" data-home-recommend-indicator data-home-recommend-index="{{ $index }}" aria-label="查看第 {{ add $index 1 }} 篇推荐文章"{{ if eq $index 0 }} aria-current="true"{{ end }}><b>0{{ add $index 1 }}</b><i></i></button>
             {{ end }}
@@ -58,42 +58,42 @@
       {{ partial "home/notices.html" . }}
       </div>
 
-      <section class="songline-terminal-stats" aria-label="站点统计">
-        <div class="songline-terminal-heading"><span>站点数据</span><i></i></div>
-        <nav class="songline-terminal-stat-grid" aria-label="站点数据入口">
-          <a class="songline-terminal-stat" style="--stat-delay:80ms" href="/posts/" aria-label="查看文章归档" title="查看文章归档"><span class="songline-terminal-stat-label">文章</span><span class="songline-terminal-stat-value">{{ len $posts }}</span></a>
-          <a class="songline-terminal-stat" style="--stat-delay:150ms" href="/tools/" aria-label="打开工具页" title="打开工具页"><span class="songline-terminal-stat-label">工具</span><span class="songline-terminal-stat-value">{{ $toolCount }}</span></a>
-          <a class="songline-terminal-stat" style="--stat-delay:220ms" href="/posts/?mode=projects" aria-label="查看项目归档" title="查看项目归档"><span class="songline-terminal-stat-label">项目</span><span class="songline-terminal-stat-value">{{ len $projects }}</span></a>
-          <button class="songline-terminal-stat" style="--stat-delay:290ms" type="button" data-home-panel-goto aria-label="打开留言板" title="打开留言板"><span class="songline-terminal-stat-label">留言</span><span class="songline-terminal-stat-value" data-home-message-stat-count aria-live="polite">—</span></button>
+      <section class="songline-terminal-stats" aria-label="站点统计" data-i18n-attrs="aria-label">
+        <div class="songline-terminal-heading"><span data-i18n-ui>站点数据</span><i></i></div>
+        <nav class="songline-terminal-stat-grid" aria-label="站点数据入口" data-i18n-attrs="aria-label">
+          <a class="songline-terminal-stat" style="--stat-delay:80ms" href="/posts/" aria-label="查看文章归档" title="查看文章归档" data-i18n-attrs="aria-label title"><span class="songline-terminal-stat-label" data-i18n-ui>文章</span><span class="songline-terminal-stat-value">{{ len $posts }}</span></a>
+          <a class="songline-terminal-stat" style="--stat-delay:150ms" href="/tools/" aria-label="打开工具页" title="打开工具页" data-i18n-attrs="aria-label title"><span class="songline-terminal-stat-label" data-i18n-ui>工具</span><span class="songline-terminal-stat-value">{{ $toolCount }}</span></a>
+          <a class="songline-terminal-stat" style="--stat-delay:220ms" href="/posts/?mode=projects" aria-label="查看项目归档" title="查看项目归档" data-i18n-attrs="aria-label title"><span class="songline-terminal-stat-label" data-i18n-ui>项目</span><span class="songline-terminal-stat-value">{{ len $projects }}</span></a>
+          <button class="songline-terminal-stat" style="--stat-delay:290ms" type="button" data-home-panel-goto aria-label="打开留言板" title="打开留言板" data-i18n-attrs="aria-label title"><span class="songline-terminal-stat-label" data-i18n-ui>留言</span><span class="songline-terminal-stat-value" data-home-message-stat-count aria-live="polite">—</span></button>
         </nav>
 
-        <section class="songline-home-music" aria-label="本地音乐" data-home-music>
+        <section class="songline-home-music" aria-label="本地音乐" data-home-music data-i18n-attrs="aria-label">
           <div class="songline-home-music-main">
             <div class="songline-home-music-track">
-              <span class="songline-home-music-label">本地音乐</span>
-              <strong data-home-music-title>选择一首歌</strong>
-              <small data-home-music-artist>单曲或音乐文件夹</small>
+              <span class="songline-home-music-label" data-i18n-ui>本地音乐</span>
+              <strong data-home-music-title data-i18n-ui>选择一首歌</strong>
+              <small data-home-music-artist data-i18n-ui>单曲或音乐文件夹</small>
             </div>
           </div>
           <div class="songline-home-music-spectrum" data-home-music-spectrum aria-hidden="true">
             <div data-home-music-bars></div>
           </div>
-          <div class="songline-home-music-actions" aria-label="音乐操作">
-            <button class="songline-home-music-play-toggle" type="button" data-home-music-toggle aria-label="播放" title="播放" aria-pressed="false"><span data-home-music-play-glyph aria-hidden="true">▶</span></button>
-            <button type="button" data-home-music-previous aria-label="上一曲" title="上一曲">{{ partial "ui-icon.html" "arrow-left" }}</button>
-            <button type="button" data-home-music-next aria-label="下一曲" title="下一曲">{{ partial "ui-icon.html" "arrow-right" }}</button>
+          <div class="songline-home-music-actions" aria-label="音乐操作" data-i18n-attrs="aria-label">
+            <button class="songline-home-music-play-toggle" type="button" data-home-music-toggle aria-label="播放" title="播放" aria-pressed="false" data-i18n-attrs="aria-label title"><span data-home-music-play-glyph aria-hidden="true">▶</span></button>
+            <button type="button" data-home-music-previous aria-label="上一曲" title="上一曲" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "arrow-left" }}</button>
+            <button type="button" data-home-music-next aria-label="下一曲" title="下一曲" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "arrow-right" }}</button>
             <span class="songline-home-music-volume-control">
-              <button class="songline-home-music-volume" type="button" data-home-music-volume aria-label="静音" title="静音" aria-pressed="false">{{ partial "ui-icon.html" "volume" }}</button>
-              <input type="range" data-home-music-volume-input aria-label="音量" min="0" max="100" value="88">
+              <button class="songline-home-music-volume" type="button" data-home-music-volume aria-label="静音" title="静音" aria-pressed="false" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "volume" }}</button>
+              <input type="range" data-home-music-volume-input aria-label="音量" min="0" max="100" value="88" data-i18n-attrs="aria-label">
             </span>
-            <button type="button" data-home-music-source-toggle aria-label="添加音乐，音乐文件夹可直接拖入" title="添加音乐 · 文件夹可直接拖入">{{ partial "ui-icon.html" "upload" }}</button>
-            <button type="button" data-home-music-list-toggle aria-label="打开播放列表" title="播放列表" aria-expanded="false">{{ partial "ui-icon.html" "menu" }}</button>
+            <button type="button" data-home-music-source-toggle aria-label="添加音乐，音乐文件夹可直接拖入" title="添加音乐 · 文件夹可直接拖入" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "upload" }}</button>
+            <button type="button" data-home-music-list-toggle aria-label="打开播放列表" title="播放列表" aria-expanded="false" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "menu" }}</button>
           </div>
           <div class="songline-home-music-playlist" data-home-music-playlist hidden>
-            <div class="songline-home-music-playlist-head"><span>播放列表</span><button type="button" data-home-music-list-close aria-label="关闭播放列表">{{ partial "ui-icon.html" "close" }}</button></div>
+            <div class="songline-home-music-playlist-head"><span data-i18n-ui>播放列表</span><button type="button" data-home-music-list-close aria-label="关闭播放列表" data-i18n-attrs="aria-label">{{ partial "ui-icon.html" "close" }}</button></div>
             <div class="songline-home-music-playlist-list" data-home-music-playlist-list></div>
           </div>
-          <p class="songline-home-music-status" data-home-music-status aria-live="polite">未选择音乐来源</p>
+          <p class="songline-home-music-status" data-home-music-status aria-live="polite" data-i18n-ui>未选择音乐来源</p>
           <input type="file" accept="audio/*,.mp3,.flac,.wav,.m4a,.aac,.ogg,.opus" data-home-music-file hidden>
           <input type="file" accept="audio/*,.mp3,.flac,.wav,.m4a,.aac,.ogg,.opus" data-home-music-folder webkitdirectory directory multiple hidden>
           <audio data-home-music-audio preload="none"></audio>
@@ -101,46 +101,46 @@
       </section>
     </div>
 
-    <footer class="songline-terminal-links" aria-label="站点链接">
+    <footer class="songline-terminal-links" aria-label="站点链接" data-i18n-attrs="aria-label">
       {{ if $cfg.social.show_github }}<a href="{{ $cfg.social.github }}" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">{{ partial "ui-icon.html" "github" }}</a>{{ end }}
       {{ if $cfg.social.show_email }}
         {{ $emailHref := $cfg.social.email }}
         {{ if and $emailHref (not (hasPrefix $emailHref "mailto:")) }}{{ $emailHref = printf "mailto:%s" $emailHref }}{{ end }}
         {{ $emailText := replaceRE "^mailto:" "" $emailHref }}
-        <button class="songline-terminal-copy-email" type="button" data-home-copy-email="{{ $emailText }}" aria-label="复制邮箱" title="复制邮箱">{{ partial "ui-icon.html" "mail" }}</button>
+        <button class="songline-terminal-copy-email" type="button" data-home-copy-email="{{ $emailText }}" aria-label="复制邮箱" title="复制邮箱" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "mail" }}</button>
       {{ end }}
-      {{ if $cfg.social.show_bilibili }}<a href="{{ $cfg.social.bilibili }}" target="_blank" rel="noopener" aria-label="哔哩哔哩" title="哔哩哔哩">{{ partial "ui-icon.html" "bilibili" }}</a>{{ end }}
+      {{ if $cfg.social.show_bilibili }}<a href="{{ $cfg.social.bilibili }}" target="_blank" rel="noopener" aria-label="哔哩哔哩" title="哔哩哔哩" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "bilibili" }}</a>{{ end }}
       <span class="songline-terminal-copy-tip" data-home-copy-tip role="status" aria-live="polite"></span>
     </footer>
     </div>
 
     <section class="songline-home-message-board" data-home-message-board aria-labelledby="songline-message-board-title" aria-hidden="true">
       <header class="songline-home-message-head">
-        <button class="songline-home-message-return" type="button" data-home-panel-return><span aria-hidden="true">‹</span> 返回</button>
+        <button class="songline-home-message-return" type="button" data-home-panel-return><span aria-hidden="true">‹</span><span class="i18n-copy" data-i18n-ui> 返回</span></button>
         <div>
-          <h2 id="songline-message-board-title">留言</h2>
-          <p><b data-home-message-count>0</b> 条留言</p>
+          <h2 id="songline-message-board-title" data-i18n-ui>留言</h2>
+          <p><b data-home-message-count>0</b><span class="i18n-copy" data-i18n-ui> 条留言</span></p>
         </div>
         <span class="songline-home-message-brass" aria-hidden="true"></span>
       </header>
 
-      <div class="songline-home-message-scroll" data-home-message-scroll tabindex="0" aria-label="留言列表">
+      <div class="songline-home-message-scroll" data-home-message-scroll tabindex="0" aria-label="留言列表" data-i18n-attrs="aria-label">
         <p data-home-message-load-status role="status" hidden></p>
         <div class="songline-home-message-list" data-home-message-list></div>
       </div>
 
       <footer class="songline-home-message-footer">
-        <button type="button" data-home-message-compose-open><span aria-hidden="true">+</span> 写下留言</button>
+        <button type="button" data-home-message-compose-open><span aria-hidden="true">+</span><span class="i18n-copy" data-i18n-ui> 写下留言</span></button>
       </footer>
 
       <form class="songline-home-message-compose" data-home-message-form hidden>
-        <div class="songline-home-message-compose-head"><strong>写下留言</strong><button type="button" data-home-message-compose-cancel aria-label="取消留言">×</button></div>
-        <label>QQ 号（可选）<input name="qq" type="text" inputmode="numeric" pattern="[0-9]{5,12}" maxlength="12" autocomplete="off" placeholder="用于昵称与头像显示"></label>
-        <label>自定义名字（优先）<input name="name" type="text" maxlength="32" autocomplete="nickname" placeholder="不填写则使用 QQ 或匿名"></label>
-        <div class="songline-home-message-compose-mode"><span>内容 <i>Markdown</i></span><button type="button" data-home-message-preview-toggle aria-pressed="false">预览</button></div>
-        <label data-home-message-content-field><textarea name="content" rows="4" maxlength="1000" required placeholder="写下一句话…"></textarea></label>
-        <div class="songline-home-message-preview" data-home-message-preview hidden aria-label="Markdown 预览"></div>
-        <div class="songline-home-message-compose-actions"><button type="submit">发布留言 <span aria-hidden="true">↵</span></button><span data-home-message-compose-status aria-live="polite"></span></div>
+        <div class="songline-home-message-compose-head"><strong data-i18n-ui>写下留言</strong><button type="button" data-home-message-compose-cancel aria-label="取消留言" data-i18n-attrs="aria-label">×</button></div>
+        <label><span class="i18n-copy" data-i18n-ui>QQ 号（可选）</span><input name="qq" type="text" inputmode="numeric" pattern="[0-9]{5,12}" maxlength="12" autocomplete="off" placeholder="用于昵称与头像显示" data-i18n-attrs="placeholder"></label>
+        <label><span class="i18n-copy" data-i18n-ui>自定义名字（优先）</span><input name="name" type="text" maxlength="32" autocomplete="nickname" placeholder="不填写则使用 QQ 或匿名" data-i18n-attrs="placeholder"></label>
+        <div class="songline-home-message-compose-mode"><span><span class="i18n-copy" data-i18n-ui>内容 </span><i>Markdown</i></span><button type="button" data-home-message-preview-toggle aria-pressed="false" data-i18n-ui>预览</button></div>
+        <label data-home-message-content-field><textarea name="content" rows="4" maxlength="1000" required placeholder="写下一句话…" data-i18n-attrs="placeholder aria-label"></textarea></label>
+        <div class="songline-home-message-preview" data-home-message-preview hidden aria-label="Markdown 预览" data-i18n-attrs="aria-label"></div>
+        <div class="songline-home-message-compose-actions"><button type="submit"><span class="i18n-copy" data-i18n-ui>发布留言 </span><span aria-hidden="true">↵</span></button><span data-home-message-compose-status aria-live="polite"></span></div>
       </form>
     </section>
   </div>

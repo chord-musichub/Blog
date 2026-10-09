@@ -1,3 +1,8 @@
+(function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
 // 将当前文章的 Markdown 源内容下载为 UTF-8 文件。
 (function(){
   const button = document.querySelector('[data-md-download]');
@@ -61,9 +66,9 @@
   }
 
   button.addEventListener('click', async function(){
-    const originalText = button.textContent;
+    const originalText = window.SonglineI18n ? window.SonglineI18n.sourceText(button) : button.textContent;
     button.disabled = true;
-    button.textContent = '准备中...';
+    uiText(button, '准备中...');
     try{
       const markdown = await getMarkdown();
       if(!button.isConnected || !sourceElement.isConnected) return;
@@ -78,7 +83,9 @@
       window.setTimeout(function(){ URL.revokeObjectURL(url); }, 600);
     }finally{
       button.disabled = false;
-      button.textContent = originalText;
+      uiText(button,originalText);
     }
   });
+})();
+
 })();

@@ -2,8 +2,8 @@
 {{- $notices := sort (where $posts ".Params.is_notice" true) "Date" "desc" -}}
 <section class="songline-terminal-notices" aria-labelledby="home-notices-title" data-home-notices>
   <div class="songline-terminal-heading songline-notices-heading">
-    <h2 id="home-notices-title">站点通知</h2><i aria-hidden="true"></i>
-    <a href="/tags/site-notice/" aria-label="查看全部站点公告">全部公告 <span aria-hidden="true">↗</span></a>
+    <h2 id="home-notices-title" data-i18n-ui>站点通知</h2><i aria-hidden="true"></i>
+    <a href="/tags/site-notice/" aria-label="查看全部站点公告" data-i18n-attrs="aria-label"><span class="i18n-copy" data-i18n-ui>全部公告 </span><span aria-hidden="true">↗</span></a>
   </div>
   {{ with first 1 $notices }}
     {{ range . }}
@@ -13,6 +13,6 @@
     </a>
     {{ end }}
   {{ else }}
-    <p class="songline-notice-empty">暂时没有新公告，站点消息会在这里与你见面。</p>
+    <p class="songline-notice-empty" data-i18n-ui>暂时没有新公告，站点消息会在这里与你见面。</p>
   {{ end }}
 </section>

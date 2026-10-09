@@ -55,7 +55,7 @@ function game2048ScoreEndpoints(){
     function renderTopScores(){
       if(!topScoresEl) return;
       if(!topScores.length){
-        topScoresEl.innerHTML = '<li>暂无记录</li>';
+        topScoresEl.innerHTML = '<li><!--ui-->暂无记录<!--/ui--></li>';
         return;
       }
       topScoresEl.innerHTML = topScores.map(function(item, index){

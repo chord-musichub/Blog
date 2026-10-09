@@ -233,7 +233,7 @@ func TestCreatorPagesShareSiteBackgroundAndIdentity(t *testing.T) {
 		if response.Code != http.StatusOK {
 			t.Fatalf("%s status = %d, body = %s", name, response.Code, body)
 		}
-		for _, want := range []string{"admin-has-site-bg", "admin-site-bg-layer", "songline · 站主"} {
+		for _, want := range []string{"admin-has-site-bg", "admin-site-bg-layer", `songline · <span class="i18n-copy" data-i18n-ui>站主</span>`} {
 			if !strings.Contains(body, want) {
 				t.Fatalf("%s did not render %q: %s", name, want, body)
 			}

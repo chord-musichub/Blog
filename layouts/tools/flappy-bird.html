@@ -4,36 +4,36 @@
   <section class="flappy-shell tool-detail-layout" data-flappy-game>
     <section class="flappy-panel tool-detail-surface" data-tool-back-surface>
       {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-      <h1 class="tool-detail-title">管道鸟</h1>
+      <h1 class="tool-detail-title" data-i18n-ui>管道鸟</h1>
       {{ partial "tool-actionbar.html" "flappy-bird" }}
       {{ partial "tool-help-dialog.html" "flappy-bird" }}
       <div class="flappy-topbar">
         <div class="flappy-score-card">
-          <span>分数</span>
+          <span data-i18n-ui>分数</span>
           <strong data-flappy-score>0</strong>
         </div>
         <div class="flappy-score-card">
-          <span>本地最佳</span>
+          <span data-i18n-ui>本地最佳</span>
           <strong data-flappy-best>0</strong>
         </div>
       </div>
 
       <div class="flappy-board-wrap">
-        <canvas class="flappy-canvas" data-flappy-canvas width="900" height="520" aria-label="管道鸟游戏画布"></canvas>
+        <canvas class="flappy-canvas" data-flappy-canvas width="900" height="520" aria-label="管道鸟游戏画布" data-i18n-attrs="aria-label"></canvas>
         <button class="flappy-overlay" type="button" data-flappy-overlay>
-          <span data-flappy-state hidden></span>
-          <strong data-flappy-title>点击开始</strong>
-          <em data-flappy-text hidden></em>
+          <span data-flappy-state hidden data-i18n-ui></span>
+          <strong data-flappy-title data-i18n-ui>点击开始</strong>
+          <em data-flappy-text hidden data-i18n-ui></em>
         </button>
       </div>
 
     </section>
-      <details class="snake-leaderboard flappy-leaderboard tool-detail-ranking" data-flappy-leaderboard aria-label="管道鸟前三名成绩">
+      <details class="snake-leaderboard flappy-leaderboard tool-detail-ranking" data-flappy-leaderboard aria-label="管道鸟前三名成绩" data-i18n-attrs="aria-label">
         <summary>
-          <span>排行榜</span>
+          <span data-i18n-ui>排行榜</span>
         </summary>
         <ol data-flappy-top-scores>
-          <li>暂无记录</li>
+          <li data-i18n-ui>暂无记录</li>
         </ol>
       </details>
   </section>

@@ -112,9 +112,10 @@
           ctx.textBaseline = 'middle';
           ctx.lineWidth = Math.max(2.4, cell * .09);
           ctx.strokeStyle = 'rgba(15,23,42,.42)';
-          ctx.strokeText(p.label, p.x, p.y - 8);
+          var label=window.SonglineI18n ? window.SonglineI18n.t(p.label) : p.label;
+          ctx.strokeText(label, p.x, p.y - 8);
           ctx.fillStyle = colorWithAlpha(p.color, .86);
-          ctx.fillText(p.label, p.x, p.y - 8);
+          ctx.fillText(label, p.x, p.y - 8);
         }else{
           ctx.fillStyle = colorWithAlpha(p.color, .78);
           ctx.beginPath();

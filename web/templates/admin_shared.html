@@ -1,11 +1,15 @@
 {{define "admin-head"}}
 <head>
   <meta charset="utf-8">
+  <script>try{document.documentElement.lang=localStorage.getItem("songline-language")==="en"?"en":"zh-CN"}catch(e){}</script>
+  <script defer src="/static/i18n-catalog.js?v=1"></script>
+  <script defer src="/static/i18n.js?v=1"></script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>{{.Title}} · 创作中心</title>
+  <title data-i18n-text>{{.Title}} · 创作中心</title>
   {{template "admin-favicon" .Data}}
   <script>(function(){try{document.documentElement.dataset.adminTheme=localStorage.getItem('songline-theme')||localStorage.getItem('gexian-admin-theme')||'dark'}catch(e){document.documentElement.dataset.adminTheme='dark'}})();</script>
   <link rel="stylesheet" href="/static/creator-center.css?v=22.9.4">
+  <link rel="stylesheet" href="/static/i18n.css?v=1">
   <script defer src="/static/admin-theme.js?v=21.1.0"></script>
   {{if .Navigation}}<script defer src="/static/admin-nav.js?v=22.9.2"></script>{{end}}
   <script defer src="/static/creator-center.js?v=21.1.1"></script>
@@ -17,41 +21,42 @@
 
 {{define "admin-client-nav"}}
 <header class="admin-client-nav" data-admin-client-nav data-base="{{adminURL "/"}}">
-  <button class="rail-toggle icon-button" type="button" aria-label="展开导航" aria-expanded="false" aria-controls="creatorRail">{{template "admin-icon" "menu"}}</button>
-  <a class="admin-client-brand" href="{{adminURL "/"}}"><img class="creator-brand-mark" src="{{default "/uploads/admin/logo/main_logo.png" .Settings.Site.LogoIcon}}" alt="" data-image-fallback="/uploads/admin/logo/main_logo.png"><span>{{if isAdminUser .User}}管理中心{{else}}创作中心{{end}}</span></a>
+  <button class="rail-toggle icon-button" type="button" aria-label="展开导航" aria-expanded="false" aria-controls="creatorRail" data-i18n-attrs="aria-label">{{template "admin-icon" "menu"}}</button>
+  <a class="admin-client-brand" href="{{adminURL "/"}}"><img class="creator-brand-mark" src="{{default "/uploads/admin/logo/main_logo.png" .Settings.Site.LogoIcon}}" alt="" data-image-fallback="/uploads/admin/logo/main_logo.png"><span>{{if isAdminUser .User}}<span class="i18n-copy" data-i18n-ui>管理中心</span>{{else}}<span class="i18n-copy" data-i18n-ui>创作中心</span>{{end}}</span></a>
   <div class="admin-client-actions">
-    <a class="admin-client-home icon-button" href="{{publicURL}}" data-document-transition aria-label="返回网站主页" title="返回网站主页">{{template "admin-icon" "home"}}</a>
-    <button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换主题" title="切换主题">◐</button>
-    <a class="admin-client-identity" href="{{adminURL "/account"}}" title="账号设置"><img class="identity-avatar" src="{{userAvatar .User.Avatar}}" alt="" data-image-fallback="/uploads/admin/friends/user-null.png"><span><strong>{{default .User.Username .User.DisplayName}}</strong><small>{{.User.Username}} · {{roleText .User.Role}}</small></span></a>
-    <a class="admin-client-logout icon-button" href="{{adminURL "/logout"}}" aria-label="退出登录" title="退出登录">{{template "admin-icon" "logout"}}</a>
+    <a class="admin-client-home icon-button" href="{{publicURL}}" data-document-transition aria-label="返回网站主页" title="返回网站主页" data-i18n-attrs="aria-label title">{{template "admin-icon" "home"}}</a>
+    <button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换主题" title="切换主题" data-i18n-attrs="aria-label title">◐</button>
+    <button class="language-toggle" data-language-toggle type="button" aria-label="切换为英文">中</button>
+    <a class="admin-client-identity" href="{{adminURL "/account"}}" title="账号设置" data-i18n-attrs="title"><img class="identity-avatar" src="{{userAvatar .User.Avatar}}" alt="" data-image-fallback="/uploads/admin/friends/user-null.png"><span><strong>{{default .User.Username .User.DisplayName}}</strong><small>{{.User.Username}} · <span class="i18n-copy" data-i18n-ui>{{roleText .User.Role}}</span></small></span></a>
+    <a class="admin-client-logout icon-button" href="{{adminURL "/logout"}}" aria-label="退出登录" title="退出登录" data-i18n-attrs="aria-label title">{{template "admin-icon" "logout"}}</a>
   </div>
 </header>
-<aside class="creator-rail" id="creatorRail" aria-label="创作中心导航">
-  <a class="rail-publish btn" href="{{adminURL "/articles/new"}}"><span aria-hidden="true">＋</span> {{if isAdminUser .User}}发布通知{{else}}投稿{{end}}</a>
+<aside class="creator-rail" id="creatorRail" aria-label="创作中心导航" data-i18n-attrs="aria-label">
+  <a class="rail-publish btn" href="{{adminURL "/articles/new"}}"><span aria-hidden="true">＋</span> {{if isAdminUser .User}}<span class="i18n-copy" data-i18n-ui>发布通知</span>{{else}}<span class="i18n-copy" data-i18n-ui>投稿</span>{{end}}</a>
   <nav class="admin-client-links">
-    <a href="{{adminURL "/"}}" data-cc-page="home">{{template "admin-icon" "home"}}工作台</a>
+    <a href="{{adminURL "/"}}" data-cc-page="home">{{template "admin-icon" "home"}}<span class="i18n-copy" data-i18n-ui>工作台</span></a>
     {{if isAdminUser .User}}
-    <div class="rail-label">社区管理</div>
-    <a href="{{adminURL "/admin#reviews"}}" data-cc-page="reviews">{{template "admin-icon" "file"}}稿件审核</a>
-    <a href="{{adminURL "/admin#messages"}}" data-cc-page="messages">{{template "admin-icon" "message"}}留言管理</a>
-    <a href="{{adminURL "/admin#users"}}" data-cc-page="users">{{template "admin-icon" "user"}}用户管理</a>
-    <a href="{{adminURL "/admin#password-requests"}}" data-cc-page="password-requests">{{template "admin-icon" "key"}}密码申请</a>
-    <a href="{{adminURL "/account"}}" data-cc-page="account">{{template "admin-icon" "settings"}}账号设置</a>
+    <div class="rail-label" data-i18n-ui>社区管理</div>
+    <a href="{{adminURL "/admin#reviews"}}" data-cc-page="reviews">{{template "admin-icon" "file"}}<span class="i18n-copy" data-i18n-ui>稿件审核</span></a>
+    <a href="{{adminURL "/admin#messages"}}" data-cc-page="messages">{{template "admin-icon" "message"}}<span class="i18n-copy" data-i18n-ui>留言管理</span></a>
+    <a href="{{adminURL "/admin#users"}}" data-cc-page="users">{{template "admin-icon" "user"}}<span class="i18n-copy" data-i18n-ui>用户管理</span></a>
+    <a href="{{adminURL "/admin#password-requests"}}" data-cc-page="password-requests">{{template "admin-icon" "key"}}<span class="i18n-copy" data-i18n-ui>密码申请</span></a>
+    <a href="{{adminURL "/account"}}" data-cc-page="account">{{template "admin-icon" "settings"}}<span class="i18n-copy" data-i18n-ui>账号设置</span></a>
     {{else}}
-    <div class="rail-label">内容管理</div>
-    <a href="{{adminURL "/#manuscripts"}}" data-cc-page="manuscripts">{{template "admin-icon" "file"}}稿件管理</a>
+    <div class="rail-label" data-i18n-ui>内容管理</div>
+    <a href="{{adminURL "/#manuscripts"}}" data-cc-page="manuscripts">{{template "admin-icon" "file"}}<span class="i18n-copy" data-i18n-ui>稿件管理</span></a>
     {{if isOwnerUser .User}}
-    <a href="{{adminURL "/compose/projects"}}" data-cc-page="projects">{{template "admin-icon" "grid"}}项目管理</a>
-    <a href="{{adminURL "/compose/memories"}}" data-cc-page="memories">{{template "admin-icon" "clock"}}回忆管理</a>
+    <a href="{{adminURL "/compose/projects"}}" data-cc-page="projects">{{template "admin-icon" "grid"}}<span class="i18n-copy" data-i18n-ui>项目管理</span></a>
+    <a href="{{adminURL "/compose/memories"}}" data-cc-page="memories">{{template "admin-icon" "clock"}}<span class="i18n-copy" data-i18n-ui>回忆管理</span></a>
     {{end}}
-    <a href="{{adminURL "/admin/media"}}" data-cc-page="media">{{template "admin-icon" "image"}}素材管理</a>
-    {{if isOwnerUser .User}}<a href="{{adminURL "/admin#reviews"}}" data-cc-page="reviews">{{template "admin-icon" "file"}}成员文章</a>{{end}}
-    <div class="rail-label">设置</div>
-    <a href="{{adminURL "/account"}}" data-cc-page="account">{{template "admin-icon" "settings"}}账号设置</a>
-    {{if isOwnerUser .User}}<a href="{{adminURL "/admin/site"}}" data-cc-page="settings">{{template "admin-icon" "grid"}}站点设置</a>{{end}}
+    <a href="{{adminURL "/admin/media"}}" data-cc-page="media">{{template "admin-icon" "image"}}<span class="i18n-copy" data-i18n-ui>素材管理</span></a>
+    {{if isOwnerUser .User}}<a href="{{adminURL "/admin#reviews"}}" data-cc-page="reviews">{{template "admin-icon" "file"}}<span class="i18n-copy" data-i18n-ui>成员文章</span></a>{{end}}
+    <div class="rail-label" data-i18n-ui>设置</div>
+    <a href="{{adminURL "/account"}}" data-cc-page="account">{{template "admin-icon" "settings"}}<span class="i18n-copy" data-i18n-ui>账号设置</span></a>
+    {{if isOwnerUser .User}}<a href="{{adminURL "/admin/site"}}" data-cc-page="settings">{{template "admin-icon" "grid"}}<span class="i18n-copy" data-i18n-ui>站点设置</span></a>{{end}}
     {{end}}
   </nav>
-  <div class="rail-foot">{{default .User.Username .User.DisplayName}} · {{roleText .User.Role}}</div>
+  <div class="rail-foot">{{default .User.Username .User.DisplayName}} · <span class="i18n-copy" data-i18n-ui>{{roleText .User.Role}}</span></div>
 </aside>
 {{end}}
 {{define "admin-icon"}}<svg class="admin-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">

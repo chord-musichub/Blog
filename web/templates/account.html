@@ -8,42 +8,42 @@
   <section class="settings-workspace">
     {{template "settings-sidebar" .}}
     <section class="settings-detail">
-      <header class="settings-detail-header"><h1>{{if isAdminUser .User}}账号设置{{else}}账号资料{{end}}</h1><span class="meta">{{.User.Username}} · {{roleText .User.Role}}{{if .User.PasswordMustChange}} · 需修改密码{{end}}</span></header>
-  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
-  {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
+      <header class="settings-detail-header"><h1>{{if isAdminUser .User}}<span class="i18n-copy" data-i18n-ui>账号设置</span>{{else}}<span class="i18n-copy" data-i18n-ui>账号资料</span>{{end}}</h1><span class="meta">{{.User.Username}} · <span class="i18n-copy" data-i18n-ui>{{roleText .User.Role}}</span>{{if .User.PasswordMustChange}}<span class="i18n-copy" data-i18n-ui> · 需修改密码</span>{{end}}</span></header>
+  {{if .Flash}}<div class="flash" data-i18n-text>{{.Flash}}</div>{{end}}
+  {{if .Error}}<div class="error" data-i18n-text>{{.Error}}</div>{{end}}
 
   {{if isAdminUser .User}}
   <section class="preview-layout account-admin-layout">
     <form method="post" class="card form account-security-card">
-      <h2>管理员密码</h2>
+      <h2 data-i18n-ui>管理员密码</h2>
 
-      <label>旧密码 <span class="password-field"><input id="old-password" name="old_password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" data-password-toggle="#old-password" aria-label="显示密码"></button></span></label>
-      <label>新密码 <span class="password-field"><input id="new-password" name="new_password" type="password" autocomplete="new-password" minlength="8" required placeholder="至少 8 位"><button class="password-toggle" type="button" data-password-toggle="#new-password" aria-label="显示密码"></button></span></label>
-      <label>确认新密码 <span class="password-field"><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required><button class="password-toggle" type="button" data-password-toggle="#confirm-password" aria-label="显示密码"></button></span></label>
-      <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">保存密码</span></button>
-      <section class="help"><h3>忘记旧密码？</h3><p>如果无法登录，可以在登录页提交密码修改申请；另一个管理员可以在审核后台处理。</p></section>
+      <label><span class="i18n-copy" data-i18n-ui>旧密码 </span><span class="password-field"><input id="old-password" name="old_password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" data-password-toggle="#old-password" aria-label="显示密码" data-i18n-attrs="aria-label title"></button></span></label>
+      <label><span class="i18n-copy" data-i18n-ui>新密码 </span><span class="password-field"><input id="new-password" name="new_password" type="password" autocomplete="new-password" minlength="8" required placeholder="至少 8 位" data-i18n-attrs="placeholder"><button class="password-toggle" type="button" data-password-toggle="#new-password" aria-label="显示密码" data-i18n-attrs="aria-label title"></button></span></label>
+      <label><span class="i18n-copy" data-i18n-ui>确认新密码 </span><span class="password-field"><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required><button class="password-toggle" type="button" data-password-toggle="#confirm-password" aria-label="显示密码" data-i18n-attrs="aria-label title"></button></span></label>
+      <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text" data-i18n-ui>保存密码</span></button>
+      <section class="help"><h3 data-i18n-ui>忘记旧密码？</h3><p data-i18n-ui>如果无法登录，可以在登录页提交密码修改申请；另一个管理员可以在审核后台处理。</p></section>
     </form>
   </section>
   {{else}}
   <section class="preview-layout">
     <form method="post" class="card form" enctype="multipart/form-data">
       <input type="hidden" name="action" value="profile">
-      <h2>个人资料</h2>
-      <label>公开显示名 <input name="display_name" value="{{.User.DisplayName}}" placeholder="显示在朋友页上的名字"></label>
-      <label>个人简介 <textarea name="bio" rows="4" placeholder="一句或几句介绍自己">{{.User.Bio}}</textarea></label>
-      <label>个人主页链接 <input name="homepage" value="{{.User.Homepage}}" placeholder="https://...，可留空"></label>
+      <h2 data-i18n-ui>个人资料</h2>
+      <label><span class="i18n-copy" data-i18n-ui>公开显示名 </span><input name="display_name" value="{{.User.DisplayName}}" placeholder="显示在朋友页上的名字" data-i18n-attrs="placeholder"></label>
+      <label><span class="i18n-copy" data-i18n-ui>个人简介 </span><textarea name="bio" rows="4" placeholder="一句或几句介绍自己">{{.User.Bio}}</textarea></label>
+      <label><span class="i18n-copy" data-i18n-ui>个人主页链接 </span><input name="homepage" value="{{.User.Homepage}}" placeholder="https://...，可留空" data-i18n-attrs="placeholder"></label>
       <div class="profile-images" data-media-url="{{adminURL "/admin/media"}}" data-media-category="profile">
-        <section><h3>头像</h3><div class="cover-preview profile-avatar-preview" data-cover-preview-for="#avatarInput"></div><label class="btn small secondary cover-upload-button">更换头像<input data-cover-upload data-cover-target="#avatarInput" data-cover-status="#profileCropStatus" type="file" accept="image/*" hidden></label></section>
-        <section><h3>主页横幅</h3><div class="cover-preview" data-cover-preview-for="#coverInput"></div><label class="btn small secondary cover-upload-button">更换横幅<input data-cover-upload data-cover-target="#coverInput" data-cover-status="#profileCropStatus" type="file" accept="image/*" hidden></label></section>
+        <section><h3 data-i18n-ui>头像</h3><div class="cover-preview profile-avatar-preview" data-cover-preview-for="#avatarInput"></div><label class="btn small secondary cover-upload-button"><span class="i18n-copy" data-i18n-ui>更换头像</span><input data-cover-upload data-cover-target="#avatarInput" data-cover-status="#profileCropStatus" type="file" accept="image/*" hidden></label></section>
+        <section><h3 data-i18n-ui>主页横幅</h3><div class="cover-preview" data-cover-preview-for="#coverInput"></div><label class="btn small secondary cover-upload-button"><span class="i18n-copy" data-i18n-ui>更换横幅</span><input data-cover-upload data-cover-target="#coverInput" data-cover-status="#profileCropStatus" type="file" accept="image/*" hidden></label></section>
       </div>
-      <details><summary>使用图片链接</summary><label>头像链接<input id="avatarInput" name="avatar" value="{{userAvatar .User.Avatar}}"></label><label>横幅链接<input id="coverInput" name="cover" value="{{.User.Cover}}"></label></details>
+      <details><summary data-i18n-ui>使用图片链接</summary><label><span class="i18n-copy" data-i18n-ui>头像链接</span><input id="avatarInput" name="avatar" value="{{userAvatar .User.Avatar}}"></label><label><span class="i18n-copy" data-i18n-ui>横幅链接</span><input id="coverInput" name="cover" value="{{.User.Cover}}"></label></details>
       <div class="cover-crop-launch" data-media-url="{{adminURL "/admin/media"}}" data-media-category="profile">
-        <button type="button" class="btn small ghost" data-crop-source="#avatarInput" data-crop-target="#avatarInput" data-crop-ratio="1x1" data-crop-label="好友头像" data-crop-status="#profileCropStatus">裁剪头像 1:1</button>
-        <button type="button" class="btn small ghost" data-crop-source="#coverInput" data-crop-target="#coverInput" data-crop-ratio="16x9" data-crop-label="朋友页横幅" data-crop-status="#profileCropStatus">裁剪横幅 16:9</button>
+        <button type="button" class="btn small ghost" data-crop-source="#avatarInput" data-crop-target="#avatarInput" data-crop-ratio="1x1" data-crop-label="好友头像" data-crop-status="#profileCropStatus" data-i18n-ui>裁剪头像 1:1</button>
+        <button type="button" class="btn small ghost" data-crop-source="#coverInput" data-crop-target="#coverInput" data-crop-ratio="16x9" data-crop-label="朋友页横幅" data-crop-status="#profileCropStatus" data-i18n-ui>裁剪横幅 16:9</button>
         <span id="profileCropStatus" class="meta" role="status" aria-live="polite"></span>
       </div>
-      <details class="cover-picker"><summary>从素材库选择</summary>
-        <label>应用到<select id="profileMediaTarget"><option value="avatarInput">头像</option><option value="coverInput">横幅</option></select></label>
+      <details class="cover-picker"><summary data-i18n-ui>从素材库选择</summary>
+        <label><span class="i18n-copy" data-i18n-ui>应用到</span><select id="profileMediaTarget"><option value="avatarInput" data-i18n-ui>头像</option><option value="coverInput" data-i18n-ui>横幅</option></select></label>
         <div class="cover-grid">
           {{range .CoverFiles}}
             <button type="button" class="cover-option" data-cover="{{.Path}}">
@@ -51,22 +51,22 @@
               <span>{{.Name}}</span>
             </button>
           {{else}}
-            <p class="meta">你的媒体库还没有图片。先打开媒体库上传。</p>
+            <p class="meta" data-i18n-ui>你的媒体库还没有图片。先打开媒体库上传。</p>
           {{end}}
         </div>
       </details>
       <div class="actions">
-        <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">保存个人资料</span></button>
+        <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text" data-i18n-ui>保存个人资料</span></button>
       </div>
     </form>
 
     <form method="post" class="card form">
-      <h2>修改密码</h2>
-      <label>旧密码 <span class="password-field"><input id="old-password" name="old_password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" data-password-toggle="#old-password" aria-label="显示密码"></button></span></label>
-      <label>新密码 <span class="password-field"><input id="new-password" name="new_password" type="password" autocomplete="new-password" minlength="8" required placeholder="至少 8 位"><button class="password-toggle" type="button" data-password-toggle="#new-password" aria-label="显示密码"></button></span></label>
-      <label>确认新密码 <span class="password-field"><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required><button class="password-toggle" type="button" data-password-toggle="#confirm-password" aria-label="显示密码"></button></span></label>
-      <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">保存新密码</span></button>
-      <section class="help"><h3>忘记旧密码？</h3><p>如果你无法登录，可以在登录页提交「密码修改申请」，由管理员批准并设置临时密码。</p></section>
+      <h2 data-i18n-ui>修改密码</h2>
+      <label><span class="i18n-copy" data-i18n-ui>旧密码 </span><span class="password-field"><input id="old-password" name="old_password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" data-password-toggle="#old-password" aria-label="显示密码" data-i18n-attrs="aria-label title"></button></span></label>
+      <label><span class="i18n-copy" data-i18n-ui>新密码 </span><span class="password-field"><input id="new-password" name="new_password" type="password" autocomplete="new-password" minlength="8" required placeholder="至少 8 位" data-i18n-attrs="placeholder"><button class="password-toggle" type="button" data-password-toggle="#new-password" aria-label="显示密码" data-i18n-attrs="aria-label title"></button></span></label>
+      <label><span class="i18n-copy" data-i18n-ui>确认新密码 </span><span class="password-field"><input id="confirm-password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required><button class="password-toggle" type="button" data-password-toggle="#confirm-password" aria-label="显示密码" data-i18n-attrs="aria-label title"></button></span></label>
+      <button><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text" data-i18n-ui>保存新密码</span></button>
+      <section class="help"><h3 data-i18n-ui>忘记旧密码？</h3><p data-i18n-ui>如果你无法登录，可以在登录页提交「密码修改申请」，由管理员批准并设置临时密码。</p></section>
     </form>
   </section>
   {{end}}

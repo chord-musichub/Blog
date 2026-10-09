@@ -5,45 +5,45 @@
 {{template "admin-client-nav" .}}
 
 <main class="wrap wide settings-page">
-  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Flash}}<div class="flash" data-i18n-text>{{.Flash}}</div>{{end}}
   <section class="settings-workspace">
     {{template "settings-sidebar" .}}
     <section class="settings-detail">
-      <header class="settings-detail-header"><h1>外观主题</h1></header>
+      <header class="settings-detail-header"><h1 data-i18n-ui>外观主题</h1></header>
 
   <form method="post" action="{{adminURL "/admin/theme"}}">
     <section class="card">
-      <h2>主题预设</h2>
+      <h2 data-i18n-ui>主题预设</h2>
       <div class="theme-presets">
-        <label class="preset-card"><input type="radio" name="preset" value="soft-blue" {{if eq .Theme.Preset "soft-blue"}}checked{{end}}><span class="swatch blue"></span><b>柔和蓝白</b><small>当前默认，清爽水彩</small></label>
-        <label class="preset-card"><input type="radio" name="preset" value="warm-notebook" {{if eq .Theme.Preset "warm-notebook"}}checked{{end}}><span class="swatch warm"></span><b>暖白手账</b><small>更温暖，像笔记本</small></label>
-        <label class="preset-card"><input type="radio" name="preset" value="cool-gray" {{if eq .Theme.Preset "cool-gray"}}checked{{end}}><span class="swatch gray"></span><b>极简冷灰</b><small>更克制，少装饰</small></label>
-        <label class="preset-card"><input type="radio" name="preset" value="winter" {{if eq .Theme.Preset "winter"}}checked{{end}}><span class="swatch winter"></span><b>冬日水彩</b><small>更轻、更蓝、更柔</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="soft-blue" {{if eq .Theme.Preset "soft-blue"}}checked{{end}}><span class="swatch blue"></span><b data-i18n-ui>柔和蓝白</b><small data-i18n-ui>当前默认，清爽水彩</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="warm-notebook" {{if eq .Theme.Preset "warm-notebook"}}checked{{end}}><span class="swatch warm"></span><b data-i18n-ui>暖白手账</b><small data-i18n-ui>更温暖，像笔记本</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="cool-gray" {{if eq .Theme.Preset "cool-gray"}}checked{{end}}><span class="swatch gray"></span><b data-i18n-ui>极简冷灰</b><small data-i18n-ui>更克制，少装饰</small></label>
+        <label class="preset-card"><input type="radio" name="preset" value="winter" {{if eq .Theme.Preset "winter"}}checked{{end}}><span class="swatch winter"></span><b data-i18n-ui>冬日水彩</b><small data-i18n-ui>更轻、更蓝、更柔</small></label>
       </div>
-      <p class="meta">不勾选「启用自定义参数」时，保存会直接套用预设。</p>
-      <label class="check"><input type="checkbox" name="use_custom"> 启用自定义参数</label>
+      <p class="meta" data-i18n-ui>不勾选「启用自定义参数」时，保存会直接套用预设。</p>
+      <label class="check"><input type="checkbox" name="use_custom"><span class="i18n-copy" data-i18n-ui> 启用自定义参数</span></label>
     </section>
 
     <section class="card">
-      <h2>自定义样式参数</h2>
+      <h2 data-i18n-ui>自定义样式参数</h2>
       <div class="grid2">
-        <label>主色 accent<input name="accent" value="{{.Theme.Accent}}" placeholder="#0ea5e9"></label>
-        <label>强调色 accent-2<input name="accent_2" value="{{.Theme.Accent2}}" placeholder="#2563eb"></label>
-        <label>背景色<input name="background" value="{{.Theme.Background}}" placeholder="#fbfaf7"></label>
-        <label>卡片色<input name="panel" value="{{.Theme.Panel}}" placeholder="#fffdfa"></label>
-        <label>文字色<input name="text" value="{{.Theme.Text}}" placeholder="#15345b"></label>
-        <label>辅助文字色<input name="muted" value="{{.Theme.Muted}}" placeholder="#64748b"></label>
-        <label>圆角大小<input name="radius" value="{{.Theme.Radius}}" placeholder="18px"></label>
-        <label>阴影强度<select name="shadow"><option value="soft" {{if eq .Theme.Shadow "soft"}}selected{{end}}>soft</option><option value="none" {{if eq .Theme.Shadow "none"}}selected{{end}}>none</option><option value="strong" {{if eq .Theme.Shadow "strong"}}selected{{end}}>strong</option></select></label>
-        <label>页面最大宽度<input name="max_width" value="{{.Theme.MaxWidth}}" placeholder="1280px"></label>
-        <label>Hero 高度<input name="hero_height" value="{{.Theme.HeroHeight}}" placeholder="300px"></label>
-        <label>文章正文宽度<input name="content_width" value="{{.Theme.ContentWidth}}" placeholder="860px"></label>
-        <label>正文字号<input name="body_font_size" value="{{.Theme.BodyFontSize}}" placeholder="17px"></label>
+        <label><span class="i18n-copy" data-i18n-ui>主色 accent</span><input name="accent" value="{{.Theme.Accent}}" placeholder="#0ea5e9"></label>
+        <label><span class="i18n-copy" data-i18n-ui>强调色 accent-2</span><input name="accent_2" value="{{.Theme.Accent2}}" placeholder="#2563eb"></label>
+        <label><span class="i18n-copy" data-i18n-ui>背景色</span><input name="background" value="{{.Theme.Background}}" placeholder="#fbfaf7"></label>
+        <label><span class="i18n-copy" data-i18n-ui>卡片色</span><input name="panel" value="{{.Theme.Panel}}" placeholder="#fffdfa"></label>
+        <label><span class="i18n-copy" data-i18n-ui>文字色</span><input name="text" value="{{.Theme.Text}}" placeholder="#15345b"></label>
+        <label><span class="i18n-copy" data-i18n-ui>辅助文字色</span><input name="muted" value="{{.Theme.Muted}}" placeholder="#64748b"></label>
+        <label><span class="i18n-copy" data-i18n-ui>圆角大小</span><input name="radius" value="{{.Theme.Radius}}" placeholder="18px"></label>
+        <label><span class="i18n-copy" data-i18n-ui>阴影强度</span><select name="shadow"><option value="soft" {{if eq .Theme.Shadow "soft"}}selected{{end}}>soft</option><option value="none" {{if eq .Theme.Shadow "none"}}selected{{end}}>none</option><option value="strong" {{if eq .Theme.Shadow "strong"}}selected{{end}}>strong</option></select></label>
+        <label><span class="i18n-copy" data-i18n-ui>页面最大宽度</span><input name="max_width" value="{{.Theme.MaxWidth}}" placeholder="1280px"></label>
+        <label><span class="i18n-copy" data-i18n-ui>Hero 高度</span><input name="hero_height" value="{{.Theme.HeroHeight}}" placeholder="300px"></label>
+        <label><span class="i18n-copy" data-i18n-ui>文章正文宽度</span><input name="content_width" value="{{.Theme.ContentWidth}}" placeholder="860px"></label>
+        <label><span class="i18n-copy" data-i18n-ui>正文字号</span><input name="body_font_size" value="{{.Theme.BodyFontSize}}" placeholder="17px"></label>
       </div>
-      <label class="check"><input type="checkbox" name="watercolor" {{if .Theme.Watercolor}}checked{{end}}> 显示水彩背景图</label>
+      <label class="check"><input type="checkbox" name="watercolor" {{if .Theme.Watercolor}}checked{{end}}><span class="i18n-copy" data-i18n-ui> 显示水彩背景图</span></label>
     </section>
 
-    <div class="actions"><button title="保存外观并重建公开站"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text optional">保存</span></button></div>
+    <div class="actions"><button title="保存外观并重建公开站" data-i18n-attrs="title"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text optional" data-i18n-ui>保存</span></button></div>
   </form>
     </section>
   </section>

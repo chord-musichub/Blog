@@ -21,6 +21,7 @@ func (app *App) router() http.Handler {
 		w.Header().Set("Cache-Control", "public, no-cache")
 		http.ServeFile(w, r, "static/js/markdown-renderer.js")
 	})
+	registerLanguageAssets(mux)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 	mux.HandleFunc("/uploads/", app.handlePublicMedia)
 	// Markdown 源文件属于运行时数据，不能依赖公开站的静态目录或 SPA 兜底规则。

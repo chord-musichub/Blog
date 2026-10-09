@@ -1,4 +1,4 @@
-<button class="tool-icon-button" type="button" {{ .attribute | safeHTMLAttr }} aria-label="{{ .label }}" title="{{ .label }}"{{ if .pause }} data-tool-paused="{{ if .idle }}true{{ else }}false{{ end }}"{{ end }}>
+<button class="tool-icon-button" data-i18n-attrs="aria-label title" type="button" {{ .attribute | safeHTMLAttr }} aria-label="{{ .label }}" title="{{ .label }}"{{ if .pause }} data-tool-paused="{{ if .idle }}true{{ else }}false{{ end }}"{{ end }}>
   {{ partial "ui-icon.html" .icon }}
   {{ if .pause }}{{ partial "ui-icon.html" (cond (eq .icon "play") "pause" "play") }}{{ end }}
 </button>

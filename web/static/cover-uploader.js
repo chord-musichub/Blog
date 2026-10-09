@@ -1,3 +1,8 @@
+(function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
 (function () {
   'use strict';
 
@@ -22,7 +27,7 @@
 
     function setStatus(message, isError) {
       if (!status) return;
-      status.textContent = message;
+      uiText(status, message);
       status.classList.toggle('error', !!isError);
     }
 
@@ -68,3 +73,5 @@
     });
   });
 }());
+
+})();

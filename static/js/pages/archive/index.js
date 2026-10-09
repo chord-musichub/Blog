@@ -1,3 +1,8 @@
+(function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
 /* Content Archive：索引、抽屉、双模式、轻量搜索和分页。 */
 (function(){
   'use strict';
@@ -200,8 +205,8 @@
       var visible = visibleCount(activeMode), total = records(activeMode).length;
       var statusText = (query || tagFilter ? '搜索 / ' : '') + (activeMode === 'articles' ? (archive.dataset.archiveArticleLabel || '文章') : '项目') + ' / ' + visible + ' / ' + total;
       if(pagers[activeMode] && visible) statusText += ' / 第 ' + currentPages[activeMode] + ' 页，共 ' + pageCounts[activeMode] + ' 页';
-      if(status && status.textContent !== statusText) status.textContent = statusText;
-      if(projectHint){ var matchedProjects = visibleCount('projects'); projectHint.hidden = !(activeMode === 'articles' && query && matchedProjects); var hintText = '项目 / ' + matchedProjects + ' →'; if(projectHint.textContent !== hintText) projectHint.textContent = hintText; }
+      if(status && status.textContent !== statusText) uiText(status, statusText);
+      if(projectHint){ var matchedProjects = visibleCount('projects'); projectHint.hidden = !(activeMode === 'articles' && query && matchedProjects); var hintText = '项目 / ' + matchedProjects + ' →'; if(projectHint.textContent !== hintText) uiText(projectHint, hintText); }
       syncPagesURL();
     }
     function switchMode(mode){
@@ -240,4 +245,6 @@
   }
   // Direct entry and AJAX entry share the page-module dispatcher.
   window.SonglineInitContentArchive = init;
+})();
+
 })();

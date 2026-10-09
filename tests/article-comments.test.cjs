@@ -72,3 +72,12 @@ test('same-theme observations do not repeat messages; iframe load and retries re
  f.document.documentElement.theme='light';observer.callback();observer.callback();assert.equal(f.posts.length,3);
  f.reply({error:'offline'});f.load();observer.callback();assert.equal(f.posts.length,4,'A fresh iframe owns a fresh theme state');
 });
+
+test('comment language follows the interface without replacing the iframe or its draft',()=>{
+ const f=fixture();let language='en';
+ f.window.SonglineI18n={getLanguage:()=>language,t:text=>text,setText(node,value){node.textContent=value;}};
+ f.init();f.load();const frame=f.mount.children[0];assert.equal(new URL(frame.src).pathname,'/en/widget');
+ f.observers[0].callback();assert.equal(f.posts.at(-1).data.giscus.setConfig.lang,'en');
+ language='zh';f.observers[0].callback();assert.equal(f.posts.at(-1).data.giscus.setConfig.lang,'zh-CN');assert.equal(f.mount.children[0],frame);
+ f.emit('pagehide');assert(f.observers.every(o=>o.disconnected));
+});

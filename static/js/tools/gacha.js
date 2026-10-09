@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   function init(root){
   const tool = (root || document).querySelector('[data-gacha-tool]');
   if(!tool || tool.dataset.gachaBound === '1') return;
@@ -222,31 +227,31 @@
     const featured = isFeatured();
     tool.classList.toggle('is-standard-banner', !featured);
     if(mode !== renderedMode || featured !== renderedFeatured){
-      els.bannerNote.textContent = featured
+      if(els.bannerNote) els.bannerNote.textContent = featured
         ? '当前为限定 / UP 池：抽到最高稀有后会判定是否为 UP，并根据规则处理小保底 / 大保底。'
         : '当前为常驻池：只模拟稀有度与保底抽数，不判定 UP，也不会触发大小保底。';
       const bannerRule = featured
         ? '当前选择的是限定 / UP 池：会显示 UP 标签，并按该游戏规则处理大小保底。'
         : '当前选择的是常驻池：不会显示 UP 标签，也不会累积或触发大保底。';
-      els.rules.innerHTML = '<ul>' + mode.rules.concat([bannerRule]).map(function(rule){ return '<li>' + rule + '</li>'; }).join('') + '</ul>';
+      if(els.rules) els.rules.innerHTML = '<ul>' + mode.rules.concat([bannerRule]).map(function(rule){ return '<li>' + rule + '</li>'; }).join('') + '</ul>';
       renderedMode = mode;
       renderedFeatured = featured;
     }
     els.total.textContent = String(state.total);
     els.pity.textContent = String(state.pity);
-    els.hardPity.textContent = mode.hardPity ? String(mode.hardPity) : '递增';
+    uiText(els.hardPity, mode.hardPity ? String(mode.hardPity) : '递增');
     const pityDenom = mode.hardPity || Math.max(80, mode.softPityStart || 80);
     els.pityBar.style.width = Math.min(100, state.pity / pityDenom * 100) + '%';
 
     if(!isFeatured()){
-      els.guarantee.textContent = '常驻池';
-      els.guaranteeNote.textContent = '常驻池不计算 UP 大小保底。';
+      uiText(els.guarantee, '常驻池');
+      uiText(els.guaranteeNote, '常驻池不计算 UP 大小保底。');
     }else if(mode.guarantee){
-      els.guarantee.textContent = state.guaranteeNext ? '大保底' : '小保底';
-      els.guaranteeNote.textContent = state.guaranteeNext ? '下次最高稀有必定为 UP。' : '下次最高稀有有概率为 UP。';
+      uiText(els.guarantee, state.guaranteeNext ? '大保底' : '小保底');
+      uiText(els.guaranteeNote, state.guaranteeNext ? '下次最高稀有必定为 UP。' : '下次最高稀有有概率为 UP。');
     }else{
-      els.guarantee.textContent = '无大保底';
-      els.guaranteeNote.textContent = '该机制只模拟 UP 概率，不设置歪后必定 UP。';
+      uiText(els.guarantee, '无大保底');
+      uiText(els.guaranteeNote, '该机制只模拟 UP 概率，不设置歪后必定 UP。');
     }
 
     els.spark.textContent = String(state.spark);
@@ -260,7 +265,7 @@
         ? '本次 ' + lastBatch.length + ' 抽：最高稀有 ' + tops + ' 个，UP ' + ups + ' 个。'
         : '本次 ' + lastBatch.length + ' 抽：最高稀有 ' + tops + ' 个。常驻池不判定 UP。';
     }else{
-      els.summary.textContent = state.total ? '已重置显示' : '';
+      uiText(els.summary, state.total ? '已重置显示' : '');
     }
 
     if(!state.history.length){
@@ -302,4 +307,6 @@
   render([]);
   }
   window.SonglineInitGacha = init;
+})();
+
 })();

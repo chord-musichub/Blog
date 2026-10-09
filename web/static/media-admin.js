@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   function copyText(text){
     if(!text) return Promise.reject(new Error('没有可复制的路径'));
     if(navigator.clipboard && window.isSecureContext){
@@ -20,11 +25,11 @@
     btn.addEventListener('click', function(){
       const path=btn.getAttribute('data-path') || '';
       const text=btn.querySelector('.btn-text');
-      const old=text ? text.textContent : '';
-      copyText(path).then(function(){ if(text)text.textContent='已复制'; },function(){ if(text)text.textContent='请手动复制'; })
+      const old=text ? (window.SonglineI18n ? window.SonglineI18n.sourceText(text) : text.textContent) : '';
+      copyText(path).then(function(){ if(text)uiText(text, '已复制'); },function(){ if(text)uiText(text, '请手动复制'); })
         .finally(function(){
           window.clearTimeout(btn.__timer);
-          btn.__timer=window.setTimeout(function(){ if(text) text.textContent=old || '复制路径'; }, 1300);
+          btn.__timer=window.setTimeout(function(){ if(text) uiText(text, old || '复制路径'); }, 1300);
         });
     });
   });
@@ -50,4 +55,6 @@
       if(empty) empty.hidden = shown !== 0 || !query;
     });
   }
+})();
+
 })();

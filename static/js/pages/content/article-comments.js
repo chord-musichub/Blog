@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
   // Lightweight, lifecycle-aware adapter for the official giscus widget.
   // Protocol: giscus/client.ts and giscus-component/web/src/giscus.ts.
@@ -52,19 +57,20 @@
     var button = panel.querySelector('[data-comments-load]');
     if(!mount || !status || !message || !button) return;
     var session = readSession();
-    var frame = null, timer = 0, observer = null, disposed = false, sentTheme = '';
+    var frame = null, timer = 0, observer = null, disposed = false, sentTheme = '', sentLanguage = '';
     function theme(){ return document.documentElement.getAttribute('data-theme') === 'dark' ? 'transparent_dark' : 'light'; }
+    function language(){return window.SonglineI18n && window.SonglineI18n.getLanguage()==='en' ? 'en' : 'zh-CN';}
     function state(value, text){
       panel.dataset.state = value;
       status.hidden = value === 'ready';
       button.hidden = value === 'loading';
-      button.textContent = value === 'error' ? '重试' : '加载留言';
-      if(text) message.textContent = text;
+      uiText(button, value === 'error' ? '重试' : '加载留言');
+      if(text) uiText(message,text);
       panel.setAttribute('aria-busy', value === 'loading' ? 'true' : 'false');
     }
     function clearFrame(){
       window.clearTimeout(timer); timer = 0;
-      sentTheme = '';
+      sentTheme = '';sentLanguage = '';
       if(frame){
         frame.removeEventListener('load', syncTheme);
         frame.removeEventListener('error', fail);
@@ -78,10 +84,11 @@
     }
     function syncTheme(event){
       if(frame && frame.contentWindow){
-        var next = theme();
-        if(sentTheme === next && !(event && event.type === 'load')) return;
-        frame.contentWindow.postMessage({giscus:{setConfig:{theme:next}}}, ORIGIN);
-        sentTheme = next;
+        var next = theme(), nextLanguage=language();
+        frame.title = window.SonglineI18n ? window.SonglineI18n.t('文章留言（GitHub）') : '文章留言（GitHub）';
+        if(sentTheme === next && sentLanguage===nextLanguage && !(event && event.type === 'load')) return;
+        frame.contentWindow.postMessage({giscus:{setConfig:{theme:next,lang:nextLanguage}}}, ORIGIN);
+        sentTheme = next;sentLanguage=nextLanguage;
       }
     }
     function load(){
@@ -100,13 +107,14 @@
       });
       frame = document.createElement('iframe');
       frame.className = 'giscus-frame';
-      frame.title = '文章留言（GitHub）';
+      frame.title = window.SonglineI18n ? window.SonglineI18n.t('文章留言（GitHub）') : '文章留言（GitHub）';
+      frame.setAttribute('data-i18n-attrs','title');
       frame.setAttribute('scrolling', 'no');
       frame.setAttribute('allow', 'clipboard-write');
       // Our observer already gates the entire request. A second iframe lazy
       // gate could consume the timeout while the browser postpones its load.
       frame.loading = 'eager';
-      frame.src = ORIGIN + '/zh-CN/widget?' + params.toString();
+      frame.src = ORIGIN + '/' + language() + '/widget?' + params.toString();
       frame.addEventListener('load', syncTheme);
       frame.addEventListener('error', fail);
       mount.replaceChildren(frame);
@@ -136,7 +144,7 @@
       }
     }
     var themeObserver = new MutationObserver(syncTheme);
-    themeObserver.observe(document.documentElement, {attributes:true,attributeFilter:['data-theme']});
+    themeObserver.observe(document.documentElement, {attributes:true,attributeFilter:['data-theme','data-language']});
     function cleanup(event){
       // A persisted document retains the widget, its observers and listeners.
       // Destroying it here leaves BFCache returns without an initializer.
@@ -176,4 +184,6 @@
     if(root.matches && root.matches('[data-article-comments]')) init(root);
     root.querySelectorAll('[data-article-comments]').forEach(init);
   };
+})();
+
 })();

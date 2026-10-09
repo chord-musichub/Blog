@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
 
   var VERSION = '20.21.20';
@@ -137,10 +142,10 @@
       }
 
       if(els.state){
-        if(next === 'running') els.state.textContent = '专注中';
-        else if(next === 'paused') els.state.textContent = '已暂停';
-        else if(next === 'finished') els.state.textContent = '专注完成';
-        else els.state.textContent = '点击播放开始';
+        if(next === 'running') uiText(els.state, '专注中');
+        else if(next === 'paused') uiText(els.state, '已暂停');
+        else if(next === 'finished') uiText(els.state, '专注完成');
+        else uiText(els.state, '点击播放开始');
       }
     }
 
@@ -424,4 +429,6 @@
     console.info('[focus-timer] robust ready', VERSION);
   }
   window.SonglineInitFocusTimer = init;
+})();
+
 })();

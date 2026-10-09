@@ -4,17 +4,17 @@
 {{template "admin-client-nav" .}}
 
 <main class="wrap wide settings-page">
-  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Flash}}<div class="flash" data-i18n-text>{{.Flash}}</div>{{end}}
   <section class="settings-workspace">
     {{template "settings-sidebar" .}}
     <section class="settings-detail settings-overview">
-      <header class="settings-detail-header"><h1>设置</h1></header>
+      <header class="settings-detail-header"><h1 data-i18n-ui>设置</h1></header>
       <div class="settings-overview-list">
-        <a href="{{adminURL "/account"}}"><span aria-hidden="true">◌</span><b>账号资料</b><i aria-hidden="true">›</i></a>
+        <a href="{{adminURL "/account"}}"><span aria-hidden="true">◌</span><b data-i18n-ui>账号资料</b><i aria-hidden="true">›</i></a>
         {{if isOwnerUser .User}}
-        <a href="{{adminURL "/admin/site"}}"><span aria-hidden="true">◇</span><b>站点信息</b><i aria-hidden="true">›</i></a>
-        <a href="{{adminURL "/admin/theme"}}"><span aria-hidden="true">◐</span><b>外观主题</b><i aria-hidden="true">›</i></a>
-        <a href="{{adminURL "/admin/manuscript"}}"><span aria-hidden="true">≡</span><b>文章默认</b><i aria-hidden="true">›</i></a>
+        <a href="{{adminURL "/admin/site"}}"><span aria-hidden="true">◇</span><b data-i18n-ui>站点信息</b><i aria-hidden="true">›</i></a>
+        <a href="{{adminURL "/admin/theme"}}"><span aria-hidden="true">◐</span><b data-i18n-ui>外观主题</b><i aria-hidden="true">›</i></a>
+        <a href="{{adminURL "/admin/manuscript"}}"><span aria-hidden="true">≡</span><b data-i18n-ui>文章默认</b><i aria-hidden="true">›</i></a>
         {{end}}
       </div>
     </section>

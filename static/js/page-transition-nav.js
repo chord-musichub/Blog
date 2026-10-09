@@ -16,7 +16,7 @@
       var label = /^\/tags\/site-notice\/?$/.test(url.pathname || url) ? '公告' : (page && page.label) || '地图';
       var current = document.querySelector('[data-site-map-current]');
       var toggle = document.querySelector('[data-site-map-toggle]');
-      if(current && current.textContent !== label) current.textContent = label;
+      if(current){ current.dataset.pageLabel=label; if(window.SonglineI18n) window.SonglineI18n.setText(current,label); else if(current.textContent!==label) current.textContent=label; }
       if(toggle) toggle.setAttribute('aria-label', '当前页面：' + label + '，' + (toggle.getAttribute('aria-expanded') === 'true' ? '关闭' : '打开') + '站点地图');
     }
     function updateNavIndicator(){ setNavActiveByURL(new URL(window.location.href)); }
@@ -68,7 +68,7 @@
           mapToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
           mapToggle.title = (open ? '关闭' : '打开') + '站点地图';
           var current = siteMap.querySelector('[data-site-map-current]');
-          mapToggle.setAttribute('aria-label', '当前页面：' + (current ? current.textContent : '地图') + '，' + (open ? '关闭' : '打开') + '站点地图');
+          mapToggle.setAttribute('aria-label', '当前页面：' + (current ? (current.dataset.pageLabel || current.textContent) : '地图') + '，' + (open ? '关闭' : '打开') + '站点地图');
         }
       }
       if(mapToggle) mapToggle.addEventListener('click', function(){ setMapOpen(!siteMap.classList.contains('is-map-open')); });

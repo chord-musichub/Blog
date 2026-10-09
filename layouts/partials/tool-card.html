@@ -1,5 +1,5 @@
 {{ $class := default "" .class }}
-<a class="tool-card tool-link-card{{ with $class }} {{ . }}{{ end }}" href="{{ .href }}" data-tool-node data-tool-side="{{ default "left" .side }}" data-tool-index="{{ default 0 .index }}"{{ with .id }} data-tool-id="{{ . }}"{{ end }}{{ with .keywords }} data-tool-keywords="{{ delimit . " " }}"{{ end }}>
+<a class="tool-card tool-link-card{{ with $class }} {{ . }}{{ end }}" href="{{ .href }}" data-tool-title="{{ .title }}" data-tool-description="{{ .desc }}" data-tool-node data-tool-side="{{ default "left" .side }}" data-tool-index="{{ default 0 .index }}"{{ with .id }} data-tool-id="{{ . }}"{{ end }}{{ with .keywords }} data-tool-keywords="{{ delimit . " " }}"{{ end }}>
   <span class="tool-node-connector" aria-hidden="true"><i></i></span>
   <div class="tool-card-icon">
     {{ with .icon_url }}
@@ -14,10 +14,10 @@
     {{ else }}{{ .icon }}{{ end }}
   </div>
   <div class="tool-card-copy">
-    <h2>{{ .title }}</h2>
-    <p>{{ .desc }}</p>
+    <h2 data-i18n-ui>{{ .title }}</h2>
+    <p data-i18n-ui>{{ .desc }}</p>
     <div class="tool-tags">
-      {{ range .tags }}<span>{{ . }}</span>{{ end }}
+      {{ range .tags }}<span data-i18n-ui>{{ . }}</span>{{ end }}
     </div>
   </div>
   <span class="tool-card-arrow">{{ partial "ui-icon.html" "arrow-right" }}</span>

@@ -4,34 +4,34 @@
   <section class="reaction-shell tool-detail-layout tool-detail-layout--game" data-reaction-test>
     <section class="reaction-panel tool-detail-surface" data-tool-back-surface>
       {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-      <h1 class="tool-detail-title">反应测试</h1>
+      <h1 class="tool-detail-title" data-i18n-ui>反应测试</h1>
       {{ partial "tool-actionbar.html" "reaction-test" }}
       {{ partial "tool-help-dialog.html" "reaction-test" }}
       <div class="reaction-stats">
         <div class="reaction-stat-card">
-          <span>本次</span>
+          <span data-i18n-ui>本次</span>
           <strong data-reaction-current>-- ms</strong>
         </div>
         <div class="reaction-stat-card">
-          <span>本地最佳</span>
+          <span data-i18n-ui>本地最佳</span>
           <strong data-reaction-best>-- ms</strong>
         </div>
       </div>
 
       <button class="reaction-stage" type="button" data-reaction-stage aria-live="polite">
-        <span class="reaction-stage-kicker" data-reaction-kicker hidden></span>
-        <strong data-reaction-title>点击开始</strong>
-        <em data-reaction-text hidden></em>
+        <span class="reaction-stage-kicker" data-reaction-kicker hidden data-i18n-ui></span>
+        <strong data-reaction-title data-i18n-ui>点击开始</strong>
+        <em data-reaction-text hidden data-i18n-ui></em>
       </button>
 
 
     </section>
-      <details class="snake-leaderboard reaction-leaderboard tool-detail-ranking" data-reaction-leaderboard aria-label="反应测试前三名成绩">
+      <details class="snake-leaderboard reaction-leaderboard tool-detail-ranking" data-reaction-leaderboard aria-label="反应测试前三名成绩" data-i18n-attrs="aria-label">
         <summary>
-          <span>排行榜</span>
+          <span data-i18n-ui>排行榜</span>
         </summary>
         <ol data-reaction-top-scores>
-          <li>暂无记录</li>
+          <li data-i18n-ui>暂无记录</li>
         </ol>
       </details>
   </section>

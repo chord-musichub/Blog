@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
   if(window.SonglineInitHomeMusic) return;
 
@@ -107,8 +112,11 @@
 
     audio.volume = preferredVolume;
 
-    function setStatus(message){ if(status) status.textContent = message; }
-    function setText(node, value){ if(node) node.textContent = value || ''; }
+    function setStatus(message){ if(status) uiText(status, message); }
+    function setText(node,value){
+      if(window.SonglineI18n) window.SonglineI18n.setContent(node,value || '');
+      else if(node) node.textContent=value || '';
+    }
     function revokeActiveUrl(){
       if(!activeUrl) return;
       try{ URL.revokeObjectURL(activeUrl); }catch(e){}
@@ -191,7 +199,7 @@
           button.type = 'button';
           button.dataset.homeTrackIndex = String(index);
           name.textContent = track.title || displayName(track.file);
-          author.textContent = track.artist || '本地音频';
+          if(track.artist) setText(author,track.artist);else uiText(author,'本地音频');
           button.appendChild(name);button.appendChild(author);fragment.appendChild(button);
           return {button:button,name:name,author:author};
         });
@@ -207,7 +215,7 @@
       if(row && track){
         var name = track.title || displayName(track.file), author = track.artist || '本地音频';
         if(row.name.textContent !== name) row.name.textContent = name;
-        if(row.author.textContent !== author) row.author.textContent = author;
+        if(track.artist) setText(row.author,author);else uiText(row.author,'本地音频');
       }
     }
 
@@ -382,7 +390,7 @@
       audio.load();
       var track = tracks[current];
       setText(title, track.title || displayName(track.file));
-      setText(artist, track.artist || '读取音频信息…');
+      if(track.artist) setText(artist,track.artist);else uiText(artist,'读取音频信息…');
       setStatus((track.source || '本地音乐') + ' · ' + (current + 1) + ' / ' + tracks.length);
       renderList();
       updateControls();
@@ -403,8 +411,8 @@
       metadataToken++;
       renderList();
       if(!tracks.length){
-        setText(title, '没有找到音频');
-        setText(artist, '请重新选择音乐来源');
+        uiText(title,'没有找到音频');
+        uiText(artist,'请重新选择音乐来源');
         setStatus('未发现可播放的音频文件');
         updateControls();
         return;
@@ -564,4 +572,6 @@
   window.addEventListener('songline:page-transition-start', function(){
     if(window.__songlineHomeMusicPlayer) window.__songlineHomeMusicPlayer.destroy();
   });
+})();
+
 })();

@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
   function init(){
     document.querySelectorAll('img[data-image-fallback]').forEach(img=>{
@@ -33,7 +38,7 @@
         rows.forEach(row => { row.hidden = true; });
         matches.slice((page-1)*size,page*size).forEach(row => { row.hidden=false; });
         list.querySelector('[data-manuscript-empty]').hidden = matches.length > 0 || rows.length === 0;
-        list.querySelector('[data-list-result]').textContent = '共 ' + matches.length + ' 篇稿件';
+        uiText(list.querySelector('[data-list-result]'), '共 ' + matches.length + ' 篇稿件');
         list.querySelector('[data-list-page]').textContent = page + ' / ' + pages;
         list.querySelector('[data-list-prev]').disabled = page <= 1;
         list.querySelector('[data-list-next]').disabled = page >= pages;
@@ -56,14 +61,14 @@
     if(form && editor){
       let dirty = false, submitting = false;
       const count = document.querySelector('[data-word-count]');
-      function changed(){ dirty=true; document.querySelector('[data-editor-dirty]').textContent='有未保存的修改'; }
+      function changed(){ dirty=true; uiText(document.querySelector('[data-editor-dirty]'),'有未保存的修改'); }
       form.addEventListener('input',changed);
       form.addEventListener('change',changed);
       form.addEventListener('submit',event => { if(!event.defaultPrevented) submitting=true; });
       document.getElementById('article-delete-form')?.addEventListener('submit',event => { if(!event.defaultPrevented) submitting=true; });
       window.addEventListener('beforeunload',event => { if(dirty && !submitting){event.preventDefault();event.returnValue='';} });
       window.addEventListener('pageshow',()=>{submitting=false;});
-      function countWords(){count.textContent=editor.value.replace(/\s/g,'').length + ' 字';}
+      function countWords(){uiText(count, editor.value.replace(/\s/g,'').length + ' 字');}
       editor.addEventListener('input',countWords); countWords();
       function mode(value){
         editor.hidden=value==='preview'; preview.hidden=value!=='preview';
@@ -97,14 +102,14 @@
       function sync(){
         const value=input.value.trim();
         container.replaceChildren();
-        const placeholder=document.createElement('span');placeholder.textContent='选择一张图片';
+        const placeholder=document.createElement('span');uiText(placeholder, '选择一张图片');
         container.appendChild(placeholder);
         if(!value) return;
         let url;try{url=new URL(value,location.href);}catch(e){return;}
         if(!['http:','https:'].includes(url.protocol)) return;
         const image=document.createElement('img');image.alt='当前图片';
         image.onload=()=>{placeholder.hidden=true;};
-        image.onerror=()=>{image.remove();placeholder.textContent='图片暂时无法显示';};
+        image.onerror=()=>{image.remove();uiText(placeholder, '图片暂时无法显示');};
         image.src=url.href;container.appendChild(image);
       }
       input.addEventListener('input',sync);input.addEventListener('change',sync);sync();
@@ -123,10 +128,10 @@
       const entry=manager.querySelector('.creator-entry:not(.creator-entry--saved)');
       const heading=manager.querySelector('.workspace-detail-header');
       if(entry && heading){
-        const button=document.createElement('button');button.type='button';button.textContent='＋ 新建';button.setAttribute('aria-expanded','false');
+        const button=document.createElement('button');button.type='button';uiText(button, '＋ 新建');button.setAttribute('aria-expanded','false');
         entry.hidden=true;heading.appendChild(button);
         button.addEventListener('click',()=>{
-          entry.hidden=!entry.hidden;button.textContent=entry.hidden?'＋ 新建':'取消新建';button.setAttribute('aria-expanded',String(!entry.hidden));
+          entry.hidden=!entry.hidden;uiText(button, entry.hidden?'＋ 新建':'取消新建');button.setAttribute('aria-expanded',String(!entry.hidden));
           if(!entry.hidden)entry.querySelector('input')?.focus();
         });
         // Only one existing record is expanded at a time, keeping long libraries scannable.
@@ -145,3 +150,5 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 }());
+
+})();

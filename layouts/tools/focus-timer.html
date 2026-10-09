@@ -1,14 +1,14 @@
 {{ define "main" }}
 <main class="tool-page focus-timer-page" data-focus-timer data-version="20.21.0">
 
-  <section class="focus-shell tool-detail-layout tool-detail-surface" aria-label="学习倒计时" data-tool-back-surface>
+  <section class="focus-shell tool-detail-layout tool-detail-surface" aria-label="学习倒计时" data-tool-back-surface data-i18n-attrs="aria-label">
     {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-    <h1 class="tool-detail-title">专注钟</h1>
+    <h1 class="tool-detail-title" data-i18n-ui>专注钟</h1>
     {{ partial "tool-actionbar.html" "focus-timer" }}
     {{ partial "tool-help-dialog.html" "focus-timer" }}
     <div class="focus-panel focus-main-card">
       <div class="focus-orbit" data-focus-orbit>
-        <svg class="focus-ring" viewBox="0 0 260 260" role="img" aria-label="倒计时进度环">
+        <svg class="focus-ring" viewBox="0 0 260 260" role="img" aria-label="倒计时进度环" data-i18n-attrs="aria-label">
           <defs>
             <linearGradient id="focusRingGradient" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="var(--tool-accent)"/>
@@ -20,14 +20,14 @@
         </svg>
         <div class="focus-core">
           <div class="focus-time" data-focus-time>25:00</div>
-          <div class="focus-state" data-focus-state>点击播放开始</div>
+          <div class="focus-state" data-focus-state data-i18n-ui>点击播放开始</div>
         </div>
       </div>
 
 
       <fieldset class="focus-duration-panel">
-        <legend>时长（分钟）</legend>
-        <div class="focus-presets" aria-label="快捷时长">
+        <legend data-i18n-ui>时长（分钟）</legend>
+        <div class="focus-presets" aria-label="快捷时长" data-i18n-attrs="aria-label">
           <button type="button" data-focus-preset="5" aria-pressed="false">5</button>
           <button type="button" data-focus-preset="15" aria-pressed="false">15</button>
           <button type="button" data-focus-preset="25" aria-pressed="true">25</button>
@@ -36,52 +36,52 @@
           <button type="button" data-focus-preset="90" aria-pressed="false">90</button>
         </div>
         <label class="focus-custom-time">
-          <span>自定义</span>
-          <span class="focus-minute-field"><input type="number" min="1" max="1440" step="1" inputmode="numeric" data-focus-minutes value="25" aria-label="自定义倒计时分钟数"><span aria-hidden="true">分钟</span></span>
+          <span data-i18n-ui>自定义</span>
+          <span class="focus-minute-field"><input type="number" min="1" max="1440" step="1" inputmode="numeric" data-focus-minutes value="25" aria-label="自定义倒计时分钟数" data-i18n-attrs="aria-label"><span aria-hidden="true" data-i18n-ui>分钟</span></span>
         </label>
       </fieldset>
     </div>
 
-    <aside class="focus-panel focus-side-card" aria-label="专注设置与本地记录">
+    <aside class="focus-panel focus-side-card" aria-label="专注设置与本地记录" data-i18n-attrs="aria-label">
       <section class="focus-side-section">
-        <h2>提示设置</h2>
+        <h2 data-i18n-ui>提示设置</h2>
         <label class="focus-range-row">
-          <span>提示音音量</span>
+          <span data-i18n-ui>提示音音量</span>
           <input type="range" min="0" max="1" step="0.01" value="0.78" data-focus-volume>
         </label>
-        <button class="focus-mini-button" type="button" data-focus-test-sound>试听提示音</button>
+        <button class="focus-mini-button" type="button" data-focus-test-sound data-i18n-ui>试听提示音</button>
       </section>
 
       <section class="focus-side-section">
-        <h2>显示偏好</h2>
+        <h2 data-i18n-ui>显示偏好</h2>
         <label class="focus-switch-row">
-          <span>显示秒数</span>
+          <span data-i18n-ui>显示秒数</span>
           <input class="focus-switch" type="checkbox" role="switch" data-focus-show-seconds checked>
         </label>
         <label class="focus-switch-row">
-          <span>完成弹窗</span>
+          <span data-i18n-ui>完成弹窗</span>
           <input class="focus-switch" type="checkbox" role="switch" data-focus-overlay checked>
         </label>
       </section>
 
       <section class="focus-side-section focus-stats">
-        <h2>今日专注</h2>
+        <h2 data-i18n-ui>今日专注</h2>
         <div class="focus-stats-grid">
-          <p><strong data-focus-today-count>0</strong><span>完成次数</span></p>
-          <p><strong data-focus-today-minutes>0</strong><span>专注分钟</span></p>
+          <p><strong data-focus-today-count>0</strong><span data-i18n-ui>完成次数</span></p>
+          <p><strong data-focus-today-minutes>0</strong><span data-i18n-ui>专注分钟</span></p>
         </div>
-        <button class="focus-mini-button" type="button" data-focus-clear-today>清空今日记录</button>
+        <button class="focus-mini-button" type="button" data-focus-clear-today data-i18n-ui>清空今日记录</button>
       </section>
     </aside>
   </section>
 
   <dialog class="focus-finish-overlay" data-focus-finish hidden aria-labelledby="focusFinishTitle">
     <div class="focus-finish-card">
-      <h2 id="focusFinishTitle">专注完成</h2>
-      <p data-focus-finish-text>本轮专注已完成。</p>
+      <h2 id="focusFinishTitle" data-i18n-ui>专注完成</h2>
+      <p data-focus-finish-text data-i18n-ui>本轮专注已完成。</p>
       <div class="focus-finish-actions">
-        <button class="focus-button focus-primary" type="button" data-focus-next>再来一轮</button>
-        <button class="focus-button" type="button" data-focus-close>收起提示</button>
+        <button class="focus-button focus-primary" type="button" data-focus-next data-i18n-ui>再来一轮</button>
+        <button class="focus-button" type="button" data-focus-close data-i18n-ui>收起提示</button>
       </div>
     </div>
   </dialog>

@@ -2,8 +2,8 @@
 {{ $memorySource := slice }}{{ if isset .Site.Data "memories" }}{{ $memorySource = .Site.Data.memories }}{{ else }}{{ with resources.Get "data/memories.json" }}{{ $memorySource = . | transform.Unmarshal }}{{ end }}{{ end }}{{ $memories := slice }}{{ range $memorySource }}{{ $date := printf "%v" .date }}{{ $parts := split $date "-" }}{{ $year := index $parts 0 }}{{ $month := 0 }}{{ if gt (len $parts) 1 }}{{ $month = int (index $parts 1) }}{{ end }}{{ $sortKey := printf "%s-%02d" $year $month }}{{ $memories = $memories | append (merge (dict "sort_key" $sortKey) .) }}{{ end }}{{ $memories = sort $memories "sort_key" "asc" }}
 {{ $dates := slice }}
 {{ range $memories }}{{ $date := printf "%v" .date }}{{ if not (in $dates $date) }}{{ $dates = $dates | append $date }}{{ end }}{{ end }}
-<section class="memory-room" data-memory-room aria-label="回忆室">
-  <a class="memory-room__back" href="/friends/" data-back-icon aria-label="返回上一页" title="返回上一页">{{ partial "ui-icon.html" "chevron-left" }}</a>
+<section class="memory-room" data-memory-room aria-label="回忆室" data-i18n-attrs="aria-label">
+  <a class="memory-room__back" href="/friends/" data-back-icon aria-label="返回上一页" title="返回上一页" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "chevron-left" }}</a>
   <div class="memory-room__viewport" data-memory-viewport>
     <div class="memory-room__track" data-memory-track data-memory-count="{{ len $dates }}" style="--memory-count:{{ len $dates }}">
     {{ range $index, $memory := $memories }}
@@ -15,10 +15,10 @@
       <div class="memory-room__caption"><h1>{{ $memory.title | default $memory.date }}</h1><p>{{ $memory.description }}</p></div>
       {{ if eq $slot 0 }}<div class="memory-room__time"><i aria-hidden="true"></i><time>{{ $memory.date }}</time></div>{{ end }}
     </article>
-    {{ else }}<p class="memory-room__empty">还没有回忆。</p>{{ end }}
+    {{ else }}<p class="memory-room__empty" data-i18n-ui>还没有回忆。</p>{{ end }}
     </div>
   </div>
   <script id="memory-room-data" type="application/json">{{ $memories | jsonify | safeJS }}</script>
 </section>
-<dialog class="memory-lightbox" data-memory-lightbox hidden aria-hidden="true" aria-label="回忆详情"><div class="memory-lightbox__panel"><button type="button" class="memory-lightbox__close" data-memory-close aria-label="关闭" autofocus>×</button><img data-memory-lightbox-image alt=""><div><time data-memory-lightbox-date></time><h2 data-memory-lightbox-title></h2><p data-memory-lightbox-description></p></div></div></dialog>
+<dialog class="memory-lightbox" data-memory-lightbox hidden aria-hidden="true" aria-label="回忆详情" data-i18n-attrs="aria-label"><div class="memory-lightbox__panel"><button type="button" class="memory-lightbox__close" data-memory-close aria-label="关闭" autofocus data-i18n-attrs="aria-label">×</button><img data-memory-lightbox-image alt=""><div><time data-memory-lightbox-date></time><h2 data-memory-lightbox-title></h2><p data-memory-lightbox-description></p></div></div></dialog>
 {{ end }}

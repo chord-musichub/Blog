@@ -13,7 +13,7 @@ class Node{
  closest(selector){for(let node=this;node;node=node.parentNode)if(selector.split(',').some(s=>node.classes.has(s.trim().slice(1))))return node;return null;}
 }
 function fixture(count=300){
- const f={playlist:Array.from({length:count},(_,i)=>({file:{name:'track-'+i+'.wav'},title:'曲目 '+i,artist:''})),playlistRows:new Map(),playlistDirty:true,activePlaylistRow:null,playlistList:new Node(),currentIndex:0,disposed:false,document:{createElement:()=>new Node()},showPlaylist(){},updatePlaybackState(){},played:[],removed:[]};
+ const f={window:{},uiContent(node,value){node.textContent=value;},uiText(node,value){node.textContent=value;},playlist:Array.from({length:count},(_,i)=>({file:{name:'track-'+i+'.wav'},title:'曲目 '+i,artist:''})),playlistRows:new Map(),playlistDirty:true,activePlaylistRow:null,playlistList:new Node(),currentIndex:0,disposed:false,document:{createElement:()=>new Node()},showPlaylist(){},updatePlaybackState(){},played:[],removed:[]};
  f.playPlaylistIndex=i=>f.played.push(i);f.removePlaylistItem=i=>f.removed.push(i);
  vm.createContext(f);vm.runInContext(functions(['trackFields','createPlaylistRow','updatePlaylistRow','renderPlaylist','onPlaylistClick']),f);f.renderPlaylist();return f;
 }

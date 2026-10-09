@@ -4,54 +4,54 @@
 {{template "admin-client-nav" .}}
 
 <main class="wrap wide workspace-shell admin-management">
-  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Flash}}<div class="flash" data-i18n-text>{{.Flash}}</div>{{end}}
   {{template "workspace-sidebar" .}}
   <section class="workspace-detail">
-  <header class="workspace-detail-header"><h1>{{if isAdminUser .User}}管理{{else}}成员文章{{end}}</h1></header>
+  <header class="workspace-detail-header"><h1>{{if isAdminUser .User}}<span class="i18n-copy" data-i18n-ui>管理</span>{{else}}<span class="i18n-copy" data-i18n-ui>成员文章</span>{{end}}</h1></header>
 
   <section id="reviews" class="admin-workspace-section">
-    <p><a class="btn small secondary" href="{{adminURL "/admin/publication-repair"}}">发布残留检查</a></p>
-    <div class="toolbar section-toolbar"><h2>{{if isAdminUser .User}}稿件审核{{else}}成员文章{{end}}</h2><span class="soft-count">{{len .ArticleGroups}} 位作者</span></div>
+    <p><a class="btn small secondary" href="{{adminURL "/admin/publication-repair"}}" data-i18n-ui>发布残留检查</a></p>
+    <div class="toolbar section-toolbar"><h2>{{if isAdminUser .User}}<span class="i18n-copy" data-i18n-ui>稿件审核</span>{{else}}<span class="i18n-copy" data-i18n-ui>成员文章</span>{{end}}</h2><span class="soft-count">{{len .ArticleGroups}}<span class="i18n-copy" data-i18n-ui> 位作者</span></span></div>
     {{range .ArticleGroups}}
     <details class="card admin-author-group" open>
-      <summary><span>{{.DisplayName}}</span><small>{{.Username}} · {{len .Articles}} 篇</small></summary>
+      <summary><span>{{.DisplayName}}</span><small>{{.Username}} · {{len .Articles}}<span class="i18n-copy" data-i18n-ui> 篇</span></small></summary>
       <div class="admin-author-articles">
       {{range .Articles}}
       <article class="article-row compact-article-row">
-        <div><h3><a href="{{adminURL (printf "/articles/%s/edit" .ID)}}">{{.Title}}</a></h3><p class="meta"><span class="badge {{statusClass .Status}}">{{statusText .Status}}</span> · {{fmtTime .UpdatedAt}}</p>{{if .Summary}}<p class="meta">{{.Summary}}</p>{{end}}{{if .RejectNote}}<p class="warn">退回：{{.RejectNote}}</p>{{end}}</div>
+        <div><h3><a href="{{adminURL (printf "/articles/%s/edit" .ID)}}">{{.Title}}</a></h3><p class="meta"><span class="badge {{statusClass .Status}}"><span class="i18n-copy" data-i18n-ui>{{statusText .Status}}</span></span> · {{fmtTime .UpdatedAt}}</p>{{if .Summary}}<p class="meta">{{.Summary}}</p>{{end}}{{if .RejectNote}}<p class="warn"><span class="i18n-copy" data-i18n-ui>退回：</span>{{.RejectNote}}</p>{{end}}</div>
         <div class="actions vertical">
-          <a class="btn small secondary" href="{{adminURL (printf "/articles/%s/edit" .ID)}}">{{if isAdminUser $.User}}审阅{{else}}编辑{{end}}</a>
+          <a class="btn small secondary" href="{{adminURL (printf "/articles/%s/edit" .ID)}}">{{if isAdminUser $.User}}<span class="i18n-copy" data-i18n-ui>审阅</span>{{else}}<span class="i18n-copy" data-i18n-ui>编辑</span>{{end}}</a>
           {{if isAdminUser $.User}}
-            {{if canPublish .}}<form method="post" action="{{adminURL (printf "/articles/%s/publish" .ID)}}"><button class="small">{{if eq .Status "pending"}}通过并发布{{else}}发布{{end}}</button></form>{{end}}
-            {{if eq .Status "pending"}}<details class="reject-box"><summary>退回</summary><form method="post" action="{{adminURL (printf "/articles/%s/reject" .ID)}}"><input name="note" placeholder="退回原因"><button class="small danger">确认</button></form></details>{{end}}
+            {{if canPublish .}}<form method="post" action="{{adminURL (printf "/articles/%s/publish" .ID)}}"><button class="small">{{if eq .Status "pending"}}<span class="i18n-copy" data-i18n-ui>通过并发布</span>{{else}}<span class="i18n-copy" data-i18n-ui>发布</span>{{end}}</button></form>{{end}}
+            {{if eq .Status "pending"}}<details class="reject-box"><summary data-i18n-ui>退回</summary><form method="post" action="{{adminURL (printf "/articles/%s/reject" .ID)}}"><input name="note" placeholder="退回原因" data-i18n-attrs="placeholder"><button class="small danger" data-i18n-ui>确认</button></form></details>{{end}}
           {{end}}
-          {{if canDeleteArticle $.User .}}<form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" data-content-delete onsubmit="return confirm('确定删除这篇文章吗？已发布内容将从公开站移除。')"><button type="submit" class="small danger" aria-label="删除 {{.Title}}">删除</button></form>{{end}}
+          {{if canDeleteArticle $.User .}}<form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" data-content-delete onsubmit="return confirm(window.SonglineI18n ? window.SonglineI18n.t('确定删除这篇文章吗？已发布内容将从公开站移除。') : '确定删除这篇文章吗？已发布内容将从公开站移除。')"><button type="submit" class="small danger" aria-label="删除 {{.Title}}" data-i18n-ui>删除</button></form>{{end}}
         </div>
       </article>
       {{end}}
       </div>
     </details>
-    {{else}}<div class="empty card">暂无文章。</div>{{end}}
+    {{else}}<div class="empty card" data-i18n-ui>暂无文章。</div>{{end}}
   </section>
 
   {{if isAdminUser .User}}
   <section id="messages" class="admin-workspace-section">
-    <div class="toolbar section-toolbar"><h2>留言</h2><span class="soft-count">{{len .Messages}}</span></div>
+    <div class="toolbar section-toolbar"><h2 data-i18n-ui>留言</h2><span class="soft-count">{{len .Messages}}</span></div>
     <div class="admin-message-grid">
       {{range .Messages}}
-      <article class="card admin-message-card"><header><img src="{{.Avatar}}" alt="" onerror="this.remove()"><strong>{{.Name}}</strong><small>{{.CreatedAt}}</small></header><p>{{.Content}}</p><form method="post" action="{{adminURL (printf "/admin/messages/%s/delete" .ID)}}" onsubmit="return confirm('确定删除这条留言吗？')"><button class="small danger">删除</button></form></article>
-      {{else}}<div class="empty card">暂无留言。</div>{{end}}
+      <article class="card admin-message-card"><header><img src="{{.Avatar}}" alt="" onerror="this.remove()"><strong>{{.Name}}</strong><small>{{.CreatedAt}}</small></header><p>{{.Content}}</p><form method="post" action="{{adminURL (printf "/admin/messages/%s/delete" .ID)}}" onsubmit="return confirm(window.SonglineI18n ? window.SonglineI18n.t('确定删除这条留言吗？') : '确定删除这条留言吗？')"><button class="small danger" data-i18n-ui>删除</button></form></article>
+      {{else}}<div class="empty card" data-i18n-ui>暂无留言。</div>{{end}}
     </div>
   </section>
 
   <section id="users" class="admin-workspace-section">
-    <div class="toolbar section-toolbar"><h2>用户</h2><a class="btn small secondary" href="{{adminURL "/users/new"}}">添加用户</a></div>
-    <div class="card table-wrap"><table><thead><tr><th>用户名</th><th>身份</th><th>状态</th><th>密码</th><th>操作</th></tr></thead><tbody>
-      {{range .Users}}<tr><td><strong>{{.DisplayName}}</strong><br><small>{{.Username}}</small></td><td>{{roleText .Role}}</td><td>{{if .Disabled}}已禁用{{else}}正常{{end}}</td><td>{{if .PasswordMustChange}}需修改{{else}}正常{{end}}</td><td>{{if canManageUser $.User .}}<div class="actions"><form method="post" action="{{adminURL (printf "/users/%s/toggle" .Username)}}"><button class="small secondary">{{if .Disabled}}启用{{else}}禁用{{end}}</button></form><details><summary>重置密码</summary><form method="post" action="{{adminURL (printf "/users/%s/reset" .Username)}}" class="mini-form"><input name="password" type="password" minlength="6" required placeholder="新密码"><button class="small">确认</button></form></details>{{if canDeleteUser .}}<form method="post" action="{{adminURL (printf "/users/%s/delete" .Username)}}" onsubmit="return confirm('确定删除该用户吗？')"><button class="small danger">删除</button></form>{{end}}</div>{{else}}<span class="meta">不可操作</span>{{end}}</td></tr>{{end}}
+    <div class="toolbar section-toolbar"><h2 data-i18n-ui>用户</h2><a class="btn small secondary" href="{{adminURL "/users/new"}}" data-i18n-ui>添加用户</a></div>
+    <div class="card table-wrap"><table><thead><tr><th data-i18n-ui>用户名</th><th data-i18n-ui>身份</th><th data-i18n-ui>状态</th><th data-i18n-ui>密码</th><th data-i18n-ui>操作</th></tr></thead><tbody>
+      {{range .Users}}<tr><td><strong>{{.DisplayName}}</strong><br><small>{{.Username}}</small></td><td><span class="i18n-copy" data-i18n-ui>{{roleText .Role}}</span></td><td>{{if .Disabled}}<span class="i18n-copy" data-i18n-ui>已禁用</span>{{else}}<span class="i18n-copy" data-i18n-ui>正常</span>{{end}}</td><td>{{if .PasswordMustChange}}<span class="i18n-copy" data-i18n-ui>需修改</span>{{else}}<span class="i18n-copy" data-i18n-ui>正常</span>{{end}}</td><td>{{if canManageUser $.User .}}<div class="actions"><form method="post" action="{{adminURL (printf "/users/%s/toggle" .Username)}}"><button class="small secondary">{{if .Disabled}}<span class="i18n-copy" data-i18n-ui>启用</span>{{else}}<span class="i18n-copy" data-i18n-ui>禁用</span>{{end}}</button></form><details><summary data-i18n-ui>重置密码</summary><form method="post" action="{{adminURL (printf "/users/%s/reset" .Username)}}" class="mini-form"><input name="password" type="password" minlength="6" required placeholder="新密码" data-i18n-attrs="placeholder"><button class="small" data-i18n-ui>确认</button></form></details>{{if canDeleteUser .}}<form method="post" action="{{adminURL (printf "/users/%s/delete" .Username)}}" onsubmit="return confirm(window.SonglineI18n ? window.SonglineI18n.t('确定删除该用户吗？') : '确定删除该用户吗？')"><button class="small danger" data-i18n-ui>删除</button></form>{{end}}</div>{{else}}<span class="meta" data-i18n-ui>不可操作</span>{{end}}</td></tr>{{end}}
     </tbody></table></div>
   </section>
 
-  <section id="password-requests" class="admin-workspace-section"><div class="toolbar section-toolbar"><h2>密码申请</h2></div><div class="card table-wrap"><table><thead><tr><th>用户</th><th>状态</th><th>提交时间</th><th>操作</th></tr></thead><tbody>{{range .PasswordResets}}<tr><td>{{.Username}}</td><td>{{resetStatusText .Status}}</td><td>{{fmtTime .CreatedAt}}</td><td>{{if eq .Status "pending"}}<details><summary>处理</summary><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/approve" .ID)}}" class="mini-form"><input name="password" type="password" minlength="8" required placeholder="临时密码"><button class="small">批准</button></form><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/reject" .ID)}}"><button class="small danger">拒绝</button></form></details>{{else}}<span class="meta">已处理</span>{{end}}</td></tr>{{else}}<tr><td colspan="4" class="meta">暂无申请。</td></tr>{{end}}</tbody></table></div></section>
+  <section id="password-requests" class="admin-workspace-section"><div class="toolbar section-toolbar"><h2 data-i18n-ui>密码申请</h2></div><div class="card table-wrap"><table><thead><tr><th data-i18n-ui>用户</th><th data-i18n-ui>状态</th><th data-i18n-ui>提交时间</th><th data-i18n-ui>操作</th></tr></thead><tbody>{{range .PasswordResets}}<tr><td>{{.Username}}</td><td><span class="i18n-copy" data-i18n-ui>{{resetStatusText .Status}}</span></td><td>{{fmtTime .CreatedAt}}</td><td>{{if eq .Status "pending"}}<details><summary data-i18n-ui>处理</summary><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/approve" .ID)}}" class="mini-form"><input name="password" type="password" minlength="8" required placeholder="临时密码" data-i18n-attrs="placeholder"><button class="small" data-i18n-ui>批准</button></form><form method="post" action="{{adminURL (printf "/admin/password-requests/%s/reject" .ID)}}"><button class="small danger" data-i18n-ui>拒绝</button></form></details>{{else}}<span class="meta" data-i18n-ui>已处理</span>{{end}}</td></tr>{{else}}<tr><td colspan="4" class="meta" data-i18n-ui>暂无申请。</td></tr>{{end}}</tbody></table></div></section>
   {{end}}
   </section>
 </main>

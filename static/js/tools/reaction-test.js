@@ -219,7 +219,7 @@
       if(disposed || !topScoresEl) return;
       var markup = topScores.length ? topScores.map(function(item, index){
         return '<li><span>第 ' + (index + 1) + ' 名</span><b>' + item.score + ' ms</b></li>';
-      }).join('') : '<li>暂无记录</li>';
+      }).join('') : '<li><!--ui-->暂无记录<!--/ui--></li>';
       if(topScoresEl.innerHTML !== markup) topScoresEl.innerHTML = markup;
     }
 

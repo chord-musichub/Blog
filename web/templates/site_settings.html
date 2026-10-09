@@ -5,88 +5,88 @@
 {{template "admin-client-nav" .}}
 
 <main class="wrap wide settings-page">
-  {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+  {{if .Flash}}<div class="flash" data-i18n-text>{{.Flash}}</div>{{end}}
   {{if .Error}}<div class="flash error">{{.Error}}</div>{{end}}
   <section class="settings-workspace">
     {{template "settings-sidebar" .}}
     <section class="settings-detail">
-      <header class="settings-detail-header"><h1>站点信息</h1></header>
+      <header class="settings-detail-header"><h1 data-i18n-ui>站点信息</h1></header>
 
   <form method="post" action="{{adminURL "/admin/site"}}">
     <section class="card admin-settings-card">
-      <h2>基础信息</h2>
+      <h2 data-i18n-ui>基础信息</h2>
       <div class="grid2">
-        <label>站点标题<input name="site_title" value="{{.Settings.Site.Title}}"></label>
-        <label>公开显示名<input name="display_name" value="{{.Settings.Site.DisplayName}}"></label>
-        <label>左上角 Logo 文本<input name="logo" value="{{.Settings.Site.Logo}}"></label>
-        <label>左上角自定义图标<input name="logo_icon" value="{{.Settings.Site.LogoIcon}}" placeholder="/uploads/admin/logo/main_logo.png"></label>
-        <label>浏览器标签页图标<input name="favicon" value="{{.Settings.Site.Favicon}}" placeholder="/uploads/favicon.png 或 /uploads/favicon.ico"></label>
-        <label>ICP备案号<input name="icp" value="{{.Settings.Site.ICP}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>站点标题</span><input name="site_title" value="{{.Settings.Site.Title}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>公开显示名</span><input name="display_name" value="{{.Settings.Site.DisplayName}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>左上角 Logo 文本</span><input name="logo" value="{{.Settings.Site.Logo}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>左上角自定义图标</span><input name="logo_icon" value="{{.Settings.Site.LogoIcon}}" placeholder="/uploads/admin/logo/main_logo.png"></label>
+        <label><span class="i18n-copy" data-i18n-ui>浏览器标签页图标</span><input name="favicon" value="{{.Settings.Site.Favicon}}" placeholder="/uploads/favicon.png 或 /uploads/favicon.ico" data-i18n-attrs="placeholder"></label>
+        <label><span class="i18n-copy" data-i18n-ui>ICP备案号</span><input name="icp" value="{{.Settings.Site.ICP}}"></label>
       </div>
-      <label>页脚文案<input name="footer_text" value="{{.Settings.Site.FooterText}}"></label>
+      <label><span class="i18n-copy" data-i18n-ui>页脚文案</span><input name="footer_text" value="{{.Settings.Site.FooterText}}"></label>
     </section>
 
     <section class="card admin-settings-card">
-      <h2>首页当前展示</h2>
-      <label>首页封面图路径<input name="hero_image" value="{{.Settings.Home.HeroImage}}" placeholder="/uploads/admin/background/qiandai_background.png"></label>
+      <h2 data-i18n-ui>首页当前展示</h2>
+      <label><span class="i18n-copy" data-i18n-ui>首页封面图路径</span><input name="hero_image" value="{{.Settings.Home.HeroImage}}" placeholder="/uploads/admin/background/qiandai_background.png"></label>
       <div class="grid2">
-        <label>创站时间<input name="founded_at" value="{{.Settings.Home.FoundedAt}}" placeholder="2026/5/8"></label>
-        <label>首页推荐文章数量<input name="recommended_count" value="{{.Settings.Home.RecommendedCount}}" placeholder="6"></label>
-      </div>
-    </section>
-
-    <section class="card admin-settings-card">
-      <h2>开机动画</h2>
-      <label>100% 后显示的欢迎文字<input name="boot_welcome_text" value="{{.Settings.Boot.WelcomeText}}" placeholder="欢迎回来"></label>
-    </section>
-
-    <section class="card admin-settings-card">
-      <h2>默认图片与栏目</h2>
-      <div class="grid2">
-        <label>朋友页标题<input name="friends_hero_title" value="{{.Settings.Pages.FriendsHeroTitle}}"></label>
-        <label>朋友页 Hero 图<input name="friends_hero_image" value="{{.Settings.Pages.FriendsHeroImage}}"></label>
-        <label>文章默认封面<input name="article_default_cover" value="{{.Settings.Pages.ArticleDefaultCover}}"></label>
-        <label>朋友详情默认图<input name="friend_default_cover" value="{{.Settings.Pages.FriendDefaultCover}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>创站时间</span><input name="founded_at" value="{{.Settings.Home.FoundedAt}}" placeholder="2026/5/8"></label>
+        <label><span class="i18n-copy" data-i18n-ui>首页推荐文章数量</span><input name="recommended_count" value="{{.Settings.Home.RecommendedCount}}" placeholder="6"></label>
       </div>
     </section>
 
     <section class="card admin-settings-card">
-      <h2>全站背景图片</h2>
+      <h2 data-i18n-ui>开机动画</h2>
+      <label><span class="i18n-copy" data-i18n-ui>100% 后显示的欢迎文字</span><input name="boot_welcome_text" value="{{.Settings.Boot.WelcomeText}}" placeholder="欢迎回来" data-i18n-attrs="placeholder"></label>
+    </section>
+
+    <section class="card admin-settings-card">
+      <h2 data-i18n-ui>默认图片与栏目</h2>
       <div class="grid2">
-        <label>背景图片路径<input name="background_image" value="{{.Settings.Background.Image}}" placeholder="/uploads/site-bg.png"></label>
-        <label>背景高度<input name="background_height" value="{{.Settings.Background.Height}}" placeholder="420px"></label>
-        <label>模糊程度<input name="background_blur" value="{{.Settings.Background.Blur}}" placeholder="18px"></label>
-        <label>透明度 0-1<input name="background_opacity" value="{{.Settings.Background.Opacity}}" placeholder="0.38"></label>
+        <label><span class="i18n-copy" data-i18n-ui>朋友页标题</span><input name="friends_hero_title" value="{{.Settings.Pages.FriendsHeroTitle}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>朋友页 Hero 图</span><input name="friends_hero_image" value="{{.Settings.Pages.FriendsHeroImage}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>文章默认封面</span><input name="article_default_cover" value="{{.Settings.Pages.ArticleDefaultCover}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>朋友详情默认图</span><input name="friend_default_cover" value="{{.Settings.Pages.FriendDefaultCover}}"></label>
       </div>
     </section>
 
     <section class="card admin-settings-card">
-      <h2>文章留言</h2>
+      <h2 data-i18n-ui>全站背景图片</h2>
+      <div class="grid2">
+        <label><span class="i18n-copy" data-i18n-ui>背景图片路径</span><input name="background_image" value="{{.Settings.Background.Image}}" placeholder="/uploads/site-bg.png"></label>
+        <label><span class="i18n-copy" data-i18n-ui>背景高度</span><input name="background_height" value="{{.Settings.Background.Height}}" placeholder="420px"></label>
+        <label><span class="i18n-copy" data-i18n-ui>模糊程度</span><input name="background_blur" value="{{.Settings.Background.Blur}}" placeholder="18px"></label>
+        <label><span class="i18n-copy" data-i18n-ui>透明度 0-1</span><input name="background_opacity" value="{{.Settings.Background.Opacity}}" placeholder="0.38"></label>
+      </div>
+    </section>
+
+    <section class="card admin-settings-card">
+      <h2 data-i18n-ui>文章留言</h2>
       <input type="hidden" name="comments_present" value="1">
-      <label class="check"><input type="checkbox" name="comments_enabled" {{if .Settings.Comments.Enabled}}checked{{end}}> 启用 GitHub 留言</label>
+      <label class="check"><input type="checkbox" name="comments_enabled" {{if .Settings.Comments.Enabled}}checked{{end}}><span class="i18n-copy" data-i18n-ui> 启用 GitHub 留言</span></label>
       <div class="grid2">
-        <label>公开仓库<input name="comments_repo" value="{{.Settings.Comments.Repo}}" placeholder="用户名/仓库名"></label>
-        <label>仓库 ID<input name="comments_repo_id" value="{{.Settings.Comments.RepoID}}"></label>
-        <label>讨论分类<input name="comments_category" value="{{.Settings.Comments.Category}}"></label>
-        <label>分类 ID<input name="comments_category_id" value="{{.Settings.Comments.CategoryID}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>公开仓库</span><input name="comments_repo" value="{{.Settings.Comments.Repo}}" placeholder="用户名/仓库名" data-i18n-attrs="placeholder"></label>
+        <label><span class="i18n-copy" data-i18n-ui>仓库 ID</span><input name="comments_repo_id" value="{{.Settings.Comments.RepoID}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>讨论分类</span><input name="comments_category" value="{{.Settings.Comments.Category}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>分类 ID</span><input name="comments_category_id" value="{{.Settings.Comments.CategoryID}}"></label>
       </div>
-      <p>从 <a href="https://giscus.app/zh-CN" target="_blank" rel="noopener noreferrer">giscus 配置页</a>复制公开配置，无需 Token。留言默认公开，在 GitHub Discussions 管理。</p>
+      <p><span class="i18n-copy" data-i18n-ui>从 </span><a href="https://giscus.app/zh-CN" target="_blank" rel="noopener noreferrer" data-i18n-ui>giscus 配置页</a><span class="i18n-copy" data-i18n-ui>复制公开配置，无需 Token。留言默认公开，在 GitHub Discussions 管理。</span></p>
     </section>
 
     <section class="card admin-settings-card">
-      <h2>联系我</h2>
+      <h2 data-i18n-ui>联系我</h2>
       <div class="grid2">
-        <label>GitHub 链接<input name="github" value="{{.Settings.Social.GitHub}}"></label>
-        <label>邮箱地址<input name="email" value="{{.Settings.Social.Email}}" placeholder="xxx@example.com 或 mailto:xxx@example.com"></label>
-        <label>B站频道链接<input name="bilibili" value="{{.Settings.Social.Bilibili}}"></label>
-        <label>B站图标路径<input name="bilibili_icon" value="{{.Settings.Social.BilibiliIcon}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>GitHub 链接</span><input name="github" value="{{.Settings.Social.GitHub}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>邮箱地址</span><input name="email" value="{{.Settings.Social.Email}}" placeholder="xxx@example.com 或 mailto:xxx@example.com" data-i18n-attrs="placeholder"></label>
+        <label><span class="i18n-copy" data-i18n-ui>B站频道链接</span><input name="bilibili" value="{{.Settings.Social.Bilibili}}"></label>
+        <label><span class="i18n-copy" data-i18n-ui>B站图标路径</span><input name="bilibili_icon" value="{{.Settings.Social.BilibiliIcon}}"></label>
       </div>
-      <label class="check"><input type="checkbox" name="show_github" {{if .Settings.Social.ShowGitHub}}checked{{end}}> 显示 GitHub</label>
-      <label class="check"><input type="checkbox" name="show_email" {{if .Settings.Social.ShowEmail}}checked{{end}}> 显示邮箱</label>
-      <label class="check"><input type="checkbox" name="show_bilibili" {{if .Settings.Social.ShowBilibili}}checked{{end}}> 显示 B站</label>
+      <label class="check"><input type="checkbox" name="show_github" {{if .Settings.Social.ShowGitHub}}checked{{end}}><span class="i18n-copy" data-i18n-ui> 显示 GitHub</span></label>
+      <label class="check"><input type="checkbox" name="show_email" {{if .Settings.Social.ShowEmail}}checked{{end}}><span class="i18n-copy" data-i18n-ui> 显示邮箱</span></label>
+      <label class="check"><input type="checkbox" name="show_bilibili" {{if .Settings.Social.ShowBilibili}}checked{{end}}><span class="i18n-copy" data-i18n-ui> 显示 B站</span></label>
     </section>
 
-    <div class="actions sticky-admin-actions"><button title="保存设置并重建公开站"><span class="btn-ico" aria-hidden="true">✓</span><span class="btn-text optional">保存</span></button></div>
+    <div class="actions sticky-admin-actions"><button title="保存设置并重建公开站" data-i18n-attrs="title"><span class="btn-ico" aria-hidden="true">✓</span><span class="btn-text optional" data-i18n-ui>保存</span></button></div>
   </form>
     </section>
   </section>

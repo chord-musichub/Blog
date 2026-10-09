@@ -183,6 +183,7 @@ func TestCreatorCenterVisualPreview(t *testing.T) {
 	}
 	t.Cleanup(func() { _ = os.Chdir(previous) })
 	mux := http.NewServeMux()
+	registerLanguageAssets(mux)
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 	mux.Handle("/uploads/", http.FileServer(http.Dir("static")))
 	mux.HandleFunc("/write/", func(w http.ResponseWriter, r *http.Request) {
@@ -195,7 +196,9 @@ func TestCreatorCenterVisualPreview(t *testing.T) {
 			role = roleOwner
 		}
 		data := creatorCenterFixture(role)
-		pages := map[string]string{"/write/": "home.html", "/write/articles/new": "editor.html", "/write/settings": "settings_hub.html", "/write/account": "account.html", "/write/admin": "admin.html", "/write/admin/media": "media.html", "/write/compose/projects": "creator_projects.html", "/write/compose/memories": "creator_memories.html", "/write/users/new": "new_user.html", "/write/admin/site": "site_settings.html", "/write/admin/theme": "theme_settings.html", "/write/settings/manuscript": "manuscript_settings.html"}
+		data["Flash"] = r.URL.Query().Get("msg")
+		data["Error"] = r.URL.Query().Get("error")
+		pages := map[string]string{"/write/login": "login.html", "/write/password/request": "request_password.html", "/write/": "home.html", "/write/articles/new": "editor.html", "/write/settings": "settings_hub.html", "/write/account": "account.html", "/write/admin": "admin.html", "/write/admin/media": "media.html", "/write/compose/projects": "creator_projects.html", "/write/compose/memories": "creator_memories.html", "/write/users/new": "new_user.html", "/write/admin/site": "site_settings.html", "/write/admin/theme": "theme_settings.html", "/write/settings/manuscript": "manuscript_settings.html"}
 		page, ok := pages[r.URL.Path]
 		if !ok {
 			http.NotFound(w, r)

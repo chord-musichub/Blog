@@ -6,20 +6,20 @@
 {{ if isset .Site.Data "projects" }}{{ $projects = .Site.Data.projects }}{{ else }}{{ with resources.Get "data/projects.json" }}{{ $projects = . | transform.Unmarshal }}{{ end }}{{ end }}
 {{ $searchTerms := slice }}{{ range $posts }}{{ range .Params.tags }}{{ $searchTerms = $searchTerms | append . }}{{ end }}{{ end }}
 {{ range $projects }}{{ range .stack }}{{ $searchTerms = $searchTerms | append . }}{{ end }}{{ end }}
-<section class="content-archive" data-content-archive data-archive-page-size="10" aria-label="内容归档">
+<section class="content-archive" data-content-archive data-archive-page-size="10" aria-label="内容归档" data-i18n-attrs="aria-label">
   <header class="content-archive__header">
     <div class="content-archive__controls">
-      <div class="content-archive__modes" role="tablist" aria-label="档案内容模式">
-        <button class="content-archive__mode is-active" type="button" role="tab" aria-selected="true" aria-controls="archiveArticles" data-archive-mode="articles"><b>01</b><span>文章</span><i aria-hidden="true"></i></button>
-        <button class="content-archive__mode" type="button" role="tab" aria-selected="false" aria-controls="archiveProjects" data-archive-mode="projects"><b>02</b><span>项目</span><i aria-hidden="true"></i></button>
+      <div class="content-archive__modes" role="tablist" aria-label="档案内容模式" data-i18n-attrs="aria-label">
+        <button class="content-archive__mode is-active" type="button" role="tab" aria-selected="true" aria-controls="archiveArticles" data-archive-mode="articles"><b>01</b><span data-i18n-ui>文章</span><i aria-hidden="true"></i></button>
+        <button class="content-archive__mode" type="button" role="tab" aria-selected="false" aria-controls="archiveProjects" data-archive-mode="projects"><b>02</b><span data-i18n-ui>项目</span><i aria-hidden="true"></i></button>
       </div>
       <div class="content-archive__search" data-archive-search>
-        <button class="content-archive__search-trigger" type="button" aria-expanded="false" aria-controls="archiveSearchInput" data-archive-search-trigger><span>搜索</span><i aria-hidden="true">+</i></button>
-        <div class="content-archive__search-field" data-archive-search-field hidden><div class="content-archive__search-input-row"><input id="archiveSearchInput" type="search" autocomplete="off" placeholder="搜索文章或项目…" data-archive-search-input><button type="button" aria-label="清除搜索" data-archive-search-clear hidden>×</button></div><div class="content-archive__search-terms" aria-label="标签与技术词条">{{ range sort ($searchTerms | uniq) }}<button type="button" data-archive-search-term="{{ . }}">{{ . }}</button>{{ end }}</div></div>
+        <button class="content-archive__search-trigger" type="button" aria-expanded="false" aria-controls="archiveSearchInput" data-archive-search-trigger><span data-i18n-ui>搜索</span><i aria-hidden="true">+</i></button>
+        <div class="content-archive__search-field" data-archive-search-field hidden><div class="content-archive__search-input-row"><input id="archiveSearchInput" type="search" autocomplete="off" placeholder="搜索文章或项目…" data-archive-search-input data-i18n-attrs="placeholder"><button type="button" aria-label="清除搜索" data-archive-search-clear hidden data-i18n-attrs="aria-label">×</button></div><div class="content-archive__search-terms" aria-label="标签与技术词条" data-i18n-attrs="aria-label">{{ range sort ($searchTerms | uniq) }}<button type="button" data-archive-search-term="{{ . }}">{{ . }}</button>{{ end }}</div></div>
       </div>
     </div>
-    <div class="content-archive__status content-archive__status--sr" aria-live="polite" data-archive-status>文章 / {{ len $posts }} 篇</div>
-    <button class="content-archive__project-hint" type="button" data-archive-project-hint hidden></button>
+    <div class="content-archive__status content-archive__status--sr" aria-live="polite" data-archive-status data-i18n-ui><span class="i18n-copy" data-i18n-ui>文章 / </span>{{ len $posts }}<span class="i18n-copy" data-i18n-ui> 篇</span></div>
+    <button class="content-archive__project-hint" type="button" data-archive-project-hint hidden data-i18n-ui></button>
   </header>
   <div class="content-archive__rule" aria-hidden="true"><i></i></div>
   <div class="content-archive__panels">
@@ -27,9 +27,9 @@
       <div class="content-archive__index" data-archive-list>
         {{ range $index, $post := $posts }}
           {{ partial "posts/archive-record.html" (dict "post" $post "index" $index) }}
-        {{ else }}<p class="content-archive__empty">还没有可归档的文章。</p>{{ end }}
+        {{ else }}<p class="content-archive__empty" data-i18n-ui>还没有可归档的文章。</p>{{ end }}
       </div>
-      <p class="content-archive__empty" data-archive-empty="articles" hidden>没有匹配的文章记录。</p>
+      <p class="content-archive__empty" data-archive-empty="articles" hidden data-i18n-ui>没有匹配的文章记录。</p>
       {{ partial "archive/pagination.html" "articles" }}
     </section>
     <section class="content-archive__panel" id="archiveProjects" role="tabpanel" data-archive-panel="projects" hidden>
@@ -40,12 +40,12 @@
             <button class="archive-record__index" type="button" aria-expanded="false" aria-controls="projectDrawer{{ $index }}" data-archive-trigger><span class="archive-record__number">P{{ printf "%02d" (add $index 1) }}</span><span class="archive-record__title">{{ $title }}</span><time>{{ $project.year }}</time><span class="archive-record__arrow" aria-hidden="true">↵</span></button>
             <div class="archive-record__drawer" id="projectDrawer{{ $index }}" data-archive-drawer><div class="archive-record__drawer-shell"><div class="archive-record__drawer-content archive-record__drawer-content--project{{ with $route }} archive-record__drawer-content--open{{ end }}"{{ with $route }} data-archive-open-url="{{ . }}" tabindex="0" role="link" aria-label="进入项目：{{ $title }}"{{ end }}>
               {{ with $project.cover }}<figure class="archive-record__cover"><img src="{{ partial "media-preview-url.html" . }}" alt="" loading="lazy" decoding="async"></figure>{{ end }}
-              <div class="archive-record__detail"><h2>{{ $title }}</h2>{{ with $project.description }}<p class="archive-record__summary">{{ . }}</p>{{ end }}<dl class="archive-project__meta">{{ with $project.status }}<div><dt>状态</dt><dd>{{ . }}</dd></div>{{ end }}{{ with $project.role }}<div><dt>职责</dt><dd>{{ . }}</dd></div>{{ end }}{{ with $project.stack }}<div><dt>技术</dt><dd>{{ delimit . " · " }}</dd></div>{{ end }}</dl><div class="archive-project__links">{{ with $project.demo }}<a href="{{ . }}" target="_blank" rel="noopener">展示页 ↵</a>{{ end }}{{ with $project.github }}<a href="{{ . }}" target="_blank" rel="noopener">源码页 ↵</a>{{ end }}</div></div>
+              <div class="archive-record__detail"><h2>{{ $title }}</h2>{{ with $project.description }}<p class="archive-record__summary">{{ . }}</p>{{ end }}<dl class="archive-project__meta">{{ with $project.status }}<div><dt data-i18n-ui>状态</dt><dd>{{ . }}</dd></div>{{ end }}{{ with $project.role }}<div><dt data-i18n-ui>职责</dt><dd>{{ . }}</dd></div>{{ end }}{{ with $project.stack }}<div><dt data-i18n-ui>技术</dt><dd>{{ delimit . " · " }}</dd></div>{{ end }}</dl><div class="archive-project__links">{{ with $project.demo }}<a href="{{ . }}" target="_blank" rel="noopener" data-i18n-ui>展示页 ↵</a>{{ end }}{{ with $project.github }}<a href="{{ . }}" target="_blank" rel="noopener" data-i18n-ui>源码页 ↵</a>{{ end }}</div></div>
             </div></div></div>
           </article>
-        {{ else }}<p class="content-archive__empty">尚未归档项目</p>{{ end }}
+        {{ else }}<p class="content-archive__empty" data-i18n-ui>尚未归档项目</p>{{ end }}
       </div>
-      <p class="content-archive__empty" data-archive-empty="projects" hidden>没有匹配的项目记录。</p>
+      <p class="content-archive__empty" data-archive-empty="projects" hidden data-i18n-ui>没有匹配的项目记录。</p>
       {{ partial "archive/pagination.html" "projects" }}
     </section>
   </div>

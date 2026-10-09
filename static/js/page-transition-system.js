@@ -420,6 +420,7 @@
       // main，慢网速时会先露出无背景/未定位的页面，再陆续加载场景资源。
       await syncDocumentShell(doc, url, options.pushState === true);
       main.innerHTML = nextMain.innerHTML;
+      if(window.SonglineI18n) window.SonglineI18n.refresh(main);
       // Measure the next scene in its final position, not the old exit transform.
       settleMain(main);
       window.scrollTo({ top:0, behavior:'instant' });

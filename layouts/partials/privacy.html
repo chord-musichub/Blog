@@ -1,20 +1,20 @@
 <section class="privacy-panel" id="privacyPreferences" role="dialog" aria-labelledby="privacyTitle" aria-describedby="privacySummary" hidden>
  <div class="privacy-inner">
  <div class="privacy-copy">
-  <div class="privacy-heading"><h2 id="privacyTitle">Cookie 与存储偏好</h2><button type="button" class="privacy-collapse" data-privacy-collapse aria-label="收起隐私偏好，不更改选择" title="收起，不更改选择">收起 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button></div>
-  <p id="privacySummary">登录 Cookie 与浏览器存储用于登录状态、主题和工具偏好。你可以选择是否参与文章阅读统计，不影响正常浏览。</p>
+  <div class="privacy-heading"><h2 id="privacyTitle" data-i18n-ui>Cookie 与存储偏好</h2><button type="button" class="privacy-collapse" data-privacy-collapse aria-label="收起隐私偏好，不更改选择" title="收起，不更改选择" data-i18n-attrs="aria-label title"><span class="i18n-copy" data-i18n-ui>收起 </span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button></div>
+  <p id="privacySummary" data-i18n-ui>登录 Cookie 与浏览器存储用于登录状态、主题和工具偏好。你可以选择是否参与文章阅读统计，不影响正常浏览。</p>
   <details>
-    <summary>查看用途与当前选择</summary>
-    <p>基础功能：登录会话、主题、目录展开状态、工具进度与设置，以及本次隐私选择。使用排行榜等工具时，会按功能需要与服务器通信。</p>
-    <p>可选统计：允许后会向本站提交文章路径、增加阅读次数，并在当前浏览会话中记住已计数的文章；拒绝时只读取已有次数。撤回不会删除此前的汇总计数。</p>
-    <p>页面中的外部图片、头像和工具图标仍会向其来源发起请求，来源服务可能收到 IP 等网络信息；此选项不控制这些内容请求。</p>
-    <p>文章留言区接近可视区域时会连接 giscus；留言公开存储于 GitHub Discussions，登录状态保存在浏览器中。阅读统计选择不控制留言服务。</p>
-    <p>选择在此浏览器保存 180 天，可随时通过顶部“隐私偏好”按钮修改。<span data-privacy-status></span></p>
+    <summary data-i18n-ui>查看用途与当前选择</summary>
+    <p data-i18n-ui>基础功能：登录会话、主题、目录展开状态、工具进度与设置，以及本次隐私选择。使用排行榜等工具时，会按功能需要与服务器通信。</p>
+    <p data-i18n-ui>可选统计：允许后会向本站提交文章路径、增加阅读次数，并在当前浏览会话中记住已计数的文章；拒绝时只读取已有次数。撤回不会删除此前的汇总计数。</p>
+    <p data-i18n-ui>页面中的外部图片、头像和工具图标仍会向其来源发起请求，来源服务可能收到 IP 等网络信息；此选项不控制这些内容请求。</p>
+    <p data-i18n-ui>文章留言区接近可视区域时会连接 giscus；留言公开存储于 GitHub Discussions，登录状态保存在浏览器中。阅读统计选择不控制留言服务。</p>
+    <p><span class="i18n-copy" data-i18n-ui>选择在此浏览器保存 180 天，可随时通过顶部“隐私偏好”按钮修改。</span><span data-privacy-status data-i18n-ui></span></p>
   </details>
  </div>
   <div class="privacy-actions">
-    <button type="button" data-privacy-choice="statistics">允许阅读统计</button>
-    <button type="button" data-privacy-choice="necessary">仅保留基础功能</button>
+    <button type="button" data-privacy-choice="statistics" data-i18n-ui>允许阅读统计</button>
+    <button type="button" data-privacy-choice="necessary" data-i18n-ui>仅保留基础功能</button>
   </div>
  </div>
 </section>

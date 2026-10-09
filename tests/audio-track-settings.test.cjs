@@ -6,7 +6,7 @@ function fixture(){
  const second={file:{name:'second.wav'},title:'Second',artist:'Other artist',sampleRate:32000};
  let renders=0;
  const input=()=>{let value='';return {get value(){return value;},set value(next){value=String(next);},validity:{valid:true}};};
- const context={disposed:false,playlist:[first,second],currentIndex:0,editItem:first,editDraft:{},editInitial:null,
+ const context={window:{},uiContent(node,value){node.textContent=value;},uiText(node,value){node.textContent=value;},disposed:false,playlist:[first,second],currentIndex:0,editItem:first,editDraft:{},editInitial:null,
   editTitle:input(),editArtist:input(),editRate:input(),titleEl:{},artistEl:{},
   hasLocalAudioFile:()=>true,updatePlaybackState(){},renderPlaylist(){renders++;}};
  vm.createContext(context);

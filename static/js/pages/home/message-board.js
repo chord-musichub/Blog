@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
 
   function initialize(root){
@@ -298,13 +303,13 @@
     function loadMessages(){
       if(pendingMessages) return pendingMessages;
       var revision = messagesRevision;
-      if(loadStatus){ loadStatus.hidden = false; loadStatus.textContent = '正在加载留言…'; }
+      if(loadStatus){ loadStatus.hidden = false; uiText(loadStatus, '正在加载留言…'); }
       if(count && !hasLoaded) count.textContent = '—';
       pendingMessages = requestAny({method:'GET'}).then(function(data){
         if(!disposed){ if(revision === messagesRevision) renderMessages(data.messages); if(loadStatus) loadStatus.hidden = true; }
         return data.messages || [];
       }).catch(function(error){
-        if(!disposed && loadStatus){ loadStatus.hidden = false; loadStatus.textContent = '留言暂时无法加载，请稍后重新打开。'; }
+        if(!disposed && loadStatus){ loadStatus.hidden = false; uiText(loadStatus, '留言暂时无法加载，请稍后重新打开。'); }
         throw error;
       })
         .finally(function(){ pendingMessages = null; });
@@ -332,13 +337,13 @@
       previewToggle.addEventListener('click', function(){
         var active = preview.hidden;
         if(active && messageInput && !messageInput.value.trim()){
-          if(status) status.textContent = '请先写下留言。'; messageInput.focus(); return;
+          if(status) uiText(status, '请先写下留言。'); messageInput.focus(); return;
         }
         updatePreview();
         preview.hidden = !active;
         contentField.hidden = active;
         previewToggle.setAttribute('aria-pressed', active ? 'true' : 'false');
-        previewToggle.textContent = active ? '继续编辑' : '预览';
+        uiText(previewToggle, active ? '继续编辑' : '预览');
       });
     }
     if(messageInput) messageInput.addEventListener('input', updatePreview);
@@ -352,21 +357,21 @@
           name: (form.elements.name && form.elements.name.value || '').trim(),
           content: (form.elements.content && form.elements.content.value || '').trim()
         };
-        if(!payload.content){ if(status) status.textContent = '请先写下留言。'; return; }
+        if(!payload.content){ if(status) uiText(status, '请先写下留言。'); return; }
         saving = true;
         if(submit) submit.disabled = true;
-        if(status) status.textContent = '正在保存…';
+        if(status) uiText(status, '正在保存…');
         requestAny({method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}).then(function(data){
           if(disposed) return;
           renderMessages(data.messages);
           form.reset();
           if(preview){ preview.hidden = true; preview.innerHTML = ''; }
           if(contentField) contentField.hidden = false;
-          if(previewToggle){ previewToggle.setAttribute('aria-pressed', 'false'); previewToggle.textContent = '预览'; }
+          if(previewToggle){ previewToggle.setAttribute('aria-pressed', 'false'); uiText(previewToggle, '预览'); }
           if(status) status.textContent = '';
           setState('message', openCompose);
         }).catch(function(error){
-          if(!disposed && status) status.textContent = error && error.message ? error.message : '保存失败，请稍后重试。';
+          if(!disposed && status) uiText(status, error && error.message ? error.message : '保存失败，请稍后重试。');
         }).finally(function(){ saving = false; if(!disposed && submit) submit.disabled = false; });
       });
     }
@@ -375,4 +380,6 @@
   }
 
   window.SonglineInitHomeMessageBoard = initialize;
+})();
+
 })();

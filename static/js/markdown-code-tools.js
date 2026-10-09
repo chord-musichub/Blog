@@ -1,3 +1,8 @@
+(function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
 /* v13.1：Markdown 代码块增强：语言标识 + 复制按钮 */
 (function(){
   if(window.SonglineEnhanceMarkdown) return;
@@ -41,7 +46,7 @@
     copyEpoch++;
     feedback.forEach(function(timer, button){
       window.clearTimeout(timer);
-      button.textContent = '复制';
+      uiText(button, '复制');
       button.classList.remove('copied');
     });
     feedback.clear();
@@ -57,7 +62,7 @@
     if(pending && pending.epoch === copyEpoch) return;
     window.clearTimeout(feedback.get(button));
     feedback.delete(button);
-    button.textContent = '复制';
+    uiText(button, '复制');
     button.classList.remove('copied');
     const operation = {epoch:copyEpoch};
     pendingCopies.set(button, operation);
@@ -68,7 +73,7 @@
       button.classList.toggle('copied', copied);
       const timer = window.setTimeout(function(){
         feedback.delete(button);
-        button.textContent = '复制';
+        uiText(button, '复制');
         button.classList.remove('copied');
       }, 1400);
       feedback.set(button, timer);
@@ -113,7 +118,7 @@
       const btn = document.createElement('button');
       btn.className = 'md-code-copy';
       btn.type = 'button';
-      btn.textContent = '复制';
+      uiText(btn, '复制');
       btn.setAttribute('aria-label', '复制代码块');
       bar.appendChild(label);
       bar.appendChild(btn);
@@ -127,4 +132,6 @@
   document.addEventListener('click', onCodeCopy);
   window.addEventListener('songline:page-transition-start', clearFeedback);
   window.addEventListener('pagehide', clearFeedback);
+})();
+
 })();

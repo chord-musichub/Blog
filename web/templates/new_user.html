@@ -5,23 +5,23 @@
 {{template "admin-client-nav" .}}
 
 <main class="wrap user-create-page">
-  <a class="back-link" href="{{adminURL "/admin#users"}}">‹ 用户管理</a>
-  <h1>添加用户</h1>
-  {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
+  <a class="back-link" href="{{adminURL "/admin#users"}}" data-i18n-ui>‹ 用户管理</a>
+  <h1 data-i18n-ui>添加用户</h1>
+  {{if .Error}}<div class="error" data-i18n-text>{{.Error}}</div>{{end}}
   <form method="post" class="card form">
-    <label>用户名 <input name="username" required placeholder="friend01"><small>只能用字母、数字、下划线、短横线。</small></label>
-    <label>显示名 <input name="display" placeholder="朋友的名字"></label>
-    <label>角色 <select name="role"><option value="user">普通用户：投稿后等待审核</option><option value="admin">管理员：审核与发布文章</option></select><small>项目、回忆、站点设置始终仅站主可管理。</small></label>
-    <label>账号类型
-      <select name="account_type">
-        <option value="friend">朋友作者：会显示在朋友页</option>
-        <option value="owner">站长 / 主账号：你的个人创作身份</option>
-        <option value="system">系统账号 / 公告：用于通知、公告、更新日志</option>
+    <label><span class="i18n-copy" data-i18n-ui>用户名 </span><input name="username" required placeholder="friend01"><small data-i18n-ui>只能用字母、数字、下划线、短横线。</small></label>
+    <label><span class="i18n-copy" data-i18n-ui>显示名 </span><input name="display" placeholder="朋友的名字" data-i18n-attrs="placeholder"></label>
+    <label><span class="i18n-copy" data-i18n-ui>角色 </span><select name="role"><option value="user" data-i18n-ui>普通用户：投稿后等待审核</option><option value="admin" data-i18n-ui>管理员：审核与发布文章</option></select><small data-i18n-ui>项目、回忆、站点设置始终仅站主可管理。</small></label>
+    <label><span class="i18n-copy" data-i18n-ui>账号类型
+      </span><select name="account_type">
+        <option value="friend" data-i18n-ui>朋友作者：会显示在朋友页</option>
+        <option value="owner" data-i18n-ui>站长 / 主账号：你的个人创作身份</option>
+        <option value="system" data-i18n-ui>系统账号 / 公告：用于通知、公告、更新日志</option>
       </select>
-      <small>普通用户一般选“朋友作者”；管理员一般选“系统账号 / 公告”。</small>
+      <small data-i18n-ui>普通用户一般选“朋友作者”；管理员一般选“系统账号 / 公告”。</small>
     </label>
-    <label>初始密码 <span class="password-field"><input id="new-user-password" name="password" type="password" required placeholder="至少 6 位"><button class="password-toggle" type="button" data-password-toggle="#new-user-password" aria-label="显示密码"></button></span></label>
-    <button><span class="btn-ico" aria-hidden="true">+</span><span class="btn-text">创建用户</span></button>
+    <label><span class="i18n-copy" data-i18n-ui>初始密码 </span><span class="password-field"><input id="new-user-password" name="password" type="password" required placeholder="至少 6 位" data-i18n-attrs="placeholder"><button class="password-toggle" type="button" data-password-toggle="#new-user-password" aria-label="显示密码" data-i18n-attrs="aria-label title"></button></span></label>
+    <button><span class="btn-ico" aria-hidden="true">+</span><span class="btn-text" data-i18n-ui>创建用户</span></button>
   </form>
 </main>
 </body>

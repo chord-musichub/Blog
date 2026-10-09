@@ -23,17 +23,17 @@
       <h1>{{ .Title }}</h1>
       <p>{{ $bio | markdownify }}</p>
       <div class="meta-row">
-        <span class="meta-icon-item">{{ partial "ui-icon.html" "article" }} 文章 {{ len .Pages }} 篇</span>
-        {{ with $homepage }}<a class="tag" href="{{ . }}" target="_blank" rel="noopener">个人主页 ↗</a>{{ end }}
+        <span class="meta-icon-item">{{ partial "ui-icon.html" "article" }}<span class="i18n-copy" data-i18n-ui> 文章 </span>{{ len .Pages }}<span class="i18n-copy" data-i18n-ui> 篇</span></span>
+        {{ with $homepage }}<a class="tag" href="{{ . }}" target="_blank" rel="noopener" data-i18n-ui>个人主页 ↗</a>{{ end }}
       </div>
     </div>
   </div>
 </section>
 
 <section class="section">
-  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "article" }}</span><h2>{{ .Title }} 的文章</h2></div>
+  <div class="section-head"><span class="section-icon">{{ partial "ui-icon.html" "article" }}</span><h2>{{ .Title }}<span class="i18n-copy" data-i18n-ui> 的文章</span></h2></div>
   <div class="article-list">
-    {{ range .Pages }}{{ partial "post-card.html" . }}{{ else }}<div class="card" style="padding:28px">还没有文章。</div>{{ end }}
+    {{ range .Pages }}{{ partial "post-card.html" . }}{{ else }}<div class="card" style="padding:28px" data-i18n-ui>还没有文章。</div>{{ end }}
   </div>
 </section>
 {{ end }}

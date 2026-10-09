@@ -10,7 +10,7 @@
     {{ if .IsHome }}
       {{ with $cfg.site.icp }}
         {{ if and . (ne . "暂无") }}
-          <a class="footer-icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">ICP备案号：{{ . }}</a>
+          <a class="footer-icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer"><span class="i18n-copy" data-i18n-ui>ICP备案号：</span>{{ . }}</a>
         {{ end }}
       {{ end }}
     {{ end }}

@@ -7,10 +7,10 @@
 {{- if index $pause $name }}{{ $count = add $count 1 }}{{ end -}}
 {{- if index $sound $name }}{{ $count = add $count 1 }}{{ end -}}
 {{- if eq $name "typing-practice" }}{{ $count = add $count 1 }}{{ end -}}
-<div class="tool-actionbar" data-tool-actionbar data-tool-actions="{{ $count }}" role="group" aria-label="工具操作">
+<div class="tool-actionbar" data-tool-actionbar data-tool-actions="{{ $count }}" role="group" aria-label="工具操作" data-i18n-attrs="aria-label">
   {{ with index $restart $name }}{{ partial "tool-icon-button.html" (dict "attribute" . "icon" "restart" "label" (cond (eq $name "gacha") "重置记录" (cond (eq $name "focus-timer") "重置倒计时" "重新开始"))) }}{{ end }}
   {{ with index $pause $name }}{{ partial "tool-icon-button.html" (dict "attribute" . "icon" (cond (eq $name "focus-timer") "play" "pause") "label" (cond (eq $name "focus-timer") "开始" "暂停") "pause" true "idle" (eq $name "focus-timer")) }}{{ end }}
   {{ if eq $name "typing-practice" }}{{ partial "tool-icon-button.html" (dict "attribute" "data-typing-random" "icon" "shuffle" "label" "随机换文") }}{{ end }}
   {{ with index $sound $name }}{{ partial "tool-sound-toggle.html" (dict "attribute" . "checkbox" (or (eq $name "snake") (eq $name "focus-timer"))) }}{{ end }}
-  <button class="tool-icon-button" type="button" data-tool-help-open aria-controls="tool-help-{{ $name }}" aria-haspopup="dialog" aria-label="操作说明" title="操作说明">{{ partial "ui-icon.html" "help" }}</button>
+  <button class="tool-icon-button" type="button" data-tool-help-open aria-controls="tool-help-{{ $name }}" aria-haspopup="dialog" aria-label="操作说明" title="操作说明" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "help" }}</button>
 </div>

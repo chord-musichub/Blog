@@ -2,7 +2,7 @@
 <section class="tool-detail-layout tool-detail-layout--compact">
 <section class="card random-tool-panel tool-detail-surface" data-random-tool data-tool-back-surface>
   {{ partial "back-icon.html" (dict "fallback" "/tools/") }}
-  <h1 class="tool-detail-title">随机数</h1>
+  <h1 class="tool-detail-title" data-i18n-ui>随机数</h1>
   {{ partial "tool-actionbar.html" "random-number" }}
   {{ partial "tool-help-dialog.html" "random-number" }}
   <div class="random-workspace">
@@ -12,14 +12,14 @@
     </div>
     <div class="random-form">
       <label>
-        <span>最小值</span>
+        <span data-i18n-ui>最小值</span>
         <input type="number" data-random-min value="1" inputmode="numeric">
       </label>
       <label>
-        <span>最大值</span>
+        <span data-i18n-ui>最大值</span>
         <input type="number" data-random-max value="100" inputmode="numeric">
       </label>
-      <button class="btn random-generate-button" type="button" data-random-generate>生成</button>
+      <button class="btn random-generate-button" type="button" data-random-generate data-i18n-ui>生成</button>
     </div>
   </div>
 </section>

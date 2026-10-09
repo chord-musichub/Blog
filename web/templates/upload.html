@@ -6,37 +6,37 @@
 
 <main class="wrap narrow">
   <nav class="nav compact-nav">
-    <a class="admin-back-icon" href="{{adminURL "/compose"}}" data-admin-back aria-label="返回投稿" title="返回投稿"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7"/></svg></a>
-    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <a class="admin-back-icon" href="{{adminURL "/compose"}}" data-admin-back aria-label="返回投稿" title="返回投稿" data-i18n-attrs="aria-label title"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7"/></svg></a>
+    <span class="spacer"></span><button class="admin-theme-icon-button" data-admin-theme-toggle type="button" aria-label="切换深色模式" title="切换深色模式" data-i18n-attrs="aria-label title"><svg class="theme-icon moon-icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
   <path d="M21 14.4A8.7 8.7 0 0 1 9.6 3a7.2 7.2 0 1 0 11.4 11.4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg></button>
+</svg></button><button class="language-toggle" data-language-toggle type="button" aria-label="切换为英文">中</button>
   </nav>
-  <h1>上传 Markdown</h1>
-  <p class="meta">支持 .md / .markdown，最大 1MB。上传后明确选择：草稿、提交审核，或管理员直接发布。</p>
-  {{if .Error}}<div class="error">{{.Error}}</div>{{end}}
+  <h1 data-i18n-ui>上传 Markdown</h1>
+  <p class="meta" data-i18n-ui>支持 .md / .markdown，最大 1MB。上传后明确选择：草稿、提交审核，或管理员直接发布。</p>
+  {{if .Error}}<div class="error" data-i18n-text>{{.Error}}</div>{{end}}
   <form method="post" enctype="multipart/form-data" class="card form">
-    <label>选择 Markdown 文件 <input name="mdfile" type="file" accept=".md,.markdown,text/markdown,text/plain" required></label>
-    <label>标题，可留空自动识别 <input name="title" placeholder="优先使用这里；留空则从 front matter 或 # 标题读取"></label>
-    <label>Slug，可留空自动生成 <input name="slug" placeholder="my-first-post"></label>
-    <label>摘要，可留空自动生成 <input name="summary" placeholder="文章列表里的一句话简介"></label>
-    <label>文章插画 / 封面图，可留空 <input name="cover" placeholder="/uploads/你的用户名/article-cover.png"></label>
-    <label>封面展示方式
-      <select name="cover_mode">
-        <option value="cover" selected>铺满裁切：更像封面，画面充满卡片</option>
-        <option value="contain">完整显示：适合 1:1 或不能裁切的图</option>
+    <label><span class="i18n-copy" data-i18n-ui>选择 Markdown 文件 </span><input name="mdfile" type="file" accept=".md,.markdown,text/markdown,text/plain" required></label>
+    <label><span class="i18n-copy" data-i18n-ui>标题，可留空自动识别 </span><input name="title" placeholder="优先使用这里；留空则从 front matter 或 # 标题读取" data-i18n-attrs="placeholder"></label>
+    <label><span class="i18n-copy" data-i18n-ui>Slug，可留空自动生成 </span><input name="slug" placeholder="my-first-post"></label>
+    <label><span class="i18n-copy" data-i18n-ui>摘要，可留空自动生成 </span><input name="summary" placeholder="文章列表里的一句话简介" data-i18n-attrs="placeholder"></label>
+    <label><span class="i18n-copy" data-i18n-ui>文章插画 / 封面图，可留空 </span><input name="cover" placeholder="/uploads/你的用户名/article-cover.png" data-i18n-attrs="placeholder"></label>
+    <label><span class="i18n-copy" data-i18n-ui>封面展示方式
+      </span><select name="cover_mode">
+        <option value="cover" selected data-i18n-ui>铺满裁切：更像封面，画面充满卡片</option>
+        <option value="contain" data-i18n-ui>完整显示：适合 1:1 或不能裁切的图</option>
       </select>
     </label>
-    <label>标签，用英文逗号分隔 <input name="tags" placeholder="技术, 随笔"></label>
+    <label><span class="i18n-copy" data-i18n-ui>标签，用英文逗号分隔 </span><input name="tags" placeholder="技术, 随笔" data-i18n-attrs="placeholder"></label>
     <div class="actions">
-      <button class="secondary" name="upload_intent" value="draft"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text">上传到草稿箱</span></button>
-      <button name="upload_intent" value="submit"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text">上传并提交审核</span></button>
+      <button class="secondary" name="upload_intent" value="draft"><span class="btn-ico" aria-hidden="true"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="m5 12.5 4 4L19 6.5"/></svg></span><span class="btn-text" data-i18n-ui>上传到草稿箱</span></button>
+      <button name="upload_intent" value="submit"><span class="btn-ico" aria-hidden="true">⇪</span><span class="btn-text" data-i18n-ui>上传并提交审核</span></button>
       {{if canModerateUser .User}}
-      <button name="upload_intent" value="publish"><span class="btn-ico" aria-hidden="true">↗</span><span class="btn-text">上传并直接发布</span></button>
+      <button name="upload_intent" value="publish"><span class="btn-ico" aria-hidden="true">↗</span><span class="btn-text" data-i18n-ui>上传并直接发布</span></button>
       {{end}}
     </div>
-    <p class="meta">草稿不会进审核；提交审核会出现在「审核后台」；只有管理员发布后才会重建公开站。</p>
+    <p class="meta" data-i18n-ui>草稿不会进审核；提交审核会出现在「审核后台」；只有管理员发布后才会重建公开站。</p>
   </form>
-  <section class="card help"><h3>front matter 示例</h3><pre><code>---
+  <section class="card help"><h3 data-i18n-ui>front matter 示例</h3><pre><code>---
 title: "我的文章"
 summary: "一句话摘要"
 cover: "/uploads/article-cover.png"

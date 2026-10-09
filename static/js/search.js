@@ -1,3 +1,8 @@
+(function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
 /* Shared manual search for tools and friend lists; the archive owns its search. */
 (function(){
   var utils=window.SonglineSearchUtils;
@@ -20,7 +25,7 @@
     if(config.strata && !empty){
       empty = document.createElement('div');
       empty.className = 'card tools-empty-state';
-      empty.textContent = '这层土里还没有挖到这个工具。';
+      uiText(empty, '这层土里还没有挖到这个工具。');
       list.appendChild(empty);
     }
     var strata = config.strata ? Array.from(list.querySelectorAll('.tools-strata')).map(function(layer){
@@ -44,7 +49,7 @@
     function updateCount(active, visible){
       if(!count) return;
       var label = active ? ('找到 ' + visible + ' / ' + items.length + ' ' + (config.unit || '项')) : ('共 ' + items.length + ' ' + (config.unit || '项'));
-      if(count.textContent !== label) count.textContent = label;
+      if(count.textContent !== label) uiText(count, label);
     }
     function runSearch(opts){
       opts = opts || {};
@@ -111,7 +116,7 @@
     }
     var searchText = items.map(function(item){ return normalize(textOf(item)); });
     function update(active, visible){
-      if(count) count.textContent = active ? ('找到 ' + visible + ' / ' + items.length + ' 位朋友') : ('共 ' + items.length + ' 位朋友');
+      if(count) uiText(count, active ? ('找到 ' + visible + ' / ' + items.length + ' 位朋友') : ('共 ' + items.length + ' 位朋友'));
       if(empty){
         var show = active && visible === 0;
         empty.hidden = !show;
@@ -155,7 +160,7 @@
 
 
   function initToolsSearch(){
-    bindManualSearch({input:'[data-tools-search]', button:'[data-tools-search-submit]', list:'.modern-tools-grid', item:'.tool-app-card, .tool-card', count:'[data-tools-search-count]', unit:'个工具', strata:true, live:true, feedbackText:'搜索工具中', text:function(item){ return [item.dataset.toolKeywords, item.textContent].filter(Boolean).join(' '); }});
+    bindManualSearch({input:'[data-tools-search]', button:'[data-tools-search-submit]', list:'.modern-tools-grid', item:'.tool-app-card, .tool-card', count:'[data-tools-search-count]', unit:'个工具', strata:true, live:true, feedbackText:'搜索工具中', text:function(item){ var i18n=window.SonglineI18n; return [item.dataset.toolKeywords,item.dataset.toolTitle,item.dataset.toolDescription,item.textContent,i18n && i18n.english(item.dataset.toolTitle),i18n && i18n.english(item.dataset.toolDescription)].filter(Boolean).join(' '); }});
   }
 
   function initAllSearch(root){
@@ -165,4 +170,6 @@
   }
 
   window.SonglineInitSearch = initAllSearch;
+})();
+
 })();

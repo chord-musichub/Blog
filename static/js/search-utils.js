@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   function normalize(value){
     return String(value == null ? '' : value)
       .toLowerCase()
@@ -20,11 +25,11 @@
       overlay = document.createElement('div');
       overlay.className = 'search-refresh-overlay';
       overlay.setAttribute('aria-hidden', 'true');
-      overlay.innerHTML = '<div class="search-refresh-card"><span class="search-refresh-ring"></span><span class="search-refresh-text">筛选中</span></div>';
+      overlay.innerHTML = '<div class="search-refresh-card"><span class="search-refresh-ring"></span><span class="search-refresh-text"><!--ui-->筛选中<!--/ui--></span></div>';
       document.body.appendChild(overlay);
     }
     var label = overlay.querySelector('.search-refresh-text');
-    if(label) label.textContent = text || '筛选中';
+    if(label) uiText(label, text || '筛选中');
     overlay.classList.remove('is-active');
     void overlay.offsetWidth;
     overlay.classList.add('is-active');
@@ -114,4 +119,6 @@
 
   window.SonglineSearchUtils={normalize:normalize,termsOf:termsOf,showSearchRefresh:showSearchRefresh,setVisible:setVisible,setEmpty:setEmpty,flashEmpty:flashEmpty,installClearButtons:installClearButtons};
   window.SonglineSearchRefresh=showSearchRefresh;
+})();
+
 })();

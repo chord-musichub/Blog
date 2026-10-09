@@ -1,3 +1,8 @@
+(function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
 // 统一媒体裁剪器：每个入口通过 data-crop-* 声明输入、输出与比例。
 (function(){
   'use strict';
@@ -23,7 +28,7 @@
   function setStatus(message, isError){
     var status = activeStatus();
     if(!status) return;
-    status.textContent = message;
+    uiText(status, message);
     status.classList.toggle('error', !!isError);
   }
   function mediaActionURL(mediaURL, action){
@@ -108,7 +113,7 @@
   }
   function loadImage(){
     configureCanvas();
-    if(title) title.textContent = '裁剪' + (activeButton.getAttribute('data-crop-label') || '图片') + '（' + variant.replace('x', ':') + '）';
+    if(title) uiText(title, '裁剪' + (activeButton.getAttribute('data-crop-label') || '图片') + '（' + variant.replace('x', ':') + '）');
     saveButton.textContent = '保存 ' + variant.replace('x', ':') + ' 图片';
     setStatus('正在读取原图…');
     var requestedImage = new Image(); requestedImage.decoding = 'async';
@@ -170,4 +175,6 @@
         .finally(function(){ saveButton.disabled = false; });
     }, 'image/webp', .9);
   });
+})();
+
 })();

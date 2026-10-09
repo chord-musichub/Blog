@@ -3,21 +3,22 @@
 {{ if or (eq .Layout "site-notice") (eq .RelPermalink "/tags/site-notice/") }}{{ $currentLabel = "公告" }}{{ end }}
 <header class="site-header modern-site-header">
   <div class="navbar modern-navbar">
-    <a class="logo" href="/" aria-label="返回首页" title="返回首页">
+    <a class="logo" href="/" aria-label="返回首页" title="返回首页" data-i18n-attrs="aria-label title">
       {{ with $cfg.site.logo_icon }}<img class="logo-icon" src="{{ . }}" alt="" loading="eager" decoding="async">{{ else }}<span class="logo-mark line-logo-mark">{{ partial "ui-icon.html" "logo" }}</span>{{ end }}
     </a>
-    <aside class="songline-site-map" aria-label="全局站点地图" data-site-map>
-      <button class="songline-site-map__toggle" type="button" title="打开站点地图" aria-label="当前页面：{{ $currentLabel }}，打开站点地图" aria-expanded="false" aria-controls="siteMapRegions" data-site-map-toggle><span data-site-map-current>{{ $currentLabel }}</span><svg class="songline-site-map__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-      <nav class="songline-site-map__regions" id="siteMapRegions" aria-label="站点地图区域" hidden>
+    <aside class="songline-site-map" aria-label="全局站点地图" data-site-map data-i18n-attrs="aria-label">
+      <button class="songline-site-map__toggle" type="button" title="打开站点地图" aria-label="当前页面：{{ $currentLabel }}，打开站点地图" aria-expanded="false" aria-controls="siteMapRegions" data-site-map-toggle data-i18n-attrs="title aria-label"><span data-site-map-current data-i18n-ui>{{ $currentLabel }}</span><svg class="songline-site-map__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <nav class="songline-site-map__regions" id="siteMapRegions" aria-label="站点地图区域" hidden data-i18n-attrs="aria-label">
         {{ range partial "page-navigation-data.html" . }}{{ if .map_visible }}
-        <a class="songline-site-map__region" href="{{ .route }}" data-page-key="{{ .key }}" data-floor="{{ .floor }}" aria-label="前往{{ .label }}，{{ .floor }}层" style="--map-column:{{ .map_column }};--map-row:{{ .map_row }};--map-column-span:{{ .map_column_span }};--map-row-span:{{ .map_row_span }};"><span class="songline-site-map__label">{{ .system_label }}</span></a>
+        <a class="songline-site-map__region" href="{{ .route }}" data-page-key="{{ .key }}" data-floor="{{ .floor }}" data-i18n-attrs="aria-label" aria-label="前往{{ .label }}，{{ .floor }}层" style="--map-column:{{ .map_column }};--map-row:{{ .map_row }};--map-column-span:{{ .map_column_span }};--map-row-span:{{ .map_row_span }};"><span class="songline-site-map__label" data-i18n-ui>{{ .system_label }}</span></a>
         {{ end }}{{ end }}
       </nav>
     </aside>
     <div class="header-icons">
-      <button class="icon-btn" data-privacy-open type="button" aria-label="隐私偏好" aria-controls="privacyPreferences" title="隐私偏好"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="m8 12 3 3 5-6"/></svg></button>
-      <a class="icon-btn header-submit-link" href="/write/" data-document-transition aria-label="投稿" title="投稿">{{ partial "ui-icon.html" "upload" }}</a>
-      <button class="icon-btn" data-theme-toggle type="button" aria-label="切换深色模式">{{ partial "ui-icon.html" "moon" }}</button>
+      <button class="icon-btn" data-privacy-open type="button" aria-label="隐私偏好" aria-controls="privacyPreferences" title="隐私偏好" data-i18n-attrs="aria-label title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="m8 12 3 3 5-6"/></svg></button>
+      <a class="icon-btn header-submit-link" href="/write/" data-document-transition aria-label="投稿" title="投稿" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "upload" }}</a>
+      <button class="icon-btn" data-theme-toggle type="button" aria-label="切换深色模式" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "moon" }}</button>
+      <button class="icon-btn language-toggle" data-language-toggle type="button" aria-label="切换为英文" title="切换为英文">中</button>
     </div>
   </div>
 </header>

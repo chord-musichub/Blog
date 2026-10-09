@@ -1,4 +1,13 @@
 (function(){
+  function uiContent(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setContent(node,value);
+    else if(node) node.textContent=value;
+  }
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
 
   var VERSION = '26.10.08';
@@ -314,8 +323,15 @@
       var artist = (data.artist || '').trim();
       var hasRealTitle = !!title;
 
-      if(titleEl) titleEl.textContent = title || '等待音乐';
-      if(artistEl){ artistEl.textContent = artist || (forceShow ? '未知作者' : ''); artistEl.hidden = !artist && !forceShow; }
+      if(titleEl){
+        if(title) uiContent(titleEl,title);
+        else uiText(titleEl,'等待音乐');
+      }
+      if(artistEl){
+        if(artist) uiContent(artistEl,artist);
+        else uiText(artistEl,forceShow ? '未知作者' : '');
+        artistEl.hidden = !artist && !forceShow;
+      }
 
       var safeProgress = Math.max(0, Math.min(100, Number(data.progress) || 0));
       if(progressEl) progressEl.style.width = safeProgress + '%';
@@ -355,8 +371,12 @@
     function refreshCurrentTrackText(){
       if(!hasLocalAudioFile() || !playlist[currentIndex]) return;
       var info = trackFields(playlist[currentIndex]);
-      if(titleEl) titleEl.textContent = info.title;
-      if(artistEl){artistEl.textContent = info.artist || '未知作者';artistEl.hidden = false;}
+      if(titleEl) uiContent(titleEl,info.title);
+      if(artistEl){
+        if(info.artist) uiContent(artistEl,info.artist);
+        else uiText(artistEl,'未知作者');
+        artistEl.hidden=false;
+      }
       updatePlaybackState();
     }
 
@@ -507,7 +527,7 @@
         var remove = document.createElement('button');
         remove.type = 'button';
         remove.className = 'av-playlist-remove';
-        remove.textContent = '移出';
+        uiText(remove, '移出');
         row.appendChild(main);
         row.appendChild(remove);
         return {row:row, main:main, title:title, meta:meta, remove:remove};
@@ -1459,4 +1479,6 @@
   }
 
   window.SonglineInitAudioVisualizer = boot;
+})();
+
 })();

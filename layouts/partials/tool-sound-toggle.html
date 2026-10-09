@@ -1,13 +1,13 @@
 {{/* Native checkbox hooks remain intact for Snake and the timer. */}}
 {{- $label := default "音效" .label -}}
 {{- if .checkbox -}}
-<label class="tool-sound-toggle" title="{{ $label }}" data-tool-sound-control>
-  <input type="checkbox" {{ .attribute | safeHTMLAttr }} checked aria-label="{{ $label }}">
+<label class="tool-sound-toggle" title="{{ $label }}" data-tool-sound-control data-i18n-attrs="title aria-label">
+  <input type="checkbox" {{ .attribute | safeHTMLAttr }} checked aria-label="{{ $label }}" data-i18n-attrs="aria-label">
   {{ partial "ui-icon.html" "volume" }}
   {{ partial "ui-icon.html" "volume-off" }}
 </label>
 {{- else -}}
-<button class="{{ .class }} tool-sound-toggle" type="button" {{ .attribute | safeHTMLAttr }} data-tool-sound-control aria-label="{{ $label }}" aria-pressed="true" title="关闭音效">
+<button class="{{ .class }} tool-sound-toggle" type="button" {{ .attribute | safeHTMLAttr }} data-tool-sound-control aria-label="{{ $label }}" aria-pressed="true" title="关闭音效" data-i18n-attrs="title aria-label">
   {{ partial "ui-icon.html" "volume" }}
   {{ partial "ui-icon.html" "volume-off" }}
 </button>

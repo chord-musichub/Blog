@@ -2,51 +2,51 @@
 <body class="creator-dashboard">
 {{template "admin-client-nav" .}}
 <main class="wrap">
-  {{if .Flash}}<div class="flash" role="status">{{.Flash}}</div>{{end}}
+  {{if .Flash}}<div class="flash" role="status" data-i18n-text>{{.Flash}}</div>{{end}}
   <header class="dashboard-welcome">
-    <div><p class="eyebrow">工作台</p><h1>{{default .User.Username .User.DisplayName}}，欢迎回来</h1><p class="meta">{{if isAdminUser .User}}待处理的社区事务，从这里开始。{{else}}记录想法，继续你的创作。{{end}}</p></div>
-    {{if not (isAdminUser .User)}}<a class="btn" href="{{adminURL "/articles/new"}}">＋ 写文章</a>{{end}}
+    <div><p class="eyebrow" data-i18n-ui>工作台</p><h1>{{default .User.Username .User.DisplayName}}<span class="i18n-copy" data-i18n-ui>，欢迎回来</span></h1><p class="meta">{{if isAdminUser .User}}<span class="i18n-copy" data-i18n-ui>待处理的社区事务，从这里开始。</span>{{else}}<span class="i18n-copy" data-i18n-ui>记录想法，继续你的创作。</span>{{end}}</p></div>
+    {{if not (isAdminUser .User)}}<a class="btn" href="{{adminURL "/articles/new"}}" data-i18n-ui>＋ 写文章</a>{{end}}
   </header>
   {{if isAdminUser .User}}
   <section class="dashboard-shortcuts">
-    <a class="card shortcut-card" href="{{adminURL "/admin#reviews"}}"><span class="shortcut-icon">☷</span><h2>稿件审核</h2><p>按作者审阅与发布</p><span class="shortcut-arrow">↗</span></a>
-    <a class="card shortcut-card" href="{{adminURL "/admin#messages"}}"><span class="shortcut-icon">☵</span><h2>留言管理</h2><p>查看与管理社区留言</p><span class="shortcut-arrow">↗</span></a>
-    <a class="card shortcut-card" href="{{adminURL "/admin#users"}}"><span class="shortcut-icon">♙</span><h2>账号管理</h2><p>用户状态与密码申请</p><span class="shortcut-arrow">↗</span></a>
+    <a class="card shortcut-card" href="{{adminURL "/admin#reviews"}}"><span class="shortcut-icon">☷</span><h2 data-i18n-ui>稿件审核</h2><p data-i18n-ui>按作者审阅与发布</p><span class="shortcut-arrow">↗</span></a>
+    <a class="card shortcut-card" href="{{adminURL "/admin#messages"}}"><span class="shortcut-icon">☵</span><h2 data-i18n-ui>留言管理</h2><p data-i18n-ui>查看与管理社区留言</p><span class="shortcut-arrow">↗</span></a>
+    <a class="card shortcut-card" href="{{adminURL "/admin#users"}}"><span class="shortcut-icon">♙</span><h2 data-i18n-ui>账号管理</h2><p data-i18n-ui>用户状态与密码申请</p><span class="shortcut-arrow">↗</span></a>
   </section>
   {{else}}
-  <section class="dashboard-metrics" aria-label="稿件统计">
-    <a href="#manuscripts" data-status-jump="all"><span>全部稿件</span><strong data-stat="all">{{len .Articles}}</strong></a>
-    <a href="#manuscripts" data-status-jump="published"><span>已发布</span><strong data-stat="published">0</strong></a>
-    <a href="#manuscripts" data-status-jump="pending"><span>审核中</span><strong data-stat="pending">0</strong></a>
-    <a href="#manuscripts" data-status-jump="draft"><span>草稿箱</span><strong data-stat="draft">0</strong></a>
+  <section class="dashboard-metrics" aria-label="稿件统计" data-i18n-attrs="aria-label">
+    <a href="#manuscripts" data-status-jump="all"><span data-i18n-ui>全部稿件</span><strong data-stat="all">{{len .Articles}}</strong></a>
+    <a href="#manuscripts" data-status-jump="published"><span data-i18n-ui>已发布</span><strong data-stat="published">0</strong></a>
+    <a href="#manuscripts" data-status-jump="pending"><span data-i18n-ui>审核中</span><strong data-stat="pending">0</strong></a>
+    <a href="#manuscripts" data-status-jump="draft"><span data-i18n-ui>草稿箱</span><strong data-stat="draft">0</strong></a>
   </section>
-  <section class="card dashboard-article-list" id="manuscripts" aria-label="稿件管理" data-manuscripts>
-    <header class="list-heading"><h2>稿件管理</h2><a href="{{adminURL "/articles/new"}}?import=1" class="text-button">导入 Markdown ↗</a></header>
+  <section class="card dashboard-article-list" id="manuscripts" aria-label="稿件管理" data-manuscripts data-i18n-attrs="aria-label">
+    <header class="list-heading"><h2 data-i18n-ui>稿件管理</h2><a href="{{adminURL "/articles/new"}}?import=1" class="text-button" data-i18n-ui>导入 Markdown ↗</a></header>
     <div class="list-controls">
-      <div class="status-tabs" role="group" aria-label="按稿件状态筛选">
-        <button type="button" data-status-filter="all" aria-pressed="true" class="active">全部</button>
-        <button type="button" data-status-filter="published" aria-pressed="false">已发布</button>
-        <button type="button" data-status-filter="pending" aria-pressed="false">审核中</button>
-        <button type="button" data-status-filter="draft" aria-pressed="false">草稿</button>
-        <button type="button" data-status-filter="rejected" aria-pressed="false">已退回</button>
+      <div class="status-tabs" role="group" aria-label="按稿件状态筛选" data-i18n-attrs="aria-label">
+        <button type="button" data-status-filter="all" aria-pressed="true" class="active" data-i18n-ui>全部</button>
+        <button type="button" data-status-filter="published" aria-pressed="false" data-i18n-ui>已发布</button>
+        <button type="button" data-status-filter="pending" aria-pressed="false" data-i18n-ui>审核中</button>
+        <button type="button" data-status-filter="draft" aria-pressed="false" data-i18n-ui>草稿</button>
+        <button type="button" data-status-filter="rejected" aria-pressed="false" data-i18n-ui>已退回</button>
       </div>
-      <input type="search" data-manuscript-search aria-label="搜索稿件标题" placeholder="搜索稿件">
+      <input type="search" data-manuscript-search aria-label="搜索稿件标题" placeholder="搜索稿件" data-i18n-attrs="aria-label placeholder">
     </div>
     <div class="manuscript-rows">
     {{range .Articles}}
       <article class="dashboard-article-row" data-manuscript-status="{{.Status}}" data-title="{{.Title}}">
         <a class="manuscript-cover" href="{{adminURL (printf "/articles/%s/edit" .ID)}}" aria-label="编辑 {{.Title}}">{{if .Cover}}<img src="{{.Cover}}" alt="" loading="lazy" onerror="this.remove()">{{else}}<span aria-hidden="true">▤</span>{{end}}</a>
-        <a class="dashboard-article-row__main" href="{{adminURL (printf "/articles/%s/edit" .ID)}}"><strong>{{.Title}}</strong><span class="manuscript-meta"><span class="badge {{statusClass .Status}}">{{statusText .Status}}</span><time>{{fmtTime .UpdatedAt}}</time></span>{{if .RejectNote}}<em class="reject-note">退回：{{.RejectNote}}</em>{{end}}</a>
+        <a class="dashboard-article-row__main" href="{{adminURL (printf "/articles/%s/edit" .ID)}}"><strong>{{.Title}}</strong><span class="manuscript-meta"><span class="badge {{statusClass .Status}}"><span class="i18n-copy" data-i18n-ui>{{statusText .Status}}</span></span><time>{{fmtTime .UpdatedAt}}</time></span>{{if .RejectNote}}<em class="reject-note"><span class="i18n-copy" data-i18n-ui>退回：</span>{{.RejectNote}}</em>{{end}}</a>
         <div class="dashboard-article-row__actions actions">
-          <a class="icon-button" href="{{adminURL (printf "/articles/%s/edit" .ID)}}" aria-label="编辑 {{.Title}}" title="编辑">{{template "admin-icon" "edit"}}</a>
-          {{if canSubmit .}}<form method="post" action="{{adminURL (printf "/articles/%s/submit" .ID)}}"><button class="small ghost">提交审核</button></form>{{end}}
-          {{if canDeleteArticle $.User .}}<form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" data-content-delete onsubmit="return confirm('确定删除这篇文章吗？已发布内容将从公开站移除。')"><button type="submit" class="icon-button danger" aria-label="删除 {{.Title}}" title="删除">{{template "admin-icon" "trash"}}</button></form>{{end}}
+          <a class="icon-button" href="{{adminURL (printf "/articles/%s/edit" .ID)}}" aria-label="编辑 {{.Title}}" title="编辑" data-i18n-attrs="title">{{template "admin-icon" "edit"}}</a>
+          {{if canSubmit .}}<form method="post" action="{{adminURL (printf "/articles/%s/submit" .ID)}}"><button class="small ghost" data-i18n-ui>提交审核</button></form>{{end}}
+          {{if canDeleteArticle $.User .}}<form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" data-content-delete onsubmit="return confirm(window.SonglineI18n ? window.SonglineI18n.t('确定删除这篇文章吗？已发布内容将从公开站移除。') : '确定删除这篇文章吗？已发布内容将从公开站移除。')"><button type="submit" class="icon-button danger" aria-label="删除 {{.Title}}" title="删除" data-i18n-attrs="title">{{template "admin-icon" "trash"}}</button></form>{{end}}
         </div>
       </article>
-    {{else}}<div class="empty-state"><span aria-hidden="true">▤</span><h3>第一篇作品，从这里开始</h3><a class="btn" href="{{adminURL "/articles/new"}}">开始创作</a></div>{{end}}
+    {{else}}<div class="empty-state"><span aria-hidden="true">▤</span><h3 data-i18n-ui>第一篇作品，从这里开始</h3><a class="btn" href="{{adminURL "/articles/new"}}" data-i18n-ui>开始创作</a></div>{{end}}
     </div>
-    <p class="empty" data-manuscript-empty hidden>没有找到符合条件的稿件</p>
-    <footer class="list-footer"><span data-list-result aria-live="polite">共 {{len .Articles}} 篇稿件</span><div class="actions"><button type="button" class="small secondary" data-list-prev>上一页</button><span data-list-page></span><button type="button" class="small secondary" data-list-next>下一页</button></div></footer>
+    <p class="empty" data-manuscript-empty hidden data-i18n-ui>没有找到符合条件的稿件</p>
+    <footer class="list-footer"><span data-list-result aria-live="polite" data-i18n-ui><span class="i18n-copy" data-i18n-ui>共 </span>{{len .Articles}}<span class="i18n-copy" data-i18n-ui> 篇稿件</span></span><div class="actions"><button type="button" class="small secondary" data-list-prev data-i18n-ui>上一页</button><span data-list-page></span><button type="button" class="small secondary" data-list-next data-i18n-ui>下一页</button></div></footer>
   </section>
   {{end}}
 </main>

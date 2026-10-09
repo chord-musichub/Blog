@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
   var storage = window.SonglineRuntime.storage;
 
@@ -201,7 +206,7 @@
     function renderArticle(){
       if(renderedArticle !== article){
         if(titleEl) titleEl.textContent = article.title;
-        if(rankTitle) rankTitle.textContent = modeName() + '排行榜';
+        if(rankTitle) uiText(rankTitle, modeName() + '排行榜');
         var fragment = document.createDocumentFragment();
         characterNodes = [];
         for(var index = 0; index < article.text.length; index++){
@@ -314,7 +319,7 @@
 
     function renderTopScores(){
       if(!topScoresEl) return;
-      if(!topScores.length){ topScoresEl.innerHTML = '<li>暂无记录</li>'; return; }
+      if(!topScores.length){ topScoresEl.innerHTML = '<li><!--ui-->暂无记录<!--/ui--></li>'; return; }
       topScoresEl.innerHTML = topScores.map(function(item, index){
         return '<li><span>第 ' + (index + 1) + ' 名</span><b>' + fmt(item.score) + '</b></li>';
       }).join('');
@@ -511,4 +516,6 @@
   }
 
   window.SonglineInitTypingPractice = boot;
+})();
+
 })();

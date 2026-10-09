@@ -1,3 +1,8 @@
+(function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
 const src = document.getElementById('md');
 const out = document.getElementById('preview');
 
@@ -43,7 +48,7 @@ function enhanceCodeBlocks(root){
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'md-code-copy';
-    btn.textContent = '复制';
+    uiText(btn, '复制');
     bar.appendChild(label);
     bar.appendChild(btn);
     pre.parentNode.insertBefore(wrapper, pre);
@@ -51,11 +56,11 @@ function enhanceCodeBlocks(root){
     wrapper.appendChild(pre);
     btn.addEventListener('click', () => {
       copyText((code || pre).innerText || '').then(() => {
-        btn.textContent = '已复制';
+        uiText(btn, '已复制');
         btn.classList.add('copied');
         clearTimeout(btn.__copyTimer);
         btn.__copyTimer = setTimeout(() => {
-          btn.textContent = '复制';
+          uiText(btn, '复制');
           btn.classList.remove('copied');
         }, 1400);
       });
@@ -83,3 +88,5 @@ if(src){
   });
   update();
 }
+
+})();

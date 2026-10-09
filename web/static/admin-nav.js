@@ -24,7 +24,10 @@
       panels.forEach(panel => { panel.hidden = panel !== chosen; });
       const heading = document.querySelector('.admin-management .workspace-detail-header h1');
       const label = chosen.querySelector('h2');
-      if(heading && label) heading.textContent = label.textContent;
+      if(heading && label){
+        if(window.SonglineI18n) window.SonglineI18n.setText(heading,window.SonglineI18n.sourceText(label));
+        else heading.textContent=label.textContent;
+      }
     }
   }
   sync();

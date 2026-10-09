@@ -3,13 +3,13 @@
 {{ $cfg := .Site.Data.site }}
 {{ $cover := .Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png" }}
 {{ $coverMode := .Params.cover_mode | default "cover" }}
-<section class="card article-intro article-heading" aria-label="文章信息">
+<section class="card article-intro article-heading" aria-label="文章信息" data-i18n-attrs="aria-label">
   <figure class="article-heading__cover cover-mode-{{ $coverMode }}">
     <img src="{{ partial "media-preview-url.html" $cover }}" alt="" width="320" height="200" loading="eager" decoding="async" fetchpriority="high">
   </figure>
   <div class="article-heading__main">
   <div class="article-heading__title">
-    {{ if .Params.is_notice }}<span class="article-heading__eyebrow">站点公告</span>{{ end }}
+    {{ if .Params.is_notice }}<span class="article-heading__eyebrow" data-i18n-ui>站点公告</span>{{ end }}
     <h1>{{ .Title }}</h1>
   </div>
   <p class="article-heading__summary">{{ with .Params.summary }}{{ . }}{{ else }}{{ .Summary | plainify }}{{ end }}</p>
@@ -20,14 +20,14 @@
       {{ $authorUsername := .Params.author_username | default .Params.author }}
       {{ range site.Data.friends }}{{ if eq .username $authorUsername }}{{ $authorHref = .url }}{{ end }}{{ end }}
     {{ if $authorHref }}<a class="author-link meta-icon-item" href="{{ $authorHref }}">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</a>{{ else }}<span class="meta-icon-item">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</span>{{ end }}
-    <span>◷ 阅读约 {{ .ReadingTime }} 分钟</span>
+    <span><span class="i18n-copy" data-i18n-ui>◷ 阅读约 </span>{{ .ReadingTime }}<span class="i18n-copy" data-i18n-ui> 分钟</span></span>
     {{ with .Params.tags }}{{ range . }}
       {{ $tagRaw := . }}{{ $tagHref := printf "/posts/?tag=%s" ($tagRaw | urlquery) }}
       <a class="tag" href="{{ $tagHref }}">{{ . }}</a>
     {{ end }}{{ end }}
-    <span class="views real-views article-view-counter meta-icon-item" data-view-mode="post" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }} 阅读 <b>0</b></span>
+    <span class="views real-views article-view-counter meta-icon-item" data-view-mode="post" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }}<span class="i18n-copy" data-i18n-ui> 阅读 </span><b>0</b></span>
   </div>
-  <button class="article-intro-download" type="button" data-md-download aria-label="下载本文 Markdown 源文件">下载 .md</button>
+  <button class="article-intro-download" type="button" data-md-download aria-label="下载本文 Markdown 源文件" data-i18n-attrs="aria-label" data-i18n-ui>下载 .md</button>
   </div>
 </section>
 
@@ -36,9 +36,9 @@
     {{ .Content }}
   </article>
   <div class="article-toc-rail">
-  <aside class="card article-toc" data-toc-toggle-card role="button" tabindex="0" aria-label="展开或收起目录" title="点击展开 / 收起目录">
+  <aside class="card article-toc" data-toc-toggle-card role="button" tabindex="0" aria-label="展开或收起目录" title="点击展开 / 收起目录" data-i18n-attrs="aria-label title">
     <div class="toc-head">
-      <h3>{{ partial "ui-icon.html" "menu" }} 目录</h3>
+      <h3>{{ partial "ui-icon.html" "menu" }}<span class="i18n-copy" data-i18n-ui> 目录</span></h3>
     </div>
     <div class="toc-body">
       {{ .TableOfContents }}
@@ -49,8 +49,8 @@
 
 <script defer src="/js/article-hard-breaks.js?v={{ partial "asset-version.html" . }}"></script>
 
-<button class="back-to-top-button" type="button" aria-label="回到顶部" title="回到顶部">{{ partial "ui-icon.html" "chevron-up" }}</button>
-<button class="scroll-to-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部">{{ partial "ui-icon.html" "chevron-down" }}</button>
+<button class="back-to-top-button" type="button" aria-label="回到顶部" title="回到顶部" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "chevron-up" }}</button>
+<button class="scroll-to-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "chevron-down" }}</button>
 <script defer src="/js/markdown-renderer.js?v={{ partial "asset-version.html" . }}"></script>
 <script defer src="/js/article-reading.js?v={{ partial "asset-version.html" . }}"></script>
 <script id="article-md-source" type="application/json" data-source-format="{{ if .Params.source_md_b64 }}base64{{ else }}text{{ end }}" data-source-url="{{ with .Params.source_md_url }}{{ . }}{{ end }}">{{ with .Params.source_md_b64 }}{{ . | jsonify }}{{ else }}{{ with .RawContent }}{{ . | jsonify }}{{ else }}{{ .Plain | jsonify }}{{ end }}{{ end }}</script>
@@ -61,12 +61,12 @@
 {{ partial "article-comments.html" . }}
 
 {{ $pages := where .Site.RegularPages "Section" "posts" }}
-<section class="article-explore" aria-label="继续阅读">
+<section class="article-explore" aria-label="继续阅读" data-i18n-attrs="aria-label">
   <div class="article-explore__sequence">
-    {{ with .PrevInSection }}<a class="article-explore__step article-explore__step--previous" href="{{ .RelPermalink }}"><span class="article-explore__arrow">{{ partial "ui-icon.html" "back" }}</span><span><small>上一篇</small><strong>{{ .Title }}</strong></span></a>{{ end }}
-    {{ with .NextInSection }}<a class="article-explore__step article-explore__step--next" href="{{ .RelPermalink }}"><span><small>下一篇</small><strong>{{ .Title }}</strong></span><span class="article-explore__arrow">{{ partial "ui-icon.html" "arrow-right" }}</span></a>{{ end }}
+    {{ with .PrevInSection }}<a class="article-explore__step article-explore__step--previous" href="{{ .RelPermalink }}"><span class="article-explore__arrow">{{ partial "ui-icon.html" "back" }}</span><span><small data-i18n-ui>上一篇</small><strong>{{ .Title }}</strong></span></a>{{ end }}
+    {{ with .NextInSection }}<a class="article-explore__step article-explore__step--next" href="{{ .RelPermalink }}"><span><small data-i18n-ui>下一篇</small><strong>{{ .Title }}</strong></span><span class="article-explore__arrow">{{ partial "ui-icon.html" "arrow-right" }}</span></a>{{ end }}
   </div>
-  <div class="article-explore__related" aria-label="相关文章">
+  <div class="article-explore__related" aria-label="相关文章" data-i18n-attrs="aria-label">
     {{ range $index, $related := first 3 (where $pages "Permalink" "ne" .Permalink) }}
     <a class="article-explore__related-item" href="{{ $related.RelPermalink }}" aria-label="阅读相关文章：{{ $related.Title }}">
       <span class="article-explore__index">{{ printf "%02d" (add $index 1) }}</span>

@@ -6,10 +6,10 @@
 {{ $rowCount := len $localTools }}
 {{ if gt (len $externalTools) $rowCount }}{{ $rowCount = len $externalTools }}{{ end }}
 <section class="tools-excavation" data-tools-archive>
-  <section class="tools-underground" aria-label="工具节点列表">
+  <section class="tools-underground" aria-label="工具节点列表" data-i18n-attrs="aria-label">
     <span class="tools-soil-root tools-soil-root--one" aria-hidden="true"></span><span class="tools-soil-root tools-soil-root--two" aria-hidden="true"></span><span class="tools-soil-root tools-soil-root--three" aria-hidden="true"></span>
     <div class="tools-search-station">
-      <div class="tools-search-row"><input id="toolsArchiveSearch" class="tools-searchbox" type="search" autocomplete="off" data-tools-search aria-label="搜索工具" placeholder="搜索工具"><button class="search-submit" type="button" data-tools-search-submit data-no-page-loading aria-label="搜索工具">{{ partial "ui-icon.html" "search" }}<span>搜索</span></button><span class="search-count" data-tools-search-count>正在统计工具</span></div>
+      <div class="tools-search-row"><input id="toolsArchiveSearch" class="tools-searchbox" type="search" autocomplete="off" data-tools-search aria-label="搜索工具" placeholder="搜索工具" data-i18n-attrs="aria-label placeholder"><button class="search-submit" type="button" data-tools-search-submit data-no-page-loading aria-label="搜索工具" data-i18n-attrs="aria-label">{{ partial "ui-icon.html" "search" }}<span data-i18n-ui>搜索</span></button><span class="search-count" data-tools-search-count data-i18n-ui>正在统计工具</span></div>
     </div>
     <div class="tools-grid modern-tools-grid" data-tools-list>
       {{ if gt $rowCount 0 }}
@@ -32,7 +32,7 @@
         </section>
         {{ end }}
       {{ end }}
-      <div class="tools-empty-state" data-tools-empty>这层土里还没有挖到这个工具。</div>
+      <div class="tools-empty-state" data-tools-empty data-i18n-ui>这层土里还没有挖到这个工具。</div>
     </div>
   </section>
 </section>

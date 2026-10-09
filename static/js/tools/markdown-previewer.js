@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
   if(window.SonglineInitMarkdownPreviewer) return;
   function init(root){
@@ -36,10 +41,10 @@
       preview.removeAttribute('aria-busy');
       shell.hidden = true;
       panel.dataset.mdState = 'empty';
-      chooseButton.textContent = '选择文件';
+      uiText(chooseButton, '选择文件');
       window.SonglineReading.buildToc(preview, toc);
-      nameEl.textContent = message;
-      messageEl.textContent = detail;
+      uiText(nameEl, message);
+      uiText(messageEl, detail);
       statusEl.hidden = !message;
       notify();
     }
@@ -67,12 +72,12 @@
         preview.innerHTML = window.SonglineMarkdown.render(text);
         shell.hidden = false;
         panel.dataset.mdState = 'ready';
-        chooseButton.textContent = '更换文件';
+        uiText(chooseButton, '更换文件');
         window.SonglineReading.buildToc(preview, toc);
         if(window.SonglineEnhanceMarkdown) window.SonglineEnhanceMarkdown(preview);
         if(window.SonglineResources) window.SonglineResources.observe(preview);
         if(window.SonglinePageModules) window.SonglinePageModules.scan(panel);
-        nameEl.textContent = file.name || '已选择文件';
+        if(file.name && window.SonglineI18n) window.SonglineI18n.setContent(nameEl,file.name); else nameEl.textContent = file.name || '已选择文件';
         messageEl.textContent = '';
         statusEl.hidden = false;
         preview.removeAttribute('aria-busy');
@@ -107,4 +112,6 @@
     window.addEventListener('songline:page-transition-start', cleanup);
   }
   window.SonglineInitMarkdownPreviewer = init;
+})();
+
 })();

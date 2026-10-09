@@ -15,7 +15,7 @@ class Node{
 }
 test('switching tracks and resolving metadata reuse all playlist rows and their focus',()=>{
  const list=new Node(),calls=[];
- const f={list,tracks:[],listTracks:null,listRows:[],listCurrent:-1,current:-1,disposed:false,
+ const f={setText(node,value){node.textContent=value;},uiText(node,value){node.textContent=value;},list,tracks:[],listTracks:null,listRows:[],listCurrent:-1,current:-1,disposed:false,
   document:{createDocumentFragment:()=>new Node(true),createElement:()=>new Node()},
   displayName:file=>file.name,loadTrack:(...args)=>calls.push(args)};
  vm.createContext(f);vm.runInContext(functions(['renderList','onPlaylistClick']),f);

@@ -5,7 +5,7 @@ const http = require('node:http');
 const assert = require('node:assert/strict');
 const {chromium} = require('playwright');
 const types = {'.html':'text/html', '.js':'application/javascript', '.css':'text/css', '.png':'image/png', '.jpg':'image/jpeg', '.svg':'image/svg+xml', '.json':'application/json'};
-async function serve(source, {delays = false, instrument = false, faults = new Map()} = {}) {
+async function serve(source, {delays = false, instrument = false, faults = new Map(), adminOrigin = null} = {}) {
   source = path.resolve(source);
   assert(fs.existsSync(path.join(source, 'public/index.html')), 'Provide an isolated Hugo source and build');
   const requests = [];
@@ -21,9 +21,20 @@ async function serve(source, {delays = false, instrument = false, faults = new M
       res.setHeader('Content-Type', 'application/javascript');
       return res.end('window.SONGLINE_API_BASE="/api";');
     }
-    const root = path.join(source, url.pathname.startsWith('/static/') ? 'web/static' : 'public');
+    if(adminOrigin && url.pathname.startsWith('/write/')) {
+      assert(['127.0.0.1','localhost','[::1]'].includes(new URL(adminOrigin).hostname), 'Only local read-only admin fixtures are allowed');
+      if(req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(405); return res.end('read-only fixture'); }
+      try {
+        const response = await fetch(adminOrigin + url.pathname + url.search, {method:req.method});
+        res.statusCode = response.status;
+        res.setHeader('Content-Type', response.headers.get('content-type') || 'text/html');
+        return res.end(Buffer.from(await response.arrayBuffer()));
+      } catch(error) { res.writeHead(502); return res.end('admin fixture unavailable'); }
+    }
+    const sharedAsset = {'/static/i18n.js':'js/i18n.js', '/static/i18n-catalog.js':'js/i18n-catalog.js', '/static/i18n.css':'css/i18n.css'}[url.pathname];
+    const root = path.join(source, !sharedAsset && url.pathname.startsWith('/static/') ? 'web/static' : 'public');
     let relative;
-    try { relative = decodeURIComponent(url.pathname.replace(/^\/static\//, '/')).slice(1); }
+    try { relative = sharedAsset || decodeURIComponent(url.pathname.replace(/^\/static\//, '/')).slice(1); }
     catch { res.writeHead(400); return res.end(); }
     const file = path.resolve(root, relative + (url.pathname.endsWith('/') ? 'index.html' : ''));
     if (!file.startsWith(root + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {

@@ -233,12 +233,14 @@
       sceneStatus = document.createElement('div');
       sceneStatus.className = 'songline-scene-status';
       sceneStatus.setAttribute('role', 'status');
-      sceneStatus.innerHTML = '<span></span><button type="button">重试</button>';
+      sceneStatus.innerHTML = '<span></span><button type="button"><!--ui-->重试<!--/ui--></button>';
       sceneStatus.querySelector('button').addEventListener('click', function(){ waitForScene(); });
       document.body.appendChild(sceneStatus);
     }
     sceneStatus.hidden = false;
-    sceneStatus.querySelector('span').textContent = state === 'pending' ? '背景仍在加载…' : '背景暂时无法加载';
+    var label=sceneStatus.querySelector('span');
+    if(window.SonglineI18n) window.SonglineI18n.setText(label,state === 'pending' ? '背景仍在加载…' : '背景暂时无法加载');
+    else label.textContent=state === 'pending' ? '背景仍在加载…' : '背景暂时无法加载';
     sceneStatus.querySelector('button').hidden = state !== 'error';
   }
   async function waitForScene(options){

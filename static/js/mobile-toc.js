@@ -1,4 +1,9 @@
 (function(){
+  function uiText(node, value){
+    if(window.SonglineI18n) window.SonglineI18n.setText(node, value);
+    else if(node) node.textContent = value;
+  }
+(function(){
   'use strict';
 
   var mq = window.matchMedia ? window.matchMedia('(max-width:980px)') : null;
@@ -140,7 +145,7 @@
     drawer.innerHTML = [
       '<div class="mobile-toc-drawer-head">',
       '  <div>',
-      '    <strong>文章目录</strong>',
+      '    <strong><!--ui-->文章目录<!--/ui--></strong>',
       '    <small data-mobile-toc-count></small>',
       '  </div>',
       '  <button type="button" class="mobile-toc-close" data-mobile-toc-close aria-label="关闭目录">×</button>',
@@ -225,7 +230,7 @@
       return !q || item.text.toLowerCase().indexOf(q) !== -1;
     });
 
-    if(count) count.textContent = state.links.length ? (state.links.length + ' 个标题') : '暂无目录';
+    if(count) uiText(count, state.links.length ? (state.links.length + ' 个标题') : '暂无目录');
 
     if(!links.length){
       list.innerHTML = '<p class="mobile-toc-empty">没有匹配的标题</p>';
@@ -347,4 +352,6 @@
     state.readyForPath = '';
   });
   window.addEventListener('songline:article-toc-ready', function(){ init(document); });
+})();
+
 })();
