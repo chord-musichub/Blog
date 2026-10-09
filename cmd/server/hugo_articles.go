@@ -154,3 +154,18 @@ func (app *App) removeHugoArticle(a Article) error {
 	}
 	return app.archivePublication(a.Slug)
 }
+
+func (app *App) removeArticleSourceMarkdown(a Article) error {
+	if strings.TrimSpace(a.Slug) == "" {
+		return nil
+	}
+	name := slugify(a.Slug)
+	if name == "" {
+		name = a.ID
+	}
+	err := os.Remove(filepath.Join(runtimeMarkdownDir(app.cfg.DataDir), name+".md"))
+	if os.IsNotExist(err) {
+		return nil
+	}
+	return err
+}

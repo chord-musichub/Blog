@@ -34,7 +34,6 @@
   window.SonglinePagePriority = {
     config: pages,
     routes: pages,
-    getNavigationItems:function(){ return pages.filter(function(page){ return page.visible; }); },
     getPageKey:getPageKey,
     getPagePriority:getPagePriority,
     getTransitionDirection:getTransitionDirection

@@ -54,6 +54,9 @@ func isAdmin(u User) bool { return normalizeRole(u.Role) == roleAdmin }
 
 // 站主和管理员可编辑、删除全站文章；审核、发布和退回仍交给管理员。
 func canManageArticles(u User) bool { return isOwner(u) || isAdmin(u) }
+func canDeleteArticle(u User, a Article) bool {
+	return a.ID != "" && (canManageArticles(u) || a.Author == u.Username)
+}
 func canModerate(u User) bool {
 	return isAdmin(u)
 }

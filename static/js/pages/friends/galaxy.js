@@ -139,9 +139,6 @@
     var profileUpdated = shell.querySelector('[data-center-updated]');
     var profileLink = shell.querySelector('[data-center-link]');
     var empty = shell.querySelector('[data-galaxy-empty]');
-    var input = shell.querySelector('#friendGalaxySearch');
-    var submit = shell.querySelector('[data-friend-search-submit]');
-    var results = shell.querySelector('[data-galaxy-results]');
     if(!stage || !world || !lines || !nodeLayer || !core){ delete shell.dataset.friendGalaxyReady; return; }
     // Clear the previous controller's edges once, not on every resize/layout.
     lines.textContent = '';
@@ -633,30 +630,6 @@
       movePan(pan.targetX, pan.targetY, true);
       drawLines();
     }
-    function renderSearch(){
-      var query = clean(input && input.value).toLowerCase();
-      if(!results) return;
-      results.innerHTML = '';
-      if(!query) return;
-      var matches = friends.filter(function(friend){ return [friend.name, friend.username, friend.id].join(' ').toLowerCase().indexOf(query) >= 0; });
-      var status = document.createElement('p');
-      status.textContent = matches.length ? ('定位到 ' + matches.length + ' 颗星') : '没有找到对应的星';
-      results.appendChild(status);
-      matches.forEach(function(friend){
-        var item = document.createElement('button');
-        item.type = 'button'; item.className = 'friends-constellation__search-result';
-        item.innerHTML = '<span></span><small></small>';
-        item.querySelector('span').textContent = friend.name;
-        item.querySelector('small').textContent = friend.username || 'FRIEND';
-        item.onclick = function(){
-          selected = friend;
-          setProfile(friend);
-          if(nodeById[friend.id]) nodeById[friend.id].focus();
-        };
-        results.appendChild(item);
-      });
-    }
-
     function onWindowLoad(){ settleLayout(); }
     function onTransitionEnd(){
       if(disposed || !stage.isConnected) return;
@@ -702,15 +675,12 @@
       core.removeEventListener('focus', onCoreFocus);
       core.removeEventListener('blur', hideHoverCard);
       core.removeEventListener('click', onCoreClick);
-      if(submit) submit.removeEventListener('click', renderSearch);
-      if(input){ input.removeEventListener('input', renderSearch); input.removeEventListener('keydown', onSearchKey); }
       if(window.__songlineFriendGalaxyCleanup === cleanup) window.__songlineFriendGalaxyCleanup = null;
     }
     function onVisibility(){ if(document.hidden){ cancelPan(); hideHoverCard(); }else settleLayout(); }
     function onPageHide(event){ if(event.persisted) cancelPan();else cleanup(); }
     function onPageShow(event){ if(event.persisted) settleLayout(); }
     function onMotionChange(){ reducedMotion = motionQuery.matches;cancelPan();paintLens(); }
-    function onSearchKey(event){ if(event.key === 'Enter') renderSearch(); }
     function onTransitionStart(event){
       var from = event.detail && event.detail.from || '';
       if(from.indexOf('/friends/') === 0) cleanup();
@@ -751,8 +721,6 @@
     stage.addEventListener('wheel', onWheel, {passive:false});
     if(zoomControls){ zoomControls.hidden = false; zoomControls.addEventListener('click', onZoomControl); }
     window.__songlineFriendGalaxyCleanup = cleanup;
-    if(submit) submit.addEventListener('click', renderSearch);
-    if(input){ input.addEventListener('input', renderSearch); input.addEventListener('keydown', onSearchKey); }
   }
 
   window.SonglineInitFriendGalaxy = init;

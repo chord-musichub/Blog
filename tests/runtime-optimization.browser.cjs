@@ -95,7 +95,7 @@ async function geometry(page){return page.evaluate(()=>[...document.querySelecto
      // A pointer left over a record intentionally opens the next archive's row.
      await page.mouse.move(0,0);
      await page.evaluate(href=>SonglinePageTransition.navigateLink(href),base+route);await page.evaluate(()=>SonglinePageModules.ready(document));
-     assert.equal(new URL(page.url()).pathname,route);assert.equal(await page.locator('[data-elevator-nav]').count(),1,'One navigation instance at '+width+' '+cycle+' '+route);
+     assert.equal(new URL(page.url()).pathname,route);assert.equal(await page.locator('[data-site-map]').count(),1,'One navigation instance at '+width+' '+cycle+' '+route);
      assert.equal(await page.locator('link#songline-home-runtime-style').count(),route==='/'?1:0,'Home-only styles follow AJAX navigation');
      assert.equal(await page.locator('link[href*="navigation-motion.css"]').count(),0,'Retired navigation stylesheet is not restored');
      if(route==='/')assert(await page.evaluate(()=>{

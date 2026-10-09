@@ -59,7 +59,7 @@ body[data-page-kind="home"] .songline-home-system{
   grid-template-columns:minmax(0, 1fr) minmax(270px, 31%)!important;
   align-items:start;
   gap:clamp(28px, 4.2vw, 76px)!important;
-  /* 为右侧电梯保留独立通道，避免压到系统信息终端。 */
+  /* 保留首页两侧留白，避免系统信息终端与主内容重叠。 */
   width:min(1540px, calc(100vw - 270px))!important;
   max-width:none!important;
   margin-left:clamp(224px, 18vw, 294px)!important;

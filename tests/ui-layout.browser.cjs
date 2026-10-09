@@ -42,11 +42,10 @@ fs.mkdirSync(out,{recursive:true});
     await page.screenshot({path:`${out}/${width}${name}.png`});
     if(width<981){
      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),`${width} ${route}: horizontal overflow`);
-     const nav=await page.locator("[data-elevator-nav]").boundingBox();
      const map=await page.locator("[data-site-map-toggle]").boundingBox();
-     assert(nav.x+nav.width<map.x, "map and elevator must not overlap");
+     assert(map.x>=0 && map.x+map.width<=width, "map toggle remains in the viewport");
      if(route==='/friends/memories/'){
-      const room=await page.locator('.memory-room').boundingBox();assert(room.y+room.height<=nav.y,'timeline fits above dock');
+      const room=await page.locator('.memory-room').boundingBox();assert(room.y+room.height<=map.y,'timeline fits above dock');
      }
     }
     console.log(`PASS ${width} ${route}`);

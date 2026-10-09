@@ -266,7 +266,7 @@ async function toc(page,width){
       await page.locator('[data-memory-close]').click();
      }
      if(!route.includes('markdown-previewer')&&!route.startsWith('/posts/'))assert.equal(await page.locator('.songline-reading-float-button').count(),0);
-     assert.equal(await page.locator('[data-elevator-nav]').count(),1);
+     assert.equal(await page.locator('[data-site-map]').count(),1);
     }
     await navigate(page,'/posts/linux-note/');await toc(page,width);
     await navigate(page,'/posts/');samples.push(await page.evaluate(()=>globalHandlerCounts()));

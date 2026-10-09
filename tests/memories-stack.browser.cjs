@@ -25,6 +25,7 @@ function fixture(count) {
    await page.addStyleTag({path:path.resolve('static/css/pages/friends/memories.css')});
    await page.addStyleTag({path:path.resolve('static/css/touch-layout.css')});
    await page.addScriptTag({path:path.resolve('static/js/pages/friends/memories.js')});
+   await page.evaluate(()=>SonglineInitMemoryRoom(document));
    const viewport=page.locator('[data-memory-viewport]');
    const bounds=await page.locator('[data-memory-card]').evaluateAll(cards=>cards.map(card=>{
     const image=card.querySelector('button').getBoundingClientRect();

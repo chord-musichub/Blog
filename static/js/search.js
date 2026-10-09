@@ -23,10 +23,13 @@
       empty.textContent = '这层土里还没有挖到这个工具。';
       list.appendChild(empty);
     }
+    var strata = config.strata ? Array.from(list.querySelectorAll('.tools-strata')).map(function(layer){
+      return {element:layer, items:Array.from(layer.querySelectorAll(config.item))};
+    }) : [];
     function syncStrata(active){
-      if(!config.strata) return;
-      list.querySelectorAll('.tools-strata').forEach(function(layer){
-        layer.hidden = active && !Array.from(layer.querySelectorAll(config.item)).some(function(item){ return !item.hidden; });
+      strata.forEach(function(layer){
+        var hidden = active && !layer.items.some(function(item){ return !item.hidden; });
+        if(layer.element.hidden !== hidden) layer.element.hidden = hidden;
       });
     }
     if(button) button.setAttribute('data-no-page-loading', '');
@@ -40,7 +43,8 @@
     var searchText = items.map(function(item){ return normalize(allText(item)); });
     function updateCount(active, visible){
       if(!count) return;
-      count.textContent = active ? ('找到 ' + visible + ' / ' + items.length + ' ' + (config.unit || '项')) : ('共 ' + items.length + ' ' + (config.unit || '项'));
+      var label = active ? ('找到 ' + visible + ' / ' + items.length + ' ' + (config.unit || '项')) : ('共 ' + items.length + ' ' + (config.unit || '项'));
+      if(count.textContent !== label) count.textContent = label;
     }
     function runSearch(opts){
       opts = opts || {};
@@ -67,11 +71,7 @@
     }
     function clearSearch(){
       input.value = '';
-      items.forEach(function(item){ setVisible(item, true); item.classList.remove('is-search-hit'); });
-      setEmpty(empty, items.length, false);
-      syncStrata(false);
-      updateCount(false, items.length);
-      input.classList.remove('has-search-value');
+      runSearch();
     }
     function submit(e){ if(e){ e.preventDefault(); e.stopPropagation(); } runSearch({feedback:true}); }
     if(button) button.addEventListener('click', submit, true);

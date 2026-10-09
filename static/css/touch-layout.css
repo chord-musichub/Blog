@@ -31,17 +31,6 @@
   html body:not(.dark) :is(.songline-terminal-stats,.songline-terminal-stat-grid,.songline-home-music,.songline-terminal-links){border-color:rgba(246,224,216,.13)!important}
   html body .modern-site-header .header-icons{gap:4px!important}
   html body .modern-site-header .icon-btn{width:42px!important;height:42px!important}
-  html body .songline-elevator-nav{position:fixed!important;z-index:12020!important;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;left:10px!important;right:68px!important;width:auto!important;max-width:none!important;height:56px!important;min-height:56px!important;display:flex!important;justify-content:space-around!important;gap:2px!important;padding:4px!important;margin:0!important;border-radius:16px!important;background:rgba(12,25,43,.92)!important;transform:none!important;overflow:hidden!important}
-  html body .songline-elevator-nav::before,html body .songline-elevator-rail{display:none!important}
-  html body .songline-elevator-nav a{display:flex!important;flex-direction:column!important;flex:1 1 0!important;min-width:0!important;align-items:center!important;justify-content:center!important;gap:2px!important;margin:0!important;padding:4px 2px!important;color:#c2ccdb!important;border-radius:10px!important;transform:none!important}
-  html body .songline-elevator-nav a.active{background:rgba(173,198,226,.18)!important;color:#fff!important}
-  html body .songline-elevator-floor{font-size:10px!important;line-height:1!important}
-  html body .songline-elevator-name{display:block!important;opacity:1!important;visibility:visible!important;position:static!important;width:auto!important;font-size:13px!important;line-height:1.3!important;transform:none!important;white-space:nowrap}
-  html:root body .songline-elevator-nav a .songline-elevator-name{display:block!important;max-width:none!important;max-height:none!important;opacity:1!important;visibility:visible!important}
-  /* 触屏底部导航没有 hover 作为信息入口，所有楼层名必须始终可见。 */
-  html body > .songline-elevator-nav[data-mobile-bottom-dock] a .songline-elevator-name{display:block!important;max-width:none!important;max-height:none!important;opacity:1!important;visibility:visible!important;color:rgba(222,232,244,.88)!important}
-  html body > .songline-elevator-nav[data-mobile-bottom-dock] a.active .songline-elevator-name{color:#fff!important}
-  html body .songline-elevator-floor::after{display:none!important}
   html body .songline-site-map{position:fixed!important;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;left:auto!important;right:10px!important;width:48px!important;padding:0!important;transform:none!important;z-index:12021!important}
   html body .songline-site-map__toggle{display:flex!important;align-items:center;justify-content:center;width:48px!important;height:56px!important;border-radius:14px!important;background:rgba(12,25,43,.92)!important;color:#dce7f4!important;pointer-events:auto!important}
   html body .songline-site-map__toggle .ui-icon{display:grid!important;place-items:center;--ui-icon-size:21px!important}

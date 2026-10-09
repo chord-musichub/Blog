@@ -37,14 +37,13 @@
 
 ## `layouts/partials/page-navigation-data.html`：全站空间导航配置
 
-页面的 route、priority、楼层电梯和 SITE MAP 共用这一份配置，不能为地图再维护第二张页面清单。
+页面的 route、priority 和 SITE MAP 共用这一份配置，不能为地图再维护第二张页面清单。
 
-- `visible`：是否出现在 Elevator；
 - `map_visible`：是否出现在 SITE MAP；
 - `map_column`、`map_row`、`map_column_span`、`map_row_span`：8 × 8 固定网格中的稳定矩形位置；
 - `route` 与 `priority`：继续由现有全站转场读取，地图链接只使用普通链接，不自行计算切页方向。
 
-新增主页面时，在该 partial 增加一项并补齐上述地图字段；电梯、地图、当前页高亮和页面过场会自动读取新配置。
+新增主页面时，在该 partial 增加一项并补齐上述地图字段；地图、当前页高亮和页面过场会自动读取新配置。
 
 ### 工具卡片图标
 

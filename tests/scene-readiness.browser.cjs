@@ -196,7 +196,7 @@ async function syntheticCases(browser){
    for(let cycle=0;cycle<2;cycle++)for(const route of ['/','/posts/','/tools/','/tools/random-number/','/friends/memories/','/friends/']){
     await f.page.mouse.move(0,0);
     const start=Date.now();await f.page.evaluate(route=>SonglinePageTransition.navigateLink(route),route);await ready(f.page,route);await assertScene(f.page);
-    assert.equal(await f.page.locator('[data-elevator-nav]').count(),1);
+    assert.equal(await f.page.locator('[data-site-map]').count(),1);
     if(route==='/')assert(!f.requests.includes('/uploads/admin/background/qiandai-background-black.png'),'Leaving friends restores the target theme before requesting its background');
     if(cycle)assert(Date.now()-start<2200,'Warm navigation should not gain a fixed scene delay');
    }

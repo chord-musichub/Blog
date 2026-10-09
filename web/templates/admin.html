@@ -25,6 +25,7 @@
             {{if canPublish .}}<form method="post" action="{{adminURL (printf "/articles/%s/publish" .ID)}}"><button class="small">{{if eq .Status "pending"}}通过并发布{{else}}发布{{end}}</button></form>{{end}}
             {{if eq .Status "pending"}}<details class="reject-box"><summary>退回</summary><form method="post" action="{{adminURL (printf "/articles/%s/reject" .ID)}}"><input name="note" placeholder="退回原因"><button class="small danger">确认</button></form></details>{{end}}
           {{end}}
+          {{if canDeleteArticle $.User .}}<form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" data-content-delete onsubmit="return confirm('确定删除这篇文章吗？已发布内容将从公开站移除。')"><button type="submit" class="small danger" aria-label="删除 {{.Title}}">删除</button></form>{{end}}
         </div>
       </article>
       {{end}}

@@ -60,6 +60,7 @@
       form.addEventListener('input',changed);
       form.addEventListener('change',changed);
       form.addEventListener('submit',event => { if(!event.defaultPrevented) submitting=true; });
+      document.getElementById('article-delete-form')?.addEventListener('submit',event => { if(!event.defaultPrevented) submitting=true; });
       window.addEventListener('beforeunload',event => { if(dirty && !submitting){event.preventDefault();event.returnValue='';} });
       window.addEventListener('pageshow',()=>{submitting=false;});
       function countWords(){count.textContent=editor.value.replace(/\s/g,'').length + ' 字';}

@@ -40,7 +40,7 @@
         <div class="dashboard-article-row__actions actions">
           <a class="icon-button" href="{{adminURL (printf "/articles/%s/edit" .ID)}}" aria-label="编辑 {{.Title}}" title="编辑">{{template "admin-icon" "edit"}}</a>
           {{if canSubmit .}}<form method="post" action="{{adminURL (printf "/articles/%s/submit" .ID)}}"><button class="small ghost">提交审核</button></form>{{end}}
-          {{if or (eq .Status "draft") (eq .Status "rejected")}}<form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" onsubmit="return confirm('确定删除这篇稿件吗？')"><button class="icon-button danger" aria-label="删除 {{.Title}}" title="删除">{{template "admin-icon" "trash"}}</button></form>{{end}}
+          {{if canDeleteArticle $.User .}}<form method="post" action="{{adminURL (printf "/articles/%s/delete" .ID)}}" data-content-delete onsubmit="return confirm('确定删除这篇文章吗？已发布内容将从公开站移除。')"><button type="submit" class="icon-button danger" aria-label="删除 {{.Title}}" title="删除">{{template "admin-icon" "trash"}}</button></form>{{end}}
         </div>
       </article>
     {{else}}<div class="empty-state"><span aria-hidden="true">▤</span><h3>第一篇作品，从这里开始</h3><a class="btn" href="{{adminURL "/articles/new"}}">开始创作</a></div>{{end}}

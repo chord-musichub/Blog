@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -70,14 +72,14 @@ func (app *App) loadCreatorData(name string, target any) error {
 }
 
 func (app *App) saveCreatorData(name string, value any) error {
-	if err := os.MkdirAll(filepath.Dir(app.creatorDataPath(name)), 0700); err != nil {
-		return err
-	}
-	b, err := json.MarshalIndent(value, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(app.creatorDataPath(name), b, 0600)
+	return writeJSONFile(app.creatorDataPath(name), value, 0600)
+}
+
+// A snapshot key prevents stale row positions from deleting a different record,
+// including identical adjacent entries, without changing the persistent format.
+func creatorEntryKey(value any) string {
+	b, _ := json.Marshal(value)
+	return fmt.Sprintf("%x", sha256.Sum256(b))
 }
 
 func (app *App) loadProjects() ([]Project, error) {
@@ -111,6 +113,8 @@ func (app *App) ensureCreatorContentData() error {
 }
 
 func (app *App) handleCreatorProjects(w http.ResponseWriter, r *http.Request) {
+	app.creatorMu.Lock()
+	defer app.creatorMu.Unlock()
 	u, _ := app.currentUser(r)
 	if err := app.ensureCreatorContentData(); err != nil {
 		http.Error(w, "初始化项目资料失败: "+err.Error(), http.StatusInternalServerError)
@@ -137,11 +141,15 @@ func (app *App) handleCreatorProjects(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
-	index, _ := strconv.Atoi(r.FormValue("index"))
+	index, indexErr := strconv.Atoi(r.FormValue("index"))
 	action := strings.TrimSpace(r.FormValue("action"))
+	if (action == "delete" || action == "update") && (indexErr != nil || index < 0 || index >= len(projects)) {
+		http.Error(w, "项目不存在，请刷新列表", http.StatusBadRequest)
+		return
+	}
 	if action == "delete" {
-		if index < 0 || index >= len(projects) {
-			http.Error(w, "项目不存在", http.StatusBadRequest)
+		if r.FormValue("list_key") != creatorEntryKey(projects) {
+			http.Error(w, "项目列表已变化，请刷新后再删除", http.StatusConflict)
 			return
 		}
 		projects = append(projects[:index], projects[index+1:]...)
@@ -152,10 +160,6 @@ func (app *App) handleCreatorProjects(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if action == "update" {
-			if index < 0 || index >= len(projects) {
-				http.Error(w, "项目不存在", http.StatusBadRequest)
-				return
-			}
 			projects[index] = item
 		} else {
 			projects = append(projects, item)
@@ -166,7 +170,15 @@ func (app *App) handleCreatorProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := app.runHugo(r.Context()); err != nil {
+		if action == "delete" {
+			app.redirect(w, r, "/compose/projects?msg=项目已删除，但公开站构建失败，请看日志", http.StatusSeeOther)
+			return
+		}
 		app.redirect(w, r, "/compose/projects?msg=项目已保存，但公开站构建失败，请看日志", http.StatusSeeOther)
+		return
+	}
+	if action == "delete" {
+		app.redirect(w, r, "/compose/projects?msg=项目已删除并更新公开站", http.StatusSeeOther)
 		return
 	}
 	app.redirect(w, r, "/compose/projects?msg=项目已保存并更新公开站", http.StatusSeeOther)
@@ -183,6 +195,8 @@ func projectFromRequest(r *http.Request) Project {
 }
 
 func (app *App) handleCreatorMemories(w http.ResponseWriter, r *http.Request) {
+	app.creatorMu.Lock()
+	defer app.creatorMu.Unlock()
 	u, _ := app.currentUser(r)
 	if err := app.ensureCreatorContentData(); err != nil {
 		http.Error(w, "初始化回忆资料失败: "+err.Error(), http.StatusInternalServerError)
@@ -209,11 +223,15 @@ func (app *App) handleCreatorMemories(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
-	index, _ := strconv.Atoi(r.FormValue("index"))
+	index, indexErr := strconv.Atoi(r.FormValue("index"))
 	action := strings.TrimSpace(r.FormValue("action"))
+	if (action == "delete" || action == "update") && (indexErr != nil || index < 0 || index >= len(memories)) {
+		http.Error(w, "回忆不存在，请刷新列表", http.StatusBadRequest)
+		return
+	}
 	if action == "delete" {
-		if index < 0 || index >= len(memories) {
-			http.Error(w, "回忆不存在", http.StatusBadRequest)
+		if r.FormValue("list_key") != creatorEntryKey(memories) {
+			http.Error(w, "回忆列表已变化，请刷新后再删除", http.StatusConflict)
 			return
 		}
 		memories = append(memories[:index], memories[index+1:]...)
@@ -224,10 +242,6 @@ func (app *App) handleCreatorMemories(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if action == "update" {
-			if index < 0 || index >= len(memories) {
-				http.Error(w, "回忆不存在", http.StatusBadRequest)
-				return
-			}
 			memories[index] = item
 		} else {
 			memories = append(memories, item)
@@ -238,7 +252,15 @@ func (app *App) handleCreatorMemories(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := app.runHugo(r.Context()); err != nil {
+		if action == "delete" {
+			app.redirect(w, r, "/compose/memories?msg=回忆已删除，但公开站构建失败，请看日志", http.StatusSeeOther)
+			return
+		}
 		app.redirect(w, r, "/compose/memories?msg=回忆已保存，但公开站构建失败，请看日志", http.StatusSeeOther)
+		return
+	}
+	if action == "delete" {
+		app.redirect(w, r, "/compose/memories?msg=回忆已删除并更新公开站", http.StatusSeeOther)
 		return
 	}
 	app.redirect(w, r, "/compose/memories?msg=回忆已保存并更新公开站", http.StatusSeeOther)

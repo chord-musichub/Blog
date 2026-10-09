@@ -104,7 +104,7 @@ async function trackSettings(p,width,theme,titleBefore){
    const {p,context,errors,requests}=await fixture(browser,width,theme,motion);
    assert.equal(await p.locator('body').getAttribute('data-page-scene'),'audio');
    assert.equal(await p.locator('.av-source-panel h2').textContent(),'享受你的音乐');
-   for(const selector of ['.modern-site-header','[data-elevator-nav]','[data-site-map]','.site-bg-layer'])assert.equal(await p.locator(selector).isVisible(),false,'No site chrome: '+selector);
+   for(const selector of ['.modern-site-header','[data-site-map]','.site-bg-layer'])assert.equal(await p.locator(selector).isVisible(),false,'No site chrome: '+selector);
    assert.equal(await p.locator('.tool-detail-surface').count(),0);
    assert.equal(await p.locator('[data-av-linework]').getAttribute('aria-hidden'),'true');
    assert.equal(await p.locator('[data-av-linework]').evaluate(e=>getComputedStyle(e).pointerEvents),'none');
@@ -285,11 +285,11 @@ async function trackSettings(p,width,theme,titleBefore){
    assert.equal(await p.locator('body').getAttribute('data-page-scene'),null,'Standalone marker is removed after return');
    assert.notEqual(await p.locator('.modern-site-header').evaluate(e=>getComputedStyle(e).display),'none','Site header shell is restored after return');
    assert(await p.locator('.modern-site-header .logo').isVisible(),'Site logo is restored after return (desktop HUD shell has zero height)');
-   assert(await p.locator('[data-elevator-nav]').isVisible(),'Elevator is restored after return');
+   assert(await p.locator('[data-site-map]').isVisible(),'Site map is restored after return');
    await p.evaluate(()=>SonglinePageTransition.navigateLink(location.origin+'/tools/audio-visualizer/'));
    await ready(p);
    assert.equal(await p.locator('body').getAttribute('data-page-scene'),'audio');
-   assert.equal(await p.locator('[data-elevator-nav]').isVisible(),false);
+   assert.equal(await p.locator('[data-site-map]').isVisible(),false);
    assert.equal(await p.locator('[data-av-linework]').count(),1,'AJAX re-entry adds exactly one grid decoration');
    assert(await p.locator('[data-av-upload]').isVisible(),'AJAX re-entry starts a usable empty studio');
    assert.deepEqual(errors,[]);

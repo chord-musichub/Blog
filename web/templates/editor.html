@@ -54,12 +54,14 @@
     <footer class="editor-publishbar">
       <span class="meta">{{if isAdminUser .User}}审核后发布至网站{{else}}保存草稿后可随时继续{{end}}</span>
       <div class="actions">
+        {{if canDeleteArticle .User .Article}}<button type="submit" form="article-delete-form" class="danger">删除文章</button>{{end}}
         <button type="submit" name="intent" value="save" class="secondary">{{if eq .Article.Status "published"}}保存修改{{else}}保存草稿{{end}}</button>
         {{if canModerateUser .User}}<button type="submit" name="intent" value="publish">{{if eq .Article.Status "pending"}}审核通过并发布{{else if eq .Article.Status "published"}}更新发布{{else}}发布文章{{end}}</button>
         {{else}}{{if or (not .Article.ID) (canSubmit .Article)}}<button type="submit" name="intent" value="submit">提交审核</button>{{end}}{{end}}
       </div>
     </footer>
   </form>
+  {{if canDeleteArticle .User .Article}}<form id="article-delete-form" method="post" action="{{adminURL (printf "/articles/%s/delete" .Article.ID)}}" data-content-delete onsubmit="return confirm('确定删除这篇文章吗？已发布内容将从公开站移除。')"></form>{{end}}
   {{template "media-crop-dialog" .}}
 </main>
 <script src="/static/markdown-renderer.js?v=20.3.5"></script>

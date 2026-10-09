@@ -39,11 +39,6 @@ body.dark .site-header{background:rgba(15,23,42,.78)}
 .navbar{max-width:var(--max);margin:0 auto;height:100%;display:flex;align-items:center;padding:0 34px;gap:36px}
 .logo{font-size:27px;font-weight:760;letter-spacing:.04em;color:#12345a}
 body.dark .logo{color:#eaf6ff}
-.nav-links{display:flex;gap:54px;margin-left:auto;margin-right:auto;align-items:center}
-.nav-links a{font-weight:650;color:#27496c;position:relative;padding:30px 0 26px}
-body.dark .nav-links a{color:#cbdcf2}
-.nav-links a.active,.nav-links a:hover{color:var(--accent-2)}
-.nav-links a.active:after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:48px;height:3px;border-radius:10px;background:var(--accent)}
 .header-icons{display:flex;gap:22px;align-items:center;color:#15345b}
 .icon-btn{border:0;background:transparent;color:inherit;cursor:pointer;padding:6px;border-radius:99px;display:inline-flex;align-items:center;justify-content:center}
 .icon-btn:hover{background:var(--soft-blue);color:var(--accent-2)}

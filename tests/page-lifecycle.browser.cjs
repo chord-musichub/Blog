@@ -24,7 +24,7 @@ const out='local-only/page-lifecycle';fs.mkdirSync(out,{recursive:true});
      await page.evaluate(href=>window.SonglinePageTransition.navigateLink(href),base+route);
      assert.equal(new URL(page.url()).pathname,route);
      assert(await page.evaluate(()=>window.lifecycleDocument===performance.timeOrigin),'navigation must stay in the same document');
-     assert.equal(await page.locator('[data-elevator-nav]').count(),1,'one navigation instance');
+     assert.equal(await page.locator('[data-site-map]').count(),1,'one navigation instance');
      const overflow=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,htmlOverflow:getComputedStyle(document.documentElement).overflowX,bodyOverflow:getComputedStyle(document.body).overflowX,offenders:[...document.querySelectorAll('body *')].map(e=>({name:e.tagName+'.'+e.className,rect:e.getBoundingClientRect()})).filter(e=>e.rect.width>0&&e.rect.right>innerWidth+2).slice(0,12).map(e=>({name:e.name,right:e.rect.right,width:e.rect.width}))}));
      if(overflow.scroll>overflow.width+2){
       overflow.maxScrollX=await page.evaluate(()=>{const y=scrollY;scrollTo({left:10000,top:y,behavior:'instant'});const x=scrollX;scrollTo({left:0,top:y,behavior:'instant'});return x;});

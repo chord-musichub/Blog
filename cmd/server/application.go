@@ -57,6 +57,8 @@ func newApp(cfg Config, store *Store) *App {
 		"isOwnerUser":      isOwner,
 		"canModerateUser":  isAdmin,
 		"canManageArticle": canManageArticles,
+		"canDeleteArticle": canDeleteArticle,
+		"creatorEntryKey":  creatorEntryKey,
 		"canManageUser":    canManageUser,
 		"roleText":         roleText,
 		"userAvatar":       normalizeUserAvatar,

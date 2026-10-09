@@ -131,20 +131,21 @@ func (app *App) deleteArticle(w http.ResponseWriter, r *http.Request, id string,
 		http.NotFound(w, r)
 		return
 	}
-	// 管理员和站主可管理全站稿件；作者只能删除自己的草稿/退回稿。
-	if isAdmin(u) {
-		// allowed
-	} else if isOwner(u) {
-		if !app.canAccessArticle(u, a) {
-			http.Error(w, "forbidden", http.StatusForbidden)
-			return
-		}
-	} else if a.Author != u.Username || !(a.Status == stDraft || a.Status == stRejected) {
+	// 站主和管理员可删除全站文章，作者可删除自己的各状态稿件。
+	if !canDeleteArticle(u, a) {
 		http.Error(w, "forbidden", http.StatusForbidden)
 		return
 	}
+	destination := "/"
+	if isAdmin(u) || (isOwner(u) && a.Author != u.Username) {
+		destination = "/admin"
+	}
 	if err := app.removeHugoArticle(a); err != nil {
 		http.Error(w, "删除发布文件失败: "+err.Error(), 500)
+		return
+	}
+	if err := app.removeArticleSourceMarkdown(a); err != nil {
+		http.Error(w, "删除公开 Markdown 源文件失败: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if err := app.store.DeleteArticle(id); err != nil {
@@ -153,12 +154,8 @@ func (app *App) deleteArticle(w http.ResponseWriter, r *http.Request, id string,
 	}
 	if err := app.runHugo(r.Context()); err != nil {
 		log.Printf("hugo build after delete error: %v", err)
-		app.redirect(w, r, "/?msg="+urlMsg("后台文章已删除，但公开站重建失败，旧页面可能仍可见，请重试或查看日志"), http.StatusSeeOther)
+		app.redirect(w, r, destination+"?msg="+urlMsg("后台文章已删除，但公开站重建失败，旧页面可能仍可见，请重试或查看日志"), http.StatusSeeOther)
 		return
 	}
-	if canManageArticles(u) {
-		app.redirect(w, r, "/admin?msg=文章已删除", http.StatusSeeOther)
-		return
-	}
-	app.redirect(w, r, "/?msg=文章已删除", http.StatusSeeOther)
+	app.redirect(w, r, destination+"?msg=文章已删除", http.StatusSeeOther)
 }

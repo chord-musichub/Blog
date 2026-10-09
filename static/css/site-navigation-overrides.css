@@ -3,85 +3,8 @@
 #site-notice{
   scroll-margin-top:96px;
 }
-@keyframes songlineNavLeaveLeft{
-  to{transform:translateX(-46px);opacity:0}
-}
-@keyframes songlineNavLeaveRight{
-  to{transform:translateX(46px);opacity:0}
-}
 
-/* v22：最右侧楼层刻度。默认只保留编号/轨道，当前层或 hover 才展开名称。 */
-@media(min-width:981px){
-  html body .modern-site-header .songline-elevator-nav{
-    top:50vh!important;
-    right:clamp(18px, 2.1vw, 46px)!important;
-    left:auto!important;
-    width:154px!important;
-    min-height:0!important;
-    padding:8px 0!important;
-    gap:5px!important;
-    background:transparent!important;
-    border:0!important;
-    border-radius:0!important;
-    box-shadow:none!important;
-    backdrop-filter:none!important;
-    -webkit-backdrop-filter:none!important;
-  }
-  html body .modern-site-header .songline-elevator-rail{
-    top:10px!important;
-    bottom:10px!important;
-    left:18px!important;
-    background:linear-gradient(180deg, transparent, rgba(235,244,252,.46) 13%, rgba(235,244,252,.46) 87%, transparent)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a,
-  html body .modern-site-header .songline-elevator-nav a:hover,
-  html body .modern-site-header .songline-elevator-nav a:focus-visible,
-  html body .modern-site-header .songline-elevator-nav a.active{
-    grid-template-columns:38px minmax(0, 1fr)!important;
-    min-height:33px!important;
-    padding:7px 0!important;
-    color:rgba(232,241,250,.66)!important;
-    background:transparent!important;
-  }
-  html body .songline-elevator-floor{
-    font-size:11px!important;
-    letter-spacing:.06em!important;
-  }
-  html body .songline-elevator-floor::after{
-    right:8px!important;
-    width:5px!important;
-    height:5px!important;
-  }
-  html body .songline-elevator-name{
-    max-width:0;
-    overflow:hidden;
-    opacity:0;
-    font-size:11px!important;
-    letter-spacing:.13em!important;
-    white-space:nowrap;
-    transform:translateX(-5px)!important;
-    transition:max-width .22s ease, opacity .18s ease, transform .22s cubic-bezier(.2,.75,.25,1)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a.active,
-  html body .modern-site-header .songline-elevator-nav a:hover,
-  html body .modern-site-header .songline-elevator-nav a:focus-visible{
-    color:rgba(250,253,255,.98)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
-  html body .modern-site-header .songline-elevator-nav a:hover .songline-elevator-name,
-  html body .modern-site-header .songline-elevator-nav a:focus-visible .songline-elevator-name{
-    max-width:92px;
-    opacity:1;
-    transform:translateX(0)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-floor::after{
-    background:#ffd3aa!important;
-    border-color:#fff0e2!important;
-    box-shadow:0 0 0 3px rgba(255,204,159,.15)!important;
-  }
-}
-
-/* 极窄视口只保留底部的小地图开关，给页面电梯与首项内容留出完整纵向安全带。 */
+/* 极窄视口只保留底部的小地图开关，给首项内容留出纵向安全带。 */
 @media(max-width:420px){
   .songline-site-map{
     top:auto!important;
@@ -122,92 +45,14 @@
   opacity:1!important;
 }
 
-/* v23：与电梯共用页面配置的全局 SITE MAP。布局坐标由 page-navigation-data.html 注入。 */
+/* v23：全局 SITE MAP。布局坐标由 page-navigation-data.html 注入。 */
 .songline-site-map{position:fixed;z-index:10055;left:clamp(22px,3.4vw,64px);top:min(calc(50vh + 154px),calc(100vh - 220px));width:clamp(156px,12.5vw,204px);color:var(--text);isolation:isolate}.songline-site-map__heading{display:flex;align-items:baseline;justify-content:space-between;padding:0 1px 8px;border-bottom:1px solid color-mix(in srgb,var(--text) 52%,transparent);font:650 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.15em}.songline-site-map__heading small{color:color-mix(in srgb,var(--text) 66%,transparent);font:inherit;font-size:8px}.songline-site-map__toggle{display:none}.songline-site-map__regions{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));width:100%;aspect-ratio:1;margin-top:9px}.songline-site-map__region{position:relative;display:block;grid-column:var(--map-column)/span var(--map-column-span);grid-row:var(--map-row)/span var(--map-row-span);min-width:0;border:1px solid color-mix(in srgb,var(--text) 56%,transparent);background:color-mix(in srgb,var(--panel) 36%,transparent);color:color-mix(in srgb,var(--text) 66%,transparent);text-decoration:none;outline-offset:-3px;transition:background-color .2s ease,border-color .2s ease,color .2s ease,transform .2s ease}.songline-site-map__region+.songline-site-map__region{margin-left:-1px;margin-top:-1px}.songline-site-map__label,.songline-site-map__floor,.songline-site-map__marker{position:absolute;opacity:0;transition:opacity .18s ease}.songline-site-map__label{top:8px;left:8px;font:650 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.11em}.songline-site-map__floor{right:7px;bottom:7px;font:650 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.08em}.songline-site-map__marker{left:8px;bottom:8px;width:5px;height:5px;border-radius:50%;background:var(--accent-2)}.songline-site-map__region:hover,.songline-site-map__region:focus-visible{z-index:1;border-color:color-mix(in srgb,var(--text) 86%,transparent);background:color-mix(in srgb,var(--panel) 62%,transparent);color:var(--text);transform:translateY(-1px);outline:0}.songline-site-map__region:hover .songline-site-map__label,.songline-site-map__region:hover .songline-site-map__floor,.songline-site-map__region:focus-visible .songline-site-map__label,.songline-site-map__region:focus-visible .songline-site-map__floor{opacity:1}.songline-site-map__region.active{z-index:2;border-color:color-mix(in srgb,var(--accent-2) 92%,var(--text));background:linear-gradient(135deg,color-mix(in srgb,var(--accent-2) 26%,transparent),color-mix(in srgb,var(--panel) 56%,transparent));color:var(--text)}.songline-site-map__region.active .songline-site-map__label,.songline-site-map__region.active .songline-site-map__floor,.songline-site-map__region.active .songline-site-map__marker{opacity:1}.songline-site-map__region.active .songline-site-map__marker{animation:songlineSiteMapMarker 2.3s ease-in-out infinite}@keyframes songlineSiteMapMarker{0%,100%{transform:scale(1);opacity:.72}50%{transform:scale(1.45);opacity:1}}
-.songline-site-map.is-site-map-probing{pointer-events:none!important}
+.songline-site-map.is-site-map-probing,.songline-site-map.is-site-map-probing *{pointer-events:none!important}
 @media(max-width:760px), (max-width:980px) and (hover:none){.songline-site-map{top:auto;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 58px);left:16px;width:min(300px,calc(100vw - 32px));pointer-events:none}.songline-site-map__toggle{display:flex;align-items:center;justify-content:space-between;width:64px;padding:8px 10px;border:1px solid color-mix(in srgb,var(--border) 88%,transparent);border-radius:12px;background:color-mix(in srgb,var(--panel) 82%,transparent);color:var(--text);font:650 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.14em;pointer-events:auto}.songline-site-map__toggle i{font-size:15px;font-style:normal;transition:transform .2s ease}.songline-site-map.is-map-open .songline-site-map__toggle i{transform:rotate(45deg)}.songline-site-map__heading,.songline-site-map__regions{visibility:hidden;opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .2s ease,transform .2s ease}.songline-site-map__heading{margin-top:8px;padding-top:10px;background:linear-gradient(90deg,color-mix(in srgb,var(--panel) 84%,transparent),transparent)}.songline-site-map__regions{margin-top:7px;background:color-mix(in srgb,var(--panel) 75%,transparent)}.songline-site-map.is-map-open .songline-site-map__heading,.songline-site-map.is-map-open .songline-site-map__regions{visibility:visible;opacity:1;pointer-events:auto;transform:none}.songline-site-map__region{min-height:0}.songline-site-map__label{top:7px;left:7px}.songline-site-map__floor{right:6px;bottom:6px}.songline-site-map__marker{left:7px;bottom:7px}}
 @media(prefers-reduced-motion:reduce){.songline-site-map__region,.songline-site-map__label,.songline-site-map__floor,.songline-site-map__marker,.songline-site-map__heading,.songline-site-map__regions,.songline-site-map__toggle i{transition-duration:.01ms!important;animation:none!important}.songline-site-map__region.active .songline-site-map__marker{transform:none!important;opacity:1!important}}
 
 /* SITE MAP 默认仅作为灰阶空间轮廓；不显示说明小字，也不以当前页面抢占视觉焦点。 */
 .songline-site-map__heading{display:none!important}.songline-site-map__regions{margin-top:0}.songline-site-map__region,.songline-site-map__region.active{z-index:0;border-color:color-mix(in srgb,var(--text) 42%,transparent);background:color-mix(in srgb,var(--panel) 22%,transparent);color:color-mix(in srgb,var(--text) 52%,transparent)}.songline-site-map__region:hover,.songline-site-map__region:focus-visible,.songline-site-map__region.active:hover,.songline-site-map__region.active:focus-visible{z-index:1;border-color:color-mix(in srgb,var(--text) 92%,transparent);background:color-mix(in srgb,var(--panel) 72%,transparent);color:var(--text);transform:translateY(-1px)}
-
-/* v25：悬停楼层向轨道靠拢，暗侧从轨道右侧开始展开。 */
-@media(min-width:981px){
-  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering{
-    background:transparent!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a .songline-elevator-floor{
-    transition:transform .24s cubic-bezier(.2,.75,.25,1), color .2s ease;
-  }
-  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered .songline-elevator-floor{
-    transform:translateX(clamp(4px, .42vw, 7px));
-  }
-  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered .songline-elevator-floor::after{
-    transition:width .2s ease, height .2s ease, background .2s ease, box-shadow .2s ease;
-  }
-}
-
-/* v24：电梯栏悬停时以指针位置接管高亮，离开后回到当前页面。 */
-@media(min-width:981px){
-  html body .modern-site-header .songline-elevator-nav{
-    isolation:isolate;
-    background:transparent!important;
-    box-shadow:none!important;
-  }
-  html body .modern-site-header .songline-elevator-nav::before{
-    content:"";
-    position:absolute;
-    z-index:-2;
-    top:-30px;
-    right:-34px;
-    bottom:-30px;
-    left:calc(clamp(25px, 2.15vw, 38px) + 6px);
-    border-radius:36px;
-    background:radial-gradient(ellipse 150% 136% at 76% 50%, rgba(11,21,35,.48) 0%, rgba(9,18,31,.34) 56%, rgba(9,18,31,0) 100%);
-    opacity:0;
-    transform:translateX(-8px);
-    transition:opacity .3s ease, transform .3s cubic-bezier(.2,.75,.25,1);
-    pointer-events:none;
-  }
-  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering{
-    background:transparent!important;
-    box-shadow:none!important;
-  }
-  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering::before{
-    opacity:1;
-    transform:translateX(0);
-  }
-  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering a.active:not(.is-elevator-hovered){
-    color:rgba(232,241,250,.66)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering a.active:not(.is-elevator-hovered) .songline-elevator-name{
-    max-width:0!important;
-    opacity:0!important;
-    transform:translateX(-5px)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav.is-elevator-hovering a.active:not(.is-elevator-hovered) .songline-elevator-floor::after{
-    width:clamp(6px, .5vw, 8px)!important;
-    height:clamp(6px, .5vw, 8px)!important;
-    background:transparent!important;
-    border-color:currentColor!important;
-    box-shadow:none!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered{
-    color:rgba(250,253,255,.99)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered .songline-elevator-name{
-    max-width:clamp(112px, 10vw, 160px)!important;
-    opacity:1!important;
-    transform:translateX(0)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a.is-elevator-hovered .songline-elevator-floor::after{
-    width:clamp(9px, .72vw, 11px)!important;
-    height:clamp(9px, .72vw, 11px)!important;
-    background:#ffd3aa!important;
-    border-color:#fff0e2!important;
-    box-shadow:0 0 0 4px rgba(255,204,159,.15)!important;
-  }
-}
 
 
 /* 页脚备案信息：提高深色背景下的可见性，并以一条细线收束页面。 */
@@ -244,19 +89,14 @@
     background:rgba(191,204,219,.25);
   }
 }
-/* 窄桌面窗口仍使用电梯导航；仅触屏设备（或真正小屏）切换成底部导航。 */
-@media (max-width:760px), (max-width:980px) and (hover:none){
-  html body .modern-site-header .songline-elevator-nav a:not(.active) .songline-elevator-name{ display:block!important; }
-  html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name{ display:block!important; }
-}
 
-/* v21：首页系统导航：右侧电梯楼层，不再复用旧横向标签。 */
+/* 浮动页头保留标识和操作图标。 */
 .modern-site-header{
   pointer-events:none!important;
   background:transparent!important;
 }
 /* The legacy horizontal header still painted a 1px border across the HUD.
-   The floating brand/icons/elevator have no full-width header surface. */
+   The floating brand/icons have no full-width header surface. */
 html body .site-header.modern-site-header{
   border:0!important;
 }
@@ -310,220 +150,16 @@ html body .site-header.modern-site-header{
   color:var(--text)!important;
   transform:translateY(-1px)!important;
 }
-.modern-site-header .songline-elevator-nav{
-  position:fixed!important;
-  z-index:10055;
-  /* 页眉自身可能建立 fixed containing block，使用视口单位避免被吸到顶部。 */
-  top:50vh!important;
-  right:auto!important;
-  left:clamp(18px, 2.4vw, 46px)!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:stretch!important;
-  gap:4px!important;
-  width:192px!important;
-  height:auto!important;
-  min-height:310px!important;
-  margin:0!important;
-  padding:18px 0!important;
-  overflow:visible!important;
-  border:0!important;
-  border-radius:0!important;
-  background:transparent!important;
-  transform:translateY(-50%)!important;
-  isolation:isolate!important;
-}
-.songline-elevator-rail{
-  position:absolute;
-  top:16px;
-  bottom:16px;
-  left:27px;
-  z-index:-1;
-  width:1px;
-  background:linear-gradient(180deg, transparent, color-mix(in srgb, var(--muted) 46%, transparent) 12%, color-mix(in srgb, var(--muted) 46%, transparent) 88%, transparent);
-}
-.modern-site-header .songline-elevator-nav a,
-.modern-site-header .songline-elevator-nav a:hover,
-.modern-site-header .songline-elevator-nav a:focus-visible,
-.modern-site-header .songline-elevator-nav a.active{
-  display:grid!important;
-  grid-template-columns:56px minmax(0, 1fr)!important;
-  align-items:center!important;
-  min-width:0!important;
-  min-height:48px!important;
-  padding:14px 10px!important;
-  color:color-mix(in srgb, var(--muted) 78%, transparent)!important;
-  background:transparent!important;
-  border:0!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-  text-decoration:none!important;
-  transform:none!important;
-}
-.songline-elevator-floor{
-  position:relative;
-  font:650 13px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
-  letter-spacing:.08em;
-  color:inherit;
-}
-.songline-elevator-floor::after{
-  content:"";
-  position:absolute;
-  top:50%;
-  right:13px;
-  width:6px;
-  height:6px;
-  border:1px solid currentColor;
-  border-radius:50%;
-  transform:translateY(-50%);
-}
-.songline-elevator-name{
-  font:650 15px/1 ui-monospace, SFMono-Regular, Consolas, monospace;
-  letter-spacing:.12em;
-  opacity:.82;
-  transition:opacity .2s ease, transform .28s cubic-bezier(.2,.75,.25,1), color .2s ease;
-}
-.modern-site-header .songline-elevator-nav a:hover,
-.modern-site-header .songline-elevator-nav a:focus-visible,
-.modern-site-header .songline-elevator-nav a.active{
-  color:var(--text)!important;
-}
-.modern-site-header .songline-elevator-nav a.active .songline-elevator-floor::after{
-  width:9px;
-  height:9px;
-  border-color:var(--accent-2);
-  background:var(--accent-2);
-  box-shadow:0 0 0 4px color-mix(in srgb, var(--accent-2) 15%, transparent);
-}
-.modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
-.modern-site-header .songline-elevator-nav a:hover .songline-elevator-name,
-.modern-site-header .songline-elevator-nav a:focus-visible .songline-elevator-name{
-  opacity:1;
-  transform:translateX(3px);
-}
-/* 不能只按窗口宽度切换：桌面浏览器半屏时也需要保留完整电梯交互。 */
+/* 紧凑视口的页头定位。 */
 @media (max-width:760px), (max-width:980px) and (hover:none){
   html.has-fixed-mobile-nav body{ padding-top:0!important; }
   .modern-site-header .logo{ top:15px; left:16px; }
   .modern-site-header .header-icons{ top:13px; right:14px; }
-  .modern-site-header .songline-elevator-nav{
-    top:auto!important;
-    left:auto!important;
-    right:50%!important;
-    bottom:max(12px, env(safe-area-inset-bottom))!important;
-    flex-direction:row!important;
-    justify-content:center!important;
-    gap:0!important;
-    width:min(390px, calc(100vw - 24px))!important;
-    min-height:0!important;
-    padding:7px 9px!important;
-    border:1px solid color-mix(in srgb, var(--border) 90%, transparent)!important;
-    border-radius:18px!important;
-    background:color-mix(in srgb, var(--panel) 88%, transparent)!important;
-    box-shadow:0 12px 34px rgba(0,0,0,.18)!important;
-    backdrop-filter:blur(16px)!important;
-    -webkit-backdrop-filter:blur(16px)!important;
-    transform:translateX(50%)!important;
-  }
-  .songline-elevator-rail{ display:none; }
-  .modern-site-header .songline-elevator-nav a,
-  .modern-site-header .songline-elevator-nav a:hover,
-  .modern-site-header .songline-elevator-nav a:focus-visible,
-  .modern-site-header .songline-elevator-nav a.active{
-    display:block!important;
-    min-height:0!important;
-    padding:6px 5px!important;
-    text-align:center;
-  }
-  .songline-elevator-floor{ display:block; font-size:9px; }
-  .songline-elevator-floor::after{ display:none; }
-  .songline-elevator-name{ display:block; margin-top:3px; font-size:8px; letter-spacing:.08em; }
-  .modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
-  .modern-site-header .songline-elevator-nav a:hover .songline-elevator-name{ transform:none; }
-}
-@keyframes songlineNavLeaveLeft{
-  to{transform:translateX(-34px);opacity:.001}
-}
-@keyframes songlineNavLeaveRight{
-  to{transform:translateX(34px);opacity:.001}
 }
 [id*="friend"][class*="map"],
 [class*="friend"][class*="map"]{
   border-radius:28px!important;
   overflow:hidden!important;
-}
-
-
-/* v20.18.5：导航滑块重写，移除旧 hover / active 重叠样式 */
-.modern-nav-links a,
-.modern-nav-links a:hover,
-.modern-nav-links a:focus,
-.modern-nav-links a:focus-visible,
-.modern-nav-links a.active,
-body.dark .modern-nav-links a,
-body.dark .modern-nav-links a:hover,
-body.dark .modern-nav-links a:focus,
-body.dark .modern-nav-links a:focus-visible,
-body.dark .modern-nav-links a.active{
-  position:relative!important;
-  z-index:2!important;
-  background:transparent!important;
-  background-image:none!important;
-  box-shadow:none!important;
-  border-color:transparent!important;
-  outline:0!important;
-}
-.modern-nav-links a{
-  transform:none!important;
-  transition:color .18s ease!important;
-}
-.modern-nav-links a:hover,
-.modern-nav-links a:focus-visible,
-.modern-nav-links a.active{
-  color:var(--accent-2)!important;
-  transform:none!important;
-}
-/* v20.18.5：导航滑块换成全新 songline-nav-slider。 */
-.modern-nav-links{
-  position:relative!important;
-  isolation:isolate!important;
-  overflow:hidden!important;
-}
-.modern-nav-links a,
-.modern-nav-links a:hover,
-.modern-nav-links a:focus,
-.modern-nav-links a:focus-visible,
-.modern-nav-links a.active,
-body.dark .modern-nav-links a,
-body.dark .modern-nav-links a:hover,
-body.dark .modern-nav-links a:focus,
-body.dark .modern-nav-links a:focus-visible,
-body.dark .modern-nav-links a.active{
-  position:relative!important;
-  z-index:2!important;
-  background:transparent!important;
-  background-image:none!important;
-  box-shadow:none!important;
-  border-color:transparent!important;
-  outline:0!important;
-  transform:none!important;
-}
-.modern-nav-links a::before,
-.modern-nav-links a::after,
-.modern-nav-links a:hover::before,
-.modern-nav-links a:hover::after,
-.modern-nav-links a.active::before,
-.modern-nav-links a.active::after{
-  display:none!important;
-  content:none!important;
-}
-.modern-nav-links a{
-  transition:color .18s ease!important;
-}
-.modern-nav-links a:hover,
-.modern-nav-links a:focus-visible,
-.modern-nav-links a.active{
-  color:var(--accent-2)!important;
 }
 
 
@@ -548,87 +184,7 @@ body.dark .modern-nav-links a.active{
   }
 }
 
-/* v23：桌面电梯回到左侧；尺寸随有效视口宽度缩放，保持楼层刻度可读。 */
-@media(min-width:981px){
-  html body .modern-site-header .songline-elevator-nav{
-    top:50vh!important;
-    right:auto!important;
-    left:clamp(22px, 3.4vw, 64px)!important;
-    width:clamp(156px, 12.5vw, 204px)!important;
-    /* 四层导航按实际内容高度收束，轨道与悬浮暗底保持上下对称。 */
-    min-height:0!important;
-    justify-content:center!important;
-    padding:clamp(12px, 1.35vh, 20px) 0!important;
-    gap:clamp(5px, .45vh, 9px)!important;
-    /* 空白暗幕不拦截星图节点，只有每个实际楼层链接可点击。 */
-    pointer-events:none!important;
-  }
-  html body .modern-site-header .songline-elevator-nav::before{
-    /* 暗幕只是视觉层，可比实际刻度与感应带更舒展，不会遮挡下层控件。 */
-    top:-42px!important;
-    right:-88px!important;
-    bottom:-42px!important;
-    border-radius:42px!important;
-  }
-  html body .modern-site-header .songline-elevator-rail{
-    top:clamp(14px, 1.55vh, 22px)!important;
-    bottom:clamp(14px, 1.55vh, 22px)!important;
-    left:clamp(25px, 2.15vw, 38px)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a,
-  html body .modern-site-header .songline-elevator-nav a:hover,
-  html body .modern-site-header .songline-elevator-nav a:focus-visible,
-  html body .modern-site-header .songline-elevator-nav a.active{
-    position:relative!important;
-    grid-template-columns:1fr!important;
-    align-self:flex-start!important;
-    /* 真正的 a 只占楼层刻度，绝不盖住星图节点；名称由无点击能力的视觉层延展。 */
-    width:clamp(46px, 4.1vw, 60px)!important;
-    min-height:clamp(47px, 5.2vh, 66px)!important;
-    padding:clamp(9px, 1vh, 13px) 0!important;
-    overflow:visible!important;
-    pointer-events:auto!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a .songline-elevator-name{
-    position:absolute!important;
-    top:50%!important;
-    left:100%!important;
-    white-space:nowrap!important;
-    pointer-events:none!important;
-    transform:translateY(-50%)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
-  html body .modern-site-header .songline-elevator-nav a:hover .songline-elevator-name,
-  html body .modern-site-header .songline-elevator-nav a:focus-visible .songline-elevator-name{
-    transform:translate(3px, -50%)!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a.is-elevator-yielding{
-    pointer-events:none!important;
-  }
-  /* JS 以此探测电梯下方的真实控件；视觉暗幕和轨道本身始终可穿透。 */
-  html body .modern-site-header .songline-elevator-nav.is-elevator-probing a{
-    pointer-events:none!important;
-  }
-  html body .songline-elevator-floor{
-    font-size:clamp(13px, 1.08vw, 17px)!important;
-  }
-  html body .songline-elevator-floor::after{
-    right:clamp(9px, .95vw, 15px)!important;
-    width:clamp(6px, .5vw, 8px)!important;
-    height:clamp(6px, .5vw, 8px)!important;
-  }
-  html body .songline-elevator-name{
-    font-size:clamp(12px, 1vw, 16px)!important;
-    letter-spacing:.15em!important;
-  }
-  html body .modern-site-header .songline-elevator-nav a.active .songline-elevator-name,
-  html body .modern-site-header .songline-elevator-nav a:hover .songline-elevator-name,
-  html body .modern-site-header .songline-elevator-nav a:focus-visible .songline-elevator-name{
-    max-width:clamp(76px, 7vw, 110px)!important;
-  }
-}
-
-/* 缩放后的桌面地图始终留在电梯左侧安全带内，不压住正文卡片。 */
+/* 缩放后的桌面地图始终留在左侧安全带内，不压住正文卡片。 */
 @media(min-width:981px){
   .songline-site-map{left:clamp(16px,2.4vw,42px)!important;top:min(calc(50vh + 154px),calc(100vh - 164px))!important;width:clamp(96px,7vw,120px)!important}
 }

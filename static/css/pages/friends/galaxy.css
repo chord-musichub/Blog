@@ -43,38 +43,6 @@ body:has(.friends-constellation){overflow-x:hidden;}
   letter-spacing:.035em;
   line-height:1;
 }
-.friends-constellation__search{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  min-width:min(360px, 100%);
-  padding:0 0 8px;
-  border-bottom:1px solid color-mix(in srgb, var(--text) 18%, transparent);
-  color:color-mix(in srgb, var(--text) 48%, transparent);
-}
-.friends-constellation__search > span{font-size:10px;font-weight:700;letter-spacing:.14em}
-.friends-constellation__search input{
-  min-width:0;
-  flex:1;
-  border:0;
-  outline:0;
-  padding:3px 0;
-  background:transparent;
-  color:var(--text);
-  font:inherit;
-}
-.friends-constellation__search input::placeholder{color:color-mix(in srgb, var(--text) 38%, transparent)}
-.friends-constellation__search button{
-  border:0;
-  padding:2px 0 2px 12px;
-  background:transparent;
-  color:color-mix(in srgb, var(--text) 72%, transparent);
-  cursor:pointer;
-  font-size:11px;
-  letter-spacing:.1em;
-}
-.friends-constellation__search:focus-within{border-color:color-mix(in srgb, var(--accent) 58%, transparent)}
-.friends-constellation__search button:hover{color:var(--text)}
 .friends-constellation__sky{
   position:relative;
   min-height:clamp(620px, 69vh, 790px);
@@ -246,11 +214,6 @@ body:has(.friends-constellation){overflow-x:hidden;}
 .friends-constellation__meteor{position:absolute;z-index:2;width:140px;height:1px;opacity:0;pointer-events:none;background:linear-gradient(90deg, transparent, rgba(235,246,255,.8), transparent);filter:drop-shadow(0 0 3px rgba(194,224,255,.42));transform:rotate(-27deg);animation:friendsMeteor 15s linear infinite;}
 .friends-constellation__meteor--one{top:17%;left:-18%;animation-delay:4s;}
 .friends-constellation__meteor--two{top:61%;left:-22%;width:104px;animation-delay:11s;animation-duration:19s;}
-.friends-constellation__results{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;min-height:0;padding:4px 3.5% 0;color:rgba(221,233,246,.57);font-size:12px;}
-.friends-constellation__results p{margin:0;}
-.friends-constellation__search-result{border:0;border-bottom:1px solid rgba(190,215,240,.22);padding:4px 0;background:transparent;color:rgba(237,245,255,.88);cursor:pointer;text-align:left;}
-.friends-constellation__search-result span{font-size:12px}.friends-constellation__search-result small{margin-left:7px;color:rgba(204,220,237,.48);font-size:10px;letter-spacing:.08em;}
-.friends-constellation__search-result:hover{border-color:rgba(226,239,253,.72);color:#fff;}
 .friends-constellation__empty{position:absolute;inset:0;z-index:6;display:grid;place-items:center;color:rgba(228,237,248,.7);}
 .friends-constellation__empty[hidden]{display:none;}
 @keyframes friendsNebulaDrift{from{transform:translate3d(-5px,-2px,0)}to{transform:translate3d(6px,4px,0)}}
@@ -267,7 +230,6 @@ body:has(.friends-constellation){overflow-x:hidden;}
   .friends-constellation{width:100%;margin:0 auto 28px}
   .friends-constellation__heading{align-items:flex-start;flex-direction:column;gap:16px;padding:22px 22px 10px}
   .friends-constellation__heading h1{font-size:34px}
-  .friends-constellation__search{width:100%;min-width:0}
   .friends-constellation__sky{min-height:760px;background-size:136px 112px, 182px 156px, 226px 198px, 118px 142px, auto;}
   .friends-constellation__core{left:50%;top:43%;width:112px;height:135px}
   .friends-constellation__core img{width:84px;height:84px}

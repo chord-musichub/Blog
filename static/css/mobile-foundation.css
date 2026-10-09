@@ -45,29 +45,6 @@
     height:38px!important;
     flex:0 0 38px;
   }
-  .modern-nav-links{
-    order:3;
-    flex:1 0 100%;
-    width:100%;
-    max-width:100%;
-    margin:0!important;
-    padding:5px!important;
-    overflow-x:auto!important;
-    overflow-y:hidden!important;
-    justify-content:flex-start!important;
-    scroll-snap-type:x proximity;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-  }
-  .modern-nav-links::-webkit-scrollbar{display:none}
-  .modern-nav-links a{
-    flex:0 0 auto;
-    min-width:64px;
-    text-align:center;
-    scroll-snap-align:center;
-    padding:8px 13px!important;
-    white-space:nowrap;
-  }
   .container{
     width:100%;
     max-width:100%;
@@ -248,11 +225,6 @@
   .logo-text{
     max-width:calc(100vw - 150px)!important;
   }
-  .modern-nav-links a{
-    min-width:58px;
-    padding:7px 11px!important;
-    font-size:14px!important;
-  }
   .container{
     padding-inline:10px!important;
   }
@@ -321,17 +293,6 @@
     box-shadow:0 12px 32px rgba(15,23,42,.14)!important;
     backdrop-filter:blur(18px) saturate(1.12)!important;
     -webkit-backdrop-filter:blur(18px) saturate(1.12)!important;
-  }
-  .modern-nav-links{
-    padding-bottom:6px!important;
-    mask-image:linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
-    -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
-  }
-  .modern-nav-links a{
-    min-height:38px!important;
-    display:inline-flex!important;
-    align-items:center!important;
-    justify-content:center!important;
   }
 
   /* 页面主体统一手机间距 */
@@ -430,10 +391,6 @@
 @media(max-width: 430px){
   .logo-text{
     max-width:44vw!important;
-  }
-  .modern-nav-links a{
-    min-width:54px!important;
-    font-size:13px!important;
   }
   .markdown-body{
     font-size:14.5px!important;

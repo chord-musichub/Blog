@@ -151,9 +151,6 @@ body.dark .section-head h2,
 body.dark .logo{
   color:#e6f0ff !important;
 }
-body.dark .nav-links a{
-  color:#cbdcf2 !important;
-}
 
 /* Markdown 正文：浅色羊皮纸阅读感 */
 .prose,

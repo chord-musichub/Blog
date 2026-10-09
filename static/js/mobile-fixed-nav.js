@@ -18,10 +18,10 @@
   }
 
   // 页头在过场、滤镜或变形状态下会成为 fixed 元素的 containing block。
-  // 将手机电梯和地图提升到 body，才能始终相对视口底部定位。
+  // 将手机地图提升到 body，才能始终相对视口底部定位。
   function syncBottomDock(){
     var shouldDock = isMobile() && document.body.dataset.pageScene !== 'audio';
-    var nodes = Array.prototype.slice.call(document.querySelectorAll('.songline-elevator-nav, .songline-site-map'));
+    var nodes = Array.prototype.slice.call(document.querySelectorAll('.songline-site-map'));
 
     nodes.forEach(function(node){
       if(!node) return;

@@ -9,11 +9,11 @@ const base=process.env.BLOG_TEST_URL||'http://127.0.0.1:8080';
    const page=await browser.newPage({viewport:{width,height:900},hasTouch:width<981,isMobile:width<981});
    async function checkMobileDock(){
     if(width>=981) return;
-    const dock=await page.locator('[data-elevator-nav]').evaluate(element=>{
+    const dock=await page.locator('[data-site-map]').evaluate(element=>{
      const rect=element.getBoundingClientRect();
-     return {bottom:rect.bottom,top:rect.top,height:innerHeight,parent:element.parentElement.tagName,count:document.querySelectorAll('[data-elevator-nav]').length};
+     return {bottom:rect.bottom,top:rect.top,height:innerHeight,parent:element.parentElement.tagName,count:document.querySelectorAll('[data-site-map]').length};
     });
-    assert.equal(dock.count,1,'page swaps must not duplicate the elevator');
+    assert.equal(dock.count,1,'page swaps must not duplicate the site map');
     assert.equal(dock.parent,'BODY','mobile dock remains outside transformed page containers');
     assert.ok(dock.top>dock.height-150 && dock.bottom<=dock.height+1,'mobile dock stays at the visible bottom: '+JSON.stringify(dock));
    }
@@ -27,13 +27,17 @@ const base=process.env.BLOG_TEST_URL||'http://127.0.0.1:8080';
     await page.setViewportSize({width,height:740});await page.waitForTimeout(350);await checkMobileDock();
     await page.setViewportSize({width,height:900});await page.waitForTimeout(350);await checkMobileDock();
    }
-   const home=page.locator('[data-elevator-nav] a[href="/"]');
+   if(width<981)await page.locator('[data-site-map-toggle]').click();
+   else await page.locator('[data-site-map]').hover();
+   await page.waitForTimeout(400);
+   const home=page.locator('[data-site-map] a[href="/"]');
    let b=await home.boundingBox();
    await page.mouse.move(b.x+b.width/2,b.y+b.height/2);await page.mouse.down();
    await page.mouse.move(width/2,150,{steps:12});await page.mouse.move(b.x+b.width/2,b.y+b.height/2,{steps:12});await page.mouse.up();
    await page.waitForTimeout(500);assert.equal(new URL(page.url()).pathname,'/friends/','drag back onto navigation must not activate');
    await page.mouse.move(width/2,150);await page.mouse.down();await page.mouse.move(b.x+b.width/2,b.y+b.height/2,{steps:12});await page.mouse.up();
    await page.waitForTimeout(500);assert.equal(new URL(page.url()).pathname,'/friends/','canvas drag ending at navigation must not activate');
+   if(width<981 && await page.locator('[data-site-map-toggle]').getAttribute('aria-expanded')==='false') await page.locator('[data-site-map-toggle]').click();
    await home.click();await page.waitForURL(base+'/');await page.waitForTimeout(2000);
    await checkMobileDock();
    if(width<981) await page.locator('[data-site-map-toggle]').click();
@@ -47,7 +51,7 @@ const base=process.env.BLOG_TEST_URL||'http://127.0.0.1:8080';
    await page.waitForTimeout(500);assert.equal(new URL(page.url()).pathname,'/','map drag must not activate');
    await room.click();await page.waitForURL('**/friends/memories/');await page.waitForTimeout(2000);
    await checkMobileDock();
-   console.log(`PASS ${width}: elevator and map ignore dragging, deliberate clicks navigate`);
+   console.log(`PASS ${width}: map ignores dragging, deliberate clicks navigate`);
    await page.close();
   }
  }finally{await browser.close()}

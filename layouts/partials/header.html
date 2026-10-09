@@ -5,15 +5,6 @@
       {{ with $cfg.site.logo_icon }}<img class="logo-icon" src="{{ . }}" alt="" loading="eager" decoding="async">{{ else }}<span class="logo-mark line-logo-mark">{{ partial "ui-icon.html" "logo" }}</span>{{ end }}
       <span class="logo-text">{{ default "Songline Blog" $cfg.site.logo }}</span>
     </a>
-    <nav class="nav-links modern-nav-links songline-elevator-nav" aria-label="站点楼层导航" data-elevator-nav>
-      <span class="songline-elevator-rail" aria-hidden="true"></span>
-      {{ range where (partial "page-navigation-data.html" .) "visible" true }}
-      <a href="{{ .route }}" data-page-key="{{ .key }}" data-floor="{{ .floor }}" aria-label="{{ .label }}，{{ .floor }}层">
-        <span class="songline-elevator-floor">{{ .floor }}</span>
-        <span class="songline-elevator-name">{{ .system_label }}</span>
-      </a>
-      {{ end }}
-    </nav>
     <aside class="songline-site-map" aria-label="全局站点地图" data-site-map>
       <button class="songline-site-map__toggle" type="button" title="站点地图" aria-label="打开站点地图" aria-expanded="false" aria-controls="siteMapRegions" data-site-map-toggle>{{ partial "ui-icon.html" "sitemap" }}</button>
       <nav class="songline-site-map__regions" id="siteMapRegions" aria-label="站点地图区域">

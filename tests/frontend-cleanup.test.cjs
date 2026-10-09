@@ -13,13 +13,13 @@ test('boot foundation is home-only and navigation feedback stays in the existing
   assert.match(styles,/{{ if \.IsHome }}\s*<link id="songline-home-runtime-style"[^>]*site-runtime\.css/);
   assert(!styles.includes('navigation-motion.css'));
   const navigation=read('static/css/navigation.css');
-  assert(navigation.indexOf('.modern-nav-links{')>navigation.indexOf('has-desktop-fixed-nav'));
-  for(const selector of ['.modern-nav-links a:focus-visible','.header-icons .header-submit-link'])assert(navigation.includes(selector));
+  assert(navigation.indexOf('.header-icons .header-submit-link')>navigation.indexOf('has-desktop-fixed-nav'));
+  assert(read('static/css/site-navigation-overrides.css').includes('.songline-site-map__region:focus-visible'));
   assert(!read('static/css/site-runtime.css').includes('.boot-panel'),'Old split-door boot UI is not shipped');
 });
 test('removed component families do not survive as positive CSS rules',()=>{
   const css=walk('static/css').filter(f=>f.endsWith('.css')).map(read).join('\n').replace(/\/\*[\s\S]*?\*\//g,'');
-  for(const name of ['game-2048-sync','leaderboard-sync-btn','recommended-grid','content-area-card','songline-nav-slider','nav-swap-layer','live-page-enter','page-loading-pill','av-bridge-card','snake-help']){
+  for(const name of ['game-2048-sync','leaderboard-sync-btn','recommended-grid','content-area-card','songline-nav-slider','nav-swap-layer','live-page-enter','page-loading-pill','av-bridge-card','snake-help','nav-links','modern-nav-links','songline-elevator-nav','songline-elevator-toggle','songline-elevator-floor']){
     assert(!new RegExp('\\.'+name+'(?=[\\s:{,.#>+~\\[])').test(css),name+' has no remaining rule');
   }
   for(const name of ['tile-v-2','tile-v-2048','toc-depth-6','md-indent-6','cover-mode-contain'])assert(css.includes('.'+name),'Keep dynamically generated '+name);

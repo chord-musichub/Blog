@@ -45,25 +45,6 @@ body.dark[data-page-kind="home"] .songline-home-scene-copy h1{
   text-shadow:0 2px 20px rgba(0,0,0,.35)!important;
 }
 
-/* 楼层导航变成夜晚建筑指示系统。 */
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-rail{
-  background:linear-gradient(180deg, transparent, rgba(160,190,230,.16) 12%, rgba(160,190,230,.16) 88%, transparent)!important;
-}
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a,
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a:hover,
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a:focus-visible,
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a.active{ color:rgba(205,220,245,.42)!important; }
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a.active,
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a:hover,
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a:focus-visible{ color:rgba(240,247,255,.95)!important; }
-body.dark[data-page-kind="home"] .songline-elevator-floor::after{ border-color:rgba(180,205,240,.30)!important; }
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a.active .songline-elevator-floor::after{
-  border-color:#d9e7ff!important;
-  background:#d9e7ff!important;
-  box-shadow:0 0 10px rgba(160,195,255,.35)!important;
-}
-body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav a.active .songline-elevator-name{ color:#e6eeff!important; }
-
 /* 右侧是一整块月光玻璃 HUD，不拆成附加卡片。 */
 body.dark[data-page-kind="home"] .songline-terminal-frame{
   color:var(--night-text-main);
@@ -147,11 +128,3 @@ body.dark[data-page-kind="home"] .songline-terminal-links button:focus-visible{ 
 body.dark[data-page-kind="home"] .songline-terminal-links{ border-top-color:var(--night-line)!important; }
 body.dark[data-page-kind="home"] .songline-home-music-spectrum::before{ background:linear-gradient(90deg, transparent, rgba(183,209,255,.55) 10%, rgba(183,209,255,.55) 90%, transparent)!important; }
 body.dark[data-page-kind="home"] .songline-home-music-playlist{ border-color:var(--night-line-strong)!important; background:linear-gradient(118deg, rgba(7,18,40,.94), rgba(12,29,58,.88))!important; }
-
-@media(max-width:980px){
-  body.dark[data-page-kind="home"] .modern-site-header .songline-elevator-nav{
-    border-color:var(--night-line-strong)!important;
-    background:rgba(7,18,40,.72)!important;
-    box-shadow:0 12px 34px rgba(0,0,0,.26)!important;
-  }
-}

@@ -34,18 +34,25 @@
 
 
   function setVisible(item, show){
-    item.hidden = !show;
+    if(item.hidden !== !show) item.hidden = !show;
     item.classList.toggle('search-hidden', !show);
     item.classList.toggle('is-search-filtered', !show);
-    if(show) item.style.removeProperty('display');
-    else item.style.setProperty('display', 'none', 'important');
+    if(show){
+      if(item.style.getPropertyValue('display')) item.style.removeProperty('display');
+    }else if(item.style.getPropertyValue('display') !== 'none' || item.style.getPropertyPriority('display') !== 'important'){
+      item.style.setProperty('display', 'none', 'important');
+    }
   }
 
   function setEmpty(empty, visible, active){
     if(!empty) return;
     var show = active && visible === 0;
-    empty.hidden = !show;
-    empty.style.setProperty('display', show ? '' : 'none', 'important');
+    if(empty.hidden !== !show) empty.hidden = !show;
+    if(show){
+      if(empty.style.getPropertyValue('display')) empty.style.removeProperty('display');
+    }else if(empty.style.getPropertyValue('display') !== 'none' || empty.style.getPropertyPriority('display') !== 'important'){
+      empty.style.setProperty('display', 'none', 'important');
+    }
   }
 
   function flashEmpty(el){

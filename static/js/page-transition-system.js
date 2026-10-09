@@ -177,6 +177,27 @@
     }, '', window.location.href);
   }
 
+  function preloadPageStyles(doc, url, hints){
+    var known = new Set();
+    document.head.querySelectorAll('link[rel="stylesheet"], link[rel="preload"][as="style"]').forEach(function(link){ known.add(link.href); });
+    doc.head.querySelectorAll('link[rel="stylesheet"]').forEach(function(style){
+      var href = style.getAttribute('href');
+      if(!href) return;
+      var target = new URL(href, url.href);
+      if(target.origin !== window.location.origin || known.has(target.href)) return;
+      if(style.media && !window.matchMedia(style.media).matches) return;
+      var hint = style.cloneNode(false);
+      hint.removeAttribute('id');
+      hint.rel = 'preload';
+      hint.as = 'style';
+      hint.href = target.href;
+      hint.dataset.songlineTransitionPreload = 'true';
+      known.add(target.href);
+      hints.push(hint);
+      document.head.appendChild(hint);
+    });
+  }
+
   function syncPageStyles(doc){
     var nextStyles = Array.from(doc.head.querySelectorAll('link[rel="stylesheet"]'));
     var pendingStyles = [];
@@ -285,7 +306,7 @@
       currentFooter.remove();
     }
     if(navigation){
-      navigation.bindNavIndicatorHover();
+      navigation.bindSiteMap();
       navigation.setNavActiveByURL(url);
     }
     // A browser Back/Forward may already have moved the cursor while the
@@ -353,13 +374,36 @@
     var loaderTimer = 0;
     var failed = false;
     var doc = null;
+    var styleHints = [];
     var controller = new AbortController();
     var requestTimer = setTimeout(function(){ controller.abort(); }, 15000);
-    var request = fetch(url.href, {
-      signal:controller.signal,
-      credentials:'same-origin',
-      headers:{ 'X-Requested-With':'songline-page-transition' }
-    });
+    // Prepare the inert response while the original cover animation runs.
+    // Preloads fetch bytes only; shell/CSS application and hydration stay below.
+    async function preparePage(){
+      async function readPage(target){
+        var response = await fetch(target.href, {
+          signal:controller.signal, credentials:'same-origin',
+          headers:{ 'X-Requested-With':'songline-page-transition' }
+        });
+        if(!response.ok) throw new Error('request failed: ' + response.status);
+        return new DOMParser().parseFromString(await response.text(), 'text/html');
+      }
+      doc = await readPage(url);
+      var archiveTarget = doc.head.querySelector('meta[name="songline-archive-target"]');
+      if(archiveTarget){
+        var target = new URL(archiveTarget.content, url.href);
+        if(target.origin !== window.location.origin || target.pathname !== '/posts/') throw new Error('invalid archive redirect');
+        url = target;
+        doc = await readPage(url);
+      }
+      var nextMain = doc.querySelector('main.container');
+      if(!nextMain) throw new Error('next page main container missing');
+      if(controller.signal.aborted) throw new Error('Navigation preparation cancelled');
+      if(window.SonglineResources) window.SonglineResources.preloadScene(doc);
+      preloadPageStyles(doc, url, styleHints);
+      return nextMain;
+    }
+    var request = preparePage();
 
     request.catch(function(){});
     lockNavigation();
@@ -370,27 +414,7 @@
       // Cached pages need no flashing spinner; show it only for a genuine wait.
       loaderTimer = setTimeout(startLoader, 180);
 
-      var response = await request;
-      if(!response.ok) throw new Error('request failed: ' + response.status);
-      var html = await response.text();
-      doc = new DOMParser().parseFromString(html, 'text/html');
-      // Lightweight retired-tag documents point to the current archive. Follow
-      // within this transition so no obsolete UI, refresh or history entry leaks.
-      var archiveTarget = doc.head.querySelector('meta[name="songline-archive-target"]');
-      if(archiveTarget){
-        var target = new URL(archiveTarget.content, url.href);
-        if(target.origin !== window.location.origin || target.pathname !== '/posts/') throw new Error('invalid archive redirect');
-        url = target;
-        response = await fetch(url.href, {
-          signal:controller.signal, credentials:'same-origin',
-          headers:{ 'X-Requested-With':'songline-page-transition' }
-        });
-        if(!response.ok) throw new Error('archive request failed: ' + response.status);
-        doc = new DOMParser().parseFromString(await response.text(), 'text/html');
-      }
-      var nextMain = doc.querySelector('main.container');
-      if(!nextMain) throw new Error('next page main container missing');
-      if(window.SonglineResources) window.SonglineResources.preloadScene(doc);
+      var nextMain = await request;
 
       // 幕布下先切换页面壳与专属样式，并预热首屏图片；此前在这里直接替换
       // main，慢网速时会先露出无背景/未定位的页面，再陆续加载场景资源。
@@ -448,6 +472,8 @@
       console.warn('[page-transition] document fallback', error);
       window.location.assign(queuedPopState ? queuedPopState.url.href : url.href);
     }finally{
+      controller.abort();
+      styleHints.forEach(function(hint){ hint.remove(); });
       // These are unused media copies in the parsed response, not the live
       // player inserted into main. Native RemotePlayback activity can retain
       // their entire temporary document after every visit to the home page.
@@ -549,7 +575,7 @@
   function initialize(){
     seedHistoryState();
     if(navigation){
-      navigation.bindNavIndicatorHover();
+      navigation.bindSiteMap();
       navigation.updateNavIndicator(true);
     }
     document.addEventListener('click', handleClick, true);

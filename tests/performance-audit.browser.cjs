@@ -31,7 +31,7 @@ fs.mkdirSync(out,{recursive:true});
     sessionStorage.setItem('songline-home-boot-v21.4','1');
     window.perfAudit={longTasks:[],shifts:[],rects:0,navRects:0,rafCallbacks:0};
     const rect=Element.prototype.getBoundingClientRect;
-    Element.prototype.getBoundingClientRect=function(){perfAudit.rects++;if(this.closest?.('[data-elevator-nav],[data-site-map]'))perfAudit.navRects++;return rect.call(this);};
+    Element.prototype.getBoundingClientRect=function(){perfAudit.rects++;if(this.closest?.('[data-site-map]'))perfAudit.navRects++;return rect.call(this);};
     const raf=window.requestAnimationFrame;
     window.requestAnimationFrame=fn=>raf.call(window,t=>{perfAudit.rafCallbacks++;fn(t);});
     try{new PerformanceObserver(list=>list.getEntries().forEach(e=>perfAudit.longTasks.push(e.duration))).observe({type:'longtask',buffered:true});}catch(e){}
