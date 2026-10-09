@@ -1,9 +1,13 @@
 {{- $image := "/uploads/admin/friends/snowMan.png" -}}
 {{- with .Site.Data.site.desktop_pet.image }}{{ $image = . }}{{ end -}}
-<div class="songline-desktop-pet" data-desktop-pet role="img" aria-label="可拖动的雪人摆件" title="拖动雪人摆动">
+<div class="songline-desktop-pet" data-desktop-pet role="button" tabindex="0" aria-label="雪人弹簧摆件，点击或拖动让它弹跳" title="点击弹跳，拖动雪人拉伸弹簧">
   <span class="songline-desktop-pet__rig">
+    <svg class="songline-desktop-pet__spring" viewBox="0 0 136 178" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="desktopPetSpringSteel"><stop stop-color="#71879c"/><stop offset=".46" stop-color="#e3edf4"/><stop offset=".7" stop-color="#9eafbd"/><stop offset="1" stop-color="#62788e"/></linearGradient></defs>
+      <path data-pet-spring-wire d="M68 178 Q55 174 68 169 Q81 165 68 160 Q55 156 68 151 Q81 147 68 142 Q55 138 68 133 Q81 128 68 124"/>
+      <path class="songline-desktop-pet__base" d="M57 178 H79"/>
+    </svg>
     <span class="songline-desktop-pet__figure">
-      <span class="songline-desktop-pet__stake" aria-hidden="true"></span>
       <img class="songline-desktop-pet__image" src="{{ $image }}" alt="" decoding="async">
     </span>
   </span>

@@ -45,9 +45,8 @@
   html body[data-page-kind="home"] .songline-terminal-stat-grid .songline-terminal-stat-value{font-size:25px!important}
   html body[data-page-kind="home"] .songline-home-music-actions button{min-width:40px;min-height:44px}
   html body[data-page-kind="home"] .songline-terminal-links{align-items:center;flex-wrap:wrap;gap:12px;min-height:44px;padding:12px 0 0!important}
-  html body[data-page-kind="home"] .songline-desktop-pet{top:auto!important;bottom:0;right:0!important;width:76px!important;height:92px!important;touch-action:pan-y pinch-zoom}
+  html body[data-page-kind="home"] .songline-desktop-pet{top:auto!important;bottom:0;right:0!important;width:76px!important;height:92px!important;touch-action:none}
   html:root body[data-page-kind="home"] .songline-terminal-status .songline-desktop-pet__image{left:0!important;width:72px!important;height:78px!important}
-  html body[data-page-kind="home"] .songline-desktop-pet__stake{left:34px;width:6px;height:28px}
   /* 品牌名按终端整体中心定位；摆件和在线信息各有独立定位，不再参与标题排版。 */
   html body[data-page-kind="home"] .songline-terminal-status{display:block!important;min-height:92px!important;padding:0!important;box-sizing:border-box}
   html body[data-page-kind="home"] .songline-terminal-status .songline-terminal-brand{position:absolute!important;z-index:1!important;top:4px!important;right:0!important;left:0!important;max-width:none!important;margin:0!important;font-size:26px!important;line-height:1.08!important;text-align:center!important;white-space:nowrap!important;transform:none!important}
