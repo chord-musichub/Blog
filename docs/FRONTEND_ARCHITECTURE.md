@@ -33,13 +33,13 @@
 
 音频可视化工具的脚本也按边界拆分：`audio-visualizer.js` 管理音频来源、播放列表、元数据、界面与事件；`audio-visualizer-renderer.js` 封装 Canvas 尺寸、频谱采样、帧循环与全部绘制状态。元数据与 renderer 必须先于控制器加载；直开页面使用有序 `defer`，站内换页由调度器显式等待依赖。
 
-音频工具是独立音乐界面而非地下玻璃工具房间，使用 `data-page-scene="audio"` 隔离满屏曲绘背景与布局，不加载 `detail-shell.css` 或地下场景预加载。顶栏/地图共享 DOM 保留但隐藏，固定导航模块同步解除占位及手机 Dock，返回普通页面后恢复；模块调度不得重新补入地下外框或启动轨迹。播放中的返回箭头先重置到音乐初始界面，使用 `data-no-page-transition` 避免共享捕获阶段导航抢占；初始界面移除此标记，箭头明确链接 `/tools/` 并恢复共享换页。帮助按钮沿用共享模态控制器，但以 `[data-audio-visualizer]` 为作用域。详见 `AUDIO_STAGE_2026-10-08.md`。
+音频工具是独立音乐界面而非地下玻璃工具房间，使用 `data-page-scene="audio"` 隔离满屏曲绘背景与布局，不加载 `detail-shell.css` 或地下场景预加载。顶栏/地图共享 DOM 保留但隐藏，固定导航模块同步解除占位，返回普通页面后恢复；模块调度不得重新补入地下外框或启动轨迹。播放中的返回箭头先重置到音乐初始界面，使用 `data-no-page-transition` 避免共享捕获阶段导航抢占；初始界面移除此标记，箭头明确链接 `/tools/` 并恢复共享换页。帮助按钮沿用共享模态控制器，但以 `[data-audio-visualizer]` 为作用域。详见 `AUDIO_STAGE_2026-10-08.md`。
 
 音频工具也不加载 `detail-layout.css`、`tool-shared.css` 和工具搜索覆盖样式。通用图标状态与帮助弹窗归入 `tools/tool-dialog.css`，玻璃工具和音乐舞台共同加载；该文件位于玻璃布局之后、返回控件之前，保留原层叠优先级。音频布局独立维护隐藏封面、全屏和操作栏，公共玻璃布局不再追加音乐补丁。
 
 小游戏遵循同一原则。`snake.js` 管理规则、输入、音效与排行榜，`snake-renderer.js` 专门绘制 Canvas；`game-2048-engine.js` 提供无副作用的棋盘运算，`game-2048-renderer.js` 管理棋盘 DOM 和过渡，`game-2048.js` 编排回合、输入、音效和排行榜。各工具的依赖脚本必须先于其控制器加载。
 
-全站过场由三个独立模块组成：`page-transition-nav.js` 独立初始化小地图并维护当前页高亮、触屏展开和点击意图判断；`page-transition-priority.js` 保存页面路由与 priority；`page-transition-system.js` 负责拦截同源页面链接、请求目标页面、替换 `main.container`、黑幕、SVG 生长圆、进入退出动画和浏览器历史。新增页面时，优先在 `PAGE_PRIORITY` 与 `PAGE_ROUTES` 添加对应项；priority 上升为向上离场、从下进入，下降则反向，同级只淡入淡出。动画节奏由控制器的既有时间轴决定：卡片离场、幕布穿屏、加载圆收束、幕布穿出与新页面进入依次衔接；目标页慢时只延长加载圆阶段。需要跳过局部换页的链接或父容器添加 `data-no-page-transition`。
+全站过场由三个独立模块组成：`page-transition-nav.js` 独立初始化小地图并维护顶栏当前页文字、地图高亮、展开收起与点击意图判断；`page-transition-priority.js` 保存页面路由与 priority；`page-transition-system.js` 负责拦截同源页面链接、请求目标页面、替换 `main.container`、黑幕、SVG 生长圆、进入退出动画和浏览器历史。新增页面时，优先在 `PAGE_PRIORITY` 与 `PAGE_ROUTES` 添加对应项；priority 上升为向上离场、从下进入，下降则反向，同级只淡入淡出。动画节奏由控制器的既有时间轴决定：卡片离场、幕布穿屏、加载圆收束、幕布穿出与新页面进入依次衔接；目标页慢时只延长加载圆阶段。需要跳过局部换页的链接或父容器添加 `data-no-page-transition`。
 
 ## 维护规则
 
@@ -103,3 +103,5 @@
 专项回归：`tests/reading-polish.test.cjs`、`tests/reading-polish.browser.cjs`，覆盖真实 reload 的加载器一致性、无白边、桌面/手机正文样式一致性、六级/重复标题、长目录、空/无效文件、换文件及 AJAX 重入。截图须等待平滑滚动稳定，避免截图工具的 viewport 采样与正在变化的滚动位置错位。
 
 首页信息方格统一显示文章、工具、项目和留言。项目数量与档案使用同一份运行时数据，只有数据键缺失时才读取构建种子，显式空数组不得回填种子；项目方格链接 `/posts/?mode=projects`。留言方格是原面板入口迁移，数量复用现有留言响应与提交结果，不增加请求；键盘激活、面板返回的焦点交接及 AJAX 重入继续由 `message-board.js` 管理。档案卡片随居中的 `main.container` 定位，不再为小地图增加左侧偏移。
+
+顶栏左侧保留返回首页图标，以带下拉箭头和主题强调色的当前页面名称替代 Blog 字样及角落地图入口。五个地图区域保持 `page-navigation-data.html` 的空间坐标，所有名称常显、当前区域高亮；地图在 header 内常驻，收起时使用 `hidden` 排除焦点。当前页文字与地图高亮在共享壳切换时同步，公告独立显示“公告”。`mobile-fixed-nav.js` 仅测量顶栏占位，不再将地图搬移到 body；旧地图靠近探测、底层控件转发和专用 CSS 已删除。

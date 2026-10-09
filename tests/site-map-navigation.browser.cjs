@@ -2,14 +2,14 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const {fixture, ready, launch} = require('./helpers/interaction-fixture.cjs');
-const source = process.env.BLOG_MAP_BUILD || 'local-only/map-only-2026-10-09/build';
-const out = 'local-only/map-only-2026-10-09/screenshots';
+const source = process.env.BLOG_MAP_BUILD || 'local-only/header-map-2026-10-09/build';
+const out = 'local-only/header-map-2026-10-09/screenshots';
 
 (async () => {
   fs.mkdirSync(out, {recursive:true});
   const browser = await launch();
   try {
-    for (const [width, theme, reduced] of [[1440,'dark',false], [1440,'light',true], [1024,'dark',false], [820,'light',false], [390,'dark',false], [390,'light',true], [360,'dark',false]]) {
+    for (const [width, theme, reduced] of [[1920,'dark',false], [1440,'dark',false], [1440,'light',true], [1024,'dark',false], [820,'light',false], [390,'dark',false], [390,'light',true], [360,'dark',false]]) {
       const f = await fixture(browser, source, {width, theme, reduced});
       try {
         const {page} = f;
@@ -23,9 +23,7 @@ const out = 'local-only/map-only-2026-10-09/screenshots';
         assert.equal(await map.getAttribute('data-site-map-ready'), '1', 'Map binds independently of the retired elevator');
         assert.equal(await map.locator('a[data-page-key]').count(), 5, 'All five public page entrances remain');
         async function openMap() {
-          if (page.viewportSize().width < 981) {
-            if (await toggle.getAttribute('aria-expanded') === 'false') await toggle.click();
-          } else await home.focus();
+          if (await toggle.getAttribute('aria-expanded') === 'false') await toggle.click();
           await home.waitFor({state:'visible'});
           // The floating map finishes its existing expansion before hit tests.
           await page.waitForTimeout(reduced ? 30 : 300);
@@ -35,19 +33,28 @@ const out = 'local-only/map-only-2026-10-09/screenshots';
           assert.equal(await page.locator('[data-elevator-nav]').count(), 0);
           assert.equal(await map.count(), 1);
           assert.equal(await map.locator(`a[data-page-key="${key}"]`).getAttribute('aria-current'), 'page');
-          if (page.viewportSize().width < 981) assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
+          assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
+          const labels={home:'首页',friends:'朋友',memories:'回忆',posts:'档案',tools:'工具'};
+          assert.equal(await map.locator('[data-site-map-current]').innerText(), labels[key]);
         }
-        if (width < 981) {
+        {
           assert(await toggle.isVisible());
+          assert.equal(await map.locator('[data-site-map-current]').innerText(), '工具');
+          assert.equal(await page.locator('.logo-text').count(), 0);
+          assert.equal(await home.isVisible(), false);
+          const colors=await toggle.evaluate(el=>({label:getComputedStyle(el).color,icons:getComputedStyle(document.querySelector('.header-icons .icon-btn')).color}));
+          assert.notEqual(colors.label, colors.icons, 'Current page has a distinct accent');
           const r = await toggle.boundingBox();
           assert(r.width >= 44 && r.height >= 44);
-          assert(await map.evaluate(el => el.parentElement === document.body), 'Map stays outside the transformed header');
+          assert(await map.evaluate(el => !!el.closest('.modern-site-header')), 'Map stays in the shared top bar');
+          assert(r.y >= 0 && r.y + r.height <= 60 && r.x >= 44, 'Current page entry sits beside the logo in the top bar');
           await toggle.focus();await page.keyboard.press('Enter');
           assert.equal(await toggle.getAttribute('aria-expanded'), 'true');
-          await page.keyboard.press('Escape');
+          await home.focus();await page.keyboard.press('Escape');
+          assert(await toggle.evaluate(el=>document.activeElement===el));
           assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
           await openMap();
-          await page.mouse.click(width / 2, 140);
+          await page.mouse.click(width - 20, 140);
           assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
         }
         await openMap();
@@ -56,10 +63,9 @@ const out = 'local-only/map-only-2026-10-09/screenshots';
         await page.screenshot({path:path.join(out, `${width}-${theme}-map.png`)});
         // Rebinding cannot multiply click handlers (one toggle must open once).
         await page.evaluate(() => {const navigation=SonglineCreatePageNavigation();for(let i=0;i<10;i++)navigation.bindSiteMap();});
-        if (width < 981) {
-          await toggle.tap();assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
-          await toggle.tap();assert.equal(await toggle.getAttribute('aria-expanded'), 'true');
-        }
+        await toggle.click();assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
+        await toggle.click();assert.equal(await toggle.getAttribute('aria-expanded'), 'true');
+        await page.waitForTimeout(reduced ? 30 : 250);
         // Returning a drag to its starting map region must never navigate.
         let r = await home.boundingBox(), x = r.x + r.width / 2, y = r.y + r.height / 2;
         await page.mouse.move(x,y);await page.mouse.down();
@@ -92,7 +98,7 @@ const out = 'local-only/map-only-2026-10-09/screenshots';
         await page.evaluate(() => document.getElementById('retired-nav-probe').remove());
         const newWidth = width < 981 ? 1440 : 390;
         await page.setViewportSize({width:newWidth,height:900});
-        await page.waitForFunction(() => !!document.querySelector('[data-site-map]').dataset.mobileBottomDock === (innerWidth <= 980));
+        assert(await map.evaluate(el => !!el.closest('.modern-site-header') && !el.hasAttribute('data-mobile-bottom-dock')));
         await openMap();
         await map.locator('a[data-page-key="posts"]').click();await arrived('/posts/','posts');
         // Audio owns a separate scene, then returns to the same map instance.
@@ -101,6 +107,13 @@ const out = 'local-only/map-only-2026-10-09/screenshots';
         await page.evaluate(() => SonglinePageTransition.navigateLink('/tools/'));
         await arrived('/tools/','tools');
         assert(await map.isVisible());
+        await page.evaluate(() => SonglinePageTransition.navigateLink('/posts/linux-note/'));
+        await arrived('/posts/linux-note/', 'posts');
+        await page.reload();await page.evaluate(()=>SonglinePageModules.ready(document));
+        assert.equal(await map.locator('[data-site-map-current]').innerText(), '档案');
+        await page.evaluate(() => SonglinePageTransition.navigateLink('/tags/site-notice/'));
+        assert.equal(await map.locator('[data-site-map-current]').innerText(), '公告');
+        assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
         assert.deepEqual(f.errors, []);
         console.log(`PASS ${width}px ${theme} reduce=${reduced}: map-only, keyboard/touch/drag/cancel, all routes, history, rebind/resize/audio`);
       } catch(error) {console.error('Failed scenario', {width,theme,url:f.page.url(),errors:f.errors});throw error;}

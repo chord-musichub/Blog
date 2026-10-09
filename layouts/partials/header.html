@@ -1,13 +1,14 @@
 {{ $cfg := .Site.Data.site }}
+{{ $currentLabel := "地图" }}{{ range partial "page-navigation-data.html" . }}{{ if .route }}{{ if or (eq $.RelPermalink .route) (and (ne .route "/") (hasPrefix $.RelPermalink .route)) }}{{ $currentLabel = .label }}{{ end }}{{ end }}{{ end }}
+{{ if or (eq .Layout "site-notice") (eq .RelPermalink "/tags/site-notice/") }}{{ $currentLabel = "公告" }}{{ end }}
 <header class="site-header modern-site-header">
   <div class="navbar modern-navbar">
-    <a class="logo" href="/">
+    <a class="logo" href="/" aria-label="返回首页" title="返回首页">
       {{ with $cfg.site.logo_icon }}<img class="logo-icon" src="{{ . }}" alt="" loading="eager" decoding="async">{{ else }}<span class="logo-mark line-logo-mark">{{ partial "ui-icon.html" "logo" }}</span>{{ end }}
-      <span class="logo-text">{{ default "Songline Blog" $cfg.site.logo }}</span>
     </a>
     <aside class="songline-site-map" aria-label="全局站点地图" data-site-map>
-      <button class="songline-site-map__toggle" type="button" title="站点地图" aria-label="打开站点地图" aria-expanded="false" aria-controls="siteMapRegions" data-site-map-toggle>{{ partial "ui-icon.html" "sitemap" }}</button>
-      <nav class="songline-site-map__regions" id="siteMapRegions" aria-label="站点地图区域">
+      <button class="songline-site-map__toggle" type="button" title="打开站点地图" aria-label="当前页面：{{ $currentLabel }}，打开站点地图" aria-expanded="false" aria-controls="siteMapRegions" data-site-map-toggle><span data-site-map-current>{{ $currentLabel }}</span><svg class="songline-site-map__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      <nav class="songline-site-map__regions" id="siteMapRegions" aria-label="站点地图区域" hidden>
         {{ range partial "page-navigation-data.html" . }}{{ if .map_visible }}
         <a class="songline-site-map__region" href="{{ .route }}" data-page-key="{{ .key }}" data-floor="{{ .floor }}" aria-label="前往{{ .label }}，{{ .floor }}层" style="--map-column:{{ .map_column }};--map-row:{{ .map_row }};--map-column-span:{{ .map_column_span }};--map-row-span:{{ .map_row_span }};"><span class="songline-site-map__label">{{ .system_label }}</span></a>
         {{ end }}{{ end }}

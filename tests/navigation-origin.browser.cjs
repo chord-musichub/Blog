@@ -5,8 +5,9 @@ const assert=require('node:assert/strict');
  const browser=await chromium.launch({headless:true,channel:'msedge'});
  try{
   const page=await browser.newPage({viewport:{width:1440,height:900}});
+  await page.addInitScript(()=>{localStorage.setItem('songline-privacy-v1',JSON.stringify({version:1,statistics:false,expires:Date.now()+86400000}));sessionStorage.setItem('songline-home-boot-v21.4','1');});
   await page.goto((process.env.BLOG_TEST_URL||'http://127.0.0.1:8080')+'/friends/');await page.waitForTimeout(2200);
-  const home=page.locator('[data-site-map] a[href="/"]');await home.focus();await page.waitForTimeout(600);
+  await page.locator('[data-site-map-toggle]').click();const home=page.locator('[data-site-map] a[href="/"]');await home.focus();await page.waitForTimeout(600);
   const box=await home.boundingBox();
   await page.evaluate(()=>{window.intentTargets=[];['pointerdown','pointerup'].forEach(type=>window.addEventListener(type,event=>intentTargets.push(event.target.closest('a')?.dataset.pageKey),true));window.intentTransitions=0;window.addEventListener('songline:page-transition-start',()=>window.intentTransitions++);});
   const x=box.x+box.width/2;

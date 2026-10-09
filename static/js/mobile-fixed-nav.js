@@ -1,12 +1,11 @@
 (function(){
   'use strict';
 
-  // 紧凑视口使用同一套底部导航；避免 CSS 已进入手机布局而脚本仍保留桌面锚点。
+  // 紧凑视口与桌面共用顶栏；这里只测量移动布局需要的内容留白。
   var mobileQuery = '(max-width: 980px)';
   var mq = window.matchMedia ? window.matchMedia(mobileQuery) : null;
   var resizeObserver = null;
   var raf = 0;
-  var dockedNodes = [];
   var observedHeader = null;
 
   function isMobile(){
@@ -17,39 +16,11 @@
     return document.querySelector('.site-header.modern-site-header, .site-header');
   }
 
-  // 页头在过场、滤镜或变形状态下会成为 fixed 元素的 containing block。
-  // 将手机地图提升到 body，才能始终相对视口底部定位。
-  function syncBottomDock(){
-    var shouldDock = isMobile() && document.body.dataset.pageScene !== 'audio';
-    var nodes = Array.prototype.slice.call(document.querySelectorAll('.songline-site-map'));
-
-    nodes.forEach(function(node){
-      if(!node) return;
-      var record = dockedNodes.find(function(item){ return item.node === node; });
-      if(shouldDock){
-        if(!record){
-          record = {node:node, parent:node.parentNode, next:node.nextSibling, marker:document.createComment('songline-mobile-dock')};
-          record.parent.insertBefore(record.marker, node);
-          dockedNodes.push(record);
-        }
-        if(node.parentNode !== document.body) document.body.appendChild(node);
-        if(!node.hasAttribute('data-mobile-bottom-dock')) node.setAttribute('data-mobile-bottom-dock', 'true');
-      }else if(record){
-        if(record.next && record.next.parentNode === record.parent) record.parent.insertBefore(node, record.next);
-        else record.parent.appendChild(node);
-        record.marker.remove();
-        dockedNodes = dockedNodes.filter(function(item){ return item !== record; });
-        node.removeAttribute('data-mobile-bottom-dock');
-      }
-    });
-  }
-
   function measure(){
     if(raf) return;
     raf = window.requestAnimationFrame(function(){
       raf = 0;
       var h = header();
-      syncBottomDock();
       if(!h || !isMobile() || document.body.dataset.pageScene === 'audio'){
         document.documentElement.classList.remove('has-fixed-mobile-nav');
         document.documentElement.style.removeProperty('--songline-mobile-nav-height');
@@ -92,7 +63,7 @@
   window.addEventListener('resize', measure, {passive:true});
   window.addEventListener('orientationchange', function(){ window.setTimeout(init, 160); }, {passive:true});
   window.addEventListener('pageshow', init);
-  // 新页面挂入时立刻重算，保证黑幕退出前顶栏和底部 Dock 已在最终位置。
+  // 新页面挂入时立刻重算，保证黑幕退出前顶栏已在最终位置。
   window.addEventListener('songline:page-swap', function(){
     init();
   });

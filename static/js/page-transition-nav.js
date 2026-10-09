@@ -12,6 +12,12 @@
         if(active) link.setAttribute('aria-current', 'page');
         else link.removeAttribute('aria-current');
       });
+      var page = (window.SonglinePagePriority.config || []).find(function(item){ return item.key === key; });
+      var label = /^\/tags\/site-notice\/?$/.test(url.pathname || url) ? '公告' : (page && page.label) || '地图';
+      var current = document.querySelector('[data-site-map-current]');
+      var toggle = document.querySelector('[data-site-map-toggle]');
+      if(current && current.textContent !== label) current.textContent = label;
+      if(toggle) toggle.setAttribute('aria-label', '当前页面：' + label + '，' + (toggle.getAttribute('aria-expanded') === 'true' ? '关闭' : '打开') + '站点地图');
     }
     function updateNavIndicator(){ setNavActiveByURL(new URL(window.location.href)); }
     function bindSiteMap(){
@@ -19,18 +25,12 @@
       if(!siteMap || siteMap.dataset.siteMapReady === '1') return;
       siteMap.dataset.siteMapReady = '1';
       var mapToggle = siteMap.querySelector('[data-site-map-toggle]');
-      var interactiveSelector = 'a[href],button,input,select,textarea,summary,label,audio[controls],video[controls],[role="button"],[tabindex]:not([tabindex="-1"])';
-      function pageControl(target){
-        var control = target && target.closest && target.closest(interactiveSelector);
-        return control && !siteMap.contains(control) ? control : null;
-      }
+      var mapPanel = siteMap.querySelector('.songline-site-map__regions');
       // Activation needs the same target at press and release. Distance alone
       // misses short drags crossing a map region boundary.
       var press = null;
-      var forwardingClick = false;
       var keyboardTarget = null;
       function navigationTarget(event){
-        if(pageControl(event.target)) return null;
         return event.target.closest && event.target.closest('[data-site-map] a[data-page-key], [data-site-map-toggle]');
       }
       window.addEventListener('pointerdown', function(event){
@@ -55,57 +55,28 @@
       // Capture runs before the document-level navigation/forwarding handlers.
       window.addEventListener('click', function(event){
         var target = navigationTarget(event);
-        if(!target || forwardingClick) return;
+        if(!target) return;
         if(event.detail===0 && (event.isTrusted || keyboardTarget===target)){ keyboardTarget=null; return; }
         var intentional = press && press.released && !press.moved && !press.cancelled && press.target===target && performance.now()-press.releasedAt<1000;
         if(!intentional){ event.preventDefault(); event.stopImmediatePropagation(); }
       }, true);
-      function forwardClick(control){
-        forwardingClick=true;
-        try{ control.click(); }finally{ forwardingClick=false; }
-      }
-      // The map remains usable while overlapping page controls keep priority.
-      function underlyingMapControlAt(x, y){
-        if(typeof document.elementFromPoint !== 'function') return null;
-        siteMap.classList.add('is-site-map-probing');
-        var target = document.elementFromPoint(x, y);
-        siteMap.classList.remove('is-site-map-probing');
-        if(!target || siteMap.contains(target) || !target.closest) return null;
-        return target.closest(interactiveSelector);
-      }
       function setMapOpen(open){
+        if(!open && mapPanel && mapPanel.contains(document.activeElement) && mapToggle) mapToggle.focus();
         siteMap.classList.toggle('is-map-open', open);
-        if(mapToggle) mapToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      }
-      var mapRect = null;
-      function clearMapRect(){ mapRect = null; }
-      window.addEventListener('resize', clearMapRect, {passive:true});
-      window.addEventListener('scroll', clearMapRect, {capture:true,passive:true});
-      function updateMapProximity(event){
-        if(document.body.dataset.pageScene === 'audio' || !window.matchMedia || !window.matchMedia('(min-width:981px)').matches) {
-          siteMap.classList.remove('is-site-map-expanded');
-          return;
+        if(mapPanel) mapPanel.hidden = !open;
+        if(mapToggle){
+          mapToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          mapToggle.title = (open ? '关闭' : '打开') + '站点地图';
+          var current = siteMap.querySelector('[data-site-map-current]');
+          mapToggle.setAttribute('aria-label', '当前页面：' + (current ? current.textContent : '地图') + '，' + (open ? '关闭' : '打开') + '站点地图');
         }
-        if(!mapRect){ mapRect = siteMap.getBoundingClientRect(); window.requestAnimationFrame(clearMapRect); }
-        var rect = mapRect;
-        var reach = 28;
-        var close = event.clientX >= rect.left - reach && event.clientX <= rect.right + reach && event.clientY >= rect.top - reach && event.clientY <= rect.bottom + reach;
-        siteMap.classList.toggle('is-site-map-expanded', close);
       }
       if(mapToggle) mapToggle.addEventListener('click', function(){ setMapOpen(!siteMap.classList.contains('is-map-open')); });
-      document.addEventListener('pointermove', updateMapProximity, {passive:true});
-      window.addEventListener('resize', function(){ siteMap.classList.remove('is-site-map-expanded'); });
-      document.addEventListener('click', function(event){
+      siteMap.addEventListener('click', function(event){
         var region = event.target.closest && event.target.closest('[data-site-map] a[data-page-key]');
-        // The explicitly opened mobile map owns its panel; only the floating
-        // desktop map yields to controls underneath it.
-        if(!region || event.detail === 0 || !window.matchMedia || !window.matchMedia('(min-width:981px)').matches) return;
-        var underlying = underlyingMapControlAt(event.clientX, event.clientY);
-        if(!underlying) return;
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        if(typeof underlying.click === 'function') forwardClick(underlying);
-      }, true);
+        if(region) setMapOpen(false);
+      });
+      siteMap.addEventListener('focusout', function(event){ if(event.relatedTarget && !siteMap.contains(event.relatedTarget)) setMapOpen(false); });
       document.addEventListener('pointerdown', function(event){ if(siteMap.classList.contains('is-map-open') && !siteMap.contains(event.target)) setMapOpen(false); });
       document.addEventListener('keydown', function(event){ if(event.key === 'Escape') setMapOpen(false); });
       window.addEventListener('songline:page-transition-start', function(){ setMapOpen(false); });

@@ -18,7 +18,7 @@ const projects=JSON.parse(fs.readFileSync(source+'/assets/data/projects.json','u
      const values=await header.evaluate(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el);return {rect:[r.x,r.y,r.width,r.height],background:s.backgroundColor,filter:s.backdropFilter,position:s.position};});
      assert.deepEqual(values.rect,[0,0,width,60]);assert.equal(values.position,'fixed');
      assert.equal(values.background,theme==='dark'?'rgba(10, 22, 38, 0.62)':'rgba(75, 66, 75, 0.48)');assert.equal(values.filter,'blur(14px) saturate(1.04)');
-     for(const selector of ['.logo','.header-icons']){const r=await header.locator(selector).boundingBox();assert(r.y>=0&&r.y+r.height<=61,selector+' fits the glass bar: '+JSON.stringify(r));}
+     for(const selector of ['.logo','[data-site-map-toggle]','.header-icons']){const r=await header.locator(selector).boundingBox();assert(r.y>=0&&r.y+r.height<=61,selector+' fits the glass bar: '+JSON.stringify(r));}
      return values;
     }
     const h=await checkHeader();

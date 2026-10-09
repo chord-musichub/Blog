@@ -26,13 +26,6 @@
   html body:not(.dark) :is(.songline-terminal-stats,.songline-terminal-stat-grid,.songline-home-music,.songline-terminal-links){border-color:rgba(246,224,216,.13)!important}
   html body .modern-site-header .header-icons{gap:4px!important}
   html body .modern-site-header .icon-btn{width:42px!important;height:42px!important}
-  html body .songline-site-map{position:fixed!important;top:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;left:auto!important;right:10px!important;width:48px!important;padding:0!important;transform:none!important;z-index:12021!important}
-  html body .songline-site-map__toggle{display:flex!important;align-items:center;justify-content:center;width:48px!important;height:56px!important;border-radius:14px!important;background:rgba(12,25,43,.92)!important;color:#dce7f4!important;pointer-events:auto!important}
-  html body .songline-site-map__toggle .ui-icon{display:grid!important;place-items:center;--ui-icon-size:21px!important}
-  html body .songline-site-map__regions{position:absolute!important;bottom:68px!important;right:0!important;left:auto!important;width:min(280px,calc(100vw - 24px))!important;margin:0!important;padding:12px!important;background:rgba(12,25,43,.95)!important;border-radius:14px;visibility:hidden!important;opacity:0!important;pointer-events:none!important;transform:none!important}
-  html body .songline-site-map.is-map-open .songline-site-map__regions{visibility:visible!important;opacity:1!important;pointer-events:auto!important}
-  html:root body .songline-site-map .songline-site-map__region .songline-site-map__label{display:block!important;opacity:1!important;visibility:visible!important;color:#e3ecf7!important;font-size:13px!important}
-  html body .songline-site-map__region{min-height:44px}
   html:root body main.container{width:100%!important;max-width:none!important;margin:0!important;padding:80px 14px 24px!important;box-sizing:border-box}
   /* 工具内页的高优先级 padding:0 曾把返回键压到固定顶栏下，触屏无法点击。 */
   html:root body[data-page-section="tools"]:not([data-page-layout="tools"]) main.container{padding:80px 14px 24px!important}
