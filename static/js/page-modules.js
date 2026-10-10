@@ -92,6 +92,11 @@
       init:function(){}
     },
     {
+      key:'article-heading', src:'/js/article-heading.js?v=' + VERSION,
+      test:function(root){ return !!query(root, '[data-article-summary]'); },
+      init:function(root){ window.SonglineInitArticleHeading(root || document); }
+    },
+    {
       key:'article-toc-controls', src:'/js/article-toc-controls.js?v=' + VERSION,
       test:function(root){ return !!query(root, '.article-shell'); },
       init:function(root){ window.SonglineInitArticleToc(root || document); }
@@ -408,7 +413,7 @@
   // and still-loading deferred scripts all have tags). Check the exported API.
   var exports = {
     'tool-controls':'SonglineInitToolControls',
-    'article-reading':'SonglineReading', 'article-toc-controls':'SonglineInitArticleToc',
+    'article-reading':'SonglineReading', 'article-heading':'SonglineInitArticleHeading', 'article-toc-controls':'SonglineInitArticleToc',
     'home-parallax':'SonglineInitHomeParallax', 'desktop-pet':'SonglineInitDesktopPet',
     'random-number':'SonglineInitRandomNumber', 'gacha':'SonglineInitGacha', 'focus-timer':'SonglineInitFocusTimer',
     'markdown-renderer':'SonglineMarkdown', 'markdown-previewer':'SonglineInitMarkdownPreviewer',

@@ -66,9 +66,10 @@
   }
 
   button.addEventListener('click', async function(){
-    const originalText = window.SonglineI18n ? window.SonglineI18n.sourceText(button) : button.textContent;
+    const label = button.querySelector && button.querySelector('[data-md-download-label]') || button;
+    const originalText = window.SonglineI18n ? window.SonglineI18n.sourceText(label) : label.textContent;
     button.disabled = true;
-    uiText(button, '准备中...');
+    uiText(label, '准备中...');
     try{
       const markdown = await getMarkdown();
       if(!button.isConnected || !sourceElement.isConnected) return;
@@ -83,7 +84,7 @@
       window.setTimeout(function(){ URL.revokeObjectURL(url); }, 600);
     }finally{
       button.disabled = false;
-      uiText(button,originalText);
+      uiText(label,originalText);
     }
   });
 })();

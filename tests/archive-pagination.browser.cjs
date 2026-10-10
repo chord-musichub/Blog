@@ -104,7 +104,7 @@ const range=(first,last)=>Array.from({length:last-first+1},(_,i)=>first+i);
    assert((await page.locator('[data-archive-status]').textContent()).includes('23 / 23'),'Status reports all matches');
    await pager(page,'articles').locator('[data-archive-page="2"]').click();
    assert.deepEqual(await indices(page,'articles'),range(11,20));
-   assert.equal(await page.locator('.archive-record[hidden].is-open,.archive-record.is-pinned').count(),0,'Leaving a page closes its old drawer; a new desktop hover may open another');
+   assert.equal(await page.locator('.archive-record[hidden].is-open,.archive-record.is-pinned').count(),0,'Leaving a page closes its old drawer');
    await page.locator('[data-archive-search-input]').fill('23');
    assert.deepEqual(await indices(page,'articles'),[23]);assert(!(await pager(page,'articles').isVisible()));
    await page.locator('[data-archive-search-input]').fill('not-found-xyz');

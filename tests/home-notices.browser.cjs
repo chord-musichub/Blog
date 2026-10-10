@@ -125,8 +125,8 @@ async function contextFor(browser,build,{width=390,height=844,theme='dark',js=tr
    };
    const noticeStyle=await page.evaluate(visualState);
    const trigger=page.locator('[data-archive-trigger]').first();
-   if(width>980){await trigger.hover();await page.waitForFunction(()=>document.querySelector('[data-archive-record]').classList.contains('is-open'));}
-   else await trigger.click();
+   await trigger.hover();assert.equal(await trigger.getAttribute('aria-expanded'),'false','Hover only highlights the index');
+   await trigger.click();
    assert.equal(await trigger.getAttribute('aria-expanded'),'true');
    await page.waitForFunction(()=>getComputedStyle(document.querySelector('.archive-record__detail--open')).opacity==='1');
    await page.screenshot({path:path.join(out,`archive-open-${width}-${theme}.png`),fullPage:true});

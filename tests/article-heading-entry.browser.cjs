@@ -1,0 +1,22 @@
+const assert=require('node:assert/strict');
+const {launch,fixture}=require('./helpers/interaction-fixture.cjs');
+const build=process.env.BLOG_ARTICLE_PRESENTATION_BUILD||'local-only/article-summary-visible-2026-10-10/build';
+(async()=>{const browser=await launch(),f=await fixture(browser,build,{width:1440});let release;
+try{
+ await f.page.route('**/uploads/admin/background/ground-back-black.png',route=>new Promise(resolve=>{release=async()=>{await route.continue();resolve();};}));
+ await f.page.goto(f.origin+'/posts/linux-note/',{waitUntil:'domcontentloaded'});
+ await f.page.evaluate(()=>SonglinePageModules.ready(document));
+ const summary=f.page.locator('[data-article-summary]');
+ await summary.scrollIntoViewIfNeeded();
+ await f.page.waitForTimeout(3500);
+ assert(await f.page.locator('#songline-scene-entry-loader').count());
+ assert.equal(await summary.getAttribute('data-summary-state'),'waiting','Slow background cannot consume typing behind the scene curtain');
+ assert.equal(await f.page.locator('.article-heading__summary-visual').textContent(),'');
+ await release();
+ await f.page.locator('#songline-scene-entry-loader').waitFor({state:'detached'});
+ await f.page.waitForFunction(()=>document.querySelector('[data-article-summary]').dataset.summaryState==='typing');
+ await f.page.waitForFunction(()=>document.querySelector('.article-heading__summary-visual').textContent.length>0);
+ assert((await f.page.locator('.article-heading__summary-visual').textContent()).length<(await f.page.locator('[data-article-summary-source]').textContent()).length);
+ await f.page.waitForFunction(()=>document.querySelector('[data-article-summary]').dataset.summaryState==='complete',null,{timeout:45000});
+ assert.deepEqual(f.errors,[]);console.log('PASS slow entry starts typing after curtain removal');
+}finally{await f.close();await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

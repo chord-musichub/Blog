@@ -2,34 +2,41 @@
 {{ partial "back-icon.html" (dict "fallback" "/posts/") }}
 {{ $cfg := .Site.Data.site }}
 {{ $cover := .Params.cover | default $cfg.pages.article_default_cover | default "/uploads/admin/article/article_default.png" }}
-{{ $coverMode := .Params.cover_mode | default "cover" }}
-<section class="card article-intro article-heading" aria-label="文章信息" data-i18n-attrs="aria-label">
-  <figure class="article-heading__cover cover-mode-{{ $coverMode }}">
-    <img src="{{ partial "media-preview-url.html" $cover }}" alt="" width="320" height="200" loading="eager" decoding="async" fetchpriority="high">
+<section class="article-intro article-heading" data-article-layout="album" aria-label="文章信息" data-i18n-attrs="aria-label">
+  <figure class="article-heading__cover" data-cover-state="loading">
+    <img src="{{ partial "media-preview-url.html" $cover }}" alt="" width="1280" height="720" loading="eager" decoding="async" fetchpriority="high" onload="this.width=this.naturalWidth;this.height=this.naturalHeight;this.parentElement.dataset.coverState='ready';" onerror="this.parentElement.dataset.coverState='error';">
+    <figcaption class="article-heading__cover-loading" role="status" data-i18n-ui>图片加载中…</figcaption>
+    <figcaption class="article-heading__cover-error" role="status" data-i18n-ui>图片暂时无法显示</figcaption>
   </figure>
   <div class="article-heading__main">
-  <div class="article-heading__title">
     {{ if .Params.is_notice }}<span class="article-heading__eyebrow" data-i18n-ui>站点公告</span>{{ end }}
-    <h1>{{ .Title }}</h1>
-  </div>
-  <p class="article-heading__summary">{{ with .Params.summary }}{{ . }}{{ else }}{{ .Summary | plainify }}{{ end }}</p>
-  <div class="meta-row">
+  <div class="meta-row article-heading__byline">
     <span class="meta-icon-item">{{ partial "ui-icon.html" "calendar" }} {{ .Date.Format "2006-01-02" }}</span>
     {{ $authorName := .Params.author_display | default .Params.author }}
     {{ $authorHref := "" }}
       {{ $authorUsername := .Params.author_username | default .Params.author }}
       {{ range site.Data.friends }}{{ if eq .username $authorUsername }}{{ $authorHref = .url }}{{ end }}{{ end }}
     {{ if $authorHref }}<a class="author-link meta-icon-item" href="{{ $authorHref }}">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</a>{{ else }}<span class="meta-icon-item">{{ partial "ui-icon.html" "user" }} {{ $authorName }}</span>{{ end }}
-    <span><span class="i18n-copy" data-i18n-ui>◷ 阅读约 </span>{{ .ReadingTime }}<span class="i18n-copy" data-i18n-ui> 分钟</span></span>
+  </div>
+  <div class="article-heading__title"><h1>{{ .Title }}</h1></div>
+  <p class="article-heading__summary" data-article-summary><span class="article-heading__summary-source" data-article-summary-source>{{ with .Params.summary }}{{ . }}{{ else }}{{ .Summary | plainify }}{{ end }}</span></p>
+  <div class="article-heading__footer" aria-label="文章阅读信息与操作" data-i18n-attrs="aria-label">
+    <div class="meta-row article-heading__reading">
+      <span class="meta-icon-item"><span class="i18n-copy" data-i18n-ui>◷ 阅读约 </span>{{ .ReadingTime }}<span class="i18n-copy" data-i18n-ui> 分钟</span></span>
+      <span class="views real-views article-view-counter meta-icon-item" data-view-mode="post" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }}<span class="i18n-copy" data-i18n-ui> 阅读 </span><b>0</b></span>
+    </div>
+    <div class="article-heading__tags">
     {{ with .Params.tags }}{{ range . }}
       {{ $tagRaw := . }}{{ $tagHref := printf "/posts/?tag=%s" ($tagRaw | urlquery) }}
       <a class="tag" href="{{ $tagHref }}">{{ . }}</a>
     {{ end }}{{ end }}
-    <span class="views real-views article-view-counter meta-icon-item" data-view-mode="post" data-view-path="{{ .RelPermalink }}">{{ partial "ui-icon.html" "eye" }}<span class="i18n-copy" data-i18n-ui> 阅读 </span><b>0</b></span>
+    </div>
+  <button class="article-intro-download" type="button" data-md-download aria-label="下载本文 Markdown 源文件" data-i18n-attrs="aria-label">{{ partial "ui-icon.html" "arrow-down" }}<span data-md-download-label data-i18n-ui>下载 .md</span></button>
   </div>
-  <button class="article-intro-download" type="button" data-md-download aria-label="下载本文 Markdown 源文件" data-i18n-attrs="aria-label" data-i18n-ui>下载 .md</button>
   </div>
 </section>
+
+<hr class="article-reading-divider">
 
 <div class="article-shell section" data-toc-state="expanded">
   <article class="card article-reader markdown-body" data-article-renderer="songline-markdown" data-article-title="{{ .Title }}">
@@ -53,6 +60,7 @@
 <button class="scroll-to-bottom-button" type="button" aria-label="下滑到底部" title="下滑到底部" data-i18n-attrs="aria-label title">{{ partial "ui-icon.html" "chevron-down" }}</button>
 <script defer src="/js/markdown-renderer.js?v={{ partial "asset-version.html" . }}"></script>
 <script defer src="/js/article-reading.js?v={{ partial "asset-version.html" . }}"></script>
+<script defer src="/js/article-heading.js?v={{ partial "asset-version.html" . }}"></script>
 <script id="article-md-source" type="application/json" data-source-format="{{ if .Params.source_md_b64 }}base64{{ else }}text{{ end }}" data-source-url="{{ with .Params.source_md_url }}{{ . }}{{ end }}">{{ with .Params.source_md_b64 }}{{ . | jsonify }}{{ else }}{{ with .RawContent }}{{ . | jsonify }}{{ else }}{{ .Plain | jsonify }}{{ end }}{{ end }}</script>
 <script defer src="/js/article-render-sync.js?v={{ partial "asset-version.html" . }}"></script>
 <script defer src="/js/article-toc-controls.js?v={{ partial "asset-version.html" . }}"></script>

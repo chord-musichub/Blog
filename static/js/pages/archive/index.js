@@ -6,10 +6,9 @@
 /* Content Archive：索引、抽屉、双模式、轻量搜索和分页。 */
 (function(){
   'use strict';
-  var VERSION = '23.2.0';
+  var VERSION = '23.3.1';
   function text(value){ return String(value == null ? '' : value).trim().toLowerCase(); }
   function terms(value){ return text(value).split(/[\s,，;；|]+/).filter(Boolean); }
-  function isMobile(){ return window.matchMedia && window.matchMedia('(max-width:980px), (hover:none)').matches; }
   function pageNumber(value){ return /^\d+$/.test(String(value || '')) && Number.isSafeInteger(Number(value)) && Number(value) > 0 ? Number(value) : 1; }
   function pageNumbers(current, total){
     var numbers = [], start = Math.max(2, Math.min(current - 1, total - 3));
@@ -35,7 +34,8 @@
     var searchTerms = Array.prototype.slice.call(archive.querySelectorAll('[data-archive-search-term]'));
     var status = archive.querySelector('[data-archive-status]');
     var projectHint = archive.querySelector('[data-archive-project-hint]');
-    var activeMode = 'articles', activeRecord = null, pinnedRecord = null, closeTimer = 0, query = '';
+    var activeMode = 'articles', activeRecord = null, query = '';
+    var savedDrawer = (history.state || {}).songlineArchiveDrawer;
     var composing = false, searchScheduled = false;
     var recordLists = {};
     panels.forEach(function(panel){ recordLists[panel.dataset.archivePanel] = Array.prototype.slice.call(panel.querySelectorAll('[data-archive-record]')); });
@@ -72,38 +72,47 @@
       });
     }
     function records(mode){ return recordLists[mode] || []; }
+    function recordKey(record){
+      var detail = record.querySelector('a.archive-record__detail--open, [data-archive-open-url]');
+      return record.dataset.archiveKind + ':' + (detail ? detail.getAttribute('href') || detail.dataset.archiveOpenUrl : record.dataset.title);
+    }
+    function rememberDrawer(){
+      // Each history entry owns its drawer; sorting or filtering must never
+      // reopen a different article merely because it occupies the same row.
+      history.replaceState(Object.assign({}, history.state, {songlineArchiveDrawer:{path:window.location.pathname,record:activeRecord ? recordKey(activeRecord) : null}}), '', window.location.href);
+    }
     function closeRecord(record){
       if(!record) return;
       record.classList.remove('is-open', 'is-pinned');
       var button = record.querySelector('[data-archive-trigger]');
       if(button) button.setAttribute('aria-expanded', 'false');
-      if(activeRecord === record) activeRecord = null;
-      if(pinnedRecord === record) pinnedRecord = null;
+      if(activeRecord === record){ activeRecord = null;rememberDrawer(); }
+      var drawer = record.querySelector('[data-archive-drawer]');
+      if(drawer) drawer.inert = true;
     }
-    function openRecord(record, pinned){
+    function openRecord(record){
       if(!record || record.hidden) return;
-      window.clearTimeout(closeTimer);
       if(activeRecord && activeRecord !== record) closeRecord(activeRecord);
       activeRecord = record;
-      record.classList.add('is-open'); record.classList.toggle('is-pinned', !!pinned);
+      record.classList.add('is-open', 'is-pinned');
       var button = record.querySelector('[data-archive-trigger]');
       if(button) button.setAttribute('aria-expanded', 'true');
-      pinnedRecord = pinned ? record : null;
+      var drawer = record.querySelector('[data-archive-drawer]');
+      if(drawer) drawer.inert = false;
+      rememberDrawer();
       if(window.SonglineInitViews) window.SonglineInitViews(record);
-    }
-    function scheduleClose(record){
-      if(!record || record === pinnedRecord) return;
-      window.clearTimeout(closeTimer);
-      closeTimer = window.setTimeout(function(){ if(record === activeRecord && !record.matches(':focus-within')) closeRecord(record); }, 180);
     }
     function bindRecord(record){
       var button = record.querySelector('[data-archive-trigger]');
       var detail = record.querySelector('[data-archive-open-url]');
-      record.addEventListener('pointerenter', function(){ if(!isMobile()) openRecord(record, pinnedRecord === record); });
-      record.addEventListener('pointerleave', function(){ if(!isMobile()) scheduleClose(record); });
-      record.addEventListener('focusin', function(){ openRecord(record, pinnedRecord === record); });
-      record.addEventListener('focusout', function(event){ if(!record.contains(event.relatedTarget)) scheduleClose(record); });
-      if(button) button.addEventListener('click', function(){ if(activeRecord === record && pinnedRecord === record) closeRecord(record); else openRecord(record, true); });
+      // Native buttons activate by click, Enter and Space; hover and focus
+      // only highlight the index. Collapsed details cannot receive keyboard focus.
+      closeRecord(record);
+      if(button) button.addEventListener('click', function(){ if(activeRecord === record) closeRecord(record); else openRecord(record); });
+      record.addEventListener('keydown', function(event){
+        if(event.key !== 'Escape' || event.isComposing || activeRecord !== record) return;
+        event.preventDefault();closeRecord(record);if(button) button.focus({preventScroll:true});
+      });
       if(detail){
         function enterDetail(event){
           if(event.target.closest('a,button,input,select,textarea,[contenteditable]')) return;
@@ -164,7 +173,7 @@
       if(mode !== activeMode || !pagers[mode]) return;
       var next = Math.max(1, Math.min(pageNumber(page), pageCounts[mode] || 1));
       if(next === currentPages[mode]) return;
-      window.clearTimeout(closeTimer); if(activeRecord) closeRecord(activeRecord);
+      if(activeRecord) closeRecord(activeRecord);
       currentPages[mode] = next;
       runSearch();
       // A bottom pager should not leave the new list above the viewport.
@@ -211,7 +220,7 @@
     }
     function switchMode(mode){
       if(mode !== 'articles' && mode !== 'projects') return;
-      window.clearTimeout(closeTimer); if(activeRecord) closeRecord(activeRecord); activeMode = mode;
+      if(activeRecord) closeRecord(activeRecord); activeMode = mode;
       modeButtons.forEach(function(button){ var selected = button.dataset.archiveMode === mode; button.classList.toggle('is-active', selected); button.setAttribute('aria-selected', selected ? 'true' : 'false'); });
       panels.forEach(function(panel){ var selected = panel.dataset.archivePanel === mode; panel.hidden = !selected; panel.classList.toggle('is-active', selected); });
       runSearch();
@@ -242,6 +251,11 @@
       searchTrigger.classList.add('is-open');
     }
     switchMode(activeMode);
+    if(savedDrawer && savedDrawer.path === window.location.pathname){
+      var restoredRecord = records(activeMode).find(function(record){ return !record.hidden && recordKey(record) === savedDrawer.record; });
+      if(restoredRecord) openRecord(restoredRecord);
+      else if(savedDrawer.record) rememberDrawer();
+    }
   }
   // Direct entry and AJAX entry share the page-module dispatcher.
   window.SonglineInitContentArchive = init;

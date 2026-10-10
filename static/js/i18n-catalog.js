@@ -923,6 +923,8 @@ window.SonglineI18nCatalog = {
   "有未保存的修改": "Unsaved changes",
   "选择一张图片": "Choose an image",
   "当前图片": "Current image",
+  "图片加载中…": "Loading image…",
+  "文章阅读信息与操作": "Reading information and actions",
   "图片暂时无法显示": "Image unavailable",
   "＋ 新建": "＋ New",
   "取消新建": "Cancel new entry",

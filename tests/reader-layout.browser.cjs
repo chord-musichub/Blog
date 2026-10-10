@@ -23,15 +23,19 @@ fs.mkdirSync(out,{recursive:true});
    await page.waitForFunction(()=>document.querySelector('[data-article-renderer]')?.dataset.songlineRenderSyncBound==='1');
    await page.waitForTimeout(600);
    const cover=await page.locator('.article-heading__cover').boundingBox();
-   assert(cover.width<=241 && cover.height<=160,`cover stays compact: ${JSON.stringify(cover)}`);
+   const heading=await page.locator('.article-heading').boundingBox();
+   const information=await page.locator('.article-heading__main').boundingBox();
+   assert(Math.abs(cover.width-heading.width)<3 && cover.y+cover.height<=information.y+1,`cover sits above the information panel: ${JSON.stringify(cover)}`);
    const size=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth}));
    assert(size.scroll<=size.width+1,`no horizontal overflow: ${JSON.stringify(size)}`);
    await page.screenshot({path:`${out}/${width}-${height}-${theme}-intro.png`});
-   // Tall and wide source images cannot enlarge the reserved cover area.
+   // Each source retains its own proportions within the album height limit.
    for(const [w,h] of [[200,1600],[1600,200]]) {
     await page.locator('.article-heading__cover img').evaluate((img,{w,h})=>{img.src='data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="100%" height="100%" fill="steelblue"/></svg>`);},{w,h});
     const next=await page.locator('.article-heading__cover').boundingBox();
-    assert.equal(next.height,cover.height,'image dimensions cannot expand the header');
+    const image=page.locator('.article-heading__cover img');await image.evaluate(n=>n.decode());
+    const imageBox=await image.boundingBox();assert(imageBox.height <= (width<=600?height/2:520)+1,'Image respects album height limit');
+    assert(Math.abs(imageBox.width/imageBox.height-w/h)<.02,'Image aspect ratio stays intact');
    }
    await page.locator('.article-heading__cover').evaluate(e=>e.classList.add('cover-mode-contain'));
    assert.equal(await page.locator('.article-heading__cover img').evaluate(e=>getComputedStyle(e).objectFit),'contain','contain preference is respected');
@@ -80,7 +84,7 @@ fs.mkdirSync(out,{recursive:true});
     assert(!(await page.locator('html').getAttribute('class')).includes('mobile-toc-open'),'mobile drawer closes after navigating');
    }
    assert.deepEqual(errors,[]);
-   console.log(`PASS ${width}x${height} ${theme}: compact cover, article metadata, sticky/scrollable TOC, collapse and anchors`);
+   console.log(`PASS ${width}x${height} ${theme}: upper cover, lower article metadata, sticky/scrollable TOC, collapse and anchors`);
    await context.close();
   }
  } finally {await browser.close();}
