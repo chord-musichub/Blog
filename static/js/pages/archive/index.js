@@ -105,8 +105,8 @@
     function bindRecord(record){
       var button = record.querySelector('[data-archive-trigger]');
       var detail = record.querySelector('[data-archive-open-url]');
-      // Native buttons activate by click, Enter and Space; hover and focus
-      // only highlight the index. Collapsed details cannot receive keyboard focus.
+      // Native buttons activate by click, Enter and Space. Selection follows
+      // the drawer; collapsed details cannot receive keyboard focus.
       closeRecord(record);
       if(button) button.addEventListener('click', function(){ if(activeRecord === record) closeRecord(record); else openRecord(record); });
       record.addEventListener('keydown', function(event){

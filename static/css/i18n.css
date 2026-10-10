@@ -5,8 +5,6 @@
 .admin-client-actions .language-toggle{height:36px;color:var(--admin-muted)}
 .auth-preferences{position:fixed;top:22px;right:26px;display:flex;align-items:center;gap:6px;z-index:10}
 .auth-preferences .language-toggle{color:var(--admin-muted)}
-.audio-language-controls{display:flex;align-items:center;gap:4px;margin-left:auto}
-.audio-language-controls .icon-btn{width:36px;height:42px;padding:8px;background:transparent;border:0;color:inherit;cursor:pointer}
 html[lang="en"] .songline-site-map__toggle{font-size:14px;gap:6px;padding-inline:10px}
 html[lang="en"] .songline-site-map__label{font-size:12px;letter-spacing:.01em}
 html[lang="en"] .songline-terminal-stat-label{font-size:12px}

@@ -24,6 +24,7 @@
   function clear(){
     busy = false;
     clearTimeout(recovery);
+    if(incoming && window.SonglineFinishSceneEntry) window.SonglineFinishSceneEntry(true);
     root.classList.remove('document-cover','document-arriving','is-document-covered','is-document-revealing');
     try { sessionStorage.removeItem(key); } catch(e) {}
   }
@@ -44,11 +45,24 @@
   window.__songlineDocumentArrival = incoming;
   if(incoming && !reduced) root.classList.add('document-cover','document-arriving');
 
+  function boundedReady(task, milliseconds){
+    return new Promise(resolve=>{
+      const timer = setTimeout(()=>resolve(false),milliseconds);
+      Promise.resolve(task).then(()=>{clearTimeout(timer);resolve(true);},()=>{clearTimeout(timer);resolve(false);});
+    });
+  }
+
+  // Also recover if an arriving document never reaches DOMContentLoaded.
+  if(incoming && !reduced) recovery = setTimeout(clear,18000);
+
   async function reveal(){
     if(!incoming || reduced) return;
     if(window.SonglineResources){
-      if(window.SonglineResources.enter) await window.SonglineResources.enter();
-      else await window.SonglineResources.prepare(document);
+      let ready = false;
+      try {
+        ready = await boundedReady(window.SonglineResources.enter ? window.SonglineResources.enter() : window.SonglineResources.prepare(document),18000);
+      } catch(e) {}
+      if(!ready && window.SonglineFinishSceneEntry) window.SonglineFinishSceneEntry(true);
       requestAnimationFrame(()=>requestAnimationFrame(()=>{
         root.classList.add('is-document-revealing');
         setTimeout(clear,550);
@@ -62,7 +76,7 @@
       if(img.decode) ready.push(img.decode().catch(()=>{}));
     });
     // Failed/offline assets must not leave an unclosable black screen.
-    await Promise.race([Promise.allSettled(ready), new Promise(resolve=>setTimeout(resolve,6000))]);
+    await boundedReady(Promise.allSettled(ready),6000);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       root.classList.add('is-document-revealing');
       setTimeout(clear,550);

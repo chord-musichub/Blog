@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs');
 const {launch,fixture,ready}=require('./helpers/interaction-fixture.cjs');
 const source=process.env.BLOG_LANGUAGE_BUILD || 'local-only/language-2026-10-09/build';
-const out='local-only/language-2026-10-09/screenshots';
+const out=process.env.BLOG_LANGUAGE_OUT||'local-only/language-2026-10-09/screenshots';
 const admin=process.env.BLOG_LANGUAGE_ADMIN || 'http://127.0.0.1:8091';
 (async()=>{
  fs.mkdirSync(out,{recursive:true});const browser=await launch();const results=[];
@@ -58,8 +58,8 @@ const admin=process.env.BLOG_LANGUAGE_ADMIN || 'http://127.0.0.1:8091';
     await page.locator('[data-language-toggle]').click();assert.equal(await page.locator('[data-language-toggle]').innerText(),'中');
     await ready(page,f.origin,'/tools/typing-practice/');await page.locator('[data-typing-mode="mixed"]').click();
     const exercise=await page.locator('[data-typing-text]').textContent();await page.locator('[data-language-toggle]').click();assert.equal(await page.locator('[data-typing-text]').textContent(),exercise,'Typing corpus stays unchanged');
-    await ready(page,f.origin,'/tools/audio-visualizer/');const language=page.locator('.audio-language-controls [data-language-toggle]');assert(await language.isVisible());
-    const themeButton=page.locator('.audio-language-controls [data-theme-toggle]');assert(await themeButton.isVisible());
+    await ready(page,f.origin,'/tools/audio-visualizer/');const language=page.locator('.av-controls [data-language-toggle]');assert(await language.isVisible());
+    const themeButton=page.locator('.av-controls [data-theme-toggle]');assert(await themeButton.isVisible());
     assert((await themeButton.boundingBox()).x<(await language.boundingBox()).x);
     await language.click();assert.equal(await language.innerText(),'中');
     assert.deepEqual(f.errors,[]);results.push({surface:'public',width,theme,reduced,slow:delays,passed:true});console.log('Public passed',width,theme);

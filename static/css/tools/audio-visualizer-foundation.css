@@ -42,6 +42,10 @@ body.dark .av-atmosphere{background:linear-gradient(115deg,rgba(5,12,30,.38),rgb
 .av-return:is(:hover,:focus-visible) .ui-icon{transform:translateX(-4px)}
 .av-stage .av-topbar{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:18px;width:min(1440px,100%);margin:0 auto}
 .av-stage .av-controls{grid-column:3}
+.av-stage .av-controls .av-icon-button{box-sizing:border-box;height:44px;min-height:44px}
+.av-controls .language-toggle{box-sizing:border-box;width:44px;height:44px;margin:0}
+.av-controls .language-toggle:hover{transform:none}
+.av-controls [data-theme-toggle],.av-controls [data-theme-toggle]:is(:hover,:focus-visible){background:none;border-color:transparent;box-shadow:none}
 body[data-page-scene="audio"][data-page-section="tools"] .av-controls .tool-actionbar{position:static;display:flex;grid-column:auto;margin:0;align-items:center;gap:4px;align-self:center;justify-self:auto;width:44px;z-index:auto}
 body[data-page-scene="audio"] :is(.av-controls,.tool-help-dialog) .tool-icon-button{display:grid;place-items:center;box-sizing:border-box;width:44px;height:44px;min-width:44px;min-height:44px;padding:9px;border:1px solid transparent;border-radius:50%;background:none;color:var(--av-ink);cursor:pointer}
 body[data-page-scene="audio"] :is(.av-controls,.tool-help-dialog) .tool-icon-button:is(:hover,:focus-visible){background:var(--av-button);border-color:var(--av-line);color:var(--av-accent)}
@@ -49,4 +53,9 @@ body[data-page-scene="audio"] :is(.av-controls,.tool-help-dialog) .tool-icon-but
   .audio-visualizer-page .av-stage{padding:max(18px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left))}
   .av-stage .av-topbar{grid-template-columns:44px minmax(0,1fr);gap:8px 12px}
   .av-stage .av-controls{grid-column:1/-1;justify-self:end;align-self:auto}
+}
+@media(max-width:380px){
+  .av-stage .av-controls{gap:4px}
+  .av-stage .av-controls .av-icon-button,body[data-page-scene="audio"] .av-controls .tool-icon-button{width:36px;min-width:36px;padding:6px}
+  body[data-page-scene="audio"][data-page-section="tools"] .av-controls .tool-actionbar{width:36px}
 }

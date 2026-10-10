@@ -80,13 +80,16 @@
   function apply(root){
     if(!root) return;
     if(root.nodeType===3){
-      if(textSources.has(root) || root.previousSibling && root.previousSibling.nodeType===8 && root.previousSibling.data==='ui' || root.parentElement && root.parentElement.closest('[data-i18n-ui]')) translateText(root);
+      var owner=root.parentElement && root.parentElement.closest('[data-i18n-text]');
+      if(owner && !ignored(root)) apply(owner);
+      else if(textSources.has(root) || root.parentElement && root.parentElement.closest('[data-i18n-ui]')) translateText(root);
       return;
     }
     if(root.nodeType!==1 && root.nodeType!==9) return;
     var elements = [];
     if(root.nodeType===1) elements.push(root);
     elements = elements.concat(Array.from(root.querySelectorAll('[data-i18n-text],[data-i18n-attrs],[data-i18n-ui],[data-language-toggle]')));
+    var textScopes=new Set();
     elements.forEach(function(element){
       if(element.hasAttribute('data-language-toggle')){
         var next = language==='en' ? 'en' : '中';
@@ -94,7 +97,8 @@
         var label = language==='en' ? 'Switch to Chinese' : '切换为英文';
         if(element.getAttribute('aria-label')!==label) element.setAttribute('aria-label',label);
         if(element.title!==label) element.title=label;
-        element.setAttribute('lang', language==='en'?'en':'zh-CN');
+        var lang=language==='en'?'en':'zh-CN';
+        if(element.getAttribute('lang')!==lang) element.setAttribute('lang',lang);
         return;
       }
       if(element.closest('[data-i18n-ignore]')) return;
@@ -105,17 +109,28 @@
         if(element.textContent!==translated) element.textContent=translated;
       }
       (element.getAttribute('data-i18n-attrs') || '').split(/\s+/).filter(Boolean).forEach(function(name){translateAttribute(element,name);});
+      if(element.hasAttribute('data-i18n-ui') && !ignored(element)) textScopes.add(element);
     });
-    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    while(walker.nextNode()) apply(walker.currentNode);
+    // User content has no translation ownership. Walk only declared UI copy,
+    // once for nested scopes, rather than every paragraph in the document.
+    textScopes.forEach(function(scope){
+      var parent=scope.parentElement && scope.parentElement.closest('[data-i18n-ui]');
+      if(parent && textScopes.has(parent)) return;
+      var walker=document.createTreeWalker(scope,NodeFilter.SHOW_TEXT);
+      while(walker.nextNode()) translateText(walker.currentNode);
+    });
   }
   function observe(){
     observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['aria-label','title','placeholder','alt','data-i18n-text','data-i18n-attrs','data-i18n-ui']});
   }
   function flush(){
     scheduled=false; observer.disconnect();
-    var roots=Array.from(pending);pending.clear();
-    roots.filter(function(root,index){return root.isConnected && !roots.some(function(other,j){return j!==index && other!==root && other.contains && other.contains(root);});}).forEach(apply);
+    var roots=pending;pending=new Set();
+    roots.forEach(function(root){
+      if(!root.isConnected) return;
+      for(var parent=root.parentNode;parent;parent=parent.parentNode) if(roots.has(parent)) return;
+      apply(root);
+    });
     observe();
   }
   function refresh(root){
@@ -164,9 +179,21 @@
   window.SonglineI18n={t:t,sourceText:sourceText,setContent:setContent,english:function(value){return Object.prototype.hasOwnProperty.call(catalog,value)?catalog[value]:value;},setText:setText,refresh:refresh,setLanguage:setLanguage,getLanguage:function(){return language;}};
   function initialize(){
     observer=new MutationObserver(function(records){
+      var addedCounts=new Map();
+      records.forEach(function(record){
+        if(record.type==='childList') addedCounts.set(record.target,(addedCounts.get(record.target)||0)+record.addedNodes.length);
+      });
       records.forEach(function(record){
         if(record.type==='attributes' && !record.target.hasAttribute('data-i18n-attrs') && !record.target.hasAttribute('data-i18n-text') && !record.target.hasAttribute('data-i18n-ui')) return;
-        pending.add(record.target);
+        if(record.type==='childList'){
+          // Whole-text ownership needs the parent source. Other insertions
+          // need only their new nodes; removal cannot introduce UI copy.
+          var owner=record.target.closest && record.target.closest('[data-i18n-text],[data-language-toggle]');
+          if(owner) pending.add(owner);
+          // Markdown hydration and repeated sibling inserts share one scan.
+          else if(addedCounts.get(record.target)>1) pending.add(record.target);
+          else record.addedNodes.forEach(function(node){pending.add(node);});
+        }else if(record.type!=='characterData' || !ignored(record.target)) pending.add(record.target);
       });
       if(pending.size && !scheduled){scheduled=true;queueMicrotask(flush);}
     });

@@ -1,5 +1,5 @@
-/* One bare chevron for page-history controls. Keep per-page placement and color,
-   plus a 44px invisible hit area for touch, without a circular/glass button. */
+/* Page-history chevrons share a 44px touch target. Article returns add a
+   visible surface below; other pages keep their existing bare controls. */
 html:root body [data-back-icon][data-back-icon]{
   display:inline-grid!important;place-items:center!important;
   box-sizing:border-box!important;width:44px!important;height:44px!important;
@@ -21,6 +21,30 @@ html:root body [data-back-icon][data-back-icon]:is(:hover,:focus-visible){
 html:root body [data-back-icon][data-back-icon]:is(:hover,:focus-visible) > .ui-icon{transform:translateX(-3px) scale(1.08)}
 html:root body [data-back-icon][data-back-icon]:active > .ui-icon{transform:translateX(-2px) scale(.96)}
 html:root body [data-back-icon][data-back-icon]:focus-visible{outline:2px solid currentColor!important;outline-offset:2px!important}
+/* Keep the article return reachable while reading, below the fixed site header.
+   Sticky preserves its space and works inside the blurred reading board. */
+html:root body main.container:has([data-article-layout="album"]) > [data-back-icon]{
+  position:sticky!important;top:calc(72px + env(safe-area-inset-top,0px));z-index:30;
+  border:1.5px solid var(--border)!important;border-radius:999px!important;
+  background:rgba(255,242,220,.92)!important;color:var(--accent-2)!important;
+  box-shadow:var(--shadow)!important;
+}
+html:root body main.container:has([data-article-layout="album"]) > [data-back-icon]:is(:hover,:focus-visible){
+  background:rgba(246,220,181,.96)!important;color:#6f3f1d!important;
+  border-color:var(--accent-2)!important;
+  box-shadow:0 18px 42px rgba(87,58,31,.18)!important;
+}
+/* Match the reading controls' warm light and blue dark surfaces. */
+html:root body.dark main.container:has([data-article-layout="album"]) > [data-back-icon]{
+  background:rgba(19,43,66,.86)!important;border-color:#2b4360!important;color:#cfe6ff!important;
+}
+html:root body.dark main.container:has([data-article-layout="album"]) > [data-back-icon]:is(:hover,:focus-visible){
+  background:rgba(19,43,66,.96)!important;border-color:#7dd3fc!important;color:#fff!important;
+}
+@media(max-width:980px){
+  html:root body.dark main.container:has([data-article-layout="album"]) > [data-back-icon]:is(:hover,:focus-visible){box-shadow:0 18px 42px rgba(0,0,0,.34)!important}
+}
+@media(min-width:981px){html:root body main.container:has([data-article-layout="album"]) > [data-back-icon]{margin-left:-96px!important}}
 /* Fallback ink for tool returns that have not opted into a panel surface. */
 body[data-page-section="tools"]{--back-ink:#fff1d2;--back-hover-ink:#fff}
 /* Returns belong to their tool panel, not to the scenery behind it. */
