@@ -1,4 +1,4 @@
-# 项目结构与资源归档
+# 项目结构与资源管理
 
 项目把“可公开构建的配置”和“运行时私有数据”分开维护。新增文件请按下面的边界放置，避免再次把不同生命周期的数据堆到同一个目录。
 
@@ -47,13 +47,13 @@
 
 ### 工具卡片图标
 
-两份工具清单均支持 `icon_url`。本站工具优先使用以 `/` 开头的站内素材 URL，例如 `"icon_url": "/uploads/admin/markdown-logo.png"`；外部工具使用完整的 `https://` 图标地址。`icon` 是文字兜底，只有未填写 `icon_url` 时才显示。本站图标放入 `static/uploads/admin/tools/` 后，只需把路径写为 `/uploads/admin/tools/<文件名>`，不需要改模板。
+两份工具清单均支持 `icon_url`。本站工具优先使用以 `/` 开头的站内素材 URL，例如 `"icon_url": "/uploads/admin/tools/markdown-logo.png"`；外部工具使用完整的 `https://` 图标地址。`icon` 是文字兜底，只有未填写 `icon_url` 时才显示。本站图标放入 `static/uploads/admin/tools/` 后，只需把路径写为 `/uploads/admin/tools/<文件名>`，不需要改模板。
 
 ## `static/`：浏览器直接请求的素材
 
 - `/uploads/` 是唯一的公开媒体 URL 根目录，但实际读取的是 `data/media/`。后台新上传的文件只会写入这里，不会污染 Git 工作区。
 - `static/uploads/` 是随仓库发布的公开媒体种子；首次部署会补入 `data/media/`，但不会覆盖服务器已有文件。
-- 已发布页面引用的媒体可以随仓库提交。`static/uploads/` 始终按公开资源处理；不应公开的原图应放在仓库根目录 `local-only/`，该目录不会进入 Git 或 Docker 镜像。
+- 仓库默认素材统一提交到 `static/uploads/admin/`；非 admin 用户目录由忽略规则排除。`static/uploads/` 始终按公开资源处理；不应公开的原图应放在仓库根目录 `local-only/`，该目录不会进入 Git 或 Docker 镜像。
 - 站点自有公开媒体采用 [CC BY-NC-SA 4.0](../MEDIA-LICENSE.md)；第三方商标、用户上传和朋友提供的素材不因仓库收录而改变其原有权利归属。
 
 ### 前端脚本分层
@@ -75,6 +75,6 @@
 
 1. 当前后台会修改、部署后应持久化的 JSON：放 `data/<职责>/`；不要再新增根目录业务 JSON。
 2. 公开页面构建时读取的清单 JSON：放 `assets/data/<模块>/`。
-3. 代码库维护或后台配置指定的公开图片、音频和插图：放 `static/uploads/<归属或模块>/`。
-4. 用户上传的公开文件：运行时写入 `data/media/<用户>/`；需要作为新安装默认内容时，再人工挑选并加入 `static/uploads/<用户>/`。
+3. 代码库维护或后台配置指定的公开图片、音频和插图：放 `static/uploads/admin/<模块>/`。
+4. 用户上传的公开文件：运行时写入 `data/media/<用户>/`；需要作为新安装默认内容时，再人工挑选并加入 `static/uploads/admin/<模块>/`，同步公开配置引用。
 5. 只供本机保留、绝不能公开的原图或备份：放 `local-only/`，不得由页面 URL 引用。

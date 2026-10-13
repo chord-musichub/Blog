@@ -1,60 +1,109 @@
-# 本地运行数据与部署配置
+# 本地运行与配置
 
-这个仓库只保存程序源码。以下目录保留在本机或服务器备份中，不会提交到 GitHub：
+推荐通过 Docker Compose 运行完整网站：Caddy 提供公开页面，Go 提供创作后台、API 与媒体。以下命令从仓库根目录执行；首次启动需要网络拉取镜像和安装 Hugo，Go 模块编译使用仓库内的 `vendor/`。
 
-- `data/`：运行时私有数据，按 `auth/`、`content/`、`community/`、`settings/`、`metrics/`、`games/` 分类保存；媒体与 Markdown 位于 `media/`、`md-source/`。
-- `content/posts/`、`content/friends/`、`content/tags/`：由后台数据生成的公开内容。
-- `static/uploads/`、`static/md-source/`：文章图片、附件和 Markdown 源文件。
-- `.env`：管理员密码、会话密钥和本机 URL 配置。
+## 首次启动
 
-首次从源码仓库启动前，在项目根目录运行：
+需要 Docker 与 Compose。Windows 或已安装 PowerShell 的环境运行：
 
 ```powershell
-.\deploy\init-local.ps1
+./deploy/init-local.ps1
 docker compose up --build -d
 ```
 
-脚本会创建未纳入 Git 的 `.env` 和运行目录，并显示一次随机生成的管理员密码。请把密码保存到密码管理器。
+初始化脚本创建 `.env` 与运行目录，生成管理员密码和会话密钥，默认管理员用户名为 `admin`。保存脚本输出的密码；已有 `.env` 时脚本会停止，不覆盖配置。
 
-## Linux 本机构建代理
+### Linux/macOS 手动初始化
 
-当前版本把 `go.sum` 锁定的 Go 依赖保存在 `vendor/`（约 340 KiB），编译阶段不再联网下载。普通 `docker compose build blog-admin` 即可编译；不要遗漏 `vendor/`。如果仍看到 `RUN go mod download`，说明使用的是旧版 Dockerfile。
-
-基础镜像拉取与 Alpine 软件包安装仍需要网络：Docker 服务的代理负责镜像拉取，不会自动配置容器里的软件包下载。如果 `FROM` 报 `proxyconnect ... 127.0.0.1:7897 ... connection refused`，应先启动该端口对应的代理。如果 `apk add` 访问 Alpine 站点失败，可使用以下可选配置：
+未安装 PowerShell 时，复制环境示例并编辑必填项：
 
 ```sh
-# 保持本机 HTTP / mixed 代理开启；端口按实际配置修改。
+cp .env.example .env
+chmod 600 .env
+```
+
+在 `.env` 填写 `ADMIN_USER`、`ADMIN_PASS` 和 `SESSION_SECRET`，保留 `ADMIN_BASE_PATH=/write`。密码和会话密钥分别使用随机值；会话密钥至少 32 个字符。若已安装 OpenSSL，可分别执行以下命令生成候选值，再写入文件：
+
+```sh
+openssl rand -hex 18
+openssl rand -hex 32
+```
+
+完成配置后运行 `docker compose up --build -d`。Compose 的绑定目录和服务启动流程会创建所需的运行目录。
+
+### 打开与检查
+
+- 公开站：`http://127.0.0.1:8080/`
+- 创作后台：`http://127.0.0.1:8080/write/`
+- 健康检查：`http://127.0.0.1:8080/healthz`
+
+Go 仅暴露在 Docker 内网，主机的 8080 入口由 Caddy 提供。首次访问前可检查状态和构建日志：
+
+```sh
+docker compose ps
+docker compose logs --tail=100 blog-admin
+```
+
+之后使用 `docker compose up -d` 启动，`docker compose stop` 暂停。代码更新后使用 `docker compose up --build -d` 重建。
+
+## 配置参考
+
+真实值只放 `.env` 或服务器环境，不提交到 Git。Go 进程环境优先于 `.env`；Compose 只向容器传入 `docker-compose.yml` 明确声明的变量。
+
+| 变量 | 用途与当前默认 |
+| --- | --- |
+| `ADMIN_USER`、`ADMIN_PASS` | 必填的配置管理员账号与密码；启动时同步该管理员密码哈希 |
+| `SESSION_SECRET` | 必填，至少 32 字符的随机会话密钥 |
+| `ADMIN_BASE_PATH` | 后台外部路径；本地初始化和 Compose 默认 `/write` |
+| `PUBLIC_BASE_URL` | 公开站路径，默认 `/`；仓库子路径部署需对应调整 |
+| `PUBLIC_SITE_URL` | 公开站完整 URL，用于生成链接与来源配置 |
+| `PUBLIC_API_URL` | API 完整 URL；同域部署通常与公开站相同 |
+| `PUBLIC_CORS_ORIGINS` | 允许跨域调用公开接口的额外来源，英文逗号分隔；同源请求直接允许 |
+| `HUGO_BUILD_TIMEOUT_SECONDS` | 单次构建上限，默认 180 秒 |
+| `MAX_UPLOAD_BYTES` | Go 默认及 `.env.example` 为 536870912（512 MiB）；初始化脚本和 Compose 未配置时为 104857600（100 MiB） |
+| `HTTP_READ_TIMEOUT_SECONDS`、`HTTP_WRITE_TIMEOUT_SECONDS` | Go 默认各 900 秒；用于上传和重建，Compose 未显式转发这两个变量 |
+
+修改 `.env` 中 Compose 支持的参数后执行 `docker compose up -d`，让 Compose 按变化重建容器；`docker compose restart` 不会重新应用 Compose 环境配置。直接运行 Go 或 systemd 时，更新对应环境后重启服务。
+
+管理员密码以 `ADMIN_PASS` 为准；其他用户通过后台账号流程管理。公开站与 API 同域部署时通常将三个 URL/来源变量填为同一站点地址。本地默认留空即可通过同源入口访问。
+
+## 数据与备份
+
+| 路径 | 内容 |
+| --- | --- |
+| `.env` | 本实例凭据、会话密钥和 URL 配置 |
+| `data/` | 账号、稿件、设置、留言、阅读量、排行、上传媒体与 Markdown 源 |
+| `content/posts/`、`content/friends/`、`content/tags/` | 后台生成的公开内容 |
+| `published/` | 可重新构建的公开输出 |
+| `assets/`、`static/uploads/admin/` | 仓库提供的公开配置与默认素材 |
+
+新克隆可使用默认页面与素材，但没有旧实例的账号和文章。迁移时先恢复 `.env`、`data/` 及动态内容目录，再启动；源码仓库不能替代实例备份。旧版上传目录的迁移说明见[数据边界](REPLICA_AND_PRIVACY.md)。
+
+`data/media/.deleted/` 保存媒体删除/重命名标记，阻止默认素材重新补回，必须随运行数据备份；不要当作缓存清空。该目录不通过 `/uploads/` 暴露。
+
+## 常见问题
+
+| 现象 | 检查方法 |
+| --- | --- |
+| Compose 提示缺少管理员配置 | 确认根目录 `.env` 的三个必填值已设置 |
+| 后台可访问，公开页不完整 | 检查 `blog-admin` 日志中的首次 Hugo 构建结果，不以 HTTP 服务启动代表构建成功 |
+| 更换密码或 URL 后仍是旧值 | 确认 Compose 容器已按新环境重建；systemd 更新的是服务器环境文件 |
+| 镜像拉取失败 | 检查 Docker 服务网络与代理，区别于 Go 模块构建 |
+| `apk add` 下载失败 | 检查构建步骤的网络；Linux 本机代理可使用下方 overlay |
+
+### Linux 构建代理
+
+仅适用于本机 Linux Docker Engine；保持 HTTP/mixed 代理开启，端口按实际配置调整：
+
+```sh
 BLOG_BUILD_PROXY=http://127.0.0.1:7897 docker compose \
   -f docker-compose.yml -f deploy/compose.build-proxy.yml build blog-admin
 
-# 仅在构建成功且准备更新网站时执行；不再次构建。
 docker compose up -d --no-build
 ```
 
-上述 overlay 仅适用于本机 Linux Docker Engine：构建步骤使用宿主机网络，使容器内的构建进程能访问宿主机回环代理；仅将代理作为 Docker 预定义构建参数传入，不改变网站容器网络，不将代理写入运行时环境。不要在 Dockerfile 内使用 `ENV HTTP_PROXY`，也不要关闭 Go 校验和或 TLS 校验。Docker Desktop / 远程构建器的宿主机地址不同，不应直接照搬此 overlay。
+该 overlay 使用宿主机网络访问回环代理，代理仅作为构建参数，不改变网站容器网络。Docker Desktop 与远程构建器不直接照搬。日常 Go 编译无需更换下载源，依赖更新见[构建指南](BUILD_DEPENDENCIES.md)。
 
-默认 `docker compose build` 使用普通网络安装 Hugo，Go 编译步骤则明确关闭网络并使用 `-mod=vendor`。这不会改变图片处理算法或依赖版本。
+## 服务器运行
 
-参考：[Docker 构建代理参数](https://docs.docker.com/build/building/variables/#proxy-arguments)、[Docker 服务代理](https://docs.docker.com/engine/daemon/proxy/)。
-
-## 账号与站点配置
-
-`ADMIN_PASS` 是该管理员账号的唯一配置来源：每次服务启动时，程序都会将 `data/auth/users.json` 中对应管理员的密码哈希同步为 `.env` 里的值。因此，修改 `.env` 后重启服务即可修改管理员密码；不要再从后台修改该管理员的密码。其他用户仍完全由 `data/auth/users.json` 和后台用户管理处理。
-
-`PUBLIC_SITE_URL` 是公开站完整 URL（例如 `https://blog.example.com`），`PUBLIC_API_URL` 是后台/API 完整 URL（例如 `https://write.example.com`）。它们用于 Hugo 生成链接、后台 CSP 和公开工具页的成绩接口；修改后重启服务会重建公开站。`PUBLIC_CORS_ORIGINS` 是允许调用成绩接口的网页来源，多个地址用英文逗号分隔；通常填写与 `PUBLIC_SITE_URL` 相同的地址。
-
-## 统一站点入口
-
-Docker Compose 通过 Caddy 在 `http://127.0.0.1:8080` 提供唯一入口：公开博客在 `/`，投稿后台在 `/write/`，公开 API 在 `/api/`。Go 服务仅在 Docker 内网监听，不再直接暴露端口。启动后应访问 `http://127.0.0.1:8080/` 查看公开站，访问 `http://127.0.0.1:8080/write/` 登录后台。
-
-若生产服务器使用 Docker 与 Caddy，可使用 `deploy/Caddyfile`：设置同一域名的 `SITE_HOST`，并将 `.env` 中 `ADMIN_BASE_PATH` 设为 `/write`；`PUBLIC_SITE_URL`、`PUBLIC_API_URL` 与 `PUBLIC_CORS_ORIGINS` 通常都填写该公开站域名。
-
-当前线上服务器采用 Nginx + systemd 时，请改看 [服务器发布与回滚](SERVER_DEPLOYMENT.md)。该方案将 Git 源码、私有运行数据和每个发布版本分离，支持先在 `127.0.0.1:8081` 验证候选版本，再切换公开流量。
-
-迁移或重装时，先恢复上述私有目录和 `.env`，再执行 `docker compose up --build -d`。只有源码仓库不足以恢复已有文章和用户。
-
-媒体删除与重命名会在 `data/media/.deleted/` 保存旧路径的删除标记，防止下次启动、构建或历史素材迁移时从仓库补回。此目录必须随运行数据一起备份，不要当作缓存清空；它不会通过 `/uploads/` 对外提供。同一路径重新上传的新文件仍可正常访问，标记只阻止旧素材回填。
-
-如果部署到 GitHub Pages 的仓库子路径，请在 `.env` 中设置正确的 `PUBLIC_BASE_URL`，并按实际部署地址调整 `hugo.toml` 的 `baseURL`。
-
-使用 systemd 部署时，将 `deploy/blog-admin.env.example` 复制为服务器上的 `/opt/songline-blog/shared/blog-admin.env`，填入真实值后执行 `chown root:blog` 和 `chmod 640`。该文件位于仓库外，不应提交。
+Docker/Caddy 的生产模板在 `deploy/Caddyfile`，使用同域的 `SITE_HOST` 与 `/write` 后台路径。Nginx/systemd 的完整发布、候选验证及回滚流程见[服务器指南](SERVER_DEPLOYMENT.md)。

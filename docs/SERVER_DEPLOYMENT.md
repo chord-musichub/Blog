@@ -1,5 +1,7 @@
 # 服务器发布与回滚
 
+本文对应仓库内的 Nginx + systemd 发布模板。路径 `/opt/songline-blog`、服务名和 `blog.songline-blog.com` 是模板示例；部署其他实例时同步调整环境文件、服务与代理配置。首次本地运行请看[本地指南](LOCAL_RUNTIME.md)，备份范围见[数据边界](REPLICA_AND_PRIVACY.md)。
+
 本文针对当前的 Ubuntu 服务器：Nginx 继续负责 HTTPS，博客后台由 systemd 运行。公开站和后台统一使用 `blog.songline-blog.com`：公开内容在 `/`，后台在 `/write/`。旧的 `write.songline-blog.com` 只负责跳转。
 
 ## 目录与数据边界
@@ -76,8 +78,8 @@ sudo systemctl restart blog-admin.service
 ```bash
 git clone https://github.com/chord-musichub/Blog.git /tmp/songline-blog-source
 sudo install -o root -g blog -m 0640 /tmp/songline-blog-source/deploy/blog-admin.env.example /opt/songline-blog/shared/blog-admin.env
-sudo rm -rf /tmp/songline-blog-source
 sudo nano /opt/songline-blog/shared/blog-admin.env
+cd /tmp/songline-blog-source
 ```
 
 `ADMIN_USER` 与 `ADMIN_PASS` 要填写当前仍可登录的管理员凭据；如果故意换成新密码，服务首次启动会同步管理员密码哈希，旧密码将失效。`SESSION_SECRET` 最好沿用旧值以避免所有已登录会话立刻失效；若旧值不可取得，换成新的随机长字符串也可以。
