@@ -1,4 +1,4 @@
-const {adminStaticRoot} = require('./helpers/source-paths.cjs');
+const {offlineSite} = require('./helpers/offline-site.cjs');
 // Offline queue and SVG-node reuse comparison. No production API calls/uploads.
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -7,17 +7,10 @@ const builds={after:path.resolve(process.env.BLOG_UI_BUILD||'')};
 if(process.env.BLOG_UI_BASELINE)builds.before=path.resolve(process.env.BLOG_UI_BASELINE);
 for(const build of Object.values(builds))assert(fs.existsSync(path.join(build,'index.html')),'Provide a fresh Hugo build');
 const out=path.join(repo,'local-only/cleanup-2026-10-09');fs.mkdirSync(out,{recursive:true});const results=[];
-const svg='<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" fill="#607d8b"/></svg>';
+
 async function fixture(browser,build,width){
  const context=await browser.newContext({viewport:{width,height:1000},isMobile:width<981,hasTouch:width<981,reducedMotion:'reduce'});
- await context.route('**/*',route=>{
-  const u=new URL(route.request().url());if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:svg,contentType:'image/svg+xml'});
-  if(u.pathname.includes('/api/'))return route.fulfill({json:{items:[],messages:[],views:83,scores:[]}});
-  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build;
-  const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
-  if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
-  return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json'})[path.extname(file)]||'application/octet-stream'});
- });
+ await context.route('**/*', offlineSite({base, build}));
  await context.addInitScript(()=>{
   localStorage.setItem('songline-theme','dark');sessionStorage.setItem('songline-home-boot-v21.4','1');localStorage.setItem('songline-privacy-v1',JSON.stringify({version:1,statistics:false,expires:Date.now()+86400000}));
   window.reuseAudit={rowListeners:0};const add=EventTarget.prototype.addEventListener;

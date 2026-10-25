@@ -181,14 +181,6 @@
   .pills{
     gap:8px!important;
   }
-  .friend-search-box{
-    grid-template-columns:auto minmax(0,1fr) auto!important;
-    width:100%!important;
-  }
-  .friend-search-submit{
-    min-width:54px!important;
-    padding-inline:10px!important;
-  }
 
   /* 工具页 */
   .tools-command-center,
@@ -271,8 +263,7 @@
   .btn,
   .pill,
   .icon-btn,
-  .search-submit,
-  .friend-search-submit{
+  .search-submit{
     min-height:42px!important;
   }
   input,
@@ -364,10 +355,6 @@
   .mobile-scroll-x{
     overflow-x:auto!important;
     -webkit-overflow-scrolling:touch;
-  }
-  .friend-search-box{
-    display:grid!important;
-    grid-template-columns:32px minmax(0,1fr) 56px!important;
   }
   .tools-search-row{
     display:grid!important;

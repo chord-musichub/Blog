@@ -14,7 +14,7 @@ function fixture(t, extra = {}) {
   t.after(() => fs.rmSync(root, {recursive:true, force:true}));
   const source = path.join(root, 'repository'), bin = path.join(root, 'bin'), app = path.join(root, 'app');
   for (const dir of [path.join(source,'deploy'),bin,path.join(app,'shared/data'),path.join(app,'releases/stable')]) fs.mkdirSync(dir,{recursive:true});
-  for (const name of ['server-update.sh','release-deploy.sh','release-promote.sh']) {
+  for (const name of ['server-update.sh','release-deploy.sh','release-promote.sh','release-from-bundle.sh']) {
     let code = fs.readFileSync(path.join(repo,'deploy',name),'utf8');
     const guard = /if \[\[ \$\{EUID(?::[^}]*)?\} -ne 0 \]\]; then/;
     assert(guard.test(code),'fixture must identify the privilege guard: '+name);
@@ -50,6 +50,8 @@ if name == 'git':
         pathlib.Path(source, 'go.mod').write_text('module changed-after-fetch\\n')
         subprocess.run([os.environ['TEST_REAL_GIT'], '-C', source, 'commit', '-qam', 'Advance branch'], check=True)
     sys.exit(result.returncode)
+elif name == 'date':
+    print('20261025000000')
 elif name == 'go':
     if os.environ.get('TEST_BUILD_FAIL'): sys.exit(1)
     output = pathlib.Path(args[args.index('-o')+1]); output.write_text('#!/bin/sh\\nexit 0\\n'); output.chmod(0o755)
@@ -75,7 +77,7 @@ elif name == 'systemctl':
 elif name == 'nginx': sys.exit(1)
 `;
   const shimPath = path.join(bin,'shim');fs.writeFileSync(shimPath,shim,{mode:0o755});
-  for (const name of ['git','go','hugo','install','chown','systemctl','curl','sleep','nginx']) fs.symlinkSync(shimPath,path.join(bin,name));
+  for (const name of ['git','go','hugo','install','chown','systemctl','curl','sleep','nginx','date']) fs.symlinkSync(shimPath,path.join(bin,name));
   const env = {...process.env, PATH:bin+path.delimiter+process.env.PATH, BLOG_APP_ROOT:app, BLOG_REPOSITORY_URL:source, BLOG_HEALTH_WAIT_SECONDS:'1', TEST_REAL_GIT:git, TEST_COMMAND_LOG:log, ...extra};
   const run = (name,args=[],overrides={}) => spawnSync('bash',[path.join(source,'deploy',name),...args],{env:{...env,...overrides},encoding:'utf8',timeout:15000});
   const clones = () => fs.readFileSync(log,'utf8').trim().split('\n').map(JSON.parse).filter(([name,args])=>name==='git'&&args[0]==='clone').length;
@@ -121,4 +123,52 @@ test('reused checkout rejects ignored local payloads before touching shared data
   const result=f.run('release-deploy.sh',['main'],{BLOG_RELEASE_SOURCE:checkout});
   assert.notEqual(result.status,0,'refuse to consume a checkout with local payloads');
   assert(fs.existsSync(path.join(checkout,'.env')));assert(!fs.existsSync(path.join(f.app,'shared/data/build.json')));f.unchanged();
+});
+
+test('legacy media import is configured only when needed and preserves explicit settings',t=>{
+  for (const existing of [null,'', '/custom/legacy']) {
+    const f=fixture(t);
+    fs.mkdirSync(path.join(f.app,'shared/static/uploads'),{recursive:true});
+    const envFile=path.join(f.app,'shared/blog-admin.env');
+    if (existing!==null) fs.appendFileSync(envFile,'RUNTIME_STATIC_DIR='+existing+'\n');
+    const releases=[];
+    for (let attempt=0;attempt<2;attempt++) {
+      const result=f.run('server-update.sh');assert.equal(result.status,0,result.stderr+result.stdout);
+      releases.push(fs.realpathSync(path.join(f.app,'next')));
+    }
+    assert.notEqual(releases[0],releases[1],'same-second updates must keep separate release directories');
+    for (const release of releases) assert(fs.existsSync(path.join(release,'.git')),'previous candidate remains intact');
+    const entries=fs.readFileSync(envFile,'utf8').split('\n').filter(line=>line.startsWith('RUNTIME_STATIC_DIR='));
+    assert.deepEqual(entries,['RUNTIME_STATIC_DIR='+(existing===null?path.join(f.app,'shared/static'):existing)]);
+    f.unchanged();
+  }
+  const fresh=fixture(t),result=fresh.run('server-update.sh');assert.equal(result.status,0,result.stderr+result.stdout);
+  assert(!fs.readFileSync(path.join(fresh.app,'shared/blog-admin.env'),'utf8').includes('RUNTIME_STATIC_DIR='));
+});
+
+
+test('same-second bundle imports keep separate candidates and pre-import backups',t=>{
+  const f=fixture(t),bundleRoot=path.join(f.root,'bundle'),runtime=path.join(bundleRoot,'runtime');
+  fs.mkdirSync(bundleRoot);
+  fs.cpSync(f.source,path.join(bundleRoot,'source'),{recursive:true});
+  for (const name of ['cmd/server','internal/server','frontend/site']) fs.mkdirSync(path.join(bundleRoot,'source',name),{recursive:true});
+  for (const name of ['data/auth/users.json','data/content/articles.json','data/community/friends.json','data/settings/site.json']) {
+    const file=path.join(runtime,name);fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,'{}');
+  }
+  for (const name of ['posts','friends','tags']) fs.mkdirSync(path.join(runtime,'content',name),{recursive:true});
+  const bundle=path.join(f.root,'bundle.tar.gz');
+  execFileSync('tar',['-C',bundleRoot,'-czf',bundle,'source','runtime']);
+  const candidates=[],assetVersions=[];
+  for (let attempt=0;attempt<2;attempt++) {
+    const result=f.run('release-from-bundle.sh',[bundle]);assert.equal(result.status,0,result.stderr+result.stdout);
+    candidates.push(fs.realpathSync(path.join(f.app,'next')));
+    assetVersions.push(JSON.parse(fs.readFileSync(path.join(f.app,'shared/data/build.json'),'utf8')).asset_version);
+    assert.equal(path.basename(fs.realpathSync(path.join(f.app,'current'))),'stable');
+  }
+  assert.notEqual(candidates[0],candidates[1]);
+  assert.notEqual(assetVersions[0],assetVersions[1],'bundle resource versions must also remain unique');
+  for (const candidate of candidates) assert.equal(fs.realpathSync(path.join(candidate,'published')),path.join(candidate,'build/public'));
+  const backups=fs.readdirSync(path.join(f.app,'backups')).map(name=>path.join(f.app,'backups',name));
+  assert.equal(backups.length,2,'keep both pre-import snapshots');
+  assert(backups.some(file=>execFileSync('tar',['-tzf',file],{encoding:'utf8'}).includes('data/keep.json')),'the original runtime snapshot was not overwritten');
 });

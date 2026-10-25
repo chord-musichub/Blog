@@ -70,7 +70,7 @@
       input.classList.toggle('has-search-value', active);
       if(opts.feedback){
         showSearchRefresh(config.feedbackText || '筛选中');
-        if(active && visible === 0) flashEmpty(input.closest('.toolbar-panel, .tools-command-center, .friend-search-box') || input);
+        if(active && visible === 0) flashEmpty(input.closest('.toolbar-panel') || input);
       }
       return {active:active, visible:visible};
     }

@@ -44,6 +44,7 @@ async function file(page,name,text,type='text/markdown'){
  await page.waitForFunction(name=>document.querySelector('[data-md-name]').textContent===name,name);
 }
 async function design(page){return page.locator('.article-reader').evaluate(e=>{const c=getComputedStyle(e);return Object.fromEntries(['fontSize','lineHeight','fontFamily','paddingLeft','paddingRight','color','backgroundImage','backgroundColor','borderRadius','backdropFilter','borderColor','boxShadow'].map(k=>[k,c[k]]));});}
+async function readingTypography(page){const all=await design(page);return Object.fromEntries(['fontSize','lineHeight','fontFamily','color'].map(key=>[key,all[key]]));}
 async function readingGeometry(page){const result={};for(const selector of ['main.container','.article-reader','.article-toc-rail']){const box=await page.locator(selector).boundingBox();if(box)result[selector]={x:box.x,width:box.width};}return result;}
 async function scene(page){await page.locator('body').evaluate(e=>Promise.all(e.getAnimations().filter(a=>a instanceof CSSTransition).map(a=>a.finished.catch(()=>{}))));return page.evaluate(()=>{const c=getComputedStyle(document.body);return Object.fromEntries(['backgroundImage','backgroundSize','backgroundRepeat','backgroundPosition','backgroundColor'].map(k=>[k,c[k]]));});}
 async function whiteIcon(icon){await icon.evaluate(e=>new Promise((resolve,reject)=>{const start=performance.now();function check(){if(getComputedStyle(e).color==='rgb(255, 255, 255)')return resolve();if(performance.now()-start>1500)return reject(new Error('Header icon did not settle to white'));requestAnimationFrame(check);}check();}));}
@@ -133,20 +134,23 @@ async function settledScroll(page){
    await p.locator('[data-md-file]').setInputFiles({name:'image.png',mimeType:'image/png',buffer:Buffer.from('not Markdown')});
    await p.waitForFunction(()=>document.querySelector('[data-md-name]').textContent==='文件类型不支持');
    await file(p,'third.md','## 再次选择\n\n正文');assert.equal(await p.locator('.toc-tree a').count(),1);
-   await navigate(p,'/posts/linux-note/');assert.deepEqual(await design(p),previewDesign,'Preview and article share the exact reading design');
-   assert.equal(await p.locator('body').getAttribute('data-page-scene'),null,'Tools background marker is removed on article navigation');await bareBack(p);
-   assert.deepEqual(await readingGeometry(p),previewGeometry,'Preview and article have the same main frame, reading card and external rail geometry');
+   await navigate(p,'/posts/linux-note/');assert.deepEqual(await readingTypography(p),Object.fromEntries(['fontSize','lineHeight','fontFamily','color'].map(key=>[key,previewDesign[key]])),'Preview and album article share reading typography');
+   assert.equal(await p.locator('body').getAttribute('data-page-scene'),null,'Tools background marker is removed on article navigation');
+   const articleBack=await p.locator('[data-back-icon]').first().boundingBox();assert.equal(articleBack.width,44);assert.equal(articleBack.height,44);
+   assert.equal(await p.locator('[data-article-layout="album"]').count(),1,'Published articles retain the album layout');
+   assert.equal((await design(p)).backgroundColor,'rgba(0, 0, 0, 0)','Album reading surface remains transparent');
    for(const route of ['/','/posts/']){
     await navigate(p,route);
     if(route==='/'){
-     const icons=p.locator('.header-icons .icon-btn');assert.equal(await icons.count(),3);
+     const icons=p.locator('.header-icons .icon-btn:not(.language-toggle)');assert.equal(await icons.count(),3);assert.equal(await p.locator('.header-icons [data-language-toggle]').count(),1);
      for(const icon of await icons.all()){await whiteIcon(icon);await icon.hover();await whiteIcon(icon);assert.equal(await icon.locator('svg').evaluate(e=>getComputedStyle(e).color),'rgb(255, 255, 255)');await icon.focus();await whiteIcon(icon);await icon.evaluate(e=>e.blur());}
     }
     const header=await p.locator('.modern-site-header').evaluate(e=>{const c=getComputedStyle(e);return {border:c.borderBottomWidth,filter:c.backdropFilter};});
-    assert.equal(header.border,'0px','No leftover full-width white HUD border');if(width>980)assert.equal(header.filter,'none');
+    assert.equal(header.border,'0px','No leftover full-width white HUD border');if(width>980)assert(header.filter.includes('blur(14px)'),'Desktop header retains its shared glass backdrop');
    }
    await navigate(p,'/tools/');assert.deepEqual(await scene(p),previewScene,'Markdown uses exactly the tools scene, in both themes');
    await navigate(p,'/tools/markdown-previewer/');await file(p,'return.md','## 返回后仍能读取');assert.equal(await p.locator('.toc-tree a').count(),1);
+   assert.deepEqual(await readingGeometry(p),previewGeometry,'Preview restores its own reading frame after returning from an album article');
    assert.deepEqual(await scene(p),previewScene,'Background is restored on AJAX reentry');
    await p.locator('[data-back-icon]').click();await ready(p,'/tools/');assert.equal(new URL(p.url()).pathname,'/tools/','Bare chevron still returns to the previous page');assert.equal(await p.locator('body').getAttribute('data-page-scene'),null);
    assert.deepEqual(f.errors,[]);assert(!f.requests.some(r=>r.method==='POST'),'No uploads or production writes');

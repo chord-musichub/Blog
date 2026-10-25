@@ -1,0 +1,25 @@
+/* 朋友页面共用的列表工具栏与按钮；星图和回忆室由各自组件维护。 */
+body .toolbar-panel{
+  border-color:transparent !important;
+  background:color-mix(in srgb, var(--panel) 64%, transparent) !important;
+  box-shadow:0 16px 42px rgba(39,74,112,.08) !important;
+  backdrop-filter:blur(18px);
+}
+body.dark .toolbar-panel{
+  background:rgba(17,28,46,.48) !important;
+  border-color:rgba(125,211,252,.08) !important;
+  box-shadow:0 18px 50px rgba(0,0,0,.18) !important;
+}
+body .btn,
+body .pill{
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background-color .18s ease, color .18s ease;
+}
+body .btn:hover,
+body .btn:focus-visible{
+  transform:translateY(-2px) !important;
+  border-color:var(--accent) !important;
+  box-shadow:0 12px 28px color-mix(in srgb, var(--accent) 14%, transparent) !important;
+}
+@media(max-width:640px){
+  body .toolbar-panel{backdrop-filter:none;}
+}

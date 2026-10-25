@@ -91,7 +91,9 @@ if [[ -n "$runtime_payloads" ]]; then
   exit 1
 fi
 REVISION="$(git -C "$SOURCE_DIR" rev-parse --short HEAD)"
-RELEASE_DIR="$RELEASES_DIR/${STAMP}-${REVISION}"
+# The build directory already has a unique suffix. Keep it in the final name so
+# two fast updates of one revision cannot merge into the same release directory.
+RELEASE_DIR="$RELEASES_DIR/${STAMP}-${REVISION}-${WORK_DIR##*-}"
 mv "$SOURCE_DIR" "$RELEASE_DIR"
 rmdir "$WORK_DIR"
 

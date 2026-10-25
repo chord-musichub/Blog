@@ -1,4 +1,4 @@
-const {adminStaticRoot} = require('./helpers/source-paths.cjs');
+const {offlineSite} = require('./helpers/offline-site.cjs');
 // Offline integration audit: no production API writes or third-party requests.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -10,21 +10,13 @@ assert(build && fs.existsSync(path.join(build,'index.html')),'Provide a fresh BL
 const baseline=process.env.BLOG_STABILITY_BASELINE==='1';
 const base='http://stability.test';
 const out=path.join(repo,'local-only/stability');
-const svg='<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" fill="#607d8b"/></svg>';
+
 const wav=Buffer.alloc(44+8000*2*3);
 wav.write('RIFF');wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(8000,24);wav.writeUInt32LE(16000,28);wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(wav.length-44,40);
 const results=[];
 async function fixture(browser,width=1440,theme='dark'){
  const context=await browser.newContext({viewport:{width,height:900},hasTouch:width<981,isMobile:width<981});
- await context.route('**/*',async route=>{
-  const u=new URL(route.request().url());
-  if(u.origin!==base || u.pathname.startsWith('/uploads/'))return route.fulfill({body:svg,contentType:'image/svg+xml'});
-  if(u.pathname.includes('/api/'))return route.fulfill({json:{views:83,items:[],messages:[],scores:[],authenticated:false}});
-  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):path.resolve(build);
-  const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
-  if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
-  return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream'});
- });
+ await context.route('**/*', offlineSite({base, build, api:{views:83,items:[],messages:[],scores:[],authenticated:false}}));
  await context.addInitScript(theme=>{
   localStorage.setItem('songline-theme',theme);
   localStorage.setItem('songline-toc-state','expanded');

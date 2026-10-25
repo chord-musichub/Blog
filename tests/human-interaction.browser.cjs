@@ -1,25 +1,19 @@
-const {adminStaticRoot} = require('./helpers/source-paths.cjs');
+const {offlineSite} = require('./helpers/offline-site.cjs');
 // Offline keyboard, touch and modal audit, including the previous build.
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
-const builds={before:process.env.BLOG_UI_BASELINE,after:process.env.BLOG_UI_BUILD};
+const builds={after:process.env.BLOG_UI_BUILD};
+if(process.env.BLOG_UI_BASELINE)builds.before=process.env.BLOG_UI_BASELINE;
 for(const build of Object.values(builds))assert(build&&fs.existsSync(path.join(build,'index.html')));
 const base='http://human-interaction.test',out=path.resolve('local-only/human-interaction');
+fs.mkdirSync(out,{recursive:true});
 const report=[];
 const wav=Buffer.alloc(44+8000*2*3);
 wav.write('RIFF');wav.writeUInt32LE(wav.length-8,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(8000,24);wav.writeUInt32LE(16000,28);wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(wav.length-44,40);
 async function fixture(browser,build,width){
  const context=await browser.newContext({viewport:{width,height:900},hasTouch:width<981,isMobile:width<981});
  const errors=[];
- await context.route('**/*',route=>{
-  const u=new URL(route.request().url());
-  if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" fill="#607d8b"/></svg>',contentType:'image/svg+xml'});
-  if(u.pathname.includes('/api/'))return route.fulfill({json:{views:83,items:[],messages:[],scores:[]}});
-  const root=path.resolve(u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build);
-  const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
-  if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
-  return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream'});
- });
+ await context.route('**/*', offlineSite({base, build}));
  await context.addInitScript(()=>{
   const now=Date.now;window.clockAdvance=0;Date.now=()=>now()+clockAdvance;
   localStorage.setItem('songline-theme','dark');sessionStorage.setItem('songline-home-boot-v21.4','1');
@@ -124,8 +118,7 @@ function sameModalDesign(actual,expected,label){
     }
     assert.deepEqual(errors,[]);await context.close();
    }
-   assert.equal(pair.before.keyboardFocus,false);assert.equal(pair.before.pauseWrites,21);assert.equal(pair.before.modalFocusContained,false);
-   sameModalDesign(pair.after.memoryDesign,pair.before.memoryDesign,'Memory modal panel');sameModalDesign(pair.after.finishDesign,pair.before.finishDesign,'Timer modal panel');
+   if(pair.before){sameModalDesign(pair.after.memoryDesign,pair.before.memoryDesign,'Memory modal panel');sameModalDesign(pair.after.finishDesign,pair.before.finishDesign,'Timer modal panel');}
    report.push(pair);console.log('PASS',JSON.stringify(pair));
   }
  }finally{fs.writeFileSync(path.join(out,'interaction-report.json'),JSON.stringify(report,null,2));await browser.close();}

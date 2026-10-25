@@ -15,9 +15,11 @@
 | `frontend/site/layouts/partials/page-navigation-data.html` | route、priority 和小地图坐标的统一配置 |
 | `frontend/admin/templates/admin_shared.html` | 后台导航、主题与公共资源 |
 
-CSS 加载顺序是层叠契约，不能按文件名或大小重排。基础 token 和公共兼容层先加载，页面样式随后，触屏布局与返回控件按照样式入口中的顺序覆盖。局部更新与直开必须恢复同样的顺序和完整资源版本 URL。
+CSS 加载顺序是层叠契约，不能按文件名或大小重排。基础 token 和公共样式先加载，页面样式随后，触屏布局与返回控件按照样式入口中的顺序覆盖。局部更新与直开必须恢复同样的顺序和完整资源版本 URL。
 
 公开页专用代码放在 `frontend/site/static/js/pages/<页面>/` 与 `frontend/site/static/css/pages/<页面>/`，工具代码放在 `tools/` 子目录，新增需要随仓库保存的第三方 JS 时使用 `frontend/site/static/js/vendor/`。公共逻辑才放根目录。后台主样式为 `frontend/admin/static/creator-center.css`。
+
+文章的表格、代码高亮、目录反馈和扩展 Markdown 样式统一位于 `frontend/site/static/css/pages/content/markdown-renderer.css`；直开与动态补载使用同一入口。朋友页共用控件位于 `pages/friends/shared.css`，星图与回忆室仍由各自组件样式维护。不要为同一组件再追加一份兼容补丁文件。
 
 修改组件时同步维护模板、模块注册和样式。检查六级目录、游戏数字和异步状态等动态生成规则；公共 `space-ribbons.js` 提供页面背景轨迹。
 

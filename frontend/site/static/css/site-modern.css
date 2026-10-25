@@ -776,9 +776,6 @@ html body .site-search-icon svg{
   height:19px !important;
   stroke-width:1.75 !important;
 }
-html body .friend-search-box:focus-within .site-search-icon{
-  color:var(--accent) !important;
-}
 html body .article-toc nav li{
   margin-top:5px !important;
   margin-bottom:5px !important;

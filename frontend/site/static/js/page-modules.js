@@ -29,9 +29,6 @@
     var isSearchSurface = !isAudioStudio && (isToolsPage || path === '/' || path.indexOf('/posts/') === 0 || path.indexOf('/friends/') === 0 || !!query(root, '[data-content-archive], [data-search-submit], [data-tools-search], .home-friends-section'));
     if(isArticleSurface){
       ensureStylesheet('songline-markdown-renderer-style', '/css/pages/content/markdown-renderer.css');
-      ensureStylesheet('songline-article-compat-style', '/css/site-article-compat.css');
-      ensureStylesheet('songline-markdown-compat-style', '/css/site-markdown-compat.css');
-      ensureStylesheet('songline-article-overrides-style', '/css/site-article-overrides.css');
     }
     if(isToolsPage && !isAudioStudio){
       ensureStylesheet('songline-tool-shared-style', '/css/tool-shared.css');
@@ -217,7 +214,7 @@
       // 命中旧缓存，导致新坐标逻辑没有真正执行。
       src:'/js/pages/friends/galaxy.js?v=' + VERSION + '&friends=22.15',
       test:function(root){
-        return !!query(root, '[data-friend-galaxy], .friend-galaxy, .friend-galaxy-stage, .friends-galaxy, .galaxy-map');
+        return !!query(root, '[data-friend-galaxy]');
       },
       init:function(root){
         if(window.SonglineInitFriendGalaxy) window.SonglineInitFriendGalaxy(root || document);

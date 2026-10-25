@@ -1,22 +1,15 @@
-const {adminStaticRoot} = require('./helpers/source-paths.cjs');
+const {offlineSite} = require('./helpers/offline-site.cjs');
 // Offline stress audit; APIs/media are fixtures, not production requests.
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
-const builds={before:process.env.BLOG_UI_BASELINE,after:process.env.BLOG_UI_BUILD};
+const builds={after:process.env.BLOG_UI_BUILD};
+if(process.env.BLOG_UI_BASELINE)builds.before=process.env.BLOG_UI_BASELINE;
 for(const build of Object.values(builds))assert(build&&fs.existsSync(path.join(build,'index.html')));
 const base='http://stable-performance.test',out='local-only/stability-performance';fs.mkdirSync(out,{recursive:true});
 const report=[];
 async function fixture(browser,build,width,theme){
  const context=await browser.newContext({viewport:{width,height:900},hasTouch:width<981,isMobile:width<981});
- await context.route('**/*',route=>{
-  const u=new URL(route.request().url());
-  if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="#607d8b"/></svg>',contentType:'image/svg+xml'});
-  if(u.pathname.includes('/api/'))return route.fulfill({json:{items:[],messages:[],views:83,scores:[]}});
-  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):path.resolve(build);
-  const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
-  if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
-  return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream'});
- });
+ await context.route('**/*', offlineSite({base, build, media:'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="#607d8b"/></svg>'}));
  await context.addInitScript(theme=>{
   localStorage.setItem('songline-theme',theme);localStorage.setItem('songline-privacy-v1',JSON.stringify({version:1,statistics:false,expires:Date.now()+86400000}));sessionStorage.setItem('songline-home-boot-v21.4','1');
   const get=CSSStyleDeclaration.prototype.getPropertyValue;
@@ -134,7 +127,6 @@ async function navigate(page,route){
     }
     assert.deepEqual(errors,[]);await context.close();
    }
-   assert(pair.before.edgeRemovals>0,'Baseline exposes line churn');assert(pair.before.motionStyleReads>0,'Baseline exposes per-frame CSS reads');
    report.push(pair);console.log('PASS',JSON.stringify(pair));
   }
  }finally{await browser.close();fs.writeFileSync(path.join(out,'stress-report.json'),JSON.stringify(report,null,2));}

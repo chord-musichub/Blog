@@ -1,12 +1,9 @@
-/* 搜索反馈与筛选状态覆盖；保持在 site-modern.css 之后加载。 */
-/* v20.0.8：搜索反馈增强 */
+/* 搜索交互、筛选状态与子页面标题的统一规则；保持在 site-modern.css 之后加载。 */
 .search-count{
   white-space:nowrap;
   color:var(--muted);
 }
 .toolbar-panel.is-search-empty,
-.tools-command-center.is-search-empty,
-.friend-search-box.is-search-empty,
 .searchbox.is-search-empty{
   animation: songline-search-shake .42s ease;
   border-color:rgba(248,113,113,.55) !important;
@@ -49,38 +46,8 @@
 .card .meta-row .tag{
   max-width:100%;
 }
-.friend-search-item.is-search-filtered{
-  display:none !important;
-}
 
-/* v20.0.8：首页朋友轮播 + 搜索筛选兜底 + 子页面标题彻底无框化 */
-body .page-hero.minimal-page-hero,
-body .page-hero.minimal-page-hero.card,
-body .minimal-page-hero{
-  background:transparent !important;
-  background-image:none !important;
-  border:0 !important;
-  outline:0 !important;
-  box-shadow:none !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-  border-radius:0 !important;
-  padding:18px 0 14px !important;
-  margin:0 0 18px !important;
-  min-height:auto !important;
-  overflow:visible !important;
-}
-body .page-hero.minimal-page-hero::before,
-body .page-hero.minimal-page-hero::after,
-body .minimal-page-hero::before,
-body .minimal-page-hero::after{
-  display:none !important;
-  content:none !important;
-  background:none !important;
-  box-shadow:none !important;
-}
-body .page-hero.minimal-page-hero h1,
-body .minimal-page-hero h1{
+body .page-hero.minimal-page-hero h1{
   margin:0 !important;
   padding:0 !important;
   background:transparent !important;
@@ -100,21 +67,13 @@ body .section-head::after{
   content:none !important;
 }
 body .friend-search-item.is-search-filtered,
-body .friend-search-item[hidden],
-body .tool-card.is-search-filtered,
-body .tool-card[hidden],
-body .tool-app-card.is-search-filtered,
-body .tool-app-card[hidden]{
-  display:none !important;
-}
+body .friend-search-item[hidden]{display:none !important;}
 .search-submit[data-no-page-loading],
-.friend-search-submit[data-no-page-loading],
 [data-tools-search-submit][data-no-page-loading]{
   position:relative;
   z-index:2;
 }
 
-/* v20.0.8：本轮强制兜底。标题区完全无框，搜索触发有刷新动画，筛选隐藏不被旧样式顶掉。 */
 html body .page-hero.minimal-page-hero,
 html body section.page-hero.minimal-page-hero{
   display:block !important;
@@ -217,7 +176,6 @@ html body .tool-app-card[hidden]{
 }
 @keyframes songline-search-spin{to{transform:rotate(360deg)}}
 
-/* v20.0.8：搜索清空按钮 hover、搜索隐藏兜底、朋友搜索状态增强。 */
 input[type="search"]::-webkit-search-cancel-button{
   -webkit-appearance:none;
   appearance:none;
@@ -274,17 +232,11 @@ body.dark .songline-search-clear:focus-visible{
 .tools-searchbox.has-custom-clear{
   padding-right:48px !important;
 }
-.friend-search-box .songline-search-clear,
 .tools-search-row .songline-search-clear,
 .toolbar-panel .songline-search-clear{
   align-self:center;
 }
-html body .tool-card.search-hidden,
-html body .tool-app-card.search-hidden{
-  display:none !important;
-}
 
-/* v20.0.8：统一搜索框结构。X 键放回输入框内部，避免跑出边框，也避免朋友页 grid 被插入按钮挤坏。 */
 .songline-search-field{
   position:relative !important;
   display:flex !important;
@@ -325,33 +277,4 @@ html body .tool-app-card.search-hidden{
 }
 .tools-search-row > .songline-search-field{
   flex:1 1 320px !important;
-}
-.friend-search-box{
-  grid-template-columns:auto minmax(0,1fr) auto !important;
-  overflow:visible !important;
-}
-.friend-search-box .songline-search-field{
-  grid-column:2 !important;
-  grid-row:1 !important;
-  width:100% !important;
-  min-width:0 !important;
-  flex:1 1 auto !important;
-}
-.friend-search-box .songline-search-field > .searchbox{
-  padding:8px 44px 8px 4px !important;
-}
-.friend-search-box .friend-search-submit{
-  grid-column:3 !important;
-  grid-row:1 !important;
-  white-space:nowrap !important;
-}
-@media(max-width:640px){
-  .friend-search-box{
-    grid-template-columns:auto minmax(0,1fr) !important;
-  }
-  .friend-search-box .friend-search-submit{
-    grid-column:1 / -1 !important;
-    grid-row:2 !important;
-    width:100% !important;
-  }
 }

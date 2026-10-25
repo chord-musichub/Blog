@@ -23,8 +23,8 @@ HEALTH_WAIT_SECONDS="${BLOG_HEALTH_WAIT_SECONDS:-240}"
 WORK_DIR="$(mktemp -d "$RELEASES_DIR/.bundle-${STAMP}-XXXXXX")"
 SOURCE_DIR="$WORK_DIR/source"
 RUNTIME_DIR="$WORK_DIR/runtime"
-RELEASE_DIR="$RELEASES_DIR/${STAMP}-bundle"
-BACKUP_PATH="$APP_ROOT/backups/runtime-before-bundle-${STAMP}.tar.gz"
+RELEASE_DIR="$RELEASES_DIR/${STAMP}-bundle-${WORK_DIR##*-}"
+BACKUP_PATH="$APP_ROOT/backups/runtime-before-bundle-${STAMP}-${WORK_DIR##*-}.tar.gz"
 
 cleanup() {
   local status=$?
@@ -105,7 +105,7 @@ for relative_path in data content/posts content/friends content/tags; do
   ln -s "$SHARED_DIR/$relative_path" "$target_path"
 done
 
-revision="bundle-${STAMP}"
+revision="bundle-${STAMP}-${WORK_DIR##*-}"
 printf '{"asset_version":"%s"}\n' "$revision" > "$RELEASE_DIR/runtime/data/build.json"
 ln -s build/public "$RELEASE_DIR/published" # compatibility for existing proxy/env files
 chown -R blog:blog "$RELEASE_DIR"
