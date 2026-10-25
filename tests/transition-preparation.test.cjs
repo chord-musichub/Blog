@@ -1,5 +1,5 @@
 const {test}=require('node:test'), assert=require('node:assert/strict'), vm=require('node:vm');
-const code=require('node:fs').readFileSync(require('node:path').join(__dirname,'../static/js/page-transition-system.js'),'utf8');
+const code=require('node:fs').readFileSync(require('node:path').join(__dirname,'../frontend/site/static/js/page-transition-system.js'),'utf8');
 const preload=code.slice(code.indexOf('  function preloadPageStyles('),code.indexOf('  function syncPageStyles('));
 const navigate=code.slice(code.indexOf('  async function navigate('),code.indexOf('  function previousPageDelta('));
 const flush=()=>new Promise(resolve=>setImmediate(resolve));

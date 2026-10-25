@@ -3,8 +3,8 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
-const markup=fs.readFileSync(path.join(__dirname,'../layouts/partials/transition-loader.html'),'utf8');
-const source=fs.readFileSync(path.join(__dirname,'../layouts/partials/scene-entry.html'),'utf8').match(/<script>\s*([\s\S]*?)<\/script>/)[1].replace(/{{ partial "transition-loader.html" \. \| jsonify \| safeJS }}/,JSON.stringify(markup));
+const markup=fs.readFileSync(path.join(__dirname,'../frontend/site/layouts/partials/transition-loader.html'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../frontend/site/layouts/partials/scene-entry.html'),'utf8').match(/<script>\s*([\s\S]*?)<\/script>/)[1].replace(/{{ partial "transition-loader.html" \. \| jsonify \| safeJS }}/,JSON.stringify(markup));
 function entry(theme,forceDark=false,empty=false){
  const classes=new Set(),attrs={},links=[],timers=[];
  const overlays=[];

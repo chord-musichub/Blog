@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -12,7 +13,7 @@ async function fixture(browser,options={}){
   const u=new URL(route.request().url());
   if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="180" height="120"><rect width="180" height="120" fill="#7497ac"/></svg>'});
   if(u.pathname.startsWith('/api/')){if(u.pathname==='/api/views')calls.push(route.request().method());return route.fulfill({json:u.pathname==='/api/views'?{views:83}:{messages:[],items:[]}});}
-  const root=path.resolve(u.pathname.startsWith('/static/')?'web/static':build);
+  const root=path.resolve(u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build);
   const file=path.resolve(root,u.pathname.replace(/^\/static\//,'/').slice(1)+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:'not found'});
   return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json'})[path.extname(file)]||'application/octet-stream'});

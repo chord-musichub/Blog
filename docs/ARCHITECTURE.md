@@ -1,13 +1,13 @@
 # 服务端架构
 
-后端位于 `cmd/server/`，保持单一 Go package，按业务职责拆分文件。Hugo 生成公开 HTML，Go 提供创作后台、公开 API、上传媒体和 Markdown 源文件；Docker 的 Caddy 或服务器 Nginx 将它们组合为同一个网站入口。
+服务入口位于 `cmd/server/main.go`，调用 `internal/server.Run()`。业务实现位于 `internal/server/`，保持单一 Go package，按职责拆分文件。Hugo 生成公开 HTML，Go 提供创作后台、公开 API、上传媒体和 Markdown 源文件；Docker 的 Caddy 或服务器 Nginx 将它们组合为同一个网站入口。
 
 ## 请求与发布流程
 
-1. `main.go` 读取 `.env` 与进程环境，创建运行目录、数据仓储和应用。
+1. `internal/server/server.go` 的 `Run` 读取 `.env` 与进程环境，创建运行目录、数据仓储和应用。
 2. `application.go` 装配模板与依赖，`routes.go` 注册页面、媒体及 API 路由。
 3. 服务启动或内容更新时，通过 `runHugo` 同步已发布文章、公开配置与资源，并执行构建。
-4. 公开 HTML 写入 `published/`，代理提供静态页面；`/uploads/`、`/md-source/`、后台和 API 由 Go 处理。
+4. 公开 HTML 写入 `build/public/`，代理提供静态页面；`/uploads/`、`/md-source/`、后台和 API 由 Go 处理。
 
 构建使用隔离 Hugo 工作区和专用的公开数据快照。账号、草稿、密码重置与 Markdown 下载源不能直接成为 Hugo 的 data namespace。后台业务 JSON 和公开生成文件的关系见[项目结构](PROJECT_STRUCTURE.md)。
 
@@ -15,7 +15,7 @@
 
 | 文件或模块 | 职责 |
 | --- | --- |
-| `main.go`、`application.go`、`app_helpers.go` | 启动、依赖、模板函数与应用级 URL/目录辅助 |
+| `server.go`、`application.go`、`app_helpers.go` | 启动、依赖、模板函数与应用级 URL/目录辅助 |
 | `config.go`、`runtime_models.go` | 环境变量校验、共享运行模型、角色和状态常量 |
 | `routes.go`、`page_handlers.go` | HTTP 配置、路由、公共页面渲染与健康检查 |
 | `auth_handlers.go`、`security.go`、`http_security.go` | 登录、会话与 HTTP 安全边界 |
@@ -24,11 +24,13 @@
 | `publisher.go`、`public_snapshot.go`、`runtime_layout.go` | 串行构建、公开默认配置与运行数据分类迁移 |
 | `creator_content.go`、`site_*`、`theme_*` | 项目、回忆、站点与主题设置 |
 | `media_*` | 素材库、上传、裁剪、迁移和派生预览 |
-| `views_api.go`、`messages_api.go`、`score_repository.go`、`*_scores.go` | 阅读量、首页留言和游戏积分 |
+| `views_api.go`、`messages_api.go`、`score_api.go`、`score_ranking.go`、`score_repository.go` | 阅读量、首页留言和游戏积分 |
 | `json_file.go`、`store.go`、`article_store.go` | JSON 原子写入与数据仓储 |
-| `language_assets.go`、`article_comments.go` | 前后台共享语言资源与文章留言配置 |
+| `shared_assets.go`、`article_comments.go` | 前后台共享语言资源与文章留言配置 |
 
-表中的模块前缀对应同目录多份文件，测试与实现一起维护；无需将所有新业务继续堆到入口文件。
+游戏排行榜在 `score_api.go` 登记计分范围、升降序和模式差异，共用请求与身份处理；`score_ranking.go` 维护去重、同分排序和前三名规则，`score_repository.go` 负责缓存及原子保存。新增游戏无需复制整套接口。
+
+上表路径均相对于 `internal/server/`；模块前缀对应同目录多份文件，测试与实现一起维护；无需将所有新业务继续堆到入口文件。
 
 ## 配置与数据约定
 
@@ -42,8 +44,8 @@ JSON 更新使用同目录临时文件和原子替换；需要并发保护的业
 
 - 环境变量在 `config.go` 集中读取，并同步环境示例与配置指南。
 - 路由在 `routes.go` 注册；兼容 URL 使用集中登记，避免重复处理函数。
-- 触发公开重建统一调用 `runHugo`，不绕过构建锁并发写入 `published/`。
-- 私有运行数据放入 `data/<职责>/`，构建仅导出公开字段；迁移不得覆盖已有实例数据。
+- 触发公开重建统一调用 `runHugo`，不绕过构建锁并发写入 `build/public/`。
+- 私有运行数据放入所配置 DATA_DIR 下的职责子目录，构建仅导出公开字段；迁移不得覆盖已有实例数据。
 - 账号权限、持久化和构建失败使用临时目录测试，命令见[测试与验证](TESTING.md)。
 
 部署拓扑与发布回滚见[服务器指南](SERVER_DEPLOYMENT.md)，图片预览限制见[性能维护](PERFORMANCE.md)。

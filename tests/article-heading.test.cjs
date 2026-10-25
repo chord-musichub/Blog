@@ -1,5 +1,5 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const code=fs.readFileSync('static/js/article-heading.js','utf8');
+const code=fs.readFileSync('frontend/site/static/js/article-heading.js','utf8');
 function fixture({text='中文👨‍👩‍👧‍👦é简介',reduced=false,transition=false,visible=true,scene=false,hidden=false}={}){
  const listeners=new Map(),frames=new Map();let sequence=0;
  const classes=new Set(),rootClasses=new Set(transition?['songline-page-transitioning']:[]),observers=[],source={textContent:text};

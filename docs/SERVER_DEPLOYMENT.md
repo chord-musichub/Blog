@@ -62,16 +62,9 @@ sudo chown -R blog:blog /opt/songline-blog/shared/data /opt/songline-blog/shared
 
 旧服务器如果已经按更早的发布脚本保留了 `shared/static/`，也不必删除它。首次运行新版本时可以临时保留 `RUNTIME_STATIC_DIR=/opt/songline-blog/shared/static`，服务会只复制 `data/` 中缺失的媒体与 Markdown；确认迁移完成后即可删除该环境变量与旧目录。旧版平铺的 `shared/data/*.json` 在启动时会被一次性移动到上面的分类目录；同名内容冲突时服务会停止迁移而不覆盖任何数据，需先人工处理冲突。
 
-### 整理早期站点图标
+### 早期素材路径兼容
 
-若旧版本把站点图标直接放在 `static/uploads/` 根目录，可在完成代码发布后执行一次：
-
-```bash
-sudo bash /opt/songline-blog/current/deploy/migrate-admin-assets.sh
-sudo systemctl restart blog-admin.service
-```
-
-脚本会将已知的站点图片移动到 `static/uploads/admin/`，并同步更新站点设置与默认朋友头像；不会删除上传资源。
+服务在启动构建时自动复制缺失的旧素材、整理运行时 JSON 中的旧图片引用，并使用现存的默认头像。旧 `/uploads/` 地址由媒体路由继续兼容；已有上传文件不会被覆盖。旧 `shared/static/` 的导入仍按上面的 `RUNTIME_STATIC_DIR` 配置完成，无需额外执行素材迁移脚本。
 
 从仓库复制环境示例，填写真实管理员账号、密码与会话密钥。不要把真实文件贴到聊天或提交到 Git：
 
@@ -135,7 +128,7 @@ sudo nginx -t
 配置中公开站的根目录必须为：
 
 ```nginx
-root /opt/songline-blog/current/published;
+root /opt/songline-blog/current/build/public;
 ```
 
 随后在候选版本目录中执行提升脚本。它会停止候选服务、原子切换 `current` 链接、重启新稳定服务并执行健康检查；启动失败会自动回到上一稳定版本。新服务健康后，再 reload Nginx：
@@ -165,7 +158,21 @@ curl -I https://blog.songline-blog.com/write/login
 
 当前 Go 构建使用项目内的 `vendor/` 依赖，不再访问 `proxy.golang.org`。发布时必须将 `vendor/`、`go.mod`、`go.sum` 和源码一起提交/推送；Git 拉取及服务器工具安装仍需要网络。旧发布版本不自动获得此修复，不能仅更新本机文件后直接期待服务器生效。
 
-每次更新都从仓库最新源码启动候选版本：
+已安装迭代入口时，优先使用：
+
+```bash
+sudo songline-blog-update
+```
+
+入口脚本拉取一次源码，再将该干净临时克隆交给同版本发布脚本构建，避免重复下载和两次拉取之间的分支变化。检查候选页面后，使用下方的提升命令切换。需要自动切换时可使用 `sudo songline-blog-update --promote`，成功后会更新服务器上的迭代入口。
+
+从更早的入口升级时，可在切换完成后安装新版入口，之后的迭代才使用单次拉取流程：
+
+```bash
+sudo install -m 0755 /opt/songline-blog/current/deploy/server-update.sh /usr/local/sbin/songline-blog-update
+```
+
+未安装迭代入口时，也可以直接运行发布脚本，它仍自行拉取源码：
 
 ```bash
 sudo bash ./deploy/release-deploy.sh main
@@ -213,3 +220,7 @@ sudo systemctl reload nginx
 ```
 
 完整发布包会以本地 `runtime/` 为准，替换线上动态数据；服务器会在替换前生成 `runtime-before-bundle-*.tar.gz`。因此开始打包后不要再在公开站新增留言、上传或编辑内容，除非这些改动也已同步回本地。
+
+## 目录版本兼容
+
+新发布版本在 `runtime/` 下链接服务器原有 `shared/data` 和 `shared/content`，共享数据不搬迁。公开输出统一到 `build/public/`；发布脚本创建 `published -> build/public` 兼容链接，因此旧 PUBLIC_DIR 和旧代理配置可以继续使用。更新代理时再切换到本文的新路径，回滚时核对目标版本的输出目录。

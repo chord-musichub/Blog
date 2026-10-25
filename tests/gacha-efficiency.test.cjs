@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const source=fs.readFileSync(path.join(__dirname,'../static/js/tools/gacha.js'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/tools/gacha.js'),'utf8');
 function fixture(){
  class Node{
   constructor(){this.dataset={};this.children=[];this.style={};this.className='';this.textContent='';this.listeners=new Map();this.html='';this.writes=0;this.created=0;this.parentNode=null;this.classList={toggle(){}};}

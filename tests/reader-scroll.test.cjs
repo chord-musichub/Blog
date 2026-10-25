@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
-const code=fs.readFileSync(require('node:path').join(__dirname,'../static/js/reader-floating-controls.js'),'utf8');
+const code=fs.readFileSync(require('node:path').join(__dirname,'../frontend/site/static/js/reader-floating-controls.js'),'utf8');
 function setup(reader){
  let reads=0,writes=0;const callbacks=[],events={};
  function button(){return {dataset:{},isConnected:true,shown:false,style:{removeProperty(){writes++;}},classList:{add(){},toggle(name,value){this.shown=value;}},addEventListener(){},remove(){this.isConnected=false;}};}

@@ -26,7 +26,7 @@ const mime=file=>({'.css':'text/css','.js':'application/javascript','.html':'tex
      if(u.pathname.startsWith('/uploads/')) {
       const size=u.searchParams.get('preview');
       const derived=path.join(audit,'generated',size==='160'?'160':'640',u.pathname);
-      file=preview && ['640','160'].includes(size) && fs.existsSync(derived)?derived:path.join('static',u.pathname);
+      file=preview && ['640','160'].includes(size) && fs.existsSync(derived)?derived:path.join('frontend/site/static',u.pathname);
       if(!fs.existsSync(file)) file=path.join('data/media',u.pathname.slice('/uploads/'.length));
       if(fs.existsSync(file)){counts.imageBytes+=fs.statSync(file).size;counts.imageRequests++;}
      } else if(u.pathname.startsWith('/static/'))file=path.join('web',u.pathname);

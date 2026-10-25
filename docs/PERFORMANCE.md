@@ -4,7 +4,7 @@
 
 ## 页面何时显示
 
-共享入口是 `web/static/resource-readiness.js`，公开站和后台跨文档过渡均使用它。当前预算由 `SonglineResources.policy` 集中维护：
+共享入口是 `frontend/shared/js/resource-readiness.js`，公开站和后台跨文档过渡均使用它。当前预算由 `SonglineResources.policy` 集中维护：
 
 | 对象 | 等待预算 | 行为 |
 | --- | --- | --- |

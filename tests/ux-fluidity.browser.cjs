@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Offline interaction regression; all media and APIs are local fixtures.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
@@ -11,7 +12,7 @@ async function fixture(browser,build,width){
   const u=new URL(route.request().url());requests.push({path:u.pathname,method:route.request().method()});
   if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" fill="#607d8b"/></svg>',contentType:'image/svg+xml'});
   if(u.pathname.includes('/api/'))return route.fulfill({json:{views:83,items:[],messages:[],scores:[]}});
-  const root=path.resolve(u.pathname.startsWith('/static/')?'web/static':build);
+  const root=path.resolve(u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build);
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   if(u.pathname.endsWith('/')&&route.request().headers()['x-requested-with'])await new Promise(resolve=>setTimeout(resolve,160));

@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Offline visual / interaction regression for shared glass tool layouts.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -188,7 +189,7 @@ async function useTool(p,name){
           if(route.request().method()==='POST'&&u.pathname.includes('-scores'))posts.push({path:u.pathname,payload:route.request().postDataJSON()});
           return route.fulfill({json:{items:[],messages:[],views:1,scores:[{score:300},{score:200},{score:100}]}});
         }
-        const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):build;
+        const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build;
         const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
         if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
         const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.json':'application/json'};

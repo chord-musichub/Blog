@@ -1,18 +1,23 @@
 // Materialize only public source plus fixed fixtures; never copy runtime data.
 // node tests/prepare-interaction-build.cjs /source/checkout /isolated/output
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
-const source=path.resolve(process.argv[2]||'.'),target=path.resolve(process.argv[3]||'');
+const checkout=path.resolve(process.argv[2]||'.'),source=path.join(checkout,'frontend/site'),target=path.resolve(process.argv[3]||'');
 assert(process.argv[3],'Provide a new isolated output directory');
 assert(!fs.existsSync(target),'Refusing to overwrite an existing fixture');
 assert(fs.existsSync(path.join(source,'hugo.toml')),'Provide a Blog source checkout');
 fs.mkdirSync(target,{recursive:true});
-for(const name of ['assets','content','layouts','static','web'])fs.cpSync(path.join(source,name),path.join(target,name),{recursive:true,filter:file=>{
+for(const name of ['assets','content','layouts','static'])fs.cpSync(path.join(source,name),path.join(target,name),{recursive:true,filter:file=>{
   const relative=path.relative(source,file).split(path.sep).join('/');
   if(/^(content\/(posts|friends|tags)|static\/(md-source|runtime-config\.js))(\/|$)/.test(relative))return false;
   if(relative.startsWith('static/uploads/'))return relative==='static/uploads/admin'||relative.startsWith('static/uploads/admin/');
   return true;
 }});
 fs.copyFileSync(path.join(source,'hugo.toml'),path.join(target,'hugo.toml'));
+// The public build consumes the same shared source files as the Go routes.
+fs.cpSync(path.join(checkout,'frontend/shared'),path.join(target,'static'),{recursive:true});
+fs.cpSync(path.join(checkout,'frontend/admin'),path.join(target,'frontend/admin'),{recursive:true});
+fs.cpSync(path.join(checkout,'frontend/shared'),path.join(target,'frontend/shared'),{recursive:true});
+
 fs.mkdirSync(path.join(target,'data'));
 for(const name of ['site','theme']){
   const data=JSON.parse(fs.readFileSync(path.join(source,`assets/bootstrap/${name}.json`),'utf8'));

@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
-const source=fs.readFileSync(path.join(__dirname,'../static/js/tools/audio-visualizer.js'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/tools/audio-visualizer.js'),'utf8');
 function functions(names){return names.map(name=>source.match(new RegExp('^    function '+name+'\\([^]*?^    }','m'))[0]).join('\n');}
 class Node{
  constructor(){this.children=[];this.dataset={};this.classes=new Set();this.attrs=new Map();this.textContent='';this.mutations=0;this.classList={add:c=>this.classes.add(c),remove:c=>this.classes.delete(c)};}

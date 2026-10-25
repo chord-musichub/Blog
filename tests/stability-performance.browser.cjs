@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Offline stress audit; APIs/media are fixtures, not production requests.
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -11,7 +12,7 @@ async function fixture(browser,build,width,theme){
   const u=new URL(route.request().url());
   if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="#607d8b"/></svg>',contentType:'image/svg+xml'});
   if(u.pathname.includes('/api/'))return route.fulfill({json:{items:[],messages:[],views:83,scores:[]}});
-  const root=u.pathname.startsWith('/static/')?path.resolve('web/static'):path.resolve(build);
+  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):path.resolve(build);
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream'});

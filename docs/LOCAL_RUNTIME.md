@@ -22,6 +22,8 @@ cp .env.example .env
 chmod 600 .env
 ```
 
+示例中的 `BLOG_DATA_DIR=./runtime/data`、`BLOG_CONTENT_DIR=./runtime/content` 指定新实例的 Docker 数据目录。
+
 在 `.env` 填写 `ADMIN_USER`、`ADMIN_PASS` 和 `SESSION_SECRET`，保留 `ADMIN_BASE_PATH=/write`。密码和会话密钥分别使用随机值；会话密钥至少 32 个字符。若已安装 OpenSSL，可分别执行以下命令生成候选值，再写入文件：
 
 ```sh
@@ -55,6 +57,9 @@ docker compose logs --tail=100 blog-admin
 | `ADMIN_USER`、`ADMIN_PASS` | 必填的配置管理员账号与密码；启动时同步该管理员密码哈希 |
 | `SESSION_SECRET` | 必填，至少 32 字符的随机会话密钥 |
 | `ADMIN_BASE_PATH` | 后台外部路径；本地初始化和 Compose 默认 `/write` |
+| `BLOG_DATA_DIR`、`BLOG_CONTENT_DIR` | Compose 主机绑定目录；新实例用 `./runtime/data`、`./runtime/content`，旧 `.env` 未设置时保留 `./data`、`./content` |
+| `DATA_DIR`、`HUGO_CONTENT_DIR` | 直接运行 Go 时的数据和生成文章目录；默认使用 runtime，发现旧目录时继续使用旧路径 |
+| `PUBLIC_DIR` | 直接运行 Go 默认输出 `./build/public`；显式设置仍优先 |
 | `PUBLIC_BASE_URL` | 公开站路径，默认 `/`；仓库子路径部署需对应调整 |
 | `PUBLIC_SITE_URL` | 公开站完整 URL，用于生成链接与来源配置 |
 | `PUBLIC_API_URL` | API 完整 URL；同域部署通常与公开站相同 |
@@ -72,12 +77,12 @@ docker compose logs --tail=100 blog-admin
 | 路径 | 内容 |
 | --- | --- |
 | `.env` | 本实例凭据、会话密钥和 URL 配置 |
-| `data/` | 账号、稿件、设置、留言、阅读量、排行、上传媒体与 Markdown 源 |
-| `content/posts/`、`content/friends/`、`content/tags/` | 后台生成的公开内容 |
-| `published/` | 可重新构建的公开输出 |
-| `assets/`、`static/uploads/admin/` | 仓库提供的公开配置与默认素材 |
+| `runtime/data/`（或原 `data/`） | 账号、稿件、设置、留言、阅读量、排行、上传媒体与 Markdown 源 |
+| `runtime/content/`（或原 `content/`） | 后台生成的公开内容 |
+| `build/public/` | 可重新构建的公开输出 |
+| `frontend/site/assets/`、`frontend/site/static/uploads/admin/` | 仓库提供的公开配置与默认素材 |
 
-新克隆可使用默认页面与素材，但没有旧实例的账号和文章。迁移时先恢复 `.env`、`data/` 及动态内容目录，再启动；源码仓库不能替代实例备份。旧版上传目录的迁移说明见[数据边界](REPLICA_AND_PRIVACY.md)。
+新克隆可使用默认页面与素材，但没有旧实例的账号和文章。迁移时先恢复 `.env`、`data/` 及动态内容目录，再启动；源码仓库不能替代实例备份。旧安装升级时保留原 `.env`，不要用新示例覆盖；未设置 BLOG_DATA_DIR/BLOG_CONTENT_DIR 的 Compose 继续挂载原目录。旧版上传目录的迁移说明见[数据边界](REPLICA_AND_PRIVACY.md)。
 
 `data/media/.deleted/` 保存媒体删除/重命名标记，阻止默认素材重新补回，必须随运行数据备份；不要当作缓存清空。该目录不通过 `/uploads/` 暴露。
 
@@ -107,3 +112,7 @@ docker compose up -d --no-build
 ## 服务器运行
 
 Docker/Caddy 的生产模板在 `deploy/Caddyfile`，使用同域的 `SITE_HOST` 与 `/write` 后台路径。Nginx/systemd 的完整发布、候选验证及回滚流程见[服务器指南](SERVER_DEPLOYMENT.md)。
+
+### 正在运行旧版容器的工作区
+
+源码整理不会重启现有容器。旧容器挂载的根目录 `content/` 可暂留固定页面副本供旧版本使用，这些副本与动态文章一样不再纳入 Git。新版本的固定页面唯一源码位于 `frontend/site/content/`；构建只从旧目录合并文章、朋友和标签内容，不让旧工具副本覆盖新模板。准备切换时再重新构建并启动容器。

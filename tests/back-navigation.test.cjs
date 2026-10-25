@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
 const path=require('node:path');
-const source=fs.readFileSync(path.join(__dirname,'../static/js/page-transition-system.js'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/page-transition-system.js'),'utf8');
 const policy=source.slice(source.indexOf('  function previousPageDelta()'),source.indexOf('  function handleClick(event)'));
 function delta(urls,index,canGoBack=false){
  const entries=urls&&urls.map((url,i)=>({url,key:String(i)}));
@@ -27,7 +27,7 @@ test('older browsers can traverse only app-owned history entries',()=>{
 });
 test('desktop and mobile directory jumps preserve history metadata',()=>{
  for(const file of ['article-reading.js','mobile-toc.js']){
-  const js=fs.readFileSync(path.join(__dirname,'../static/js',file),'utf8');
+  const js=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js',file),'utf8');
   assert(js.includes('history.replaceState(history.state,'));
   assert(!js.includes('history.pushState(null'));
  }

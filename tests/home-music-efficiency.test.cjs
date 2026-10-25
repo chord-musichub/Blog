@@ -1,7 +1,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const source=fs.readFileSync(path.join(__dirname,'../static/js/pages/home/music-player.js'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/pages/home/music-player.js'),'utf8');
 function functions(names){return names.map(name=>{
  const match=source.match(new RegExp('^    function '+name+'\\([^]*?^    }','m'));
  assert(match,'Real player function '+name);return match[0];

@@ -10,7 +10,7 @@ function loader(){
  const document={body:{dataset:{}},querySelector:()=>({inert:true}),currentScript:null};
  document.createElement=()=>({dataset:{},remove(){this.removed=true;}});
  document.head={appendChild(script){requested.push(script.src);scripts.push(script);}};
- const code=fs.readFileSync(path.join(repo,'static/js/page-modules.js'),'utf8').replace('  var scanTimer = 0;','  window.testLoad = (key, root = document) => loadScript(modules.find(mod => mod.key === key), root); window.testLoaded = loaded; return;');
+ const code=fs.readFileSync(path.join(repo,'frontend/site/static/js/page-modules.js'),'utf8').replace('  var scanTimer = 0;','  window.testLoad = (key, root = document) => loadScript(modules.find(mod => mod.key === key), root); window.testLoaded = loaded; return;');
  vm.runInNewContext(code,{window,document,URL,console});
  return {window,requested,scripts};
 }
@@ -49,13 +49,13 @@ test('late module responses cannot initialize a detached page but remain reusabl
  assert.equal(f.scripts.length,1,'Late code is reusable without re-fetching');
 });
 test('legacy tools use one managed entry and expose repeat-safe initializers',()=>{
- const registry=fs.readFileSync(path.join(repo,'static/js/page-modules.js'),'utf8');
+ const registry=fs.readFileSync(path.join(repo,'frontend/site/static/js/page-modules.js'),'utf8');
  for(const name of ['random-number','gacha','focus-timer','markdown-previewer']){
-  const template=fs.readFileSync(path.join(repo,'layouts/tools',name+'.html'),'utf8');
+  const template=fs.readFileSync(path.join(repo,'frontend/site/layouts/tools',name+'.html'),'utf8');
   assert(!template.includes('/js/tools/'+name+'.js'),'No duplicated or re-executed main script: '+name);
   assert(registry.includes("key:'"+name+"'"));
  }
- assert(!fs.existsSync(path.join(repo,'static/js/tools/index.js')),'Retired competing search owner is removed');
+ assert(!fs.existsSync(path.join(repo,'frontend/site/static/js/tools/index.js')),'Retired competing search owner is removed');
 });
 test('focus timer owns exactly one frame chain and releases global listeners on departure',()=>{
  const frames=new Map(),events=new Map();let next=0,click;
@@ -64,7 +64,7 @@ test('focus timer owns exactly one frame chain and releases global listeners on 
  const window={requestAnimationFrame(fn){frames.set(++next,fn);return next;},cancelAnimationFrame(id){frames.delete(id);},
   addEventListener(type,fn){events.set(type,fn);},removeEventListener(type,fn){if(events.get(type)===fn)events.delete(type);}};
  const document={querySelector:()=>root,addEventListener:window.addEventListener,removeEventListener:window.removeEventListener};
- vm.runInNewContext(fs.readFileSync(path.join(repo,'static/js/tools/focus-timer.js'),'utf8'),{
+ vm.runInNewContext(fs.readFileSync(path.join(repo,'frontend/site/static/js/tools/focus-timer.js'),'utf8'),{
   window,document,localStorage:{getItem:()=>null,setItem(){}},console,
   requestAnimationFrame:window.requestAnimationFrame,cancelAnimationFrame:window.cancelAnimationFrame
  });
@@ -76,7 +76,7 @@ test('2048 audio engine is disposable and cannot reopen a departed game context'
  let closes=0;
  class AudioContext{constructor(){this.state='running';}close(){this.state='closed';closes++;return Promise.resolve();}}
  const window={AudioContext};
- vm.runInNewContext(fs.readFileSync(path.join(repo,'static/js/tools/game-2048-audio.js'),'utf8'),{window});
+ vm.runInNewContext(fs.readFileSync(path.join(repo,'frontend/site/static/js/tools/game-2048-audio.js'),'utf8'),{window});
  const audio=window.SonglineCreate2048Audio({isEnabled:()=>true});assert(audio.ensureAudio());
  audio.destroy();audio.destroy();assert.equal(closes,1);assert.equal(audio.ensureAudio(),null);
 });

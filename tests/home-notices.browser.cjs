@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Isolated Hugo fixtures + browser checks. No production requests or writes.
 const {chromium}=require('playwright');
 const {execFileSync}=require('node:child_process');
@@ -24,8 +25,11 @@ function makeFixtures(){
   // archive, even when its custom frontmatter index is absent.
   if(count===4){if(fs.existsSync(noticeIndex))fs.unlinkSync(noticeIndex);}
   else fs.writeFileSync(noticeIndex,'---\ntitle: 站点公告\nlayout: site-notice\n---\n');
+  fs.cpSync(path.join(repo,'frontend/site/static'),path.join(root,'static'),{recursive:true});
+  fs.cpSync(path.join(repo,'frontend/shared'),path.join(root,'static'),{recursive:true});
   const args=['run','--pull=never','--rm','--network','none','--read-only','--tmpfs','/tmp','--user','1000:1000','--workdir','/src','--entrypoint','hugo','-e','HUGO_RESOURCEDIR=/out/resources'];
-  for(const [src,dst] of [['hugo.toml','hugo.toml'],['layouts','layouts'],['assets','assets'],['assets/bootstrap','data'],['static','static']])args.push('--mount',`type=bind,src=${path.join(repo,src)},dst=/src/${dst},readonly`);
+  for(const [src,dst] of [['frontend/site/hugo.toml','hugo.toml'],['frontend/site/layouts','layouts'],['frontend/site/assets','assets'],['frontend/site/assets/bootstrap','data']])args.push('--mount',`type=bind,src=${path.join(repo,src)},dst=/src/${dst},readonly`);
+  args.push('--mount',`type=bind,src=${root}/static,dst=/src/static,readonly`);
   args.push('--mount',`type=bind,src=${root}/content,dst=/src/content,readonly`,'--mount',`type=bind,src=${root}/out,dst=/out`,process.env.BLOG_HUGO_IMAGE||'blog-blog-admin:latest','--source','/src','--destination','/out/public','--minify','--noBuildLock','--cacheDir','/tmp/hugo-cache');
   execFileSync('docker',args,{stdio:'pipe',timeout:60000});
  }
@@ -37,7 +41,7 @@ async function contextFor(browser,build,{width=390,height=844,theme='dark',js=tr
   const url=new URL(route.request().url());
   if(url.origin!==base)return route.fulfill({status:204,body:''});
   if(url.pathname.startsWith('/api/'))return route.fulfill({json:url.pathname==='/api/views'?{views:83}:{messages:[],items:[]}});
-  const root=path.resolve(url.pathname.startsWith('/static/')?path.join(repo,'web/static'):build);
+  const root=path.resolve(url.pathname.startsWith('/static/')?adminStaticRoot(url.pathname):build);
   const relative=decodeURIComponent(url.pathname.replace(/^\/static\//,'/').slice(1));
   const file=path.resolve(root,relative+(url.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});

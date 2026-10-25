@@ -11,7 +11,7 @@ function fixture(){
 function module(){
  let serial=0;const revoked=[],created=[];
  const ctx={window:{},TextDecoder,Uint8Array,Blob,console,URL:{createObjectURL:()=>{const u='blob:test-'+(++serial);created.push(u);return u;},revokeObjectURL:u=>revoked.push(u)}};
- vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../static/js/tools/audio-metadata.js'),'utf8'),ctx);
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/tools/audio-metadata.js'),'utf8'),ctx);
  return {api:ctx.window.SonglineAudioMetadata,revoked,created};
 }
 test('independent MP3 metadata covers do not revoke each other or the default consumer',async()=>{

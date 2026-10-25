@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Offline checks for centered main panels, complete scene coverage and reader chevrons.
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -51,7 +52,7 @@ async function chevrons(p){
         const u=new URL(route.request().url());
         if(u.origin!==base)return route.fulfill({body:'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"/>',contentType:'image/svg+xml'});
         if(/^\/(?:api|static\/api|write\/api)\//.test(u.pathname))return route.fulfill({json:{items:[],messages:[],views:1,scores:[{score:300},{score:200},{score:100}]}});
-        const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):build;
+        const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build;
         const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
         if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({body:'',status:404});
         const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.json':'application/json'};

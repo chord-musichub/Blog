@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const repo=path.resolve(__dirname,'..');
-const source=fs.readFileSync(path.join(repo,'static/js/page-modules.js'),'utf8');
+const source=fs.readFileSync(path.join(repo,'frontend/site/static/js/page-modules.js'),'utf8');
 function fixture(mode='idle'){
  const events=new Map(),tasks=new Map(),elements=new Map(),features=new Set(),queries=new Map(),inits=new Map();let serial=0;
  const schedule=fn=>{const id=++serial;tasks.set(id,fn);return id;},cancel=id=>tasks.delete(id);
@@ -68,7 +68,7 @@ test('audio requests only shared help, not retired glass layout or tool search s
  assert(!f.document.getElementById('songline-tool-shared-style'));
  assert(!f.document.getElementById('songline-search-overrides-style'));
  assert(f.document.getElementById('songline-tool-dialog-style'));
- const layout=fs.readFileSync(path.join(repo,'static/css/tools/detail-layout.css'),'utf8');
+ const layout=fs.readFileSync(path.join(repo,'frontend/site/static/css/tools/detail-layout.css'),'utf8');
  assert(!layout.includes('.audio-visualizer-page'),'The shared glass layout no longer patches the independent studio');
  assert(!layout.includes('.tool-help-dialog'),'Shared help has a single narrower owner');
 });

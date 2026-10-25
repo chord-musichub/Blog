@@ -1,7 +1,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
-const source=fs.readFileSync(path.join(root,'static/js/pages/archive/index.js'),'utf8');
+const source=fs.readFileSync(path.join(root,'frontend/site/static/js/pages/archive/index.js'),'utf8');
 const helpers=source.slice(source.indexOf('  function pageNumber('),source.indexOf('  function init('));
 const context=vm.createContext({});vm.runInContext(helpers,context);
 test('archive page inputs reject malformed, unsafe and non-positive values',()=>{
@@ -20,12 +20,12 @@ test('compact page window includes current and endpoints, without duplicates or 
 });
 test('both archive modes have paging; notices retain their existing full-list behavior',()=>{
  const read=p=>fs.readFileSync(path.join(root,p),'utf8');
- const template=read('layouts/_default/list.html');
+ const template=read('frontend/site/layouts/_default/list.html');
  for(const mode of ['articles','projects'])assert(template.includes('partial "archive/pagination.html" "'+mode+'"'));
  assert(template.includes('data-archive-page-size="10"'));
- assert(!read('layouts/partials/notices/archive.html').includes('archive/pagination.html'));
+ assert(!read('frontend/site/layouts/partials/notices/archive.html').includes('archive/pagination.html'));
  assert(source.includes('pagers[mode] ? matched.slice(start, start + pageSize) : matched'));
  assert(source.includes('history.replaceState(history.state,'));assert(!source.includes('history.pushState'));
  assert(!source.includes('addEventListener(\'popstate\''),'Global transition owns browser history');
- const css=read('static/css/pages/archive/index.css');assert(css.includes('.content-archive__pagination[hidden]{display:none}'));
+ const css=read('frontend/site/static/css/pages/archive/index.css');assert(css.includes('.content-archive__pagination[hidden]{display:none}'));
 });

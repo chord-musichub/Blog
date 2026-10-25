@@ -10,7 +10,7 @@ for(const [name,script,factory,bestKey,playerKey,cacheKey] of [
     const storage=new Map([[bestKey,'64']]),posts=[];
     let offline=false;
     const window={SonglineRuntime:{storage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)}}};
-    vm.runInNewContext(fs.readFileSync(path.join(repo,'static/js/tools',script),'utf8'),{
+    vm.runInNewContext(fs.readFileSync(path.join(repo,'frontend/site/static/js/tools',script),'utf8'),{
       window,localStorage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)},
       fetch:async(url,options)=>{
         if(offline)throw new Error('offline');
@@ -32,8 +32,8 @@ for(const [name,script,factory,bestKey,playerKey,cacheKey] of [
   });
 }
 test('2048 renderer and palette use the same actual tile-value classes',()=>{
-  const window={};vm.runInNewContext(fs.readFileSync(path.join(repo,'static/js/tools/game-2048-engine.js'),'utf8'),{window});
-  const css=fs.readFileSync(path.join(repo,'static/css/tools/game-2048.css'),'utf8');
+  const window={};vm.runInNewContext(fs.readFileSync(path.join(repo,'frontend/site/static/js/tools/game-2048-engine.js'),'utf8'),{window});
+  const css=fs.readFileSync(path.join(repo,'frontend/site/static/css/tools/game-2048.css'),'utf8');
   for(const value of [2,4,8,16,32,64,128,256,512,1024,2048])assert(css.includes('.game-2048-tile.'+window.Songline2048Engine.tileClass(value)+'{'));
 });
 test('help close is synchronous, rapid reopen ignores a stale close event, and reconnect syncs only the active page',()=>{
@@ -51,7 +51,7 @@ test('help close is synchronous, rapid reopen ignores a stale close event, and r
   let blurs=0;trigger.blur=()=>{blurs++;document.activeElement=null;};
   const window=element();
   class CustomEvent{constructor(type,options){this.type=type;Object.assign(this,options);}}
-  vm.runInNewContext(fs.readFileSync(path.join(repo,'static/js/tool-controls.js'),'utf8'),{window,document,CustomEvent,WeakMap});
+  vm.runInNewContext(fs.readFileSync(path.join(repo,'frontend/site/static/js/tool-controls.js'),'utf8'),{window,document,CustomEvent,WeakMap});
   window.SonglineInitToolControls(document);window.SonglineInitToolControls(document);
   assert.equal(trigger.listeners.click.length,1,'Repeated initialization does not duplicate handlers');
   trigger.emit('click');dismiss.emit('click');assert.deepEqual(states,[true,false],'State is restored without waiting for a queued native close event');

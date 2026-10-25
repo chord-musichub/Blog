@@ -4,7 +4,7 @@ const {readFileSync} = require('node:fs');
 const {join} = require('node:path');
 const vm = require('node:vm');
 
-const source = readFileSync(join(__dirname, '../web/static/document-transition.js'), 'utf8');
+const source = readFileSync(join(__dirname, '../frontend/shared/js/document-transition.js'), 'utf8');
 function setup(backend, path, base='/write/', mark=null) {
   const window = {matchMedia:()=>({matches:false}), addEventListener(){}, SonglinePageConfig:[{key:'write',route:base}]};
   const document = {

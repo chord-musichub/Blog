@@ -39,7 +39,7 @@
     header @versionedAssets Cache-Control "public, max-age=31536000, immutable"
 
     handle {
-        root * {$PUBLIC_DIR:/opt/gexian-blog-mvp-v2/published}
+        root * {$PUBLIC_DIR:/opt/songline-blog/current/build/public}
         file_server
     }
 }

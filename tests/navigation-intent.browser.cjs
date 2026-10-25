@@ -19,7 +19,7 @@ const base=process.env.BLOG_TEST_URL||'http://127.0.0.1:8080';
     assert.ok(dock.top>=0 && dock.bottom<=60,'map entrance stays in the top bar: '+JSON.stringify(dock));
    }
    if(process.env.UI_SOURCE_CSS) await page.route('**/css/**',async route=>{
-    const file='static'+new URL(route.request().url()).pathname;
+    const file='frontend/site/static'+new URL(route.request().url()).pathname;
     if(fs.existsSync(file)) await route.fulfill({contentType:'text/css',body:fs.readFileSync(file)});else await route.continue();
    });
    await page.goto(base+'/friends/');await page.waitForTimeout(2500);

@@ -4,12 +4,12 @@ const fs=require('node:fs');
 const path=require('node:path');
 const assert=require('node:assert/strict');
 const readSource=file=>process.env.RESOURCE_AUDIT_BASELINE
- ? require('node:child_process').execFileSync('git',['show','HEAD:'+file],{encoding:'utf8'})
+ ? require('./helpers/source-paths.cjs').readGitSource(file)
  : fs.readFileSync(path.join(__dirname,'..',file),'utf8');
-const loader=readSource('web/static/resource-readiness.js');
-const renderer=readSource('static/js/markdown-renderer.js');
-const articleSync=readSource('static/js/article-render-sync.js');
-const reading=readSource('static/js/article-reading.js');
+const loader=readSource('frontend/shared/js/resource-readiness.js');
+const renderer=readSource('frontend/shared/js/markdown-renderer.js');
+const articleSync=readSource('frontend/site/static/js/article-render-sync.js');
+const reading=readSource('frontend/site/static/js/article-reading.js');
 const svg='<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"><rect width="120" height="80" fill="steelblue"/></svg>';
 const report=[];
 (async()=>{

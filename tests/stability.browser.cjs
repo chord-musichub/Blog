@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Offline integration audit: no production API writes or third-party requests.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -19,7 +20,7 @@ async function fixture(browser,width=1440,theme='dark'){
   const u=new URL(route.request().url());
   if(u.origin!==base || u.pathname.startsWith('/uploads/'))return route.fulfill({body:svg,contentType:'image/svg+xml'});
   if(u.pathname.includes('/api/'))return route.fulfill({json:{views:83,items:[],messages:[],scores:[],authenticated:false}});
-  const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):path.resolve(build);
+  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):path.resolve(build);
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream'});

@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const source=fs.readFileSync(path.join(__dirname,'../static/js/markdown-code-tools.js'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/markdown-code-tools.js'),'utf8');
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 function fixture(count=1,secure=true){
  const listeners=new Map(),timers=new Map(),requests=[];let serial=0,localListeners=0,fallbacks=0;

@@ -15,13 +15,13 @@ function fixture(query=''){
  const document={querySelector:selector=>({'[data-tools-search]':input,'.modern-tools-grid':list,'[data-tools-search-count]':count})[selector]||null,querySelectorAll:()=>[],createElement:()=>({style:style()})};
  const window={location:{search:query}};
  const context={window,document,URLSearchParams};
- vm.runInNewContext(read('static/js/search-utils.js'),context);
+ vm.runInNewContext(read('frontend/site/static/js/search-utils.js'),context);
  const utils=window.SonglineSearchUtils;
  const normalize=utils.normalize,termsOf=utils.termsOf;
  utils.normalize=value=>{stats.normalize++;return normalize(value);};
  utils.termsOf=value=>{stats.terms++;return termsOf(value);};
  utils.installClearButtons=()=>{};utils.showSearchRefresh=()=>{};utils.flashEmpty=()=>{};
- vm.runInNewContext(read('static/js/search.js'),context);
+ vm.runInNewContext(read('frontend/site/static/js/search.js'),context);
  window.SonglineInitSearch(document);
  return {window,document,input,items,layers,count,stats,get empty(){return empty;},search(value){input.value=value;input.handlers.input();}};
 }
@@ -67,8 +67,8 @@ test('unchanged search results keep text and style state while external edits ar
  assert(writes.some(value=>value>0));
 });
 test('retired snapshot and helpers do not return to the delivery tree',()=>{
- assert(!fs.existsSync(path.join(root,'static/friends-data.json')));
- assert(read('static/js/pages/friends/galaxy.js').includes("document.getElementById('friend-galaxy-data')"));
- assert(!read('static/js/pages/home/music-player.js').includes('function chooseDirectory'));
- assert(read('static/js/pages/home/music-player.js').includes('async function restoreDirectory'),'Keep old directory grants readable');
+ assert(!fs.existsSync(path.join(root,'frontend/site/static/friends-data.json')));
+ assert(read('frontend/site/static/js/pages/friends/galaxy.js').includes("document.getElementById('friend-galaxy-data')"));
+ assert(!read('frontend/site/static/js/pages/home/music-player.js').includes('function chooseDirectory'));
+ assert(read('frontend/site/static/js/pages/home/music-player.js').includes('async function restoreDirectory'),'Keep old directory grants readable');
 });

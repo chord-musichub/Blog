@@ -22,9 +22,9 @@ function fixture(count) {
    const page = await browser.newPage({viewport:{width,height},hasTouch:touch,isMobile:touch});
    const errors=[]; page.on('pageerror',e=>errors.push(e.message));
    await page.setContent(fixture(count));
-   await page.addStyleTag({path:path.resolve('static/css/pages/friends/memories.css')});
-   await page.addStyleTag({path:path.resolve('static/css/touch-layout.css')});
-   await page.addScriptTag({path:path.resolve('static/js/pages/friends/memories.js')});
+   await page.addStyleTag({path:path.resolve('frontend/site/static/css/pages/friends/memories.css')});
+   await page.addStyleTag({path:path.resolve('frontend/site/static/css/touch-layout.css')});
+   await page.addScriptTag({path:path.resolve('frontend/site/static/js/pages/friends/memories.js')});
    await page.evaluate(()=>SonglineInitMemoryRoom(document));
    const viewport=page.locator('[data-memory-viewport]');
    const bounds=await page.locator('[data-memory-card]').evaluateAll(cards=>cards.map(card=>{

@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Offline queue and SVG-node reuse comparison. No production API calls/uploads.
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -12,7 +13,7 @@ async function fixture(browser,build,width){
  await context.route('**/*',route=>{
   const u=new URL(route.request().url());if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:svg,contentType:'image/svg+xml'});
   if(u.pathname.includes('/api/'))return route.fulfill({json:{items:[],messages:[],views:83,scores:[]}});
-  const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):build;
+  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build;
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json'})[path.extname(file)]||'application/octet-stream'});

@@ -7,10 +7,10 @@ services:
       ADDR: "${ADDR:-:8080}"
       # 运行时数据不能挂载到 /app/data：Hugo 会把该目录视作 data namespace，
       # 而文章下载源中的 .md 不是 Hugo data 文件，会导致整站首次构建中断。
-      DATA_DIR: "/app/runtime"
-      HUGO_CONTENT_DIR: "/app/content/posts"
-      PUBLIC_DIR: "/app/published"
-      HUGO_COMMAND: "hugo --minify --source . --destination /app/published"
+      DATA_DIR: "/app/runtime/data"
+      HUGO_CONTENT_DIR: "/app/runtime/content/posts"
+      PUBLIC_DIR: "/app/build/public"
+      HUGO_COMMAND: "hugo --minify"
       ADMIN_USER: "${ADMIN_USER:?Run deploy/init-local.ps1 to create .env first}"
       ADMIN_PASS: "${ADMIN_PASS:?Run deploy/init-local.ps1 to create .env first}"
       SESSION_SECRET: "${SESSION_SECRET:?Run deploy/init-local.ps1 to create .env first}"
@@ -22,9 +22,9 @@ services:
       HUGO_BUILD_TIMEOUT_SECONDS: "${HUGO_BUILD_TIMEOUT_SECONDS:-180}"
       MAX_UPLOAD_BYTES: "${MAX_UPLOAD_BYTES:-104857600}"
     volumes:
-      - ./data:/app/runtime
-      - ./content:/app/content
-      - ./published:/app/published
+      - ${BLOG_DATA_DIR:-./data}:/app/runtime/data
+      - ${BLOG_CONTENT_DIR:-./content}:/app/runtime/content
+      - ./build/public:/app/build/public
     expose:
       - "8080"
 
@@ -37,5 +37,5 @@ services:
     ports:
       - "127.0.0.1:8080:80"
     volumes:
-      - ./published:/srv:ro
+      - ./build/public:/srv:ro
       - ./deploy/Caddyfile.compose:/etc/caddy/Caddyfile:ro

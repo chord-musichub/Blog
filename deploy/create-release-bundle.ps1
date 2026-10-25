@@ -23,19 +23,21 @@ if ($LASTEXITCODE -ne 0) {
     throw "Index has staged but uncommitted changes. Commit source changes before creating a release bundle."
 }
 
-$trackedRuntime = & git ls-files -- data content/posts content/friends content/tags static/md-source
+$trackedRuntime = & git ls-files -- runtime/data runtime/content data content/posts content/friends content/tags frontend/site/content/posts frontend/site/content/friends frontend/site/content/tags frontend/site/static/md-source
 if ($trackedRuntime) {
     throw "Tracked runtime files cannot be included in a release bundle:`n$($trackedRuntime -join "`n")"
 }
 
+$dataRoot = if (Test-Path "data") { "data" } else { "runtime/data" }
+$contentRoot = if (Test-Path "content/posts") { "content" } else { "runtime/content" }
 $requiredRuntimePaths = @(
-    "data/auth/users.json",
-    "data/content/articles.json",
-    "data/community/friends.json",
-    "data/settings/site.json",
-    "content/posts",
-    "content/friends",
-    "content/tags"
+    "$dataRoot/auth/users.json",
+    "$dataRoot/content/articles.json",
+    "$dataRoot/community/friends.json",
+    "$dataRoot/settings/site.json",
+    "$contentRoot/posts",
+    "$contentRoot/friends",
+    "$contentRoot/tags"
 )
 foreach ($relativePath in $requiredRuntimePaths) {
     if (-not (Test-Path -LiteralPath (Join-Path $projectRoot $relativePath))) {
@@ -81,7 +83,10 @@ with tarfile.open(output_path, "w:gz", format=tarfile.PAX_FORMAT) as destination
                 payload = io.BytesIO(data)
             destination.addfile(member, payload)
     for relative in runtime_paths:
-        destination.add(root / relative, arcname=f"runtime/{relative}")
+        source_relative = relative
+        if not (root / relative).exists():
+            source_relative = "runtime/" + relative
+        destination.add(root / source_relative, arcname=f"runtime/{relative}")
 
 print(output_path)
 '@ | & $PythonPath -

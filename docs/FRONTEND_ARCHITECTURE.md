@@ -2,20 +2,22 @@
 
 公开站由 Hugo 模板生成页面，共享壳管理主题、导航、资源与切页；页面模块负责各自组件。创作后台使用独立模板和样式，并复用语言与跨文档资源就绪组件。页面功能见[使用指南](FEATURES.md)，性能规则见[加载与性能维护](PERFORMANCE.md)。
 
+共用模块的唯一源码位于 `frontend/shared/`，Go 直接提供后台资源，Hugo 工作区复制同一份文件供公开站使用。
+
 ## 资源与样式入口
 
 | 入口 | 职责 |
 | --- | --- |
-| `layouts/partials/assets/page-styles.html` | 页面实际 CSS 清单与层叠顺序 |
-| `layouts/partials/assets/core-scripts.html` | 全站核心脚本 |
-| `layouts/partials/page-specific-scripts.html` | 页面专用脚本及依赖顺序 |
-| `static/js/page-modules.js` | 按实际 DOM 补载样式、等待依赖与初始化组件 |
-| `layouts/partials/page-navigation-data.html` | route、priority 和小地图坐标的统一配置 |
-| `web/templates/admin_shared.html` | 后台导航、主题与公共资源 |
+| `frontend/site/layouts/partials/assets/page-styles.html` | 页面实际 CSS 清单与层叠顺序 |
+| `frontend/site/layouts/partials/assets/core-scripts.html` | 全站核心脚本 |
+| `frontend/site/layouts/partials/page-specific-scripts.html` | 页面专用脚本及依赖顺序 |
+| `frontend/site/static/js/page-modules.js` | 按实际 DOM 补载样式、等待依赖与初始化组件 |
+| `frontend/site/layouts/partials/page-navigation-data.html` | route、priority 和小地图坐标的统一配置 |
+| `frontend/admin/templates/admin_shared.html` | 后台导航、主题与公共资源 |
 
 CSS 加载顺序是层叠契约，不能按文件名或大小重排。基础 token 和公共兼容层先加载，页面样式随后，触屏布局与返回控件按照样式入口中的顺序覆盖。局部更新与直开必须恢复同样的顺序和完整资源版本 URL。
 
-公开页专用代码放在 `static/js/pages/<页面>/` 与 `static/css/pages/<页面>/`，工具代码放在 `tools/` 子目录，新增需要随仓库保存的第三方 JS 时使用 `static/js/vendor/`。公共逻辑才放根目录。后台主样式为 `web/static/creator-center.css`，不再加载旧 `style.css`。
+公开页专用代码放在 `frontend/site/static/js/pages/<页面>/` 与 `frontend/site/static/css/pages/<页面>/`，工具代码放在 `tools/` 子目录，新增需要随仓库保存的第三方 JS 时使用 `frontend/site/static/js/vendor/`。公共逻辑才放根目录。后台主样式为 `frontend/admin/static/creator-center.css`。
 
 修改组件时同步维护模板、模块注册和样式。检查六级目录、游戏数字和异步状态等动态生成规则；公共 `space-ribbons.js` 提供页面背景轨迹。
 
@@ -23,7 +25,7 @@ CSS 加载顺序是层叠契约，不能按文件名或大小重排。基础 tok
 
 `page-transition-nav.js` 管理小地图，`page-transition-priority.js` 读取路由优先级，`page-transition-system.js` 管理链接拦截、请求、幕布、内容替换与历史。新增主页面在 `page-navigation-data.html` 配置 route、priority、可见性和网格字段，不维护第二份地图清单。
 
-仅替换 `main.container`，共享导航根据当前页面同步名称与高亮。需要完整文档导航的链接或容器设置 `data-no-page-transition`。公开站到后台使用 `web/static/document-transition.js` 的跨文档过渡，后台内部导航保持自身规则。
+仅替换 `main.container`，共享导航根据当前页面同步名称与高亮。需要完整文档导航的链接或容器设置 `data-no-page-transition`。公开站到后台使用 `frontend/shared/js/document-transition.js` 的跨文档过渡，后台内部导航保持自身规则。
 
 切页预热可以并行解析目标 HTML、预热目标主题场景与同源 CSS，但覆盖前不能应用目标样式、替换正文或初始化模块。预加载保留完整版本 URL、去重，完成或失败后释放。请求失败保留完整文档回退。
 

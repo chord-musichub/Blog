@@ -2,7 +2,7 @@
 
 除下方“例外”所列内容外，本仓库中由站点维护者拥有著作权的公开媒体资源，采用 **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International（CC BY-NC-SA 4.0）** 协议发布。
 
-适用的资源包括站点原创或已取得再授权权利的图片、插图、背景、音频、视频、封面和界面视觉素材；主要位于 `static/uploads/` 中，并随公开站快照提交。
+适用的资源包括站点原创或已取得再授权权利的图片、插图、背景、音频、视频、封面和界面视觉素材；主要位于 `frontend/site/static/uploads/` 中，并随公开站快照提交。
 
 完整协议文本与通俗说明：<https://creativecommons.org/licenses/by-nc-sa/4.0/>
 

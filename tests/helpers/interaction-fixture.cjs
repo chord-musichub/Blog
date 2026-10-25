@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./source-paths.cjs');
 // Local HTTP preserves real browser caching; no route interception or live APIs.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -31,10 +32,9 @@ async function serve(source, {delays = false, instrument = false, faults = new M
         return res.end(Buffer.from(await response.arrayBuffer()));
       } catch(error) { res.writeHead(502); return res.end('admin fixture unavailable'); }
     }
-    const sharedAsset = {'/static/i18n.js':'js/i18n.js', '/static/i18n-catalog.js':'js/i18n-catalog.js', '/static/i18n.css':'css/i18n.css'}[url.pathname];
-    const root = path.join(source, !sharedAsset && url.pathname.startsWith('/static/') ? 'web/static' : 'public');
+    const root = url.pathname.startsWith('/static/') ? adminStaticRoot(url.pathname, source) : path.join(source, 'public');
     let relative;
-    try { relative = sharedAsset || decodeURIComponent(url.pathname.replace(/^\/static\//, '/')).slice(1); }
+    try { relative = decodeURIComponent(url.pathname.replace(/^\/static\//, '/')).slice(1); }
     catch { res.writeHead(400); return res.end(); }
     const file = path.resolve(root, relative + (url.pathname.endsWith('/') ? 'index.html' : ''));
     if (!file.startsWith(root + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {

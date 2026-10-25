@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // All requests are fulfilled locally, including simulated submissions.
 // No production API, OAuth, GitHub or third-party writes.
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
@@ -44,7 +45,7 @@ async function fixture(browser,width,theme,{storage,source=build}={}){
   }
   if(u.pathname.includes('/api/'))return route.fulfill({json:{views:83,scores:[],items:[],messages:[],authenticated:false}});
   if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({contentType:'image/svg+xml',body:svg});
-  const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):source;
+  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):source;
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json'})[path.extname(file)]||'application/octet-stream'});

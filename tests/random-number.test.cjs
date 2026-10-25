@@ -5,7 +5,7 @@ function fixture(min,max){
  const low=input(min),high=input(max),button=input(''),result={},note={classList:{toggle(){}}};
  const tool={dataset:{},querySelector(selector){return {'[data-random-min]':low,'[data-random-max]':high,'[data-random-generate]':button,'[data-random-result]':result,'[data-random-note]':note}[selector];}};
  const window={};
- vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../static/js/tools/random-number.js'),'utf8'),{window,document:{querySelector:()=>tool},Math:Object.create(Math,{random:{value:()=>.5}})});
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/tools/random-number.js'),'utf8'),{window,document:{querySelector:()=>tool},Math:Object.create(Math,{random:{value:()=>.5}})});
  window.SonglineInitRandomNumber();
  return {low,high,result,note,generate:()=>button.events.click()};
 }

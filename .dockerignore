@@ -1,28 +1,24 @@
-# Keep private runtime content out of Docker build contexts and images.
 .git
 .env
 .env.*
-data/*
-!data/
-.hugo-data/
-content/posts/
-content/friends/
-content/tags/
-static/uploads/*
-!static/uploads/admin/
-static/md-source/
-# The repository carries a public snapshot so a fresh clone renders the same
-# public site. Local-only source material and temporary media stay out of images.
-local-only/
-static/runtime-config.js
-published/
-resources/
-deploy/verify_v*.sh
-deploy/deploy_v*_safe.sh
-deploy/install_*_v*.sh
-deploy/nginx-*-v*.conf
-
-# Local/editor files.
+runtime
+build
+local-only
+data
+content
+static
+published
+resources
+hugo-data
+.hugo-workspace
+frontend/site/content/posts
+frontend/site/content/friends
+frontend/site/content/tags
+frontend/site/static/uploads/*
+!frontend/site/static/uploads/admin/
+frontend/site/static/md-source
+frontend/site/static/runtime-config.js
+blog-admin
 .DS_Store
 Thumbs.db
 *.pem

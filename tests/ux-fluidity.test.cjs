@@ -1,6 +1,6 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const read=name=>fs.readFileSync(path.join(__dirname,'../static/js',name),'utf8');
+const read=name=>fs.readFileSync(path.join(__dirname,'../frontend/site/static/js',name),'utf8');
 const archive=read('pages/archive/index.js'),transition=read('page-transition-system.js');
 test('archive batches input without committing partial IME text or detached DOM',async()=>{
  const code=archive.slice(archive.indexOf('    function scheduleQuery()'),archive.indexOf('    function records('));

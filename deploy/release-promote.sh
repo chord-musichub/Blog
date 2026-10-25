@@ -34,7 +34,7 @@ if [[ ! -x "$NEXT_LINK/blog-admin" ]]; then
   exit 1
 fi
 
-if [[ ! -s "$NEXT_LINK/published/index.html" ]]; then
+if [[ ! -s "$NEXT_LINK/build/public/index.html" ]]; then
   echo "next 版本尚未生成公开首页，拒绝切换。" >&2
   exit 1
 fi

@@ -6,17 +6,17 @@
 
 | 当前路径 | 使用处 | 归属与后续处理 |
 | --- | --- | --- |
-| `static/uploads/admin/background/under-ground.png` | 工具页日间地下场景 | `/uploads` 为统一公开媒体根目录。 |
-| `static/uploads/admin/background/under-ground-black.png` | 工具页夜间地下场景 | 同上。 |
-| `static/uploads/admin/background/tools-underground-soil-light-v1.png` | 工具页日间可延展土层 | 同上。 |
-| `static/uploads/admin/background/tools-underground-soil-dark-v1.png` | 工具页夜间可延展土层 | 同上。 |
+| `frontend/site/static/uploads/admin/background/under-ground.png` | 工具页日间地下场景 | `/uploads` 为统一公开媒体根目录。 |
+| `frontend/site/static/uploads/admin/background/under-ground-black.png` | 工具页夜间地下场景 | 同上。 |
+| `frontend/site/static/uploads/admin/background/tools-underground-soil-light-v1.png` | 工具页日间可延展土层 | 同上。 |
+| `frontend/site/static/uploads/admin/background/tools-underground-soil-dark-v1.png` | 工具页夜间可延展土层 | 同上。 |
 
 ## 不进入此表的文件
 
-- `static/uploads/admin/` 下未登记的其他公开素材：受版本控制；非 admin 用户目录默认忽略。运行时上传文件写入 `data/media/<用户>/`，由同一 `/uploads/` URL 提供。
-- `static/md-source/`：用户提交的 Markdown 源文件。
+- `frontend/site/static/uploads/admin/` 下未登记的其他公开素材：受版本控制；非 admin 用户目录默认忽略。运行时上传文件写入 `data/media/<用户>/`，由同一 `/uploads/` URL 提供。
+- `frontend/site/static/md-source/`：用户提交的 Markdown 源文件。
 - `local-only/`：只在本机存在的私密原图或备份，不应成为页面资源。
 
 ## 新增素材规则
 
-新建、由代码或后台维护的公开插图与场景素材直接放到 `static/uploads/admin/<模块>/`，并在本文件登记用途与引用页面。只要某个旧上传路径还可能被数据库或公开链接引用，就保留其兼容 URL。
+新建、由代码或后台维护的公开插图与场景素材直接放到 `frontend/site/static/uploads/admin/<模块>/`，并在本文件登记用途与引用页面。只要某个旧上传路径还可能被数据库或公开链接引用，就保留其兼容 URL。

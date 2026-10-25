@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -19,7 +20,7 @@ fs.mkdirSync('local-only/galaxy-lens',{recursive:true});
      const u=new URL(route.request().url());
      if(u.origin!==origin||u.pathname.startsWith('/uploads/'))return route.fulfill({body:'<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="#607d8b"/></svg>',contentType:'image/svg+xml'});
      if(u.pathname.startsWith('/api/'))return route.fulfill({json:{items:[],views:83}});
-     const root=u.pathname.startsWith('/static/')?path.resolve('web/static'):build;
+     const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build;
      const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
      if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
      return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml'})[path.extname(file)]||'application/octet-stream'});

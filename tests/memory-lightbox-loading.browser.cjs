@@ -21,7 +21,7 @@ const {launch} = require('./helpers/interaction-fixture.cjs');
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const origin = 'http://127.0.0.1:' + server.address().port;
-  const dialog = fs.readFileSync('layouts/friends/memories.html', 'utf8').match(/<dialog\b[\s\S]*?<\/dialog>/)[0];
+  const dialog = fs.readFileSync('frontend/site/layouts/friends/memories.html', 'utf8').match(/<dialog\b[\s\S]*?<\/dialog>/)[0];
   let browser;
   try {
     browser = await launch();
@@ -36,10 +36,10 @@ const {launch} = require('./helpers/interaction-fixture.cjs');
         <article class="memory-room__memory" data-memory-card data-memory-month-index="0" data-memory-title="慢加载回忆" data-memory-date="2026-10" data-memory-description="测试详情">
         <button class="memory-room__image-button" data-memory-open>打开回忆</button></article>
         </div></div></section>${dialog}</body></html>`);
-      await page.addStyleTag({path:path.resolve('static/css/pages/friends/memories.css')});
-      await page.addStyleTag({path:path.resolve('static/css/touch-layout.css')});
-      await page.addScriptTag({path:path.resolve('web/static/resource-readiness.js')});
-      await page.addScriptTag({path:path.resolve('static/js/pages/friends/memories.js')});
+      await page.addStyleTag({path:path.resolve('frontend/site/static/css/pages/friends/memories.css')});
+      await page.addStyleTag({path:path.resolve('frontend/site/static/css/touch-layout.css')});
+      await page.addScriptTag({path:path.resolve('frontend/shared/js/resource-readiness.js')});
+      await page.addScriptTag({path:path.resolve('frontend/site/static/js/pages/friends/memories.js')});
       await page.evaluate(() => SonglineInitMemoryRoom(document));
       const opener = page.locator('[data-memory-open]');
       const modal = page.locator('[data-memory-lightbox]');

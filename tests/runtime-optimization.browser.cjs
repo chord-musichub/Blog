@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Same-content before/after audit. Every request is fulfilled locally; no production writes.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -16,7 +17,7 @@ async function fixture(browser,build,width,theme){
   const u=new URL(route.request().url());requests.push({path:u.pathname,method:route.request().method(),query:u.search});
   if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:placeholder,contentType:'image/svg+xml'});
   if(u.pathname.startsWith('/api/'))return route.fulfill({json:u.pathname==='/api/views'?{views:83}:{items:[],messages:[]}});
-  const root=path.resolve(u.pathname.startsWith('/static/')?path.join(repo,'web/static'):build);
+  const root=path.resolve(u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build);
   const relative=decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1));
   const file=path.resolve(root,relative+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});

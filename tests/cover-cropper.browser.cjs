@@ -28,7 +28,7 @@ const path = require('node:path');
     window.cropPaints.push(args.slice(1)); return original.apply(this,args);
    };
   });
-  await page.addScriptTag({path:path.resolve('web/static/cover-cropper.js')});
+  await page.addScriptTag({path:path.resolve('frontend/admin/static/cover-cropper.js')});
   await page.locator('#open').click();
   await page.waitForSelector('dialog[open]');
   const lastPaint = () => page.evaluate(() => window.cropPaints.at(-1));

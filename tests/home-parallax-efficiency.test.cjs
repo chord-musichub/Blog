@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const script=fs.readFileSync(path.join(__dirname,'../static/js/pages/home/scene-parallax.js'),'utf8');
+const script=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/pages/home/scene-parallax.js'),'utf8');
 
 function fixture(source=script){
  const frames=new Map(),events=new Map(),windowEvents=new Map();let serial=0;

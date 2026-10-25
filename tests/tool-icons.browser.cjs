@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Real tools HTML; all external requests are synthetic, never production writes.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -21,7 +22,7 @@ const svg='<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36"><rect 
     }
     if(url.pathname.startsWith('/api/'))return route.fulfill({json:{items:[],views:0}});
     if(url.pathname.startsWith('/uploads/'))return route.fulfill({contentType:'image/svg+xml',body:svg});
-    const root=path.resolve(url.pathname.startsWith('/static/')?path.join(__dirname,'../web/static'):build);
+    const root=path.resolve(url.pathname.startsWith('/static/')?adminStaticRoot(url.pathname):build);
     const relative=decodeURIComponent(url.pathname.replace(/^\/static\//,'/').slice(1));
     const file=path.resolve(root,relative+(url.pathname.endsWith('/')?'index.html':''));
     if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});

@@ -14,7 +14,7 @@ function fixture(){
  const math=Object.create(Math);math.pow=(...args)=>{powers++;return Math.pow(...args);};
  const freq=new Uint8Array(1024),wave=new Uint8Array(2048);
  const data={sampleRate:48000,freqData:freq,waveData:wave,analyser:{getByteFrequencyData:f=>f.fill(110),getByteTimeDomainData:w=>w.fill(144)}};
- vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../static/js/tools/audio-visualizer-renderer.js'),'utf8'),{
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/tools/audio-visualizer-renderer.js'),'utf8'),{
   window,document,MutationObserver:Observer,ResizeObserver:Observer,Math:math,
   getComputedStyle:()=>({getPropertyValue:()=>''}),performance:{now:()=>now},
   requestAnimationFrame:fn=>{frames.set(++id,fn);return id;},cancelAnimationFrame:id=>frames.delete(id)

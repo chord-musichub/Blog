@@ -10,7 +10,7 @@ fs.mkdirSync(out,{recursive:true});
   for(const width of (process.env.UI_WIDTHS||'360,390,900,1440').split(',').map(Number)){
    const page=await browser.newPage({viewport:{width,height:900},isMobile:width<981,hasTouch:width<981});
    if(process.env.UI_SOURCE_CSS) await page.route("**/css/**",async route=>{
-    const file="static"+new URL(route.request().url()).pathname;
+    const file="frontend/site/static"+new URL(route.request().url()).pathname;
     if(fs.existsSync(file)) await route.fulfill({contentType:"text/css",body:fs.readFileSync(file)});else await route.continue();
    });
    await page.addInitScript(()=>localStorage.setItem('songline-theme','dark'));

@@ -19,7 +19,7 @@ function fixture(){
  window.setTimeout=fn=>{timers.set(++serial,fn);return serial;};window.clearTimeout=id=>timers.delete(id);
  window.requestAnimationFrame=fn=>{frames.set(++serial,fn);return serial;};window.cancelAnimationFrame=id=>frames.delete(id);
  let copyResolve,copyReject;const clipboard={writeText:()=>new Promise((resolve,reject)=>{copyResolve=resolve;copyReject=reject;})};
- vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../static/js/pages/home/recommendations.js'),'utf8'),{window,document,navigator:{clipboard},console});
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/pages/home/recommendations.js'),'utf8'),{window,document,navigator:{clipboard},console});
  window.SonglineInitHomeRecommendations(document);
  return {window,document,panel,copy,tip,cards,indicators,frames,timers,all:[window,document,panel,copy,...indicators],fallbacks:()=>fallbacks,resolveCopy:()=>copyResolve(),rejectCopy:()=>copyReject(new Error('permission')),flushFrames(){for(const [id,fn] of [...frames]){frames.delete(id);fn();}}};
 }

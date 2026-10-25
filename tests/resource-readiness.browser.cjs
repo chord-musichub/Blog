@@ -3,7 +3,7 @@ const {chromium} = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const source = fs.readFileSync(path.join(__dirname, '../web/static/resource-readiness.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '../frontend/shared/js/resource-readiness.js'), 'utf8');
 const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"><rect width="120" height="80" fill="steelblue"/></svg>';
 
 (async()=>{

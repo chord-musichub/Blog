@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Local-only audio fixtures and intercepted routes: no real uploads or API writes.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
@@ -30,7 +31,7 @@ async function fixture(browser,width,theme,motion,fallback=false){
   requests.push(u.pathname);
   if(u.origin!==base)return r.fulfill({status:404,body:''});
   if(/\/(?:api|static\/api|write\/api)\//.test(u.pathname))return r.fulfill({json:{views:1,scores:[],messages:[]}});
-  const fileRoot=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):build;
+  const fileRoot=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build;
   const file=path.resolve(fileRoot,decodeURIComponent(u.pathname.replace(/^\/static\//,'/')).slice(1)+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(fileRoot+path.sep)||!fs.existsSync(file))return r.fulfill({status:404,body:''});
   const types={'.html':'text/html','.js':'application/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.json':'application/json'};
@@ -152,7 +153,7 @@ async function trackSettings(p,width,theme,titleBefore){
    assert(await p.locator('.av-volume-control').evaluate(e=>{
     return e.scrollWidth<=e.clientWidth+1;
    }),'Volume is not clipped inside the stage');
-   await p.locator('[data-av-cover-file]').setInputFiles(path.join(repo,'static/uploads/admin/background/qiandai_background.png'));
+   await p.locator('[data-av-cover-file]').setInputFiles(path.join(repo,'frontend/site/static/uploads/admin/background/qiandai_background.png'));
    await p.waitForFunction(()=>!document.querySelector('[data-av-cover-img]').hidden && document.querySelector('[data-av-cover-img]').naturalWidth>0);
    await p.locator('[data-av-backdrop]').waitFor({state:'visible'});
    assert(await p.locator('[data-av-backdrop]').evaluate(e=>{const b=e.getBoundingClientRect(),stage=e.closest('[data-av-stage]').getBoundingClientRect();return Math.abs(b.top-stage.top)<1 && Math.abs(b.height-stage.height)<1;}),'Artwork background covers the complete scrollable stage, not just one viewport');
@@ -208,7 +209,7 @@ async function trackSettings(p,width,theme,titleBefore){
     });
     await p.waitForFunction(()=>document.querySelector('[data-audio-visualizer]').style.getPropertyValue('--av-art-hue')==='');
     assert(await p.locator('[data-av-backdrop]').isVisible(),'Gray artwork keeps its background while using the neutral default palette');
-    await p.locator('[data-av-cover-file]').setInputFiles(path.join(repo,'static/uploads/admin/background/qiandai_background.png'));
+    await p.locator('[data-av-cover-file]').setInputFiles(path.join(repo,'frontend/site/static/uploads/admin/background/qiandai_background.png'));
     await p.waitForFunction(()=>document.querySelector('[data-audio-visualizer]').style.getPropertyValue('--av-art-hue')!=='');
     assert.equal(await p.evaluate(()=>avURLs.size),2,'Repeated palette changes do not allocate additional artwork URLs');
    }

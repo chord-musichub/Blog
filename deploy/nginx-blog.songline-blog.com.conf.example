@@ -25,7 +25,7 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-    root /opt/songline-blog/current/published;
+    root /opt/songline-blog/current/build/public;
     index index.html;
 
     # 模板为 CSS/JS 附带 Git 版本号查询参数；仅这两类构建资源长期缓存。

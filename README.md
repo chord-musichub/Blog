@@ -25,19 +25,29 @@ docker compose up --build -d
 
 仓库提供公开页面的默认配置与素材。账号、草稿、上传媒体和互动数据由每个部署实例独立保存；新克隆没有已有实例的文章或账号。备份与迁移范围见[公开资源与私有数据](docs/REPLICA_AND_PRIVACY.md)。
 
-## 技术与目录
+## 项目结构
 
-| 目录 | 内容 |
-| --- | --- |
-| `cmd/server/` | Go HTTP 服务、权限、数据持久化与 Hugo 构建 |
-| `layouts/`、`content/`、`hugo.toml` | Hugo 模板、固定页面与构建配置 |
-| `assets/`、`static/` | 公开配置、前端代码与默认素材 |
-| `web/` | 创作后台模板及共享加载组件 |
-| `deploy/` | Docker/Caddy、Nginx/systemd 与发布脚本 |
-| `tests/` | 前端单元测试与浏览器专项检查 |
-| `docs/` | 项目介绍、使用、部署与开发指南 |
+```text
+Blog/
+├── frontend/
+│   ├── site/          # Hugo 公开网站：模板、固定页面、样式和素材
+│   ├── admin/         # 创作后台模板与界面资源
+│   └── shared/        # 前后台共用的语言、Markdown 和加载组件
+├── cmd/server/        # Go 服务启动入口
+├── internal/server/   # 后端业务、存储、权限、发布及 Go 测试
+├── runtime/           # 新实例的私有数据与动态内容（不提交）
+├── build/             # 公开输出、构建工作区与快照（不提交）
+├── deploy/            # 容器、代理、服务与发布脚本
+├── tests/             # 前端单元测试与浏览器检查
+├── docs/              # 使用与开发指南
+└── vendor/            # Go 第三方依赖
+```
 
-本机开发使用 Go 1.22 或更新版本、Hugo 和 Node.js；常规检查及浏览器测试的额外依赖见[测试与验证](docs/TESTING.md)。Go 依赖随 `vendor/` 保存，编译无需下载模块。
+开发使用 Go 1.22 或更新版本、Hugo 和 Node.js。后端从项目根目录启动；`cmd/server` 只调用 `internal/server` 的服务入口。Go 依赖随 `vendor/` 保存，编译无需下载模块。
+
+新实例的数据在 `runtime/data/`、动态内容在 `runtime/content/`，公开站输出到 `build/public/`。已有实例的根目录 `data/`、`content/` 和显式设置的数据路径继续使用，不自动移动；旧 Docker `.env` 没有新目录变量时也沿用原数据卷。升级详情见[本地运行](docs/LOCAL_RUNTIME.md)。
+
+测试命令与依赖见[测试与验证](docs/TESTING.md)，文件职责见[项目结构](docs/PROJECT_STRUCTURE.md)。
 
 ## 许可
 

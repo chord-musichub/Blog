@@ -11,7 +11,7 @@ function runtime(idleThrows=false){
   requestIdleCallback(fn){if(idleThrows)throw Error('unavailable');idle.set(++next,fn);return next;},cancelIdleCallback(id){idle.delete(id);}};
  const document={readyState:'loading',hidden:false,documentElement:{classList:{toggle(){},add(){},remove(){}},setAttribute(){},removeAttribute(){}},
   getAnimations:()=>animations,addEventListener(){}};
- vm.runInNewContext(read('static/js/performance-guard.js'),{window,document,navigator:{},performance:{now:()=>now},CustomEvent:class{},setTimeout:window.setTimeout});
+ vm.runInNewContext(read('frontend/site/static/js/performance-guard.js'),{window,document,navigator:{},performance:{now:()=>now},CustomEvent:class{},setTimeout:window.setTimeout});
  return {window,animations,frames,timers,idle,tick(time){now=time;const batch=[...frames.values()];frames.clear();batch.forEach(fn=>fn(now));}};
 }
 test('animation rate recovery uses one frame chain and rapid hides retain the original rate',()=>{
@@ -52,7 +52,7 @@ test('optional tool storage tolerates blocked access and quota errors without st
 });
 test('galaxy has one managed initializer and ignores duplicate identities',()=>{
  const window={};
- const source=read('static/js/pages/friends/galaxy.js').replace('  window.SonglineInitFriendGalaxy = init;','  window.normalizeForTest = normalize; window.SonglineInitFriendGalaxy = init;');
+ const source=read('frontend/site/static/js/pages/friends/galaxy.js').replace('  window.SonglineInitFriendGalaxy = init;','  window.normalizeForTest = normalize; window.SonglineInitFriendGalaxy = init;');
  vm.runInNewContext(source,{window});
  const friends=window.normalizeForTest([{id:'songline',username:'songline'},{id:'a'},{id:' A '},{id:'root'}],{});
  assert.equal(friends.length,2);assert.equal(friends[1].id,'a');
@@ -63,7 +63,7 @@ test('galaxy has one managed initializer and ignores duplicate identities',()=>{
  assert(source.includes('if(friend.configuredLinks) hasConfiguredGraphLinks = true'));
 });
 test('memory room uses one managed initializer and releases the connected DOM marker',()=>{
- const source=read('static/js/pages/friends/memories.js');
+ const source=read('frontend/site/static/js/pages/friends/memories.js');
  assert(!source.includes('DOMContentLoaded'));assert(!source.includes("addEventListener('songline:page-swap'"));
  assert(source.includes('delete room.dataset.memoryReady'));assert(source.includes('if(disposed || resizeFrame) return'));
  assert(source.includes("removeEventListener('pagehide', onPageHide)"));

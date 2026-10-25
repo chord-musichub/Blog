@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Compare two isolated Hugo builds; all API writes and remote media are mocked.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -14,7 +15,7 @@ async function fixture(context,build){
   const u=new URL(route.request().url());
   if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:svg,contentType:'image/svg+xml'});
   if(u.pathname.startsWith('/api/'))return route.fulfill({json:u.pathname==='/api/views'?{views:83}:{items:[],messages:[]}});
-  const root=path.resolve(u.pathname.startsWith('/static/')?'web/static':build);
+  const root=path.resolve(u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build);
   const relative=u.pathname.startsWith('/static/')?u.pathname.slice(8):u.pathname.slice(1);
   const file=path.resolve(root,relative+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:'fixture not found'});

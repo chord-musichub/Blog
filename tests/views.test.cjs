@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const fs=require('node:fs');
-const source=fs.readFileSync(require('node:path').join(__dirname,'../static/js/views.js'),'utf8');
+const source=fs.readFileSync(require('node:path').join(__dirname,'../frontend/site/static/js/views.js'),'utf8');
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 function counter(path,mode='get'){
  const attrs={'data-view-path':path,'data-view-mode':mode};

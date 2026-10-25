@@ -1,80 +1,59 @@
 # 项目结构与资源管理
 
-项目把“可公开构建的配置”和“运行时私有数据”分开维护。新增文件请按下面的边界放置，避免再次把不同生命周期的数据堆到同一个目录。
+源码、实例数据和构建结果分别维护。目录按职责组织；以下路径均相对于项目根目录。
 
-## `data/`：运行时私有 JSON
-
-这些文件由后台服务读写，Git 与 Docker 构建上下文都不会收录。业务 JSON 按职责放在分类目录；旧版本的 `data/*.json` 会在服务启动时一次性移动到下列最终位置，迁移完成后不保留旧副本。
-
-| 路径 | 内容 |
+| 目录 | 职责 |
 | --- | --- |
-| `data/auth/users.json`、`data/auth/password_resets.json` | 账号、密码哈希与重置请求。 |
-| `data/content/articles.json`、`projects.json`、`memories.json`、`tag_urls.json` | 用户内容、草稿、项目、回忆与标签链接。 |
-| `data/community/friends.json`、`messages.json` | 当前实例可修改的朋友资料与留言。 |
-| `data/settings/site.json`、`theme.json` | 本实例的站点和主题设置。 |
-| `data/metrics/views.json`、`data/games/*_scores.json` | 阅读统计和小游戏排行榜。 |
-| `data/media/<用户>/` | 所有运行时上传媒体，由 `/uploads/` 提供。 |
-| `data/md-source/` | Markdown 下载源文件。 |
+| `frontend/site/` | Hugo 网站：`layouts/` 模板、`content/` 固定页面、`static/` 浏览器资源、`assets/` 公开配置，以及 `hugo.toml` |
+| `frontend/admin/` | Go 后台模板 `templates/` 和后台 JS/CSS `static/` |
+| `frontend/shared/` | 共用 JS/CSS 唯一源码：语言、Markdown 渲染、资源就绪与跨文档过渡 |
+| `cmd/server/` | 启动程序，不承载业务实现 |
+| `internal/server/` | HTTP 服务、权限、业务、存储、构建与 Go 测试 |
+| `runtime/` | 新实例的持久数据与后台生成的内容 |
+| `build/` | 公开输出与可重新生成的 Hugo 工作文件 |
+| `deploy/`、`tests/`、`docs/` | 部署、前端测试与文档 |
 
-`data/build.json` 保留在根目录：它只提供 Hugo 的构建版本号，不是后台业务数据。
+## 公开网站与后台
 
-站内朋友的星链由管理员维护 `assets/data/friends/links.json`：键为本站朋友的用户名或第三方朋友 ID，值为朋友用户名或第三方朋友 ID 的数组，例如 `"songline": ["mxbt", "shoper"]`。该文件随 Git 发布；关系线只需任一端配置。公开朋友基础资料维护在同目录的 `friends.json`；部署后的资料修改只写入 `data/community/friends.json`。
+`frontend/site/layouts/partials/assets/` 统一维护公开页面的脚本与样式入口。页面专用代码放在 `static/js/pages/`、`static/css/pages/`，工具代码放在相应 `tools/` 子目录。全站导航配置在 `frontend/site/layouts/partials/page-navigation-data.html`，route、priority 与地图坐标只维护一份。
 
-## `assets/data/`：随 Hugo 构建的公开配置
+`frontend/admin/templates/admin_shared.html` 维护后台公共页头和导航；后台样式位于 `frontend/admin/static/creator-center.css`。
 
-这类 JSON 会被模板通过 `resources.Get` 读取，并参与前台静态构建：
+共用脚本不在前后台分别保留副本。Go 直接通过原有 `/static/` URL 提供 `frontend/shared/` 文件；构建公开站时，将同一份源文件复制到隔离工作区的 `static/js/` 和 `static/css/`，保持原有 `/js/`、`/css/` 地址。
 
-- `assets/data/friends/friends.json`：朋友星图的公开种子，包含本站用户的基础资料与第三方节点；
-- `assets/data/projects.json`：内容归档页的项目清单；
-- `assets/data/tools/local.json`：本站工具卡片；
-- `assets/data/tools/external.json`：外部工具卡片。
+## 公开配置与素材
 
-这里不要放私密资料、后台账号数据或运行时统计。
+- `frontend/site/assets/bootstrap/`：新实例的初始站点和主题配置。
+- `frontend/site/assets/data/`：项目、朋友、关系和工具清单等可提交的公开配置。
+- `frontend/site/static/uploads/admin/`：可随版本发布的公开素材。
 
-## `assets/bootstrap/`：首次启动的公开快照
+本站工具图标在工具清单中使用 `/uploads/admin/tool/<文件名>`，对应公开素材目录。外部图标使用完整 HTTPS 地址。不应公开的原图或个人备份放在 `local-only/`，不能被页面 URL 引用。素材许可见 [MEDIA-LICENSE.md](../MEDIA-LICENSE.md)。
 
-空白克隆第一次启动时，服务会从这里初始化 `site.json` 与 `theme.json`。这些文件用于复刻公开呈现，不包含账号、密码、留言、草稿或统计；已存在的 `data/` 永远优先，不会被覆盖。朋友星图种子单独放在 `assets/data/friends/friends.json`。
+## 实例数据
 
-## `layouts/partials/page-navigation-data.html`：全站空间导航配置
+新实例默认使用 `runtime/data/`：
 
-页面的 route、priority 和 SITE MAP 共用这一份配置，不能为地图再维护第二张页面清单。
+| 子目录 | 内容 |
+| --- | --- |
+| `auth/` | 账号与密码重置 |
+| `content/` | 稿件、项目、回忆和兼容标签信息 |
+| `community/` | 朋友覆盖资料与首页留言 |
+| `settings/` | 当前实例站点与主题设置 |
+| `metrics/`、`games/` | 阅读量与游戏排行 |
+| `media/`、`md-source/` | 上传原文件与 Markdown 下载源 |
+| `media-previews/` | 可再生图片预览缓存 |
 
-- `map_visible`：是否出现在 SITE MAP；
-- `map_column`、`map_row`、`map_column_span`、`map_row_span`：8 × 8 固定网格中的稳定矩形位置；
-- `route` 与 `priority`：继续由现有全站转场读取，地图链接只使用普通链接，不自行计算切页方向。
+动态文章、朋友资料页和公告入口生成到 `runtime/content/`。固定工具页面仍在前端源码目录；构建时合并固定页面和动态内容。`data/build.json`（相对于所配置的 DATA_DIR）保存资源版本号。
 
-新增主页面时，在该 partial 增加一项并补齐上述地图字段；地图、当前页高亮和页面过场会自动读取新配置。
+已有根目录 `data/` 和 `content/posts/` 会继续作为默认运行路径；明确配置的 `DATA_DIR`、`HUGO_CONTENT_DIR` 始终优先。不会因为更新代码而移动或覆盖已有数据。
 
-### 工具卡片图标
+## 构建结果
 
-两份工具清单均支持 `icon_url`。本站工具优先使用以 `/` 开头的站内素材 URL，例如 `"icon_url": "/uploads/admin/tools/markdown-logo.png"`；外部工具使用完整的 `https://` 图标地址。`icon` 是文字兜底，只有未填写 `icon_url` 时才显示。本站图标放入 `static/uploads/admin/tools/` 后，只需把路径写为 `/uploads/admin/tools/<文件名>`，不需要改模板。
+- `build/public/`：网站最终 HTML、CSS、JS 等公开文件。
+- `build/hugo/data/`：仅包含允许公开字段的 Hugo 数据快照。
+- `build/hugo/static/`：运行时生成的配置和主题 CSS。
+- `build/hugo/workspace/`：由固定页面、动态内容、共享资源和公开快照组成的完整 Hugo 输入。
 
-## `static/`：浏览器直接请求的素材
+构建不向源码目录写入主题或运行配置。私有账号、草稿和互动记录不复制到 Hugo 工作区。`runtime/` 与 `build/` 的实际内容均不提交 Git、不进入 Docker 镜像。
 
-- `/uploads/` 是唯一的公开媒体 URL 根目录，但实际读取的是 `data/media/`。后台新上传的文件只会写入这里，不会污染 Git 工作区。
-- `static/uploads/` 是随仓库发布的公开媒体种子；首次部署会补入 `data/media/`，但不会覆盖服务器已有文件。
-- 仓库默认素材统一提交到 `static/uploads/admin/`；非 admin 用户目录由忽略规则排除。`static/uploads/` 始终按公开资源处理；不应公开的原图应放在仓库根目录 `local-only/`，该目录不会进入 Git 或 Docker 镜像。
-- 站点自有公开媒体采用 [CC BY-NC-SA 4.0](../MEDIA-LICENSE.md)；第三方商标、用户上传和朋友提供的素材不因仓库收录而改变其原有权利归属。
-
-### 前端脚本分层
-
-- `static/js/` 根目录仅保留全站运行时、导航、搜索和页面模块调度；
-- `static/js/pages/<页面>/` 放对应页面的脚本，例如首页启动场景、朋友星图、回忆时间线和档案筛选；旧标签漂流已退役；公共 `space-ribbons.js` 对应现用行星轨迹，不属于旧标签组件；
-- `static/js/tools/` 放单个工具及其引擎、渲染器和排行榜依赖；
-- `static/js/vendor/` 只放第三方库，不混入本站业务逻辑。
-
-页面专用样式使用同样的边界：`static/css/pages/<页面>/`；工具维持在 `static/css/tools/`；全站基础和兼容层保留在 `static/css/` 根目录。实际加载顺序由 `layouts/partials/assets/page-styles.html` 统一维护。
-
-## `web/templates/`：后台页面骨架
-
-- `admin_shared.html` 提供后台共用的 `admin-head` 与 `admin-client-nav` 模板；
-- 登录、后台、设置、编辑与媒体页面只保留各自正文和少量页面特有脚本；
-- 修改后台全局主题变量、导航项或公共脚本时，只改 `admin_shared.html`。
-
-## 新增时的判断
-
-1. 当前后台会修改、部署后应持久化的 JSON：放 `data/<职责>/`；不要再新增根目录业务 JSON。
-2. 公开页面构建时读取的清单 JSON：放 `assets/data/<模块>/`。
-3. 代码库维护或后台配置指定的公开图片、音频和插图：放 `static/uploads/admin/<模块>/`。
-4. 用户上传的公开文件：运行时写入 `data/media/<用户>/`；需要作为新安装默认内容时，再人工挑选并加入 `static/uploads/admin/<模块>/`，同步公开配置引用。
-5. 只供本机保留、绝不能公开的原图或备份：放 `local-only/`，不得由页面 URL 引用。
+新增文件时，先判断它是源码、实例数据还是构建结果，再放入对应目录；备份范围见[数据边界](REPLICA_AND_PRIVACY.md)。

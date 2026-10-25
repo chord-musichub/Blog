@@ -1,40 +1,35 @@
-# 每个部署实例独有的运行数据：账号、草稿、文章、留言、统计、排行榜、
-# 用户上传媒体与 Markdown 源文件。公开初始资料放在 assets/；
-# 站点构建素材统一放在 static/uploads/admin/。
-/data/
-
-# 后台生成的公开内容也是运行数据；服务器通过 shared/content 持久保存。
-/content/posts/
-/content/friends/
-/content/tags/
-
-# 兼容旧版本尚未迁入 data 的用户上传目录，不把用户文件当作站点素材发布。
-/static/uploads/*
-!/static/uploads/admin/
-/static/md-source/
-
-# 仅本机保存且绝不能通过站点 URL 访问的原图、备份与导出文件。
+# Runtime instances and generated builds are local to each deployment.
+/runtime/*
+!/runtime/.gitignore
+/build/*
+!/build/.gitignore
 /local-only/
+/blog-admin
 
-# 由服务启动时生成的运行时配置。
-/static/runtime-config.js
-
-# Hugo 构建产物与本地二进制
+# Legacy runtime directories remain ignored during upgrades.
+/data/
+/content/
+/static/
 /published/
 /resources/
 /hugo-data/
 /.hugo-workspace/
 .hugo_build.lock
-/blog-admin
 
-# 本地部署配置与密钥
+# Only fixed pages and public seed media belong in frontend sources.
+/frontend/site/content/posts/
+/frontend/site/content/friends/
+/frontend/site/content/tags/
+/frontend/site/static/uploads/*
+!/frontend/site/static/uploads/admin/
+/frontend/site/static/md-source/
+/frontend/site/static/runtime-config.js
+
 .env
 .env.*
 !.env.example
 deploy/*.local.sh
 deploy/*.local.ps1
-
-# 系统、编辑器和私钥文件
 .DS_Store
 Thumbs.db
 *.pem

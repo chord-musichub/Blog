@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Offline regression for refresh / HUD border / shared Markdown reading design.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -17,7 +18,7 @@ async function fixture(browser,width=1440,theme='dark',reduced=true){
   if(u.pathname==='/backend-style-test/')return route.fulfill({body:'<!doctype html><html><head></head><body></body></html>',contentType:'text/html'});
   if(u.pathname.startsWith('/api/'))return route.fulfill({json:{items:[],messages:[],views:83,scores:[]}});
   if(gate&&(blockedPath==='backgrounds'&&u.pathname.startsWith('/uploads/admin/background/')||blockedPath===u.pathname))await gate;
-  const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):build;
+  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build;
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   const ext=path.extname(file),mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.png':'image/png','.svg':'image/svg+xml','.json':'application/json'};
@@ -170,7 +171,7 @@ async function settledScroll(page){
    }
    // Backend control styles are checked without logging in or uploading.
    await p.goto(base+'/backend-style-test/');
-   await p.setContent(`<!doctype html><html data-admin-theme="${theme}"><head><link rel="stylesheet" href="/static/style.css"></head><body class="${theme==='dark'?'admin-dark':''}"><a class="admin-back-icon" data-admin-back href="#" aria-label="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none"><path d="m15 5-7 7 7 7"/></svg></a></body></html>`,{waitUntil:'load'});
+   await p.setContent(`<!doctype html><html data-admin-theme="${theme}"><head><link rel="stylesheet" href="/static/creator-center.css"></head><body class="${theme==='dark'?'admin-dark':''}"><a class="admin-back-icon" data-admin-back href="#" aria-label="返回"><svg class="ui-line-icon" viewBox="0 0 24 24" fill="none"><path d="m15 5-7 7 7 7"/></svg></a></body></html>`,{waitUntil:'load'});
    const adminBack=p.locator('[data-admin-back]');for(const mode of ['normal','hover','focus']){if(mode==='hover')await adminBack.hover();if(mode==='focus'){await p.keyboard.press('Tab');await adminBack.focus();}await adminBack.evaluate(e=>Promise.all(e.getAnimations().filter(a=>a instanceof CSSTransition).map(a=>a.finished.catch(()=>{}))));assert.deepEqual(await adminBack.evaluate(e=>{const s=getComputedStyle(e);return [s.backgroundColor,s.borderTopWidth,s.boxShadow,s.borderRadius,e.getBoundingClientRect().width,e.getBoundingClientRect().height];}),['rgba(0, 0, 0, 0)','0px','none','0px',44,44]);}
    assert.deepEqual(f.errors,[]);assert(!f.requests.some(r=>r.method==='POST'));await f.context.close();
   }

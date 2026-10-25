@@ -59,6 +59,8 @@ find "$SOURCE_DIR/deploy" -maxdepth 1 -type f -name '*.sh' -exec sed -i 's/\r$//
 for path in \
   "$SOURCE_DIR/go.mod" \
   "$SOURCE_DIR/cmd/server" \
+  "$SOURCE_DIR/internal/server" \
+  "$SOURCE_DIR/frontend/site" \
   "$SOURCE_DIR/deploy/release-promote.sh" \
   "$RUNTIME_DIR/data/auth/users.json" \
   "$RUNTIME_DIR/data/content/articles.json" \
@@ -73,10 +75,10 @@ done
 # 编译不依赖线上运行数据；先完成此步骤，尽量缩短服务暂停时间。
 echo "正在编译本地发布包…"
 (cd "$SOURCE_DIR" && go build -mod=vendor -buildvcs=false -trimpath -ldflags='-s -w' -o blog-admin ./cmd/server)
-install -d -m 0755 "$SOURCE_DIR/published"
+install -d -m 0755 "$SOURCE_DIR/build/public"
 
 # 源码中不得携带运行时目录，以免发布版本和 shared 出现两份数据。
-for relative_path in data content/posts content/friends content/tags; do
+for relative_path in runtime/data runtime/content/posts runtime/content/friends runtime/content/tags data content/posts content/friends content/tags; do
   if [[ -e "$SOURCE_DIR/$relative_path" || -L "$SOURCE_DIR/$relative_path" ]]; then
     echo "发布包源码意外包含运行目录：$relative_path" >&2
     exit 1
@@ -98,20 +100,21 @@ chown -R blog:blog "$SHARED_DIR/data" "$SHARED_DIR/content"
 
 mv "$SOURCE_DIR" "$RELEASE_DIR"
 for relative_path in data content/posts content/friends content/tags; do
-  target_path="$RELEASE_DIR/$relative_path"
+  target_path="$RELEASE_DIR/runtime/$relative_path"
   install -d -o blog -g blog -m 0755 "$(dirname "$target_path")"
   ln -s "$SHARED_DIR/$relative_path" "$target_path"
 done
 
 revision="bundle-${STAMP}"
-printf '{"asset_version":"%s"}\n' "$revision" > "$RELEASE_DIR/data/build.json"
+printf '{"asset_version":"%s"}\n' "$revision" > "$RELEASE_DIR/runtime/data/build.json"
+ln -s build/public "$RELEASE_DIR/published" # compatibility for existing proxy/env files
 chown -R blog:blog "$RELEASE_DIR"
 ln -sfn "$RELEASE_DIR" "$APP_ROOT/next"
 systemctl restart blog-admin-next.service
 
 for ((attempt = 1; attempt <= HEALTH_WAIT_SECONDS; attempt++)); do
   if curl --fail --silent --show-error http://127.0.0.1:8081/healthz >/dev/null \
-    && [[ -s "$RELEASE_DIR/published/index.html" ]]; then
+    && [[ -s "$RELEASE_DIR/build/public/index.html" ]]; then
     echo "候选版本已就绪：$RELEASE_DIR"
     echo "线上数据备份：$BACKUP_PATH"
     echo "确认后执行：sudo bash $RELEASE_DIR/deploy/release-promote.sh"

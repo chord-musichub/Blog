@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
 function fixture(){
- const source=fs.readFileSync(path.join(__dirname,'../static/js/tools/audio-visualizer.js'),'utf8');
+ const source=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/tools/audio-visualizer.js'),'utf8');
  const first={file:{name:'first.wav'},title:'First',artist:'File artist',sampleRate:16000};
  const second={file:{name:'second.wav'},title:'Second',artist:'Other artist',sampleRate:32000};
  let renders=0;
@@ -51,7 +51,7 @@ test('invalid rates retain the last valid annotation; manual text is bounded',()
  c.saveTrackEditor();assert.equal(f.first.overrides.sampleRate,44100);assert.equal(f.first.overrides.artist.length,160);assert.equal(f.first.overrides.title.length,240);
 });
 test('playback return resets locally; source-home navigation and modifier clicks stay native',()=>{
- const source=fs.readFileSync(path.join(__dirname,'../static/js/tools/audio-visualizer.js'),'utf8'),calls=[];
+ const source=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/tools/audio-visualizer.js'),'utf8'),calls=[];
  let live=true;
  const context={disposed:false,root:{classList:{contains:()=>live}},returnToSource:()=>calls.push('reset'),
   uploadBtn:{focus:()=>calls.push('focus')},returnBtn:{addEventListener(){},blur:()=>calls.push('blur')}};
@@ -65,7 +65,7 @@ test('playback return resets locally; source-home navigation and modifier clicks
  calls.length=0;live=false;const empty=click();context.onReturnClick(empty);assert.deepEqual(calls,[]);assert.equal(empty.defaultPrevented,undefined);
 });
 test('in-tool return opt-out is synchronized before the capture-phase navigator can run',()=>{
- const source=fs.readFileSync(path.join(__dirname,'../static/js/tools/audio-visualizer.js'),'utf8'),attrs=new Map();let live=false;
+ const source=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/tools/audio-visualizer.js'),'utf8'),attrs=new Map();let live=false;
  const context={root:{classList:{contains:()=>live}},returnBtn:{setAttribute:(k,v)=>attrs.set(k,v),toggleAttribute:(k,v)=>v?attrs.set(k,''):attrs.delete(k)}};
  vm.createContext(context);vm.runInContext(source.slice(source.indexOf('    function syncReturnButton('),source.indexOf('    function setHasTrack(')),context);
  context.syncReturnButton();assert.equal(attrs.get('aria-label'),'返回工具页');assert(!attrs.has('data-no-page-transition'));

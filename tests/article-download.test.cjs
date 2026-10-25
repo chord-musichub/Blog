@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
-const code=fs.readFileSync(path.join(__dirname,'../static/js/article-download.js'),'utf8');
+const code=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/article-download.js'),'utf8');
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 function fixture(fetch,withLabel=false){
  let click,downloads=0,next=0;const timers=new Map();

@@ -12,10 +12,10 @@
 
 ## 源码与新增文案
 
-- `static/js/i18n-catalog.js`：中英文界面文案的唯一词典。
-- `static/js/i18n.js`：语言存储、翻译标记处理、动态文案与单例观察器。
-- `static/css/i18n.css`：共用按钮、窄屏布局与少量英文排版适配。
-- Go 的 `registerLanguageAssets` 将同一份源文件提供给 `/static/`，后台在 Hugo 首次构建前即可使用；不复制词典，不增加业务 API。
+- `frontend/shared/js/i18n-catalog.js`：中英文界面文案的唯一词典。
+- `frontend/shared/js/i18n.js`：语言存储、翻译标记处理、动态文案与单例观察器。
+- `frontend/shared/css/i18n.css`：共用按钮、窄屏布局与少量英文排版适配。
+- Go 的 `registerSharedAssets` 将同一份源文件提供给 `/static/`，后台在 Hugo 首次构建前即可使用；不复制词典，不增加业务 API。
 
 只在确定属于界面的文字上添加标记：
 

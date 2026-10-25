@@ -26,7 +26,7 @@ async function refreshArticle(page) {
    const page = await browser.newPage({viewport:{width,height:900},isMobile:touch,hasTouch:touch});
    const errors = []; page.on('pageerror',error => errors.push(error.message));
    if (process.env.BLOG_TEST_SOURCE === '1') await page.route(/\/(css|js)\//,async route => {
-    const path = 'static'+new URL(route.request().url()).pathname;
+    const path = 'frontend/site/static'+new URL(route.request().url()).pathname;
     if (fs.existsSync(path)) await route.fulfill({body:fs.readFileSync(path),contentType:path.endsWith('.css')?'text/css':'application/javascript'});
     else await route.continue();
    });

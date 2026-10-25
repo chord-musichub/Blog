@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Diagnostic benchmark, not a production latency guarantee. Use the same
 // browser, CPU rate and site snapshot for baseline/after comparisons.
 const {chromium}=require('playwright');
@@ -19,7 +20,7 @@ fs.mkdirSync(out,{recursive:true});
    if(process.env.PERF_SOURCE==='1') await context.route(/\/(css|js|static)\//,async route=>{
     const url=new URL(route.request().url());
     if(url.origin!==new URL(base).origin) return route.continue();
-    const file=(url.pathname.startsWith('/static/')?'web':'static')+url.pathname;
+    const file=url.pathname.startsWith('/static/')?path.join(adminStaticRoot(url.pathname),url.pathname.slice('/static/'.length)):'frontend/site/static'+url.pathname;
     if(!fs.existsSync(file)) return route.continue();
     await route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.css')?'text/css':'application/javascript'});
    });

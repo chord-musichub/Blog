@@ -7,7 +7,7 @@ function fixture(){
  let top=button(),bottom=button();
  const document={currentScript:null,head:{appendChild(){}},getElementById:()=>({}),documentElement:{classList:classes(),scrollTop:0,get scrollHeight(){reads++;return 2000;},get offsetHeight(){reads++;return 2000;}},body:{appendChild(node){node.parentNode=this;},get scrollHeight(){reads++;return 2000;}},querySelector(){queries++;return reader?{}:null;},querySelectorAll(selector){queries++;return selector==='.back-to-top-button'?[top]:selector==='.scroll-to-bottom-button'?[bottom]:[top,bottom].filter(b=>b.isConnected);}};
  const window={location:{href:'https://reading.test/'},scrollY:500,innerHeight:800,matchMedia:()=>({matches:false}),addEventListener:(type,fn)=>events.set(type,fn),requestAnimationFrame(fn){frames.set(++id,fn);return id;},cancelAnimationFrame:id=>frames.delete(id),setTimeout(fn){timers.set(++id,fn);return id;},clearTimeout:id=>timers.delete(id)};
- vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../static/js/reader-floating-controls.js'),'utf8'),{window,document,URL});
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/reader-floating-controls.js'),'utf8'),{window,document,URL});
  return {events,frames,timers,window,setReader(value){reader=value;},newButtons(){top=button();bottom=button();},reset(){queries=0;reads=0;},counts:()=>({queries,reads}),flush(){for(const [id,fn] of frames){frames.delete(id);fn();}}};
 }
 test('non-reader scrolling schedules no frames and performs no DOM queries',()=>{

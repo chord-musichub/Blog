@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Offline, real-image hardware regression for the retained parallax change.
 const {chromium}=require('playwright'),sharp=require('sharp');
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
@@ -14,7 +15,7 @@ async function fixture(browser,mode,width,height,dpr,theme){
   const u=new URL(route.request().url());
   if(u.origin!==base)return route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" fill="#607d8b"/></svg>'});
   if(/^\/(?:write\/|static\/)?api\//.test(u.pathname))return route.fulfill({json:{items:[],messages:[],views:83,scores:[]}});
-  const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):build;
+  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build;
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp'})[path.extname(file)]||'application/octet-stream'});

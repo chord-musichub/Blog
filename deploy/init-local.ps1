@@ -42,11 +42,13 @@ PUBLIC_API_URL=$PublicAPIURL
 PUBLIC_CORS_ORIGINS=$PublicSiteURL
 HUGO_BUILD_TIMEOUT_SECONDS=180
 MAX_UPLOAD_BYTES=104857600
+BLOG_DATA_DIR=./runtime/data
+BLOG_CONTENT_DIR=./runtime/content
 "@
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($envPath, $envContent, $utf8NoBom)
 
-foreach ($relativePath in @("data", "content/posts", "content/friends", "content/tags", "static/uploads", "published", "local-only")) {
+foreach ($relativePath in @("runtime/data", "runtime/content/posts", "runtime/content/friends", "runtime/content/tags", "build/public", "local-only")) {
     $null = New-Item -ItemType Directory -Path (Join-Path $projectRoot $relativePath) -Force
 }
 

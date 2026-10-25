@@ -8,7 +8,7 @@ test('zero-height HUD keeps minimum clearance without changing normal header spa
   const window={requestAnimationFrame:fn=>{frame=fn;return 1;},setTimeout:()=>1,clearTimeout(){},addEventListener(){},matchMedia:()=>({matches:true}),getComputedStyle:()=>({})};
   const header={closest:()=>false,getBoundingClientRect:()=>({width:800,height}),offsetHeight,setAttribute(){}};
   const document={body:{dataset:{}},readyState:'complete',querySelectorAll:()=>[header],documentElement:{classList:{add(){}},style:{setProperty:(_,v)=>{value=v;}}}};
-  vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../static/js/desktop-fixed-nav.js'),'utf8'),{window,document});
+  vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../frontend/site/static/js/desktop-fixed-nav.js'),'utf8'),{window,document});
   frame();
   assert.equal(value,expected);
  }
@@ -18,7 +18,7 @@ test('resize bursts keep only one frame and two settling checks',()=>{
  const window={requestAnimationFrame:fn=>{frames.set(++id,fn);return id;},setTimeout:fn=>{timers.set(++id,fn);return id;},clearTimeout:id=>timers.delete(id),addEventListener(){},matchMedia:()=>({matches:true}),getComputedStyle:()=>({})};
  const header={closest:()=>false,getBoundingClientRect:()=>{reads++;return {width:800,height:72};},setAttribute(){}};
  const document={body:{dataset:{}},readyState:'complete',querySelectorAll:()=>[header],documentElement:{classList:{add(){}},style:{setProperty(){}}}};
- vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../static/js/desktop-fixed-nav.js'),'utf8'),{window,document});
+ vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../frontend/site/static/js/desktop-fixed-nav.js'),'utf8'),{window,document});
  for(let n=0;n<100;n++)window.SonglineDesktopFixedNav.refresh();
  assert.equal(frames.size,1);
  for(const [id,fn] of frames){frames.delete(id);fn();}
@@ -34,7 +34,7 @@ test('independent audio scene clears HUD clearance and restores it after departu
  const window={requestAnimationFrame:fn=>{frame=fn;return 1;},setTimeout:()=>1,clearTimeout(){},addEventListener(){},matchMedia:()=>({matches:true}),getComputedStyle:()=>({})};
  const header={closest:()=>false,getBoundingClientRect:()=>({width:800,height:0}),setAttribute(){marked=true;},removeAttribute(){marked=false;}};
  const document={body:{dataset:{pageScene:'audio'}},readyState:'complete',querySelectorAll:()=>[header],documentElement:{classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)},style:{setProperty:(_,v)=>{value=v;},removeProperty(){value='';}}}};
- vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../static/js/desktop-fixed-nav.js'),'utf8'),{window,document});
+ vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../frontend/site/static/js/desktop-fixed-nav.js'),'utf8'),{window,document});
  frame();assert.equal(marked,false);assert.equal(value,'');assert.equal(classes.size,0);
  delete document.body.dataset.pageScene;window.SonglineDesktopFixedNav.refresh();frame();
  assert.equal(marked,true);assert.equal(value,'56px');assert(classes.has('has-desktop-fixed-nav'));

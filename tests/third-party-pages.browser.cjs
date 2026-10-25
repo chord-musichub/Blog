@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Real built layouts, deterministic external images. Never writes view counts.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -14,7 +15,7 @@ async function fixture(context,{native=false,failExternal=false}={}){
   const u=new URL(route.request().url());
   if(u.origin!==new URL(base).origin)return failExternal?route.abort():route.fulfill({contentType:'image/svg+xml',body:svg});
   if(u.pathname==='/api/views')return route.fulfill({json:{views:83}});
-  const root=path.resolve(u.pathname.startsWith('/static/')?path.join(__dirname,'../web/static'):build);
+  const root=path.resolve(u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build);
   const relative=u.pathname.startsWith('/static/')?u.pathname.slice('/static/'.length):u.pathname.slice(1);
   const file=path.resolve(root,relative+(u.pathname.endsWith('/')?'index.html':''));
   if(file.startsWith(root+path.sep)&&fs.existsSync(file)&&fs.statSync(file).isFile()&&!u.pathname.startsWith('/uploads/')){

@@ -7,7 +7,7 @@ const out='local-only/mobile-surfaces';fs.mkdirSync(out,{recursive:true});
 const publicBase=process.env.BLOG_TEST_URL||'http://127.0.0.1:8080';
 const creatorBase=process.env.CREATOR_TEST_URL||'http://127.0.0.1:8091';
 const publicOnly=process.env.PUBLIC_ONLY==='1';
-const tools=fs.readdirSync('content/tools',{withFileTypes:true}).filter(d=>d.isDirectory()).map(d=>'/tools/'+d.name+'/');
+const tools=fs.readdirSync('frontend/site/content/tools',{withFileTypes:true}).filter(d=>d.isDirectory()).map(d=>'/tools/'+d.name+'/');
 const publicPaths=['/','/posts/','/friends/','/friends/songline/','/friends/memories/','/tools/','/posts/c-note/','/tools/focus-timer/',...tools];
 const creatorPaths=['/write/','/write/articles/new','/write/account','/write/admin','/write/admin/media','/write/compose/projects','/write/compose/memories','/write/users/new','/write/admin/site','/write/admin/theme','/write/settings/manuscript'];
 (async()=>{

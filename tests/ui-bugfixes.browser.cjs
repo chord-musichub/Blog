@@ -9,7 +9,7 @@ const admin=process.env.BLOG_UI_BUGFIX_ADMIN||'http://127.0.0.1:8091';
 (async()=>{fs.mkdirSync(out,{recursive:true});const browser=await launch();try{
  if(run('memory'))for(const width of [1440,390]){
   const f=await fixture(browser,build,{width});try{
-   const dialog=fs.readFileSync('layouts/friends/memories.html','utf8').match(/<dialog\b[\s\S]*?<\/dialog>/)[0];
+   const dialog=fs.readFileSync('frontend/site/layouts/friends/memories.html','utf8').match(/<dialog\b[\s\S]*?<\/dialog>/)[0];
    const cards=Array.from({length:3},(_,slot)=>`<article class="memory-room__memory" data-memory-card data-memory-month-index="0" data-memory-title="回忆 ${slot}" data-memory-description="完整简介，关闭详情后仍沿图片阅读。" data-memory-image="/album-landscape.svg" style="--memory-index:0;--memory-slot:${slot}"><span class="memory-room__stem"></span><button class="memory-room__image-button" data-memory-open><img src="/album-landscape.svg" alt="测试回忆"></button><div class="memory-room__caption"><h1>回忆 ${slot}</h1><p>完整简介，关闭详情后仍沿图片阅读。</p></div></article>`).join('');
    await f.page.route(f.origin+'/memory-fixture.html',route=>route.fulfill({contentType:'text/html',body:'<!doctype html><html></html>'}));
    await f.page.goto(f.origin+'/memory-fixture.html');

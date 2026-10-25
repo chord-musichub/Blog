@@ -31,7 +31,7 @@ async function fits(page,label){
    const page=await context.newPage();
    const errors=[];page.on('pageerror',error=>errors.push(error.message));
    if(process.env.UI_SOURCE_CSS) await page.route('**/css/**',route=>{
-    const path='static'+new URL(route.request().url()).pathname;
+    const path='frontend/site/static'+new URL(route.request().url()).pathname;
     return fs.existsSync(path)?route.fulfill({contentType:'text/css',body:fs.readFileSync(path)}):route.continue();
    });
    await page.route('**/api/messages',route=>route.fulfill({json:{messages:Array.from({length:12},(_,i)=>({id:String(i),name:'测试访客',content:'这是一条用来测试手机滚动的留言。',created_at:'2026-09-15T10:00:00Z'}))}}));

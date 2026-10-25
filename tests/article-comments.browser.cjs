@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Real local Hugo build, isolated third-party widget. No GitHub writes/OAuth.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
@@ -34,7 +35,7 @@ async function fixture(browser,width,theme,{blocked=false,silent=false,disabled=
   }
   if(u.origin!==base||u.pathname.startsWith('/uploads/'))return route.fulfill({body:svg,contentType:'image/svg+xml'});
   if(u.pathname.includes('/api/'))return route.fulfill({json:{views:83,items:[],messages:[],scores:[]}});
-  const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):build;
+  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):build;
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   let body=fs.readFileSync(file);

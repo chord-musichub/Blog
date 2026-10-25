@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const source=fs.readFileSync(path.join(__dirname,'../static/js/icon-system.js'),'utf8');
+const source=fs.readFileSync(path.join(__dirname,'../frontend/site/static/js/icon-system.js'),'utf8');
 function fixture(){
  const events=new Map(),timers=new Map();let serial=0,templates=0,writes=0;
  function node(name='play'){let markup='';return {name,isConnected:true,classList:{add(){}},get innerHTML(){return markup;},set innerHTML(value){writes++;markup=String(value).replace(/<(path|circle|rect)([^>]*)\/>/g,'<$1$2></$1>');},getAttribute(){return this.name;},matches:()=>true,querySelectorAll:()=>[]};}

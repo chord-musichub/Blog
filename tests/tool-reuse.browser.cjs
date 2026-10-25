@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Offline actual-tool regression. All scores, images and writes are fixtures.
 const {chromium}=require('playwright'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path');
@@ -19,7 +20,7 @@ async function fixture(browser,mode,width=1440,theme='dark',behavior='normal'){
    }
    return route.fulfill({json:{items:[],messages:[],views:83,scores:[{score:180}]}});
   }
-  const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):builds[mode];
+  const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):builds[mode];
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json'})[path.extname(file)]||'application/octet-stream'});

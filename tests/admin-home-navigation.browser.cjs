@@ -1,5 +1,5 @@
 // Run against the opt-in, read-only TestCreatorCenterVisualPreview fixture.
-// CREATOR_CENTER_PREVIEW=1 go test ./cmd/server -run TestCreatorCenterVisualPreview -timeout 10m
+// CREATOR_CENTER_PREVIEW=1 go test ./internal/server -run TestCreatorCenterVisualPreview -timeout 10m
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const base=process.env.ADMIN_UI_URL||'http://127.0.0.1:8091';
@@ -25,7 +25,7 @@ const base=process.env.ADMIN_UI_URL||'http://127.0.0.1:8091';
     assert.notEqual(await home.getAttribute('data-document-transition'),null);
     const geometry=await page.locator('.admin-client-nav').evaluate(header=>{
      const elements=[...header.children].filter(el=>getComputedStyle(el).display!=='none');
-     const controls=[...header.querySelectorAll('.admin-client-actions>*')];
+     const controls=[...header.querySelectorAll('.admin-client-actions>*')].filter(el=>el.getClientRects().length>0);
      const boxes=[...elements,...controls].map(el=>el.getBoundingClientRect());
      return {inside:boxes.every(b=>b.left>=0&&b.right<=innerWidth&&b.top>=0&&b.bottom<=header.getBoundingClientRect().bottom),
       overlaps:elements.some((el,i)=>i>0&&el.getBoundingClientRect().left<elements[i-1].getBoundingClientRect().right),

@@ -1,6 +1,6 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
-const read=file=>fs.readFileSync(path.join(__dirname,'../static/js',file),'utf8');
+const read=file=>fs.readFileSync(path.join(__dirname,'../frontend/site/static/js',file),'utf8');
 function key(extra={}){return Object.assign({key:' ',code:'Space',target:{closest:()=>null},preventDefault(){this.defaultPrevented=true;}},extra);}
 function controller(file,name,end){
  const source=read(file),calls=[];

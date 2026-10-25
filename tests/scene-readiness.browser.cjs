@@ -1,3 +1,4 @@
+const {adminStaticRoot,readGitSource} = require('./helpers/source-paths.cjs');
 // Offline scene audit: real local backgrounds, isolated builds and mocked APIs.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
@@ -33,14 +34,14 @@ async function fixture(browser,{mode='after',width=390,theme='dark',boot=false,r
   if(u.pathname.startsWith('/api/'))return route.fulfill({json:u.pathname==='/api/views'?{views:83}:{items:[],messages:[]}});
   if(u.pathname.startsWith('/uploads/admin/background/')){
    if(slow)await gate;
-   return route.fulfill({body:fs.readFileSync(path.join(repo,'static',decodeURIComponent(u.pathname))),contentType:'image/png'});
+   return route.fulfill({body:fs.readFileSync(path.join(repo,'frontend/site/static',decodeURIComponent(u.pathname))),contentType:'image/png'});
   }
   if(u.pathname.startsWith('/uploads/'))return route.fulfill({body:svg,contentType:'image/svg+xml'});
   if(mode==='before'&&['/static/resource-readiness.js','/static/document-transition.js'].includes(u.pathname)){
-   if(!oldSources[u.pathname])oldSources[u.pathname]=execFileSync('git',['show',(process.env.BLOG_UI_BASELINE_REF||'HEAD')+':web'+u.pathname],{cwd:repo,encoding:'utf8'});
+   if(!oldSources[u.pathname])oldSources[u.pathname]=readGitSource('frontend/shared/js/'+path.basename(u.pathname),process.env.BLOG_UI_BASELINE_REF||'HEAD');
    return route.fulfill({body:oldSources[u.pathname],contentType:'application/javascript'});
   }
-  const root=path.resolve(u.pathname.startsWith('/static/')?path.join(repo,'web/static'):builds[mode]);
+  const root=path.resolve(u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):builds[mode]);
   const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
   if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
   return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json'})[path.extname(file)]||'application/octet-stream'});
@@ -90,7 +91,7 @@ async function syntheticCases(browser){
   return route.fulfill({body:svg,contentType:'image/svg+xml'});
  });
  await page.setContent('<style>body{min-height:100vh;background-image:url(https://scene-delay.test/a.svg)}</style>',{waitUntil:'domcontentloaded'});
- await page.addScriptTag({content:fs.readFileSync(path.join(repo,'web/static/resource-readiness.js'),'utf8')});
+ await page.addScriptTag({content:fs.readFileSync(path.join(repo,'frontend/shared/js/resource-readiness.js'),'utf8')});
  let result=await page.evaluate(()=>SonglineResources.scene({timeout:40}));
  assert.equal(result.sceneReady,false);assert.equal(result.scenePending,1);assert.equal(result.sceneTimedOut,true);
  assert(await page.getByRole('status').isVisible());
@@ -203,7 +204,7 @@ async function syntheticCases(browser){
    // Block only the next theme's home image, not the already loaded night sky.
    await f.page.evaluate(()=>SonglinePageTransition.navigateLink('/'));
    let releaseTheme;const themeGate=new Promise(resolve=>releaseTheme=resolve);
-   await f.page.route('**/qiandai-background-black.png',async route=>{await themeGate;return route.fulfill({body:fs.readFileSync(path.join(repo,'static/uploads/admin/background/qiandai-background-black.png')),contentType:'image/png'});});
+   await f.page.route('**/qiandai-background-black.png',async route=>{await themeGate;return route.fulfill({body:fs.readFileSync(path.join(repo,'frontend/site/static/uploads/admin/background/qiandai-background-black.png')),contentType:'image/png'});});
    await f.page.locator('[data-theme-toggle]').click();await f.page.waitForTimeout(1500);
    assert(await f.page.locator('.songline-theme-transition').count());
    assert(!await f.page.locator('.songline-theme-transition').evaluate(node=>node.classList.contains('is-leaving')),'Theme curtain cannot leave on the old fixed timer');

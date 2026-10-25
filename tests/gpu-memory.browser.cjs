@@ -1,3 +1,4 @@
+const {adminStaticRoot} = require('./helpers/source-paths.cjs');
 // Isolated offline GPU audit with real repository images and NVIDIA process
 // memory. CDP layer bounds are diagnostics, not measured VRAM: their coordinate
 // units can differ between headful and headless device emulation.
@@ -28,7 +29,7 @@ async function measure(route,run,variant){
    const u=new URL(route.request().url());
    if(u.origin!==base)return route.fulfill({contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="100"><rect width="160" height="100" fill="#607d8b"/></svg>'});
    if(/^\/(?:write\/|static\/)?api\//.test(u.pathname))return route.fulfill({json:{items:[],messages:[],views:83,scores:[]}});
-   const root=u.pathname.startsWith('/static/')?path.join(repo,'web/static'):activeBuild;
+   const root=u.pathname.startsWith('/static/')?adminStaticRoot(u.pathname):activeBuild;
    const file=path.resolve(root,decodeURIComponent(u.pathname.replace(/^\/static\//,'/').slice(1))+(u.pathname.endsWith('/')?'index.html':''));
    if(!file.startsWith(root+path.sep)||!fs.existsSync(file))return route.fulfill({status:404,body:''});
    return route.fulfill({body:fs.readFileSync(file),contentType:({'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp'})[path.extname(file)]||'application/octet-stream'});

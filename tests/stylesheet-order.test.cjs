@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-const code=fs.readFileSync(require('node:path').join(__dirname,'../static/js/page-transition-system.js'),'utf8');
+const code=fs.readFileSync(require('node:path').join(__dirname,'../frontend/site/static/js/page-transition-system.js'),'utf8');
 const fn=code.slice(code.indexOf('  function syncPageStyles(doc){'),code.indexOf('  async function syncDocumentShell('));
 function link(id,href){return {id,media:'',dataset:{},sheet:{},getAttribute:name=>name==='href'?href:null,cloneNode:()=>link(id,href),remove(){this.parentNode?.remove(this);},get nextSibling(){return this.parentNode?.nodes[this.parentNode.nodes.indexOf(this)+1]||null;}};}
 function head(nodes){

@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-const code=fs.readFileSync(require('node:path').join(__dirname,'../static/js/article-render-sync.js'),'utf8');
+const code=fs.readFileSync(require('node:path').join(__dirname,'../frontend/site/static/js/article-render-sync.js'),'utf8');
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
 function setup(fetch,{ajax=false,hash=''}={}){
  const timers=new Map();let id=0;
